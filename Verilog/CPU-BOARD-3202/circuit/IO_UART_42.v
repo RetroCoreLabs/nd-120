@@ -32,7 +32,8 @@ module IO_UART_42 (
     output TXD,  //! RS232 Transmit
 
     // Baud rate settings
-    input [3:0] BAUD_RATE_SWITCH,  //! Baud rate switch
+    input [3:0] BAUD_RATE_SWITCH,  //! Baud rate switch (microcode thumbwheel)
+    input BAUD_9600,               //! runtime 9600/115200 select -> SC2661
 
     // Output and Input signals
     input  [ 7:0] IDB_7_0_IN,   //! Internal Data Bus 7:0 IN
@@ -179,6 +180,7 @@ module IO_UART_42 (
   SC2661_UART CHIP_32H (
       .sysclk(sysclk),  // System clock in FPGA
       .sys_rst_n(sys_rst_n),  // System reset in FPGA
+      .BAUD_9600(BAUD_9600),  // runtime baud select (9600 vs 115200)
 
       .ADDRESS(s_mis_1_0[1:0]),
 

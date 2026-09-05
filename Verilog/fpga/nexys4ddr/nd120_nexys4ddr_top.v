@@ -55,7 +55,7 @@ module nd120_nexys4ddr_top (
     input wire cpu_resetn,  // C12, red CPU RESET button (ACTIVE LOW)
     input wire btnc,        // N17, centre button
 
-    input  wire [15:0] sw,  // [0] 7-seg source  [1] US/Norwegian  [3] operator panel  [4] cache OFF
+    input  wire [15:0] sw,  // [0] 7-seg source  [1] US/Norwegian  [3] operator panel  [4] cache OFF  [7] console 9600 baud
     input  wire        uart_txd_in,   // C4, PC -> FPGA
     output wire        uart_rxd_out,  // D4, FPGA -> PC
 
@@ -548,7 +548,17 @@ module nd120_nexys4ddr_top (
   //! and produce garbage in the other.
   localparam integer CON_DIV_LO = 40_000_000  / `ND120_CONSOLE_BAUD;
   localparam integer CON_DIV_HI = 139_705_882 / `ND120_CONSOLE_BAUD;
-  wire [15:0] s_con_divisor = s_vmode ? CON_DIV_HI[15:0] : CON_DIV_LO[15:0];
+  //! 9600-baud divisors for the same two pixel clocks, selected by sw[7] (the
+  //! baud switch) so the on-screen console tracks the SC2661 line speed.
+  localparam integer CON_DIV_LO_9600 = 40_000_000  / 9600;
+  localparam integer CON_DIV_HI_9600 = 139_705_882 / 9600;
+  //! sw[7] synced into the pixel-clock domain (the console runs here).
+  reg [1:0] s_baud_sync_pix = 2'b00;
+  always @(posedge clk_pix) s_baud_sync_pix <= {s_baud_sync_pix[0], sw[7]};
+  wire s_baud9600_pix = s_baud_sync_pix[1];
+  wire [15:0] s_con_divisor =
+      s_baud9600_pix ? (s_vmode ? CON_DIV_HI_9600[15:0] : CON_DIV_LO_9600[15:0])
+                     : (s_vmode ? CON_DIV_HI[15:0]      : CON_DIV_LO[15:0]);
 
   console_uart_rx #(
       .CLK_HZ   (40_000_000),
@@ -883,6 +893,15 @@ module nd120_nexys4ddr_top (
   //! flushed by it, so do it at the OPCOM prompt or reboot afterwards.
   reg [1:0] s_cache_sw_sync = 2'b00;
   always @(posedge clk_cpu) s_cache_sw_sync <= {s_cache_sw_sync[0], sw[4]};
+
+  //! sw[7] = console baud select (UP = 9600, DOWN = 115200), synced to the CPU
+  //! clock for the SC2661 divisor. The on-screen terminal tracks it via
+  //! s_baud9600_pix above. Software that cannot take 115200 runs at 9600 with
+  //! no rebuild; the microcode baud thumbwheel stays at 9600 so boot is
+  //! unaffected - only the physical SC2661 divisor changes.
+  reg [1:0] s_baud_sync_cpu = 2'b00;
+  always @(posedge clk_cpu) s_baud_sync_cpu <= {s_baud_sync_cpu[0], sw[7]};
+  wire s_baud9600_cpu = s_baud_sync_cpu[1];
   wire s_cache_on = ~s_cache_sw_sync[1];
 
   ND120_CORE #(
@@ -891,6 +910,7 @@ module nd120_nexys4ddr_top (
       .INCLUDE_SMD   (0),
       .INCLUDE_WD    (1)
   ) CORE (
+      .BAUD_9600(s_baud9600_cpu),   // sw[7]: console 9600 (else 115200)
 `ifdef ND120_ERRFA_PROBE
       .ERRFA_CONTX(cpu_txd),
       .ERRFA_TXD(s_errfa_txd),

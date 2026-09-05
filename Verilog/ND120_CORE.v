@@ -100,6 +100,7 @@ module ND120_CORE #(
      *  (a) CLOCK / RESET                              *
      ***************************************************/
     input wire clk_cpu,    //! CPU + bus + device domain (ND3202D sysclk/CLOCK_1/CLOCK_2)
+    input wire BAUD_9600,  //! runtime console baud select: 1 = 9600, 0 = build default (115200). Tie 1'b0 on boards without a baud switch.
     input wire sys_rst_n,  //! Active-low reset, from the board's power-on reset
 
     /***************************************************
@@ -1220,7 +1221,8 @@ module ND120_CORE #(
       /* Configuration switches (input to ND3202D board) */
       .SW1_CONSOLE     (CACHE_SW),           // Console SW1 = cache on/off, from the board top
       .SEL_TESTMUX     (s_SEL_TESTMUX),      // Test MUX (select signals to test pads)
-      .BAUD_RATE_SWITCH(s_baud_rate_switch), // Baud rate switch
+      .BAUD_RATE_SWITCH(s_baud_rate_switch), // Baud rate switch (microcode thumbwheel, fixed 9600)
+      .BAUD_9600(BAUD_9600),                 // runtime SC2661 line-speed select
 
       // outputs
       .CSBITS     (s_csbits),       // Microcode CPU BITS

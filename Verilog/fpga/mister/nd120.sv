@@ -848,6 +848,7 @@ ND120_CORE #(
 	.INCLUDE_SMD   (0),
 	.INCLUDE_WD    (1)
 ) CORE (
+	.BAUD_9600(1'b0),      // no baud switch - console fixed 115200
 	.clk_cpu  (clk_cpu),    // 20 MHz - see the CPU CLOCK note above
 	.sys_rst_n(cpu_rst_n),
 	// Cache ON, matching BOTH proven configurations (31-AUG-2026):

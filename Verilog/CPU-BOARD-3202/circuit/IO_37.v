@@ -15,6 +15,7 @@ module IO_37(
    input sys_rst_n,   // System reset in FPGA
 
    input [3:0] BAUD_RATE_SWITCH,
+   input BAUD_9600,   //! runtime 9600/115200 console select -> IO_UART_42 -> SC2661
    input       BDRY50_n,
    input       BRK_n,
    input       CLK,
@@ -468,6 +469,7 @@ module IO_37(
 
       // Baud dare settings
       .BAUD_RATE_SWITCH(BAUD_RATE_SWITCH),
+      .BAUD_9600(BAUD_9600),
 
       // Input and output signals
       .IDB_7_0_IN(s_idb_7_0_in[7:0]),

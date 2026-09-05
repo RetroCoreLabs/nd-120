@@ -126,6 +126,7 @@ module ND3202D (
     input SW1_CONSOLE,            // Switch on the console (on/off)
     input [2:0] SEL_TESTMUX,      // Selects testmux signals to output on TEST_4_0
     input [3:0] BAUD_RATE_SWITCH, // TH2 - 'BAUD RATE CONTROL' Switch on the PCB to select baudrate
+    input BAUD_9600,             // runtime 9600/115200 select for the SC2661 line (separate from the microcode thumbwheel above)
 
     /*******************************************************************************
    ** The outputs are defined here                                               **
@@ -976,6 +977,7 @@ TODO: Sort bits on output LED to match led numbering
 
     // Input Signals
     .BAUD_RATE_SWITCH(BAUD_RATE_SWITCH),
+    .BAUD_9600(BAUD_9600),
     .BDRY50_n(s_bdry50_n),
     .BRK_n(s_brk_n),
     .CLK(s_clk),

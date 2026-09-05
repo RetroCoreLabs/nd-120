@@ -2269,6 +2269,7 @@ module ND120_TANG20K_TOP (
       .INCLUDE_SMD   (TANG_INC_SMD),
       .INCLUDE_WD    (TANG_INC_WD)
   ) CORE (
+      .BAUD_9600(1'b0),   // no baud switch on this board - console fixed 115200
       .clk_cpu(clk_cpu),  // CPU core, OSC and bus all on 27 MHz
       .sys_rst_n(sys_rst_n),
       .CACHE_SW(1'b1),    // console SW1: no free switch here; ND120_NO_CACHE overrides it to off

@@ -44,6 +44,7 @@
 module SC2661_UART (
     input sysclk,    // System clock in FPGA
     input sys_rst_n, // System reset in FPGA
+    input BAUD_9600, //! 1 = 9600 baud; 0 = build default (UART_BAUD_RATE, normally 115200) - runtime select
 
     input [1:0] ADDRESS,  // Address lines (used to select internal EPCI registers)
     input BRCLK,  // Baud rate clock - Comes from the IO_DCD module. 4.9152Mhz
@@ -171,13 +172,23 @@ module SC2661_UART (
   // polling-loop pacing that the fast sim UART hides - the FILSYS
   // "DEVICE NEVER READY" retry path is only reachable when the TX-ready
   // poll actually spins (24-AUG LIST-FILE-NAMES campaign).
-  localparam DELAY_FRAMES = `ND120_UART_DELAY_FRAMES;
+  localparam DELAY_DEFAULT = `ND120_UART_DELAY_FRAMES;
 `elsif VERILATOR_SIM
-  localparam DELAY_FRAMES = 32'd16;   // Fast for simulation
+  localparam DELAY_DEFAULT = 32'd16;   // Fast for simulation
 `else
-  localparam DELAY_FRAMES = `BOARD_CLK_FREQ / `UART_BAUD_RATE;
+  localparam DELAY_DEFAULT = `BOARD_CLK_FREQ / `UART_BAUD_RATE;
 `endif
-  localparam HALF_DELAY_WAIT = (DELAY_FRAMES >> 1);
+`ifdef VERILATOR_SIM
+  localparam DELAY_9600 = 32'd16;             // keep sim fast regardless of the switch
+`else
+  localparam DELAY_9600 = `BOARD_CLK_FREQ / 9600;
+`endif
+  //! Runtime baud select (BAUD_9600 input). High -> 9600, low -> the build
+  //! default (UART_BAUD_RATE, normally 115200). A board switch can drop the
+  //! console to 9600 for software that cannot take 115200, with no rebuild.
+  //! The microcode baud thumbwheel is unaffected - only this divisor changes.
+  wire [31:0] DELAY_FRAMES    = BAUD_9600 ? DELAY_9600[31:0] : DELAY_DEFAULT[31:0];
+  wire [31:0] HALF_DELAY_WAIT = (DELAY_FRAMES >> 1);
 
 
   // Chip Registers

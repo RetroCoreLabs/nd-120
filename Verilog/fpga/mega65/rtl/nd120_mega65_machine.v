@@ -438,6 +438,7 @@ module nd120_mega65_machine #(
       .INCLUDE_SMD   (0),
       .INCLUDE_WD    (1)
   ) CORE (
+      .BAUD_9600(1'b0),   // no baud switch - console fixed 115200
       .clk_cpu  (clk_cpu),
       .sys_rst_n(cpu_rst_n),
       .CACHE_SW (s_cache_on_cpu),
