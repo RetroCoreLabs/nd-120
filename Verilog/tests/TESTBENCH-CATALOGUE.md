@@ -200,7 +200,7 @@ Note on the `assign` column: the Logisim-generated style wires nets together wit
 
 | Module | `always` | `assign` | submodules | kind |
 |---|---|---|---|---|
-| `CPU-BOARD-3202/circuit/IO_37.v` | 2 | 82 | 4 | **HIGH** |
+| `CPU-BOARD-3202/circuit/IO_37.v` | 2 | 83 | 4 | **HIGH** |
 | `CPU-BOARD-3202/circuit/CPU_CS_PROM_19_ORG.v` | 2 | 5 | 0 | **HIGH** |
 | `CPU-BOARD-3202/circuit/CPU_PROC_32.v` | 1 | 79 | 4 | **HIGH** |
 | `CPU-BOARD-3202/circuit/BIF_BCTL_6.v` | 1 | 62 | 5 | **HIGH** |
