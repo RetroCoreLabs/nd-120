@@ -40,11 +40,11 @@ release.
 | `nd120_qmtech_a35t_20MHz_115200.bit` | QMTECH XC7A35T SDRAM core board | `.bit` | 20 MHz | **Built + timing met (+4.645 ns). NOT yet run on a board.** |
 | `SHA256SUMS` | — | — | — | regenerated when the whole set is final |
 
-The two MEGA65 cores (the 04-SEP rebuild, uploaded 05-SEP) and the
-hardware-verified MiSTer `.rbf` are attached. The QMTECH `.bit` is staged but
-not attached until someone has run it on a board; the Nexys/Tang refresh is
-added as each is built and checked, and the `SHA256SUMS` asset is regenerated
-and re-uploaded with any such change - never on its own.
+Four files are attached: the two MEGA65 cores (the 04-SEP rebuild, uploaded
+05-SEP), the hardware-verified MiSTer `.rbf`, and the QMTECH `.bit` (uploaded
+06-SEP). The Nexys/Tang refresh is added as each is built and checked, and
+the `SHA256SUMS` asset is regenerated and re-uploaded with any such change -
+never on its own.
 
 ### SHA-256 (MEGA65 cores + MiSTer + QMTECH)
 
@@ -87,8 +87,13 @@ order-independent group: all three carried the old pair.
 Verified after the 05-SEP upload by downloading every asset fresh and running
 `sha256sum -c SHA256SUMS` against the server's own copy: 3 of 3 OK.
 
-`nd120_qmtech_a35t_20MHz_115200.bit` (`61d23600...`) is staged locally but
-**deliberately not attached** - it waits on a first hardware bring-up.
+`nd120_qmtech_a35t_20MHz_115200.bit` (`61d23600...`) was attached on
+06-SEP-2026. It was briefly held back "until a first bring-up", which was the
+wrong call and contradicted the decision already taken for the MEGA65 cores
+on 02-SEP: **there is no board here, so the release IS the verification
+channel.** Withholding the binary only guarantees no first tester - anyone
+wanting to try it would need a Vivado install and an hour-long build before
+plugging anything in. It ships labelled exactly as the MEGA65 cores are.
 
 ---
 
