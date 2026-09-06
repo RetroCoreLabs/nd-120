@@ -1,22 +1,93 @@
-# ND-120 on Digilent Cmod A7-35T (future target)
+# ND-120 on Digilent Cmod A7-35T
 
 **Full path:** `Verilog/fpga/cmod-a7-35t/`
 
 ## Status
 
-**ACTIVE since 13-JUL-2026 - the owner has the board.** First-version build
-files are in this directory (BRAM main memory, CPU at 27 MHz = the Tang
-Nano 20K's full CPU speed; see "First build" below). The 512 KB SRAM
-main-memory upgrade is specified in
+**ACTIVE - the owner has the board. First built 04-SEP-2026** (the build files
+had sat unrun since 13-JUL). Configuration: block-RAM main memory, CPU at
+27 MHz, console on the on-board USB chip; see "First build" below.
+
+**It fits the part easily and does NOT meet timing: WNS -89.814 ns at 27 MHz.**
+No bitstream is written, because `build.tcl` refuses to write one on negative
+slack. The cause is the CGA IDB combinational ring, not this board and not
+this clock - full diagnosis under "Build history". Until the ring is cut in
+RTL, this board cannot be signed off by its own timing gate, and lowering the
+clock would only fit the clock to a tool artifact.
+
+The 512 KB SRAM main-memory upgrade is specified in
 [`SRAM-BRIDGE-PLAN.md`](SRAM-BRIDGE-PLAN.md) (pack16, <= 33 MHz validated -
 see `Verilog/docs/basys3-memory-speed-validation.md`).
 Board docs live with the board, not in `Verilog/docs/`.
 
+## Build history - FIRST BUILT 04-SEP-2026
+
+The build files sat unbuilt from 13-JUL to 04-SEP-2026. Two things were wrong
+with them, both found on the first run and both now fixed in `build.tcl`:
+
+1. **Missing include paths.** Synthesis stopped with 17 errors before touching
+   any logic: `cannot open include file 'nd_storage_status.vh'` and
+   `'nd120_backwiring_defaults.vh'`, then a cascade of undefined-macro errors
+   in `ND_FLOPPY_DMA.v`. Both headers were added to the tree after this script
+   was written. Fixed by passing `SD-FAT/circuit` and `Shared/support` to
+   `synth_design -include_dirs`, as the Nexys and MEGA65 builds already do.
+2. **Timing, badly, and NOT for the reason it first looked like.** With the
+   includes fixed the design placed and routed at a comfortable **11,493 of
+   20,800 LUTs and 26.5 of 50 block RAM tiles**, then **missed timing by
+   95.488 ns at 27 MHz** - 5133 of 18465 endpoints failing. The Inter Clock
+   Table was EMPTY, so the clock groups were working.
+
+   The first worst path ended at the microcode PROM's data register, which
+   suggested the runtime PROM-to-WCS load (this was the last build still
+   using it). `SKIP_WCS_LOAD` was made the default here, as on every other
+   board. **It bought 5.7 ns: -95.488 -> -89.814 ns.** That hypothesis was
+   wrong, and the change is kept only because it is right on its own merits
+   (the PROM's ROM is not built at all). `-promload` restores the old path.
+
+   **The real cause, from the routed checkpoint:** all 200 worst paths share
+   ONE start and ONE end - `CPU/CS/WCS/CHIP_21C` to
+   `CPU/PROC/CGA/DELILAH/MAC/MAC_LA1025/R_LA_L`, 234 logic levels, 126.5 ns,
+   running through the ALU and never touching main memory. The build reports
+   **16 `[DRC LUTLP-1]` combinatorial-loop critical warnings and 23
+   auto-inserted loop-breaking false paths**, and the loops named in them are
+   the CGA IDB ring exactly as `DELILAH-CPU/CGA/circuit/CGA.v:700-745`
+   describes it: `ALU_OUTMUX/OUTMUX_IDBS/IDBS_R1/D_15_0[n]` -> `G_15_0[n]` ->
+   FIDBO -> MAC/INTR -> back.
+
+   **So the 234-level path is where Vivado happened to cut a loop, not a real
+   microcycle.** The same RTL gives this path 58 levels in the MEGA65 R6
+   netlist and 93 in the R3 (`fpga/mega65/docs/00-plan.md`), 7 levels on the
+   Nexys at 33.9 MHz, and 234 here. It also boots SINTRAN on the Tang, whose
+   toolchain has no loop DRC at all. **A lower clock does not fix this**: at
+   126.5 ns the CPU would have to run under 7.9 MHz, and that is fitting the
+   clock to an artifact rather than to the machine. The fix is to break the
+   ring in RTL, and CGA.v:734-737 says what would work and records three
+   attempts that were measured WORSE.
+
+A routed checkpoint is now written before the timing gate
+(`nd120_cmod_routed.dcp`), so a failing build can be interrogated without
+paying for another run - the first 04-SEP failure could only report its single
+worst path, which is exactly how the wrong hypothesis above survived as long
+as it did. Interrogate it with:
+
+```
+open_checkpoint nd120_cmod_routed.dcp
+report_timing -max_paths 50 -slack_lesser_than 0 -file paths.rpt
+```
+
+**Note on capacity, so nobody plans a SINTRAN machine around this board:** the
+512 KB SRAM upgrade gives **256K ND words**. SINTRAN's working boards all have
+2M words. The one documented hard requirement is memory above 0o200000
+(64K words), which 256K clears, but whether SINTRAN runs in 256K words is not
+measured anywhere. This is a test-program board plus an SD card unless that
+measurement says otherwise.
+
 ## First build: ND-120 CPU on BRAM at 27 MHz
 
-Same configuration as the Basys3 build (FPGA_FF_MODE, MAIN_RAM_BLOCKRAM,
-runtime WCS load from the PROM images) but self-contained (no Vivado GUI
-project) and clocked at 27 MHz:
+Same configuration as the Basys3 build (FPGA_FF_MODE, MAIN_RAM_BLOCKRAM) but
+self-contained (no Vivado GUI project) and clocked at 27 MHz. **The microcode
+now comes from the WCS preload (`SKIP_WCS_LOAD`), not the runtime PROM load** -
+see "Build history" for the timing measurement that forced the change:
 
 ```
 cd Verilog/fpga/cmod-a7-35t

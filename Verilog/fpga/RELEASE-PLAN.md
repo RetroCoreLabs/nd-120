@@ -56,12 +56,20 @@ and the arrow keys work on the real board), then dropped into
 | `nd120_nexys4ddr_33MHz_115200.bit` | Nexys 4 DDR | `.bit` | 33.333 MHz | REFRESH - box font + left arrow + embedded font, cache ON; build 30 boots and both are confirmed on hardware. Re-verify + stage. |
 | `nd120_tang20k_fast20_20MHz_115200.fs` | Tang Nano 20K | `.fs` | 20.25 MHz | REFRESH - rebuild with the embedded font; Tang is TDV via the same core. Build + verify. |
 | `nd120_mister_<clk>_115200.rbf` | MiSTer (DE10-Nano) | `.rbf` | TBD | NEW - TDV2200 console wired (font page 2 box glyphs + TDV keyboard). Quartus binaries land later today; verify glyphs + keys on hardware, then stage. |
-| `nd120_mega65_rev3_13MHz_115200.cor` | MEGA65 R3 / R3A | `.cor` | 13.33 MHz | NEW - **REBUILT 04-SEP-2026 (raw microcode word, RUN/STOP = EXIT), timing-clean (WNS +0.093 / WHS +0.032 ns), stamp `3e1f90c+ 04-Sep-2026 09:46`; NOT silicon-verified - no MEGA65 here.** Whole machine: CPU, 4 MB in the HyperRAM (Nexys cache seam + Avalon port), TDV2200 console on the MEGA65 keyboard/screen, floppy 0/1 + Winchester 0/1 + tape on the framework's virtual drives. Staged in `fpga/release-staging/`. |
-| `nd120_mega65_r6_20MHz_115200.cor` | MEGA65 R4/R5/R6 | `.cor` | 20 MHz | NEW - **REBUILT 04-SEP-2026 (same sources: raw microcode word, RUN/STOP = EXIT), timing-clean (WNS +0.249 / WHS +0.002 ns), stamp `bc612ad+ 04-Sep-2026 09:25`; NOT silicon-verified.** As above with the 4 MB in the 64 MB SDRAM (the MiSTer sheet-49 bridge). Built for R6; R4/R5 rebuild with `BOARD=r4`/`r5` (same memory, different top). Staged. |
+| `nd120_mega65_rev3_13MHz_115200.cor` | MEGA65 R3 / R3A | `.cor` | 13.33 MHz | NEW - **REBUILT 04-SEP-2026 (raw microcode word, RUN/STOP = EXIT), timing-clean (WNS +0.093 / WHS +0.032 ns), stamp `3e1f90c+ 04-Sep-2026 09:46`; NOT silicon-verified - no MEGA65 here.** Whole machine: CPU, 4 MB in the HyperRAM (Nexys cache seam + Avalon port), TDV2200 console on the MEGA65 keyboard/screen, floppy 0/1 + Winchester 0/1 + tape on the framework's virtual drives. Staged, and **uploaded to the live release 05-SEP-2026** replacing the 02-SEP core. |
+| `nd120_mega65_r6_20MHz_115200.cor` | MEGA65 R4/R5/R6 | `.cor` | 20 MHz | NEW - **REBUILT 04-SEP-2026 (same sources: raw microcode word, RUN/STOP = EXIT), timing-clean (WNS +0.249 / WHS +0.002 ns), stamp `bc612ad+ 04-Sep-2026 09:25`; NOT silicon-verified.** As above with the 4 MB in the 64 MB SDRAM (the MiSTer sheet-49 bridge). Built for R6; R4/R5 rebuild with `BOARD=r4`/`r5` (same memory, different top). Staged, and **uploaded to the live release 05-SEP-2026** replacing the 02-SEP core. |
+| `nd120_qmtech_a35t_20MHz_115200.bit` | QMTECH XC7A35T SDRAM core board | `.bit` | 20 MHz | NEW - **BUILT 04-SEP-2026, timing met (WNS +4.645 ns), 0 errors, 12,619/20,800 LUTs, 22/50 BRAM; NOT silicon-verified - the board has never loaded it.** Whole machine: CPU, 4 MB in the board's 32 MB SDRAM through the sheet-49 bridge in 16-bit mode, SD card + serial console on header JP3, storage uncached. Loading is JTAG-only and volatile (no USB data path, no SD-config, no flash flow). Staged locally under its long name; **deliberately NOT attached to the release** until someone has run it on a board. |
 | `SHA256SUMS` | - | - | - | checksums of the above, regenerated when the set is final |
 
 Notes:
 - MiSTer binaries are `.rbf` (the DE10-Nano config format); MEGA65 are `.cor`.
+- **The QMTECH is the second board in this release that nobody has run**, for
+  the same stated reason as the MEGA65 cores: the release is the verification
+  channel. It differs in one way worth calling out in the release notes -
+  its console and SD card are on **jumper wires to a raw 2x25 header**, not a
+  connector, so a first tester has real wiring to do and one fact
+  (which JP3 pin is ground) to measure that this project has not measured.
+  `QUICKSTART-qmtech-a35t.md` says exactly that and asks for it back.
 - MEGA65 ships TWO cores because the hardware revisions differ (R3: HyperRAM
   only; R4/R5/R6: SDRAM) and the flash menu refuses a wrong-model `.cor`.
   Exception to the silicon-verified rule (Ronny, 02-SEP-2026): there is no
@@ -103,6 +111,17 @@ not to configuration, so there is no SD-config on this board. Instead:
 3. Disc image on the microSD, terminal on the second USB serial port.
    Alternative for Windows-only users: the Gowin Programmer GUI.
 
+**QMTECH XC7A35T - JTAG only, and volatile:** this board has no USB data
+path (the Mini USB socket is power only), no SD-card configuration path and
+no flash flow, so there is no "copy a file" route at all:
+
+1. Wire the console and an SD Pmod to header JP3 on jumper wires - the board
+   has neither an on-board UART nor an SD slot. Pin table in the quickstart.
+2. Program `nd120_qmtech_a35t_20MHz_115200.bit` over the 6-pin JTAG header
+   with a Xilinx Platform Cable USB II, from the Vivado Hardware Manager or
+   the free Vivado Lab Tools.
+3. Re-program after every power cycle - the FPGA does not keep it.
+
 **Disc image (both boards):** NOT in the release (Ronny, decision 1).
 The quickstarts explain what the machine needs (a Winchester image on the
 card's FAT root), point at the ND software preservation community for
@@ -116,6 +135,7 @@ an image still comes up in OPCOM - the quickstart shows that as the
 |---|---|
 | `fpga/QUICKSTART-nexys4ddr.md` | **WRITTEN 26-AUG** - both deployment paths (USB volatile/QSPI-persistent + microSD config with an UNVERIFIED banner and the test checklist), terminal settings, OPCOM smoke test, `20500&`, troubleshooting |
 | `fpga/QUICKSTART-tang-nano-20k.md` | **WRITTEN 26-AUG** - openFPGALoader install matrix, persistent `-f` flash, WSL usbipd note, second-serial-port console, boot walkthrough, troubleshooting |
+| `fpga/QUICKSTART-qmtech-a35t.md` | **WRITTEN 04-SEP** - JTAG-only volatile loading (Platform Cable USB II, Hardware Manager or Lab Tools), the JP3 wiring table for the console and an SD Pmod, the meter check for the unverified ground pin, 7E1 console test, first-boot checklist, troubleshooting, and what a first tester should report back |
 | Release-notes template | **WRITTEN 02-SEP** as `fpga/RELEASE-NOTES-release2.md` (Release 2, tag `bitstreams-2026-09`): source commit `b09302e`, artifact table with the MEGA65 rows filled + SHA-256, the "not yet run on a MEGA65" caveat, quickstart links, changed-since-Release-1 list. Nexys/Tang/MiSTer rows marked pending until built. |
 
 Terminal settings table (both quickstarts): 7 data bits, EVEN parity,

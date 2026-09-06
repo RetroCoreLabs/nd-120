@@ -21,8 +21,10 @@ build:
 	$(CMD) "$(VIVADO)" -mode batch -source build.tcl -tclargs -noburn
 
 clean:
-	rm -f nd120_cmod.bit util.rpt timing.rpt AM27256_45132L.hex AM27256_45133L.hex \
-	      vivado*.jou vivado*.log
+	rm -f nd120_cmod.bit util.rpt timing.rpt top5_paths.rpt paths.rpt \
+	      worst_paths.txt tight_setup_hold_pins.txt nd120_cmod_routed.dcp \
+	      AM27256_45132L.hex AM27256_45133L.hex wcs_*.hex \
+	      vivado*.jou vivado*.log build.log query.log
 	rm -rf .Xil
 
 .PHONY: all build clean

@@ -1,10 +1,34 @@
-# HANDOFF: QMTECH XC7A35T board bring-up (paused)
+# HANDOFF: QMTECH XC7A35T board bring-up
 
 **Full path:** `Verilog/fpga/qmtech-a35t/HANDOFF-qmtech-a35t-bringup.md`
-**Date paused:** 2026-07-08
-**Priority:** side experiment - Basys3 debugging is the main line. Resume whenever.
+**Written:** 2026-07-08 (paused) — **resumed and superseded 2026-09-04**
+**Priority:** this is now the SINTRAN-capable Artix-7 target.
 
-## One-paragraph state
+> **READ THIS FIRST (04-SEP-2026).** Most of what follows was written while
+> the board was parked, and two of its central claims are now WRONG:
+>
+> * **"The only real design work left is the 16-bit SDRAM bridge"** — that
+>   bridge mode was written on 01-SEP-2026 for the DE10-Nano
+>   (`ND_SDRAM_DQ16`), boots SINTRAN on the MiSTer and builds timing-clean
+>   for the MEGA65 R6. It did not have to be written again. Stage 3 below is
+>   done, by someone else, for a different board.
+> * **"The next action is two one-command Vivado runs"** — the LED and
+>   memory smoke tests are no longer the critical path. A FULL ND-120 build
+>   now exists in this directory (top level, pin map, `build.tcl`), it lints
+>   clean end to end, and it proves the clock and the programming chain by
+>   booting. Run the smoke tests only if the full build fails in a way that
+>   makes the board itself the suspect.
+>
+> There is ONE new constraint the old plan did not know about: the 16-bit
+> bridge mode and the disc cache cannot both be used, because that mode drops
+> the 32-bit access the cache's region port needs. The build works round it by
+> running storage uncached. Full explanation, and the proper fix, are in
+> [`README.md`](README.md) under "The 16-bit bridge and the disc cache".
+>
+> **Current state and the ordered next actions live in [`README.md`](README.md).**
+> What is below is kept for the hardware facts, which are still good.
+
+## One-paragraph state (2026-07-08, historical)
 
 The board folder `Verilog/fpga/qmtech-a35t/` is fully scaffolded: verified
 reference pin map, LED smoke test, and a port of the Basys3 standalone

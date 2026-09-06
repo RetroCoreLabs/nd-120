@@ -173,6 +173,18 @@ REGISTRY=(
   # the R3 HyperRAM backend: nd_ddr2_port's contract on an Avalon-MM master,
   # burst and single-beat fallback, random waitrequest/latency slave model
   "fpga/mega65/sim :: test-avalon-port :: TB_RESULT: PASS"
+  # --- QMTECH XC7A35T -------------------------------------------------------
+  # nd_storage_bram: the region behind nd_storage's mem_* port. Every other
+  # board puts that region in a big memory (SDRAM on the Tang, DDR2 on the
+  # Nexys); this one cannot, because the 16-bit SDRAM bridge mode has no
+  # 32-bit full-location access, so the region is a block RAM instead. That
+  # makes it board-specific RTL carrying a protocol contract, and this bench
+  # is what stands between a mistake in it and a disc that reads rubbish on
+  # silicon. Checks the whole contract: readback over every word, done being
+  # exactly one cycle, busy never dropping mid-operation, rdata HELD after
+  # done (the engine reads it late), a write not disturbing rdata, and
+  # back-to-back operations at the tightest legal spacing.
+  "fpga/qmtech-a35t/sim :: test-storage-bram :: TB_RESULT: PASS"
   # --- Shared support chips -------------------------------------------------
   "Shared/support/sim :: test-ram      :: ALL PASS"
   "Shared/support/sim :: test-uart     :: DONE"

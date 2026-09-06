@@ -23,8 +23,14 @@ staging="$here/release-staging"
 sums="$staging/SHA256SUMS"
 mkdir -p "$staging"
 
-all_names()    { awk '!/^#/ && NF>=2 {print $1}' "$manifest"; }
-lookup_source() { awk -v n="$1" '!/^#/ && NF>=2 && $1==n {print $2; exit}' "$manifest"; }
+# The sub(/\r$/,"") is not decoration. This repo is checked out on a Windows
+# drive as well, where git hands the manifest over with CRLF line endings; the
+# trailing carriage return then rides along on the LAST field and every lookup
+# fails with "build output not found" against a path that plainly exists.
+# Measured 04-SEP-2026: on the Windows checkout NO artifact could be staged.
+all_names()     { awk '!/^#/ && NF>=2 {sub(/\r$/,"",$1); sub(/\r$/,"",$2); print $1}' "$manifest"; }
+lookup_source() { awk -v n="$1" '!/^#/ && NF>=2 {sub(/\r$/,"",$1); sub(/\r$/,"",$2)}
+                                 $1==n {print $2; exit}' "$manifest"; }
 
 regen_sums() {
   ( cd "$staging" && : > "$sums"

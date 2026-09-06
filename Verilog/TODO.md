@@ -594,12 +594,133 @@ Next actions:
 
 ---
 
-## QMTECH XC7A35T board (PARKED side experiment)
+## The CGA IDB combinational ring - analysed, NOT blocking the target (04-SEP-2026)
 
-Stages 1-2 (LED smoke test + Basys3 mem-test port) written and sim-verified
-under `fpga/qmtech-a35t/`; **nothing run on hardware yet**. Resume point with
-exact next actions and stage-3 design notes (16-bit burst-of-2 SDRAM bridge):
-`fpga/qmtech-a35t/HANDOFF-qmtech-a35t-bringup.md`.
+**Full analysis: `docs/HANDOFF-cga-idb-ring-cut.md`.** Four things in it change
+what anyone should do next, and two of them contradict comments in the tree:
+
+1. **The ring is NOT where `CGA.v:707-745` says it is.** That comment describes
+   the design before the 21/22-AUG cuts. The internal ring it names is DEAD -
+   every SEL6 source (PCR, PGS, PICMASK, PICS, PICV) is behind a register now.
+   The live ring **leaves the chip**: FIDBI -> OUTMUX pass-through -> FIDBO ->
+   `BusDriver16` -> `TTL_74245` -> board IDB -> back -> `XFIDBI` -> SEL6 ->
+   FIDBI. `BusDriver16.v:49` reads the pad back **unconditionally, with no
+   enable**. A second live arc runs FIDBO -> MAC's transparent PCR/SEG/XPT
+   latches -> `MAC_LASEL`/`MAC_LA1025`, which is why every Cmod worst path
+   ended at `MAC_LA1025/R_LA_L`.
+2. **The one-hot exclusivity is REAL and structural**, not a microcode
+   accident: `CSIDBS_4_0` is `CSBITS[41:37]`, a binary field, decoded as full
+   minterms and by two complementary 3-to-8 decoders. The tool cannot see it
+   only because the decoded enables are registered and then cross two module
+   boundaries. `CGA_IDBCTL.v:115` is the shape that already convinces Vivado.
+3. **Nothing in simulation covers the PGS readback leg.** All four `IDBS,PGS`
+   microwords are SINTRAN paging traps, and no target boots SINTRAN in
+   Verilator. Verified against the golden trace: those control-store addresses
+   show only the loader's single pass. A broken PGS leg passes every
+   simulation gate in this repo and shows up as a board dying on a page fault.
+   **Only a hardware SINTRAN boot covers it.**
+4. **THE RING DOES NOT BLOCK THE SINTRAN TARGET.** Measured on the QMTECH's
+   first build, with the ring present (16 `LUTLP-1`, 10 auto-cuts): CPU domain
+   **+5.255 ns, 0 of 27,698 endpoints failing** at 20 MHz. Cutting it is
+   quality work now, not a blocker, and should be done to the full
+   verification bar rather than in a hurry.
+
+Two gate-integrity defects found on the way, both verified and both worth
+fixing regardless of the ring: `tests/instruction-verify/run_area_test.sh:23-27`
+prints `TB_RESULT: PASS` and exits 0 when its golden is missing (and the
+goldens live OUTSIDE the repo), and `make -C sim compare` cannot fail because
+its diff sits in a `|| (echo ...)`.
+
+---
+
+## The ring as a board blocker (Cmod A7 only)
+
+The ring documented at `DELILAH-CPU/CGA/circuit/CGA.v:700-745` stopped being a
+warning-count nuisance and became the thing that fails a build.
+
+**Measured on the Cmod A7 (`xc7a35t`), first build of those files:** fits the
+part easily at 11,493 of 20,800 LUTs, then **WNS -89.814 ns at 27 MHz**, 5133
+of 18465 endpoints failing. From the routed checkpoint, **all 200 worst paths
+share one start and one end** - `CPU/CS/WCS/CHIP_21C` to
+`CPU/PROC/CGA/DELILAH/MAC/MAC_LA1025/R_LA_L`, 234 logic levels, 126.5 ns,
+through the ALU, never touching main memory. The build reports **16
+`[DRC LUTLP-1]` critical warnings and 23 auto-inserted `Synth 8-326`
+loop-breaking false paths**, naming the ring exactly:
+`ALU_OUTMUX/OUTMUX_IDBS/IDBS_R1/D_15_0[n]` -> `G_15_0[n]` -> FIDBO ->
+MAC/INTR -> back.
+
+**The number is a property of the netlist, not the machine.** The same RTL
+gives that path 58 logic levels on MEGA65 R6, 93 on R3, 7 on the Nexys at
+33.9 MHz, and 234 here; and it boots SINTRAN on the Tang, whose toolchain has
+no loop DRC at all. Two things follow:
+
+- **Lowering a clock does not fix it.** 126.5 ns would need the CPU under
+  7.9 MHz. That fits the clock to a tool artifact.
+- **Every Artix board's WNS is a floor while the ring exists**, which the
+  Nexys README already says of its own 45 MHz sign-off. The QMTECH build may
+  land anywhere on this spectrum; its README says what to read first.
+
+Ruled out on the way, so nobody repeats it: the runtime PROM-to-WCS load was
+the first suspect (the very first worst path ended at the PROM's data
+register). `SKIP_WCS_LOAD` bought **5.7 ns of 95** and is kept only on its own
+merits.
+
+What CGA.v:734-737 says would actually work: stop FIDBO feeding MAC/INTR
+combinationally - either register it, or qualify the PCR/PGS readback with the
+one-hot `CSIDBS_4_0` select at the SEL6 inputs so the tool can prove
+exclusivity inside one module. Three other attempts are recorded there and all
+measured WORSE; read them before trying a fourth.
+
+---
+
+## QMTECH XC7A35T board - FIRST BUILT 04-SEP-2026, fits and closes
+
+The whole machine now has a top level, a pin map and a Vivado script under
+`fpga/qmtech-a35t/`: CPU at 20 MHz, **4 MB of SDRAM main memory** through the
+sheet-49 bridge in its 16-bit module mode, SD-card storage on header JP3, and
+a serial console on two more header pins.
+
+This board matters because it is the one Artix-7 target that can run SINTRAN:
+same die as the Basys3, whose 24 KB of block RAM is a capacity limit no clock
+speed fixes.
+
+**Measured on the first build:** 13,170 of 20,800 LUTs, 22 of 50 block RAM
+tiles, and the **CPU domain closes at +5.255 ns with 0 of 27,698 endpoints
+failing** at 20 MHz. Storage +11.475, SDRAM bridge +10.949, the related
+CPU/bridge pair +4.105. It fits with room, so the panel clock and the CPU
+cache both stay in.
+
+The build still reported WNS -2.137 ns from **two** paths, both storage clock
+crossings with a **1.000 ns required time** - two unrelated clocks timed as
+synchronous. **A constraint bug, not the design:** generated clocks do not
+exist when an XDC is read before `synth_design`, so the `get_clocks` guard in
+`nd120_timing.xdc` found nothing and the constraint silently did nothing. The
+relationships moved into `build.tcl` after synthesis, as
+`set_max_delay -datapath_only` bounds rather than asynchronous groups - the
+Nexys proved on 22-AUG-2026 that groups leave the `nds_sync` handshake
+payloads untimed and corrupt floppy reads. **This trap has now cost three
+boards; it is written up in `docs/HANDOFF-cga-idb-ring-cut.md` section 9.**
+
+**Next: rebuild, then wire JP3 and boot.** Confirm a ground pin on JP3 against
+the board before wiring - the schematic extraction could not settle it, and a
+card with no shared ground fails exactly like a bad card.
+
+Two things a reader should know before interpreting any result there:
+
+- **The 16-bit bridge mode and the disc cache are mutually exclusive** as the
+  code stands: `ND_SDRAM_DQ16` drops the 32-bit full-location access that
+  nd_storage's region port raises on every operation (`sdram18.v` header, and
+  its DQ16 write branch). The build runs every client DIRECT instead, with the
+  staging line in block RAM (`rtl/nd_storage_bram.v`). That costs disc speed,
+  not function - the Tang ran that way for weeks. Restoring the cache means a
+  two-beat 32-bit access in the DQ16 mode plus a wider location space; the
+  chip has 8192 rows against the 2048 the mode maps today.
+- **The LED and mem-test smoke tests are no longer the critical path.** They
+  were the only way to prove the clock and programming chain before a full
+  build existed. Keep them for when the board itself is the suspect.
+
+Detail: `fpga/qmtech-a35t/README.md`. The older
+`HANDOFF-qmtech-a35t-bringup.md` is superseded and says so at the top.
 
 ---
 

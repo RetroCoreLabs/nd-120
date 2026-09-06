@@ -88,8 +88,18 @@ Verilog/fpga/tang-nano-20k/wcs_image.hex
 Verilog/fpga/**/*.bit
 Verilog/fpga/**/timing.rpt
 Verilog/fpga/**/util.rpt
+Verilog/fpga/**/util_synth.rpt
+Verilog/fpga/**/drc_loops.rpt
+# Routed checkpoints - written before the timing gate so a failing build can be
+# interrogated without paying for another run. Large, and regenerable.
+Verilog/fpga/**/*.dcp
+# WCS preload hex, copied in by build.tcl from Code/Microcode/wcs/
+Verilog/fpga/qmtech-a35t/wcs_*.hex
+Verilog/fpga/qmtech-a35t/wcs_image.hex
 Verilog/fpga/**/clockInfo.txt
 Verilog/fpga/**/mem-test/sim/tb
+# compiled iverilog testbench binaries in board sim/ folders
+Verilog/fpga/qmtech-a35t/sim/tb_storage_bram
 # iverilog testbench outputs
 Verilog/CPU-BOARD-3202/circuit/sim/*.log
 # sim run output logs
