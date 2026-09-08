@@ -86,7 +86,10 @@ none has a debounce, none needs one.
 | sw2 | VGA 800x600 at 40 MHz pixel clock | 1920x1080 at 148.4 MHz - debounced 26 ms before it reaches the clock mux | VGA console |
 | sw3 | operator panel hidden | operator panel drawn under the console text (PIL, hit rate, uptime ...) | VGA console |
 | sw4 | **CPU cache ON** - the ND-100 console's SW1 (sheet 25 CON), the state every deployed image has run with | cache OFF - every access goes to main memory, the CSR reports the cache disabled; flip it at the OPCOM prompt or reboot, the cache is not flushed by the switch | cache compiled in (default; `nocache` removes it and the switch does nothing) |
-| sw5-sw13 | unused | unused | - |
+| sw5 | keyboard debug off | 7-seg shows the last raw PS/2 scancode (extended/release + code), when sw6=0 and sw15:14=00 | debug |
+| sw6 | keyboard debug off | 7-seg shows the DECODED keyboard byte the table hands on (e.g. F1 = 00B2), when sw15:14=00 | debug |
+| sw7 | **console 115200 baud** (default) | **console 9600 baud** - drops BOTH the USB-serial line (SC2661) and the on-screen terminal to 9600, in lockstep, for software that cannot take 115200. No rebuild; the microcode baud thumbwheel stays at 9600 so boot is unaffected. Verified on hardware 06-SEP-2026 | - |
+| sw8-sw13 | unused | unused | - |
 | sw15:14 | right-display mode: 00 = sw0 picks CSA/LA, 01 = {FDISK request count, done count}, 10 = {FDISK error count, first error code, last error code}, 11 = first FDISK_LSECT requested (table above) | | - |
 
 `sw1`-`sw3` exist only in the VGA-console build; without it (`novgaconsole`)

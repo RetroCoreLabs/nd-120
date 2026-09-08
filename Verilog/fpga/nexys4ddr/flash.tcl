@@ -12,8 +12,17 @@
 # FLASH PART: the Nexys 4 DDR carries a Spansion S25FL128S (128 Mbit, QSPI).
 # The exact Vivado cfgmem part NAME varies between Vivado releases, so instead
 # of hard-coding one this script asks the running Vivado for every cfgmem part
-# matching s25fl128 and uses the first SPIx4 one - and prints what it picked,
-# so a wrong pick is visible in the log rather than silent.
+# matching s25fl128 and uses the first one - and prints what it picked, so a
+# wrong pick is visible in the log rather than silent.
+#
+# INTERFACE = SPIx1. build.tcl writes an x1 bitstream (it does NOT set
+# BITSTREAM.Config.SPI_buswidth 4), so the flash image must be SPIx1 to match -
+# an SPIx4 write_cfgmem refuses an x1 bitstream ("SPI_BUSWIDTH ... set to 1 ...
+# has to be 4", 08-SEP-2026). x1 is the board's universal master-SPI config
+# mode: it always boots, with no SPI_Fall_Edge / ConfigRate tuning. The only
+# cost is ~1-2 s more at power-on than x4 would be. To go faster, make build.tcl
+# emit an x4 bitstream (SPI_buswidth 4 + SPI_Fall_Edge YES + a ConfigRate) AND
+# switch the -interface below back to SPIx4 - the two must move together.
 #
 # After flashing, the FPGA is booted from the new image (boot_hw_device), so
 # the board is running it immediately - no power cycle needed to check.
@@ -39,7 +48,7 @@ puts "MODIFIED:  [clock format [file mtime $bit] -format {%Y-%m-%d %H:%M:%S}]"
 
 # --- 1. bitstream -> flash image (.mcs) ------------------------------------
 set mcs [file rootname $bit].mcs
-write_cfgmem -force -format mcs -size 16 -interface SPIx4 \
+write_cfgmem -force -format mcs -size 16 -interface SPIx1 \
     -loadbit "up 0x0 $bit" -file $mcs
 puts "FLASH IMAGE: $mcs"
 
