@@ -1,0 +1,852 @@
+{
+  "schema": "retrowire.wiredef/1",
+  "meta": {
+    "title": "Pico <-> Tang Nano 20K - ND-bus rig wiring",
+    "authoritative_source": "NDModulE/docs/design/nd120_tang20k_rig.cst + nd_bus_pins.h",
+    "wire_count": 31,
+    "voltage": "3.3V LVCMOS33, no level shifters",
+    "directions": "dir is from the FPGA(Tang) view: OUT=Tang drives->Pico samples; IN=Pico drives->Tang samples; BIDIR=shared data bus",
+    "notes": "Interrupts are latched over DBUS via LE_INT (no dedicated BINT pins). Daisy OE not wired."
+  },
+  "clock_reset": [
+    {
+      "signal": "clk",
+      "tang_ball": "4",
+      "note": "27 MHz onboard osc",
+      "pull": "UP"
+    },
+    {
+      "signal": "rst_n",
+      "tang_ball": "88",
+      "note": "S1 button, active-low",
+      "pull": "UP"
+    }
+  ],
+  "boards": {
+    "pico": {
+      "name": "Olimex RP2350-PICO2-BB48R",
+      "header": "2x27",
+      "usb": "top",
+      "columns": [
+        [
+          {
+            "pin": "+3.3V",
+            "signal": "+3.3V",
+            "kind": "PWR",
+            "note": "+3.3 V output, up to 2 A"
+          },
+          {
+            "pin": "GND",
+            "signal": "GND",
+            "kind": "GND",
+            "note": "ground"
+          },
+          {
+            "pin": "3V3_EN",
+            "signal": "3V3_EN",
+            "kind": "CTRL",
+            "note": "input \u2014 pull to GND to stop the 3.3 V DC-DC converter"
+          },
+          {
+            "pin": "G0",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G1",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G2",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G3",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G4",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G5",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G6",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G7",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G8",
+            "signal": "PSRAM CS",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G9",
+            "signal": "SD CS",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G10",
+            "signal": "SD CLK",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G11",
+            "signal": "SD CMD",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G12",
+            "signal": "DBUS0",
+            "kind": "BIDIR"
+          },
+          {
+            "pin": "G13",
+            "signal": "DBUS1",
+            "kind": "BIDIR"
+          },
+          {
+            "pin": "G14",
+            "signal": "DBUS2",
+            "kind": "BIDIR"
+          },
+          {
+            "pin": "G15",
+            "signal": "DBUS3",
+            "kind": "BIDIR"
+          },
+          {
+            "pin": "G16",
+            "signal": "DBUS4",
+            "kind": "BIDIR"
+          },
+          {
+            "pin": "G17",
+            "signal": "DBUS5",
+            "kind": "BIDIR"
+          },
+          {
+            "pin": "G18",
+            "signal": "DBUS6",
+            "kind": "BIDIR"
+          },
+          {
+            "pin": "G19",
+            "signal": "DBUS7",
+            "kind": "BIDIR"
+          },
+          {
+            "pin": "G20",
+            "signal": "/BAPR_IN",
+            "kind": "IN"
+          },
+          {
+            "pin": "G21",
+            "signal": "/BIOXE_IN",
+            "kind": "IN"
+          },
+          {
+            "pin": "G22",
+            "signal": "/BDAP_IN",
+            "kind": "IN"
+          },
+          {
+            "pin": "G23",
+            "signal": "/BDRY_IN",
+            "kind": "IN"
+          }
+        ],
+        [
+          {
+            "pin": "VBUS",
+            "signal": "VBUS",
+            "kind": "PWR",
+            "note": "+5 V from USB-C (output)"
+          },
+          {
+            "pin": "VDD_SYS",
+            "signal": "VDD_SYS",
+            "kind": "PWR",
+            "note": "+5 V, may be input or output \u2014 max 1 A out; do NOT feed 5 V in while USB is connected"
+          },
+          {
+            "pin": "GND",
+            "signal": "GND",
+            "kind": "GND",
+            "note": "ground"
+          },
+          {
+            "pin": "G24",
+            "signal": "SD DAT0",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G25",
+            "signal": "User LED",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G26",
+            "signal": "/OE_IN_0",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G27",
+            "signal": "/OE_IN_1",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G28",
+            "signal": "/OE_IN_2",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G29",
+            "signal": "LE_OUT_0",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G30",
+            "signal": "LE_OUT_1",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G31",
+            "signal": "LE_OUT_2",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G32",
+            "signal": "/BD_OE_BUS",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G33",
+            "signal": "BMEM",
+            "kind": "IN"
+          },
+          {
+            "pin": "G34",
+            "signal": "BINACK",
+            "kind": "IN"
+          },
+          {
+            "pin": "G35",
+            "signal": "BMCL",
+            "kind": "IN"
+          },
+          {
+            "pin": "G36",
+            "signal": "BINPUT",
+            "kind": "IN"
+          },
+          {
+            "pin": "G37",
+            "signal": "INGRANT",
+            "kind": "IN"
+          },
+          {
+            "pin": "G38",
+            "signal": "INIDENT",
+            "kind": "IN"
+          },
+          {
+            "pin": "G39",
+            "signal": "LE_INT",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G40",
+            "signal": "free",
+            "kind": "FREE"
+          },
+          {
+            "pin": "G41",
+            "signal": "/BAPR_OUT",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G42",
+            "signal": "/BDRY_OUT",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G43",
+            "signal": "/BINPUT_OUT",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G44",
+            "signal": "/BDAP_OUT",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G45",
+            "signal": "/BREQ_OUT",
+            "kind": "OUT"
+          },
+          {
+            "pin": "G46",
+            "signal": "daisy",
+            "kind": "RSVD"
+          },
+          {
+            "pin": "G47",
+            "signal": "daisy",
+            "kind": "RSVD"
+          }
+        ]
+      ]
+    },
+    "tang": {
+      "name": "Tang Nano 20K",
+      "header": "2x20 (J6 left, J5 right)",
+      "usb": "top",
+      "columns": [
+        [
+          {
+            "ball": "73",
+            "signal": "/OE_IN_0",
+            "gpio": "G26",
+            "kind": "OUT"
+          },
+          {
+            "ball": "74",
+            "signal": "/OE_IN_1",
+            "gpio": "G27",
+            "kind": "OUT"
+          },
+          {
+            "ball": "75",
+            "signal": "/OE_IN_2",
+            "gpio": "G28",
+            "kind": "OUT"
+          },
+          {
+            "ball": "85",
+            "signal": "free",
+            "gpio": null,
+            "kind": "FREE"
+          },
+          {
+            "ball": "77",
+            "signal": "LE_OUT_0",
+            "gpio": "G29",
+            "kind": "OUT"
+          },
+          {
+            "ball": "15",
+            "signal": "/BAPR_IN",
+            "gpio": "G20",
+            "kind": "IN"
+          },
+          {
+            "ball": "16",
+            "signal": "/BIOXE_IN",
+            "gpio": "G21",
+            "kind": "IN"
+          },
+          {
+            "ball": "27",
+            "signal": "LE_OUT_1",
+            "gpio": "G30",
+            "kind": "OUT"
+          },
+          {
+            "ball": "28",
+            "signal": "LE_OUT_2",
+            "gpio": "G31",
+            "kind": "OUT"
+          },
+          {
+            "ball": "25",
+            "signal": "/BD_OE_BUS",
+            "gpio": "G32",
+            "kind": "OUT"
+          },
+          {
+            "ball": "26",
+            "signal": "BMCL",
+            "gpio": "G35",
+            "kind": "IN"
+          },
+          {
+            "ball": "29",
+            "signal": "BINPUT",
+            "gpio": "G36",
+            "kind": "IN"
+          },
+          {
+            "ball": "30",
+            "signal": "LE_INT",
+            "gpio": "G39",
+            "kind": "OUT"
+          },
+          {
+            "ball": "31",
+            "signal": "free",
+            "gpio": null,
+            "kind": "FREE"
+          },
+          {
+            "ball": "17",
+            "signal": "BMEM",
+            "gpio": "G33",
+            "kind": "IN"
+          },
+          {
+            "ball": "20",
+            "signal": "INIDENT",
+            "gpio": "G38",
+            "kind": "IN"
+          },
+          {
+            "ball": "19",
+            "signal": "INGRANT",
+            "gpio": "G37",
+            "kind": "IN"
+          },
+          {
+            "ball": "18",
+            "signal": "BINACK",
+            "gpio": "G34",
+            "kind": "IN"
+          },
+          {
+            "ball": "3V3",
+            "signal": "3V3",
+            "gpio": null,
+            "kind": "PWR",
+            "note": "+3.3 V rail"
+          },
+          {
+            "ball": "GND",
+            "signal": "GND",
+            "gpio": null,
+            "kind": "GND",
+            "note": "ground"
+          }
+        ],
+        [
+          {
+            "ball": "5V",
+            "signal": "5V",
+            "gpio": null,
+            "kind": "PWR",
+            "note": "+5 V rail"
+          },
+          {
+            "ball": "GND",
+            "signal": "GND",
+            "gpio": null,
+            "kind": "GND",
+            "note": "ground"
+          },
+          {
+            "ball": "76",
+            "signal": "/BDAP_IN",
+            "gpio": "G22",
+            "kind": "IN"
+          },
+          {
+            "ball": "80",
+            "signal": "free",
+            "gpio": null,
+            "kind": "FREE"
+          },
+          {
+            "ball": "42",
+            "signal": "DBUS0",
+            "gpio": "G12",
+            "kind": "BIDIR"
+          },
+          {
+            "ball": "41",
+            "signal": "DBUS1",
+            "gpio": "G13",
+            "kind": "BIDIR"
+          },
+          {
+            "ball": "56",
+            "signal": "DBUS2",
+            "gpio": "G14",
+            "kind": "BIDIR"
+          },
+          {
+            "ball": "54",
+            "signal": "DBUS3",
+            "gpio": "G15",
+            "kind": "BIDIR"
+          },
+          {
+            "ball": "51",
+            "signal": "DBUS4",
+            "gpio": "G16",
+            "kind": "BIDIR"
+          },
+          {
+            "ball": "48",
+            "signal": "DBUS5",
+            "gpio": "G17",
+            "kind": "BIDIR"
+          },
+          {
+            "ball": "55",
+            "signal": "DBUS6",
+            "gpio": "G18",
+            "kind": "BIDIR"
+          },
+          {
+            "ball": "49",
+            "signal": "DBUS7",
+            "gpio": "G19",
+            "kind": "BIDIR"
+          },
+          {
+            "ball": "86",
+            "signal": "/BDRY_IN",
+            "gpio": "G23",
+            "kind": "IN"
+          },
+          {
+            "ball": "79",
+            "signal": "/BAPR_OUT",
+            "gpio": "G41",
+            "kind": "OUT"
+          },
+          {
+            "ball": "GND",
+            "signal": "GND",
+            "gpio": null,
+            "kind": "GND",
+            "note": "ground"
+          },
+          {
+            "ball": "3V3",
+            "signal": "3V3",
+            "gpio": null,
+            "kind": "PWR",
+            "note": "+3.3 V rail"
+          },
+          {
+            "ball": "72",
+            "signal": "/BDRY_OUT",
+            "gpio": "G42",
+            "kind": "OUT"
+          },
+          {
+            "ball": "71",
+            "signal": "/BINPUT_OUT",
+            "gpio": "G43",
+            "kind": "OUT"
+          },
+          {
+            "ball": "53",
+            "signal": "/BDAP_OUT",
+            "gpio": "G44",
+            "kind": "OUT"
+          },
+          {
+            "ball": "52",
+            "signal": "/BREQ_OUT",
+            "gpio": "G45",
+            "kind": "OUT"
+          }
+        ]
+      ]
+    }
+  },
+  "wires": [
+    {
+      "cable": 1,
+      "signal": "/OE_IN_0",
+      "dir": "OUT",
+      "pico_gpio": 26,
+      "tang_ball": 73,
+      "group": "LATCH_CTRL",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 2,
+      "signal": "/OE_IN_1",
+      "dir": "OUT",
+      "pico_gpio": 27,
+      "tang_ball": 74,
+      "group": "LATCH_CTRL",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 3,
+      "signal": "/OE_IN_2",
+      "dir": "OUT",
+      "pico_gpio": 28,
+      "tang_ball": 75,
+      "group": "LATCH_CTRL",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 4,
+      "signal": "LE_OUT_0",
+      "dir": "OUT",
+      "pico_gpio": 29,
+      "tang_ball": 77,
+      "group": "LATCH_CTRL",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 5,
+      "signal": "/BAPR_IN",
+      "dir": "IN",
+      "pico_gpio": 20,
+      "tang_ball": 15,
+      "group": "TRIGGER_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 6,
+      "signal": "/BIOXE_IN",
+      "dir": "IN",
+      "pico_gpio": 21,
+      "tang_ball": 16,
+      "group": "TRIGGER_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 7,
+      "signal": "LE_OUT_1",
+      "dir": "OUT",
+      "pico_gpio": 30,
+      "tang_ball": 27,
+      "group": "LATCH_CTRL",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 8,
+      "signal": "LE_OUT_2",
+      "dir": "OUT",
+      "pico_gpio": 31,
+      "tang_ball": 28,
+      "group": "LATCH_CTRL",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 9,
+      "signal": "/BD_OE_BUS",
+      "dir": "OUT",
+      "pico_gpio": 32,
+      "tang_ball": 25,
+      "group": "LATCH_CTRL",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 10,
+      "signal": "BMCL",
+      "dir": "IN",
+      "pico_gpio": 35,
+      "tang_ball": 26,
+      "group": "SLOW_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 11,
+      "signal": "BINPUT",
+      "dir": "IN",
+      "pico_gpio": 36,
+      "tang_ball": 29,
+      "group": "SLOW_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 12,
+      "signal": "LE_INT",
+      "dir": "OUT",
+      "pico_gpio": 39,
+      "tang_ball": 30,
+      "group": "LATCH_CTRL",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 13,
+      "signal": "BMEM",
+      "dir": "IN",
+      "pico_gpio": 33,
+      "tang_ball": 17,
+      "group": "SLOW_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 14,
+      "signal": "INIDENT",
+      "dir": "IN",
+      "pico_gpio": 38,
+      "tang_ball": 20,
+      "group": "SLOW_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 15,
+      "signal": "INGRANT",
+      "dir": "IN",
+      "pico_gpio": 37,
+      "tang_ball": 19,
+      "group": "SLOW_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 16,
+      "signal": "BINACK",
+      "dir": "IN",
+      "pico_gpio": 34,
+      "tang_ball": 18,
+      "group": "SLOW_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 17,
+      "signal": "/BDAP_IN",
+      "dir": "IN",
+      "pico_gpio": 22,
+      "tang_ball": 76,
+      "group": "TRIGGER_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 18,
+      "signal": "DBUS0",
+      "dir": "BIDIR",
+      "pico_gpio": 12,
+      "tang_ball": 42,
+      "group": "DATA_BUS",
+      "series_r_ohm": 220
+    },
+    {
+      "cable": 19,
+      "signal": "DBUS1",
+      "dir": "BIDIR",
+      "pico_gpio": 13,
+      "tang_ball": 41,
+      "group": "DATA_BUS",
+      "series_r_ohm": 220
+    },
+    {
+      "cable": 20,
+      "signal": "DBUS2",
+      "dir": "BIDIR",
+      "pico_gpio": 14,
+      "tang_ball": 56,
+      "group": "DATA_BUS",
+      "series_r_ohm": 220
+    },
+    {
+      "cable": 21,
+      "signal": "DBUS3",
+      "dir": "BIDIR",
+      "pico_gpio": 15,
+      "tang_ball": 54,
+      "group": "DATA_BUS",
+      "series_r_ohm": 220
+    },
+    {
+      "cable": 22,
+      "signal": "DBUS4",
+      "dir": "BIDIR",
+      "pico_gpio": 16,
+      "tang_ball": 51,
+      "group": "DATA_BUS",
+      "series_r_ohm": 220
+    },
+    {
+      "cable": 23,
+      "signal": "DBUS5",
+      "dir": "BIDIR",
+      "pico_gpio": 17,
+      "tang_ball": 48,
+      "group": "DATA_BUS",
+      "series_r_ohm": 220
+    },
+    {
+      "cable": 24,
+      "signal": "DBUS6",
+      "dir": "BIDIR",
+      "pico_gpio": 18,
+      "tang_ball": 55,
+      "group": "DATA_BUS",
+      "series_r_ohm": 220
+    },
+    {
+      "cable": 25,
+      "signal": "DBUS7",
+      "dir": "BIDIR",
+      "pico_gpio": 19,
+      "tang_ball": 49,
+      "group": "DATA_BUS",
+      "series_r_ohm": 220
+    },
+    {
+      "cable": 26,
+      "signal": "/BDRY_IN",
+      "dir": "IN",
+      "pico_gpio": 23,
+      "tang_ball": 86,
+      "group": "TRIGGER_SNIFF",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 27,
+      "signal": "/BAPR_OUT",
+      "dir": "OUT",
+      "pico_gpio": 41,
+      "tang_ball": 79,
+      "group": "CTRL_DRIVE",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 28,
+      "signal": "/BDRY_OUT",
+      "dir": "OUT",
+      "pico_gpio": 42,
+      "tang_ball": 72,
+      "group": "CTRL_DRIVE",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 29,
+      "signal": "/BINPUT_OUT",
+      "dir": "OUT",
+      "pico_gpio": 43,
+      "tang_ball": 71,
+      "group": "CTRL_DRIVE",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 30,
+      "signal": "/BDAP_OUT",
+      "dir": "OUT",
+      "pico_gpio": 44,
+      "tang_ball": 53,
+      "group": "CTRL_DRIVE",
+      "series_r_ohm": null
+    },
+    {
+      "cable": 31,
+      "signal": "/BREQ_OUT",
+      "dir": "OUT",
+      "pico_gpio": 45,
+      "tang_ball": 52,
+      "group": "CTRL_DRIVE",
+      "series_r_ohm": null
+    }
+  ]
+}
