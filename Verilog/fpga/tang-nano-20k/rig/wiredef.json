@@ -6,7 +6,8 @@
     "wire_count": 31,
     "voltage": "3.3V LVCMOS33, no level shifters",
     "directions": "dir is from the FPGA(Tang) view: OUT=Tang drives->Pico samples; IN=Pico drives->Tang samples; BIDIR=shared data bus",
-    "notes": "Interrupts are latched over DBUS via LE_INT (no dedicated BINT pins). Daisy OE not wired."
+    "notes": "Interrupts are latched over DBUS via LE_INT (no dedicated BINT pins). Daisy OE not wired.",
+    "pin_overlap": "Tang balls 15-20 are the CPU's led[0-5] (repurposed by the bus HAL); balls 80-85 are the CPU SD card (kept free); 'HSPI' silk pins carry no PSRAM (CPU memory is on-package SDRAM). See per-pin notes."
   },
   "clock_reset": [
     {
@@ -320,25 +321,29 @@
             "ball": "73",
             "signal": "/OE_IN_0",
             "gpio": "G26",
-            "kind": "OUT"
+            "kind": "OUT",
+            "note": "silk 'HSPI' \u2014 no PSRAM here; free GPIO"
           },
           {
             "ball": "74",
             "signal": "/OE_IN_1",
             "gpio": "G27",
-            "kind": "OUT"
+            "kind": "OUT",
+            "note": "silk 'HSPI' \u2014 no PSRAM here; free GPIO"
           },
           {
             "ball": "75",
             "signal": "/OE_IN_2",
             "gpio": "G28",
-            "kind": "OUT"
+            "kind": "OUT",
+            "note": "silk 'HSPI' \u2014 no PSRAM here; free GPIO"
           },
           {
             "ball": "85",
             "signal": "free",
             "gpio": null,
-            "kind": "FREE"
+            "kind": "FREE",
+            "note": "CPU SD-card pin (sd D1); kept free"
           },
           {
             "ball": "77",
@@ -350,13 +355,15 @@
             "ball": "15",
             "signal": "/BAPR_IN",
             "gpio": "G20",
-            "kind": "IN"
+            "kind": "IN",
+            "note": "on-board LED \u2014 CPU led[0]; repurposed by the bus HAL"
           },
           {
             "ball": "16",
             "signal": "/BIOXE_IN",
             "gpio": "G21",
-            "kind": "IN"
+            "kind": "IN",
+            "note": "on-board LED \u2014 CPU led[1]; repurposed by the bus HAL"
           },
           {
             "ball": "27",
@@ -404,25 +411,29 @@
             "ball": "17",
             "signal": "BMEM",
             "gpio": "G33",
-            "kind": "IN"
+            "kind": "IN",
+            "note": "on-board LED \u2014 CPU led[2]; repurposed by the bus HAL"
           },
           {
             "ball": "20",
             "signal": "INIDENT",
             "gpio": "G38",
-            "kind": "IN"
+            "kind": "IN",
+            "note": "on-board LED \u2014 CPU led[5]; repurposed by the bus HAL"
           },
           {
             "ball": "19",
             "signal": "INGRANT",
             "gpio": "G37",
-            "kind": "IN"
+            "kind": "IN",
+            "note": "on-board LED \u2014 CPU led[4]; repurposed by the bus HAL"
           },
           {
             "ball": "18",
             "signal": "BINACK",
             "gpio": "G34",
-            "kind": "IN"
+            "kind": "IN",
+            "note": "on-board LED \u2014 CPU led[3]; repurposed by the bus HAL"
           },
           {
             "ball": "3V3",
@@ -458,13 +469,15 @@
             "ball": "76",
             "signal": "/BDAP_IN",
             "gpio": "G22",
-            "kind": "IN"
+            "kind": "IN",
+            "note": "silk 'HSPI' \u2014 no PSRAM here; free GPIO"
           },
           {
             "ball": "80",
             "signal": "free",
             "gpio": null,
-            "kind": "FREE"
+            "kind": "FREE",
+            "note": "CPU SD-card pin (sd D2); kept free"
           },
           {
             "ball": "42",
@@ -518,7 +531,8 @@
             "ball": "86",
             "signal": "/BDRY_IN",
             "gpio": "G23",
-            "kind": "IN"
+            "kind": "IN",
+            "note": "silk 'HSPI' \u2014 no PSRAM here; free GPIO"
           },
           {
             "ball": "79",
@@ -544,13 +558,15 @@
             "ball": "72",
             "signal": "/BDRY_OUT",
             "gpio": "G42",
-            "kind": "OUT"
+            "kind": "OUT",
+            "note": "silk 'HSPI' \u2014 no PSRAM here; free GPIO"
           },
           {
             "ball": "71",
             "signal": "/BINPUT_OUT",
             "gpio": "G43",
-            "kind": "OUT"
+            "kind": "OUT",
+            "note": "silk 'HSPI' \u2014 no PSRAM here; free GPIO"
           },
           {
             "ball": "53",
