@@ -6,7 +6,7 @@
     "wire_count": 31,
     "voltage": "3.3V LVCMOS33, no level shifters",
     "directions": "dir is from the FPGA(Tang) view: OUT=Tang drives->Pico samples; IN=Pico drives->Tang samples; BIDIR=shared data bus",
-    "notes": "Interrupts are latched over DBUS via LE_INT (no dedicated BINT pins). Daisy OE not wired.",
+    "notes": "Interrupts are latched over DBUS via LE_INT (no dedicated BINT pins). Daisy OE not wired. NOTE two direction conventions: wires[].dir is Tang-view (OUT=Tang drives); the board columns kind is the ND-bus signal-name view (=Pico view, the opposite for non-BIDIR) - do NOT make them match.",
     "pin_overlap": "Tang balls 15-20 are the CPU's led[0-5] (repurposed by the bus HAL); balls 80-85 are the CPU SD card (kept free); 'HSPI' silk pins carry no PSRAM (CPU memory is on-package SDRAM). See per-pin notes."
   },
   "clock_reset": [
@@ -403,9 +403,9 @@
           },
           {
             "ball": "31",
-            "signal": "free",
-            "gpio": null,
-            "kind": "FREE"
+            "signal": "/BAPR_OUT",
+            "gpio": "G41",
+            "kind": "OUT"
           },
           {
             "ball": "17",
@@ -536,9 +536,10 @@
           },
           {
             "ball": "79",
-            "signal": "/BAPR_OUT",
-            "gpio": "G41",
-            "kind": "OUT"
+            "signal": "WS2812",
+            "gpio": null,
+            "kind": "LED",
+            "note": "onboard WS2812 status LED (dedicated); no longer a rig wire"
           },
           {
             "ball": "GND",
@@ -588,7 +589,7 @@
     {
       "cable": 1,
       "signal": "/OE_IN_0",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 26,
       "tang_ball": 73,
       "group": "LATCH_CTRL",
@@ -597,7 +598,7 @@
     {
       "cable": 2,
       "signal": "/OE_IN_1",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 27,
       "tang_ball": 74,
       "group": "LATCH_CTRL",
@@ -606,7 +607,7 @@
     {
       "cable": 3,
       "signal": "/OE_IN_2",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 28,
       "tang_ball": 75,
       "group": "LATCH_CTRL",
@@ -615,7 +616,7 @@
     {
       "cable": 4,
       "signal": "LE_OUT_0",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 29,
       "tang_ball": 77,
       "group": "LATCH_CTRL",
@@ -624,7 +625,7 @@
     {
       "cable": 5,
       "signal": "/BAPR_IN",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 20,
       "tang_ball": 15,
       "group": "TRIGGER_SNIFF",
@@ -633,7 +634,7 @@
     {
       "cable": 6,
       "signal": "/BIOXE_IN",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 21,
       "tang_ball": 16,
       "group": "TRIGGER_SNIFF",
@@ -642,7 +643,7 @@
     {
       "cable": 7,
       "signal": "LE_OUT_1",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 30,
       "tang_ball": 27,
       "group": "LATCH_CTRL",
@@ -651,7 +652,7 @@
     {
       "cable": 8,
       "signal": "LE_OUT_2",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 31,
       "tang_ball": 28,
       "group": "LATCH_CTRL",
@@ -660,7 +661,7 @@
     {
       "cable": 9,
       "signal": "/BD_OE_BUS",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 32,
       "tang_ball": 25,
       "group": "LATCH_CTRL",
@@ -669,7 +670,7 @@
     {
       "cable": 10,
       "signal": "BMCL",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 35,
       "tang_ball": 26,
       "group": "SLOW_SNIFF",
@@ -678,7 +679,7 @@
     {
       "cable": 11,
       "signal": "BINPUT",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 36,
       "tang_ball": 29,
       "group": "SLOW_SNIFF",
@@ -687,7 +688,7 @@
     {
       "cable": 12,
       "signal": "LE_INT",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 39,
       "tang_ball": 30,
       "group": "LATCH_CTRL",
@@ -696,7 +697,7 @@
     {
       "cable": 13,
       "signal": "BMEM",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 33,
       "tang_ball": 17,
       "group": "SLOW_SNIFF",
@@ -705,7 +706,7 @@
     {
       "cable": 14,
       "signal": "INIDENT",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 38,
       "tang_ball": 20,
       "group": "SLOW_SNIFF",
@@ -714,7 +715,7 @@
     {
       "cable": 15,
       "signal": "INGRANT",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 37,
       "tang_ball": 19,
       "group": "SLOW_SNIFF",
@@ -723,7 +724,7 @@
     {
       "cable": 16,
       "signal": "BINACK",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 34,
       "tang_ball": 18,
       "group": "SLOW_SNIFF",
@@ -732,7 +733,7 @@
     {
       "cable": 17,
       "signal": "/BDAP_IN",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 22,
       "tang_ball": 76,
       "group": "TRIGGER_SNIFF",
@@ -813,7 +814,7 @@
     {
       "cable": 26,
       "signal": "/BDRY_IN",
-      "dir": "IN",
+      "dir": "OUT",
       "pico_gpio": 23,
       "tang_ball": 86,
       "group": "TRIGGER_SNIFF",
@@ -822,16 +823,17 @@
     {
       "cable": 27,
       "signal": "/BAPR_OUT",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 41,
-      "tang_ball": 79,
+      "tang_ball": 31,
       "group": "CTRL_DRIVE",
+      "note": "moved off ball 79 (onboard WS2812 collides there); ball 31 is a freed BINT pin",
       "series_r_ohm": null
     },
     {
       "cable": 28,
       "signal": "/BDRY_OUT",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 42,
       "tang_ball": 72,
       "group": "CTRL_DRIVE",
@@ -840,7 +842,7 @@
     {
       "cable": 29,
       "signal": "/BINPUT_OUT",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 43,
       "tang_ball": 71,
       "group": "CTRL_DRIVE",
@@ -849,7 +851,7 @@
     {
       "cable": 30,
       "signal": "/BDAP_OUT",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 44,
       "tang_ball": 53,
       "group": "CTRL_DRIVE",
@@ -858,7 +860,7 @@
     {
       "cable": 31,
       "signal": "/BREQ_OUT",
-      "dir": "OUT",
+      "dir": "IN",
       "pico_gpio": 45,
       "tang_ball": 52,
       "group": "CTRL_DRIVE",
