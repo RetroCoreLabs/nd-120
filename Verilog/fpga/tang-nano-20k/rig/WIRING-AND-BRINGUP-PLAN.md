@@ -16,7 +16,7 @@ point-to-point, no PCB (design phase). Seam: `nd_bus_if.h`.
 ## Decisions locked (08-SEP-2026)
 
 1. **Wire list = 31-wire latched-interrupt map** (the newer `.cst`), not the older
-   34-wire `TANG-RIG-PIN-BUDGET.md` individual-interrupt map. Interrupts are NOT
+   34-wire `TANG-RIG-PIN-BUDGET.STALE.md` individual-interrupt map. Interrupts are NOT
    dedicated pins: the Pico writes a 4-bit mask on DBUS and pulses `LE_INT`; balls
    79/80/85 are freed (ball 31 now carries /BAPR_OUT, moved off ball 79 = onboard
    WS2812 LED). Daisy OE not wired (a single-card rig can't exercise it).
@@ -137,6 +137,6 @@ physical header pin once read from the Olimex board header.
 - Nothing physically wired.
 
 Cross-refs: `NDModulE/docs/design/nd120_tang20k_rig.cst`,
-`NDModulE/docs/design/TANG-RIG-PIN-BUDGET.md`,
+`NDModulE/docs/design/TANG-RIG-PIN-BUDGET.STALE.md`,
 `NDModulE/docs/design/PIO-BUS-ARBITER.md` (§2a — DBUS/LE_INT latch payload),
 `NDModulE/docs/BENCH.md` (USB/serial map).
