@@ -45,7 +45,8 @@ all: test-keys test-console test-storage-vdrives test-storage-devices test-avalo
 # checks as the MiSTer's test-storage-hps, on the byte-wide buffer bus.
 test-storage-vdrives: nd_storage_vdrives_tb.vvp
 	@$(VVP) $< | tee nd_storage_vdrives_tb.log
-	@grep -q "TB_RESULT: PASS" nd_storage_vdrives_tb.log \n		|| { echo "nd_storage_vdrives_tb FAILED"; exit 1; }
+	@grep -q "TB_RESULT: PASS" nd_storage_vdrives_tb.log \
+		|| { echo "nd_storage_vdrives_tb FAILED"; exit 1; }
 
 nd_storage_vdrives_tb.vvp: nd_storage_vdrives_tb.v vdrives_model.v $(GLUE)/nd_storage_vdrives.v
 	$(IVERILOG) $(IVFLAGS) -I$(SDFAT) -o $@ $^
