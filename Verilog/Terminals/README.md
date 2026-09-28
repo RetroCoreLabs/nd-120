@@ -11,8 +11,10 @@ missing is the piece in between: a terminal. That is what lives here.
 
 **First test rig: the Nexys 4 DDR**, not MiSTer or MEGA65 - it is the only
 board that today has a booting SINTRAN, a VGA connector AND a USB keyboard
-host all at once, so the terminal is the only new thing in the build. Plan:
-[../fpga/nexys4ddr/PLAN-vga-console.md](../fpga/nexys4ddr/PLAN-vga-console.md).
+host all at once, so the terminal is the only new thing in the build. The
+plan it was built from, `Verilog/fpga/nexys4ddr/PLAN-vga-console.md`, was
+deleted as finished in commit c4896a4; read it with
+`git show c4896a4^:Verilog/fpga/nexys4ddr/PLAN-vga-console.md`.
 
 This folder is **board-independent RTL**. It knows nothing about MiSTer,
 MEGA65, Tang or Nexys. Each board supplies the two ends - a source of key
@@ -147,8 +149,8 @@ Every set-2 code in `ps2_ascii_table.v` was cross-checked 30-AUG-2026 against
 two independent published references - the OSDev wiki set-2 table and Vetra
 Systems' translation table - and both agree with every entry, F7=0x83
 included. Scan code set 2 is a fixed standard, so the codes are settled by
-documentation. What still needs the real board (phase 3 of
-[../fpga/nexys4ddr/PLAN-vga-console.md](../fpga/nexys4ddr/PLAN-vga-console.md)):
+documentation. What still needs the real board (phase 3 of the deleted
+VGA-console plan, see above):
 that the Nexys USB-HID bridge behaves as the standard says, and the
 **Norwegian layout positions**, which come from RetroTerm's KBD-ND-246 grid
 rather than from any scancode standard - parentheses, colon, comma, full
