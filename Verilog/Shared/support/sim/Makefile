@@ -54,8 +54,11 @@ test-am29833a-parity: AM29833A_parity_regen_tb
 AM29833A_parity_regen_tb: AM29833A_parity_regen_tb.v ../AM29833A.v
 	$(IVERILOG) -g2012 -o $@ $(INCDIRS) AM29833A_parity_regen_tb.v ../AM29833A.v
 
+# Self-checking since 28-SEP-2026: decodes every frame on TXD and checks the
+# TX flags; exits non-zero unless the bench prints TB_RESULT: PASS.
 test-uart: SC2661_UART_tb
-	$(VVP) SC2661_UART_tb
+	$(VVP) SC2661_UART_tb | tee uart_result.tmp
+	@grep -q "TB_RESULT: PASS" uart_result.tmp && rm -f uart_result.tmp
 
 # TX abort-on-command-write regression (24-AUG-2026, Nexys LFN campaign):
 # a command write with TxEN=0 must not chop the character in flight and

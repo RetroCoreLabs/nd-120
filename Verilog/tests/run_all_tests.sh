@@ -202,7 +202,7 @@ REGISTRY=(
   "fpga/qmtech-a35t/sim :: test-storage-bram :: TB_RESULT: PASS"
   # --- Shared support chips -------------------------------------------------
   "Shared/support/sim :: test-ram      :: ALL PASS"
-  "Shared/support/sim :: test-uart     :: DONE"
+  "Shared/support/sim :: test-uart     :: TB_RESULT: PASS"
   "Shared/support/sim :: test-uart-txabort :: TB_RESULT: PASS"
   "Shared/support/sim :: test-uart-txint :: TB_RESULT: PASS"
   # RX overrun regression (31-AUG-2026, PED keyboard-input investigation):
