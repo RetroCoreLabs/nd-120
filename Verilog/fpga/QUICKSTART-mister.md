@@ -3,7 +3,7 @@
 Run the 1988 Norsk Data ND-120 CPU on a MiSTer (Terasic DE10-Nano, or the
 Retro Remake **MiSTer Pi** clone - same Cyclone V SoC, the core is the same
 `.rbf` either way). No FPGA toolchain needed - just the ready-built `.rbf`
-from the [Releases page](https://github.com/RonnyA/nd-120/releases).
+from the [Releases page](https://github.com/RetroCoreLabs/nd-120/releases).
 
 **Verified on real hardware (DE10-Nano, 02-SEP-2026):** boots to OPCOM, boots
 SINTRAN III from a mounted Winchester image, CPU self-test passes (green `G`

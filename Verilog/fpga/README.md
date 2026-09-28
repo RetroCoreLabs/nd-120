@@ -8,7 +8,7 @@ board-specific build/flow files (scripts, constraints, tool projects) live here,
 one folder per board.
 
 **Ready-built bitstreams** are on the
-[Releases page](https://github.com/RonnyA/nd-120/releases) with
+[Releases page](https://github.com/RetroCoreLabs/nd-120/releases) with
 step-by-step loading guides: [QUICKSTART-nexys4ddr.md](QUICKSTART-nexys4ddr.md),
 [QUICKSTART-tang-nano-20k.md](QUICKSTART-tang-nano-20k.md),
 [QUICKSTART-mister.md](QUICKSTART-mister.md),

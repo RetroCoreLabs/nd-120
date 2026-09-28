@@ -140,7 +140,7 @@ routes: `Verilog/fpga/nexys4ddr/timing.md`.
 **FPGA hardware:**
 
 > **Ready-built bitstreams:** grab them from the
-> [Releases page](https://github.com/RonnyA/nd-120/releases) - no FPGA
+> [Releases page](https://github.com/RetroCoreLabs/nd-120/releases) - no FPGA
 > toolchain needed. Quickstarts: `Verilog/fpga/QUICKSTART-nexys4ddr.md`
 > (incl. the no-software SD-card path),
 > `Verilog/fpga/QUICKSTART-tang-nano-20k.md`,

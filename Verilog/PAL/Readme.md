@@ -11,4 +11,4 @@ In the future I hope to make the tests more automated to validate that the PAL c
 
 ## Design documents 
 
-The code is based on the original [design documents](https://github.com/RonnyA/nd-120/tree/main/DesignDocuments/PAL-Code) and the PALASM code is manually converted to Verilog
+The code is based on the original [design documents](https://github.com/RetroCoreLabs/nd-120/tree/main/DesignDocuments/PAL-Code) and the PALASM code is manually converted to Verilog
