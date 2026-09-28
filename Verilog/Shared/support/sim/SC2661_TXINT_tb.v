@@ -29,6 +29,7 @@ module SC2661_TXINT_tb;
 
   SC2661_UART dut (
       .sysclk(sysclk), .sys_rst_n(sys_rst_n), .ADDRESS(ADDRESS),
+      .BAUD_9600(1'b0),   // build-default divisor; an open input is z, not 0
       .BRCLK(1'b0), .CE_n(CE_n), .CTS_n(1'b0), .DCD_n(1'b0), .DSR_n(1'b0),
       .READ_n(READ_n), .RESET(RESET), .RXC_n(1'b1), .RXD(1'b1), .TXC_n(1'b1),
       .D(D), .D_OUT(D_OUT), .DTR_n(DTR_n), .RTS_n(RTS_n),

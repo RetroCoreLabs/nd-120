@@ -84,6 +84,7 @@ module IO_UART_42_tb;
 
   IO_UART_42 DUT (
       .sysclk(sysclk), .sys_rst_n(sys_rst_n),
+      .BAUD_9600(1'b0),   // build-default divisor; an open input is z, not 0
       .CEUART_n(CEUART_n), .CLK(CLK), .CLK_EN(CLK_EN), .CONSOLE_n(CONSOLE_n),
       .EAUTO_n(EAUTO_n), .EIOR_n(EIOR_n), .LCS_n(LCS_n), .LOCK_n(LOCK_n),
       .MIS_1_0(MIS_1_0), .PPOSC(PPOSC), .RUART_n(RUART_n), .XTR(XTR),

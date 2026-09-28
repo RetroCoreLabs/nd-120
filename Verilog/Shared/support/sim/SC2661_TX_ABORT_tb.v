@@ -48,6 +48,7 @@ module SC2661_TX_ABORT_tb;
   SC2661_UART dut (
       .sysclk(sysclk),
       .sys_rst_n(sys_rst_n),
+      .BAUD_9600(1'b0),   // build-default divisor; an open input is z, not 0
       .ADDRESS(address),
       .BRCLK(1'b0),
       .RESET(reset),
