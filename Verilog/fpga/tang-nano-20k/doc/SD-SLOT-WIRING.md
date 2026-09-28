@@ -54,7 +54,7 @@ Not an inference from the schematic - a measurement on this board:
   **WRITE 3418 KB/s, READ 5981 KB/s** over DAT3..DAT0, against a
   137 KB/s 1-bit baseline. The full FAT walk (`LIST` freescan and
   `CHECK` over a 75 MB image) ran over 4-bit as well.
-  Recorded in `Verilog/docs/sd-speed-plan.md`, rung c.
+  Recorded in `Verilog/fpga/tang-nano-20k/sd-fat-test/README.md`.
 - MiSTeryNano runs 4-bit at 16 MHz on this same slot with the same
   `PULL_MODE=NONE` configuration.
 

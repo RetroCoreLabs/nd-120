@@ -19,6 +19,10 @@ WHAT IT SKIPS, AND SAYS SO
     - VENDOR-GENERATED IP: Xilinx MIG (ip/ trees, mig_7series_*), Gowin PLLs,
       and Vivado's .Xil scratch. Those are not our design, they are hundreds of
       files, and documenting them buries the 300-odd modules that ARE ours.
+    - git SUBMODULES (any folder below the top with its own .git entry, e.g.
+      fpga/mega65/m2m). They are other people's repos: writing doc/ folders
+      into them would leave their working trees dirty, and the code is not
+      ours to document.
     - files with no module declaration
     Every skip and every failure is listed at the end. A sweep that silently
     drops files is worse than no sweep, because the count looks complete.
@@ -48,6 +52,12 @@ MODULE_RE = re.compile(r"^\s*module\s+([A-Za-z_][A-Za-z0-9_$]*)", re.M)
 def find_sources(root):
     out = []
     for dirpath, dirnames, filenames in os.walk(root):
+        # a submodule has its own .git entry - skip it and everything under
+        # it (see WHAT IT SKIPS above). The repo top itself is above VROOT,
+        # so it is never seen here.
+        if os.path.exists(os.path.join(dirpath, ".git")):
+            dirnames[:] = []
+            continue
         parts = set(dirpath.replace("\\", "/").split("/"))
         if "sim" in parts or "obj_dir" in parts or ".git" in parts:
             continue
@@ -84,6 +94,9 @@ def one(path, dry):
     os.makedirs(outdir, exist_ok=True)
     made = []
     for m in mods:
+        # path is absolute here. That is fine: module_doc.py turns it into a
+        # repo-relative path before it writes the doc, so no machine path
+        # (/mnt/e/..., E:\...) ends up in a committed file.
         cmd = [sys.executable, MODULE_DOC, path, "-o", outdir, "--module", m]
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
         if r.returncode != 0:

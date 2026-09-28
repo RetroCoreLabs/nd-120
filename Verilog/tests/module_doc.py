@@ -33,7 +33,7 @@ EXAMPLE
     python3 tests/module_doc.py Shared/support/TTL_74245.v -o Shared/support/doc \\
         --note "TB_RESULT: PASS - 524292 checks, exhaustive"
 
-Last reviewed: 20-AUG-2026
+Last reviewed: 28-SEP-2026
 Ronny Hansen
 """
 import argparse
@@ -346,6 +346,32 @@ def draw_symbol(name, params, ports, note, out_png):
     return out_png
 
 
+def repo_relative(path):
+    """The source path as it should appear in a doc: relative to the top of
+    the git checkout, with forward slashes (Verilog/Shared/support/TTL_74245.v).
+
+    RULE: a generated doc must never hold a machine path. These docs are
+    committed to a public repo, and a path like /mnt/e/... or E:\\... is only
+    right on one machine. The sweep (gen_module_docs.py) passes absolute
+    paths, and until 28-SEP-2026 this script wrote them as given, so every
+    doc carried the path of the machine that made it. Now the path is worked
+    out here, whatever form the caller used.
+
+    The top of the checkout is the nearest folder above the file that holds a
+    .git entry (a folder in a normal clone, a file in a worktree or
+    submodule). No git call is needed. If the file is not inside a checkout at
+    all, only the file name is written - never the full path."""
+    ap = os.path.abspath(path)
+    d = os.path.dirname(ap)
+    while True:
+        if os.path.exists(os.path.join(d, ".git")):
+            return os.path.relpath(ap, d).replace(os.sep, "/")
+        parent = os.path.dirname(d)
+        if parent == d:
+            return os.path.basename(ap)
+        d = parent
+
+
 def write_md(name, title, author, desc, params, ports, note, src_rel,
              png_rel, out_md):
     L = []
@@ -424,7 +450,9 @@ def main():
         made.append(draw_symbol(name, params, ports, args.note, png))
     if not args.png_only:
         made.append(write_md(name, title, author, desc, params, ports,
-                             args.note, args.source,
+                             # repo-relative, never the path as given -
+                             # see repo_relative() for the rule
+                             args.note, repo_relative(args.source),
                              os.path.basename(png) if not args.md_only else "",
                              md))
     for f in made:
