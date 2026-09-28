@@ -108,6 +108,16 @@ test-blockram-errfa: MEM_RAM_49_BLOCKRAM_ERRFA_tb
 MEM_RAM_49_BLOCKRAM_ERRFA_tb: MEM_RAM_49_BLOCKRAM_ERRFA_tb.v $(CIRCUIT)/MEM_RAM_49_BLOCKRAM.v
 	$(IVERILOG) -g2012 -DND120_ERRFA_PROBE -DND120_ERRFA_BAUD_DIV=16 -DND120_ERRFA_GAP_BITS=18 -DND120_ERRFA_RWAIT_BITS=13 -o $@ MEM_RAM_49_BLOCKRAM_ERRFA_tb.v $(CIRCUIT)/MEM_RAM_49_BLOCKRAM.v
 
+# MEM_RAM_49_BLOCKRAM: the Quartus arm (-DQUARTUS_RAM_INFER, MiSTer only) vs
+# the plain arm every other toolchain builds. MEM_RAM_49_BLOCKRAM_equiv_tb is
+# built twice; each arm must pass its own read-back self-check AND the two
+# cycle logs must be identical. The script lives with its WCS twin in
+# Shared/support/sim (test-quartus-ram-equiv there runs the IDT6168A_20 pair).
+.PHONY: test-mem-ram-equiv
+test-mem-ram-equiv: MEM_RAM_49_BLOCKRAM_equiv_tb.v $(CIRCUIT)/MEM_RAM_49_BLOCKRAM.v
+	$(SUPPORT)/sim/run_quartus_ram_equiv.sh mem | tee mem_ram_equiv_result.tmp
+	@grep -q "^TB_RESULT: PASS" mem_ram_equiv_result.tmp && rm -f mem_ram_equiv_result.tmp
+
 # BIF datapath sheets: run the same vectors in latch mode (plain) and FF
 # mode (-DFPGA_FF_MODE, the P1c-2/P1d sysclk edge-captures). Both must pass.
 BIF_SUPPORT = ../../../Shared/support

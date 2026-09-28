@@ -413,6 +413,12 @@ AM29C821_func_tb: AM29C821_func_tb.v ../AM29C821.v
 # The megafunction arm was deleted the same day; this gate is what keeps its
 # replacement honest.
 ###############################################################################
+#
+# This target runs the WCS pair (IDT6168A_20_equiv_tb). The main-memory pair
+# (MEM_RAM_49_BLOCKRAM_equiv_tb) runs from its own directory:
+# CPU-BOARD-3202/circuit/sim, make test-mem-ram-equiv. Each arm must pass its
+# own self-check as well as match the other arm.
 .PHONY: test-quartus-ram-equiv
-test-quartus-ram-equiv:
-	@./run_quartus_ram_equiv.sh
+test-quartus-ram-equiv: IDT6168A_20_equiv_tb.v ../IDT6168A_20.v
+	./run_quartus_ram_equiv.sh wcs | tee quartus_ram_equiv_result.tmp
+	@grep -q "^TB_RESULT: PASS" quartus_ram_equiv_result.tmp && rm -f quartus_ram_equiv_result.tmp

@@ -134,7 +134,12 @@ REGISTRY=(
   # (altsyncram registers the address as well): every microinstruction
   # arrived a clock late and a nested microsubroutine return popped the wrong
   # address.
+  # Split in two 28-SEP-2026 so each testbench runs from its own sim/ folder:
+  # the WCS pair (IDT6168A_20_equiv_tb) and the main-memory pair
+  # (MEM_RAM_49_BLOCKRAM_equiv_tb). Each arm must also pass its own read-back
+  # self-check - two arms can agree on a wrong answer.
   "Shared/support/sim :: test-quartus-ram-equiv :: TB_RESULT: PASS"
+  "CPU-BOARD-3202/circuit/sim :: test-mem-ram-equiv :: TB_RESULT: PASS"
   "fpga/mister/sim :: test-csa-trace :: TB_RESULT: PASS"
   "fpga/mister/sim :: test-csa-trig :: TB_RESULT: PASS"
   "fpga/mister/sim :: test-sterr :: TB_RESULT: PASS"
@@ -158,6 +163,11 @@ REGISTRY=(
   # tests miss): key expander -> serializer, and a full PS/2 scancode -> byte
   "fpga/mister/sim :: test-kbd-uart :: TB_RESULT: PASS"
   "fpga/mister/sim :: test-kbd-chain :: TB_RESULT: PASS"
+  # the console serial line across the two clock domains: the CPU's SC2661 on
+  # the 20 MHz CPU clock (with nd120.qsf's UART defines) into the 7E1
+  # console_uart_rx on the 40 MHz pixel clock - five bytes, incl. a CR with
+  # software parity in bit 7 (console_bridge_tb, registered 28-SEP-2026)
+  "fpga/mister/sim :: test-console-bridge :: TB_RESULT: PASS"
   # --- MEGA65 core glue (02-SEP-2026) ---------------------------------------
   # the MEGA65 keyboard scan -> PS/2 events, checked THROUGH the shared TDV
   # decoder against the C64 keycaps (2" 6& :[ ;] + @ * = ...), ctrl, caps
@@ -170,6 +180,11 @@ REGISTRY=(
   # bus, QNICE-firmware-style strobes): the same 8 checks as the MiSTer's
   # test-storage-hps, against vdrives_model.v
   "fpga/mega65/sim :: test-storage-vdrives :: TB_RESULT: PASS"
+  # ...and the whole storage subsystem on it: two floppy drives, two
+  # Winchester units and the tape on their adapters over nd_storage_vdrives
+  # (the MiSTer's test-storage-devices on the vdrives backend; registered
+  # 28-SEP-2026 - it had a Makefile rule but no registry entry)
+  "fpga/mega65/sim :: test-storage-devices :: TB_RESULT: PASS"
   # the R3 HyperRAM backend: nd_ddr2_port's contract on an Avalon-MM master,
   # burst and single-beat fallback, random waitrequest/latency slave model
   "fpga/mega65/sim :: test-avalon-port :: TB_RESULT: PASS"

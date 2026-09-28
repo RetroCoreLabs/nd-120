@@ -47,6 +47,12 @@ module console_bridge_tb;
   SC2661_UART CPU_UART (
       .sysclk   (clk_cpu),
       .sys_rst_n(rst_n),
+      // Build-default baud (UART_BAUD_RATE), as nd120.sv wires it. Left
+      // unconnected (the first version of this bench) the port floats to z,
+      // so SC2661_UART's DELAY_FRAMES mux (BAUD_9600 ? 9600 : default) gives
+      // x and no byte ever arrived (measured 28-SEP-2026: 3 TXD edges, all
+      // four checks FAIL). A bench fault, not a board one.
+      .BAUD_9600(1'b0),
       .ADDRESS  (cpu_addr),   // 00 = data register, 11 = command register
       .BRCLK    (1'b0),
       .CE_n     (cpu_ce_n),
@@ -71,14 +77,20 @@ module console_bridge_tb;
   //--------------------------------------------------------------------------
   // Terminal side: exactly how nd120.sv instantiates it
   //--------------------------------------------------------------------------
+  // 7 data bits + a parity bit that is read and dropped (7E1), as nd120.sv
+  // has done since 02-SEP-2026: SINTRAN's boot text puts SOFTWARE parity in
+  // bit 7, and the terminal drops every byte >= 7F. The SC2661 still sends
+  // 8N1 - the receiver takes the eighth bit as the parity slot - so what
+  // arrives is the byte with bit 7 cleared. (This bench was written 31-AUG
+  // against the 8N1 receiver of that day.)
   wire       term_valid;
   wire [7:0] term_data;
 
   console_uart_rx #(
       .CLK_HZ   (40_000_000),
       .BAUD     (115_200),
-      .DATA_BITS(8),
-      .PARITY   (1'b0)
+      .DATA_BITS(7),
+      .PARITY   (1'b1)
   ) CONSOLE_UART_RX (
       .clk        (clk_pix),
       .rst_n      (rst_n),
@@ -145,6 +157,9 @@ module console_bridge_tb;
     end
   endtask
 
+  integer passed = 0;
+
+  // The 7E1 receiver hands over bit 7 cleared, so that is what must arrive.
   task expect_byte(input [7:0] ch, input [127:0] name);
     begin
       got_any = 1'b0;
@@ -155,11 +170,13 @@ module console_bridge_tb;
         $display("FAIL: %0s (%02x) - terminal received NOTHING (TXD edges seen: %0d)", name, ch,
                  txd_edges);
         errors = errors + 1;
-      end else if (got !== ch) begin
-        $display("FAIL: %0s - sent %02x, terminal got %02x", name, ch, got);
+      end else if (got !== {1'b0, ch[6:0]}) begin
+        $display("FAIL: %0s - sent %02x, terminal got %02x, expected %02x", name, ch, got,
+                 {1'b0, ch[6:0]});
         errors = errors + 1;
       end else begin
-        $display("  ok: %0s - %02x arrived intact", name, ch);
+        $display("  ok: %0s - sent %02x, %02x arrived", name, ch, got);
+        passed = passed + 1;
       end
     end
   endtask
@@ -182,8 +199,11 @@ module console_bridge_tb;
     expect_byte(8'h41, "letter 'A'");
     expect_byte(8'h0D, "carriage return");
     expect_byte(8'h55, "0x55 alternating");
+    // CR as SINTRAN's boot text sends it: software parity in bit 7 (8D, as
+    // captured on the board's serial line 02-SEP-2026) - must arrive as 0D.
+    expect_byte(8'h8D, "CR + parity bit");
 
-    if (errors == 0) $display("TB_RESULT: PASS (console bridge carries bytes intact)");
+    if (errors == 0 && passed == 5) $display("TB_RESULT: PASS (console bridge carries bytes intact)");
     else $display("TB_RESULT: FAIL (%0d errors)", errors);
 
     $finish;

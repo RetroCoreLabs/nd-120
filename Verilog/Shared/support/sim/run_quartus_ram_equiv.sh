@@ -53,9 +53,18 @@ run_arm () {
     local label="$1" arm="$2" tb="$3" dut="$4" log="$5"; shift 5
     rm -f "$log"
     $IVERILOG -g2012 -o "/tmp/eq_${label}_${arm}" "$tb" "$dut" "$@" || return 1
-    $VVP "/tmp/eq_${label}_${arm}" > /dev/null 2>&1
+    # Each arm must ALSO pass its own self-check (28-SEP-2026): two arms that
+    # agree can agree on a wrong answer, so the diff alone is not enough.
+    local out; out=$($VVP "/tmp/eq_${label}_${arm}" 2>&1)
     cp "$log" "/tmp/eq_${label}_${arm}.txt" 2>/dev/null \
         || { echo "  $label/$arm: produced no log"; return 1; }
+    rm -f "$log"        # the copy in /tmp is the one compared; keep the tree clean
+    if ! printf '%s\n' "$out" | grep -q "^TB_RESULT: PASS"; then
+        echo "  $label/$arm: self-check did not pass:"
+        printf '%s\n' "$out" | grep -E "FAIL|checked" | head -12
+        return 1
+    fi
+    echo "  $label/$arm: $(printf '%s\n' "$out" | grep '^checked')"
 }
 
 # compare one Quartus arm against the reference arm
@@ -87,10 +96,23 @@ check () {          # $1 = label, $2 = tb, $3 = dut, $4 = logfile, $5 = workdir
     return $rc
 }
 
+# Which pair to check: "wcs" (IDT6168A_20, run by this directory's
+# test-quartus-ram-equiv), "mem" (MEM_RAM_49_BLOCKRAM, run by
+# CPU-BOARD-3202/circuit/sim test-mem-ram-equiv), or none given = both.
+which="${1:-all}"
+case "$which" in
+    wcs|mem|all) ;;
+    *) echo "usage: $0 [wcs|mem]"; echo "TB_RESULT: FAIL"; exit 1 ;;
+esac
+
 echo "Quartus RAM arm vs the plain-Verilog reference arm:"
-check wcs  "$HERE/IDT6168A_20_equiv_tb.v" "$SUP/IDT6168A_20.v" equiv_log.txt "$HERE" || fail=1
-check mem  "$CIRC/sim/MEM_RAM_49_BLOCKRAM_equiv_tb.v" "$CIRC/MEM_RAM_49_BLOCKRAM.v" \
-           mem_equiv_log.txt "$CIRC/sim" || fail=1
+if [ "$which" != mem ]; then
+    check wcs  "$HERE/IDT6168A_20_equiv_tb.v" "$SUP/IDT6168A_20.v" equiv_log.txt "$HERE" || fail=1
+fi
+if [ "$which" != wcs ]; then
+    check mem  "$CIRC/sim/MEM_RAM_49_BLOCKRAM_equiv_tb.v" "$CIRC/MEM_RAM_49_BLOCKRAM.v" \
+               mem_equiv_log.txt "$CIRC/sim" || fail=1
+fi
 
 if [ "$fail" -eq 0 ]; then echo "TB_RESULT: PASS"; else echo "TB_RESULT: FAIL"; fi
 exit $fail

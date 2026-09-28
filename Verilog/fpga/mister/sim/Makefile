@@ -31,9 +31,9 @@ TERM_SRC = $(TERM)/terminal_top.v $(TERM)/terminal_ctrl.v $(TERM)/terminal_ctrl_
            $(TERM)/term_banner.v $(TERM)/term_banner_rom.v \
            $(TERM)/term_console_feed.v $(TERM)/term_panel.v $(TERM)/term_panel_rom.v $(TERM)/rate_meter.v $(TERM)/ratio_meter.v
 
-.PHONY: all test-console test-diag-print test-csa-trace test-csa-trig test-sterr test-storage-hps test-storage-devices test-console-burst test-console-burst-fast test-storage-reset test-kbd-uart test-kbd-chain lint clean
+.PHONY: all test-console test-diag-print test-csa-trace test-csa-trig test-sterr test-storage-hps test-storage-devices test-console-burst test-console-burst-fast test-storage-reset test-kbd-uart test-kbd-chain test-console-bridge lint clean
 
-all: test-console test-diag-print test-csa-trace test-csa-trig test-sterr test-storage-hps test-storage-devices test-console-burst test-console-burst-fast test-storage-reset test-kbd-uart test-kbd-chain
+all: test-console test-diag-print test-csa-trace test-csa-trig test-sterr test-storage-hps test-storage-devices test-console-burst test-console-burst-fast test-storage-reset test-kbd-uart test-kbd-chain test-console-bridge
 	@echo "MiSTer core: all testbenches passed"
 
 # The storage backend: the ND-120 client bus (Verilog/docs/
@@ -181,6 +181,21 @@ test-kbd-chain: kbd_chain_tb.vvp
 
 kbd_chain_tb.vvp: kbd_chain_tb.v $(GLUE)/nd120_console_mister.v $(TERMR)/console_uart_tx.v 		$(TERMR)/ps2_decoder_tdv.v $(TERMR)/ps2_ascii_table_tdv.v $(TERMR)/key_tdv2200.v $(TERM_SRC)
 	$(IVERILOG) $(IVFLAGS) -o $@ $^
+
+# The console serial line between the two clock domains: the CPU's real
+# SC2661 on clk_cpu (20 MHz) into console_uart_rx on the 40 MHz pixel clock,
+# both at 115200. Built with the same UART defines nd120.qsf gives the board
+# (BOARD_CLK_FREQ, UART_BAUD_RATE, ND120_UART_DELAY_FRAMES=173): if the CPU
+# side falls back to SC2661_UART's 100 MHz default it sends at ~23 kbaud and
+# the board shows "no prompt, no echo" with the CPU otherwise healthy.
+SUPPORTR = ../../../Shared/support
+test-console-bridge: console_bridge_tb.vvp
+	@$(VVP) $< | tee console_bridge_tb.log
+	@grep -q "TB_RESULT: PASS" console_bridge_tb.log || { echo "console_bridge_tb FAILED"; exit 1; }
+
+console_bridge_tb.vvp: console_bridge_tb.v $(SUPPORTR)/SC2661_UART.v $(TERMR)/console_uart_rx.v
+	$(IVERILOG) $(IVFLAGS) -DBOARD_CLK_FREQ=20000000 -DUART_BAUD_RATE=115200 \
+		-DND120_UART_DELAY_FRAMES=173 -o $@ $^
 
 clean:
 	rm -f *.vvp *.vcd *.log
