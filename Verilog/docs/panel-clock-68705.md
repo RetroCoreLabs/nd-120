@@ -84,12 +84,17 @@ The clock starts at 0 = 1979-01-01 00:00 at FPGA power-up; SINTRAN's `@UPDAT`
 
 ## Enabling it
 
-Off by default everywhere - the Tang Nano 20K is nearly full.
+ON by default on every FPGA build (Tang, Nexys, MiSTer, MEGA65); off in the
+Verilator sims unless `PANEL_CLOCK=1`. The Tang, Nexys and MEGA65 builds have
+a switch to leave it out (the Tang Nano 20K is nearly full); on the MiSTer it
+is one line in the qsf.
 
 | where | how |
 |-------|-----|
 | Tang Nano 20K | ON BY DEFAULT (adds `` `define ND120_PANEL_CLOCK`` to `build/tang20k_variant.v`); `.\gowin_build.ps1 -Variant fast20 -NoPanelClock` falls back to the stub |
 | Nexys 4 DDR | ON BY DEFAULT (adds `ND120_PANEL_CLOCK` to the synth defines); `build.tcl ... -NoPanelClock` falls back to the stub (same spelling as the Tang; the tcl matches with or without the dash, any case) |
+| MiSTer | ON (`VERILOG_MACRO "ND120_PANEL_CLOCK=1"` in `fpga/mister/nd120.qsf`) |
+| MEGA65 | ON by default; `build.tcl ... nopanelclock` leaves it out |
 | Verilator `sim/` and `runSim/` | `PANEL_CLOCK=1` on the make line (also reaches the `probe*` engines in `sim/`) |
 | unit tests | always built (`test-pancal-clock`, `test-pancal-clock-ff`); the stub contract test `test-pancal` still builds without the define |
 
@@ -106,8 +111,8 @@ Tang and the Nexys builds read); without the define it is an unused module.
 - `make test-pancal` (stub, no define): 8194 checks, PASS - the default build
   is unchanged.
 - Verilator lint (`-Wall`, latch and FF) of `IO_PANCAL_40` with the define: clean.
-- Full-tree `sim/ make test_nd120 PANEL_CLOCK=1 USE_LATCHES=0`: the same 82
-  pre-existing `-Wall` warnings as without the define (CGA_WRF/CGA_MAC
+- Full-tree `sim/ make test_nd120 PANEL_CLOCK=1 USE_LATCHES=0` (28-AUG-2026):
+  the same 82 pre-existing `-Wall` warnings as without the define (CGA_WRF/CGA_MAC
   PINMISSING etc.), none in the new or edited files.
 
 ## Not modelled (display only)
@@ -142,7 +147,11 @@ two faults in the recreated DGA, both independent of the panel clock:
    UART read, IDBS o37, CLK0-registered `RUARTN`) holds its data one phase
    later. Fix: `EPANSN = comb(o20) & ~MAPANS` - the comb window stays for
    o20 (MIPANS, needed by `COND,F15`), o21 (MAPANS, the macro read) uses the
-   existing A275 CLK0-registered decode. Two other variants (registered term
+   existing A275 CLK0-registered decode. **Changed again 30-AUG-2026:** the
+   o20 comb window is now also shut for the whole of any RWCS
+   microinstruction (`RWCSN` input, `DECODE_DGA_IDBS.v`), because it let the
+   panel status word onto the IDB while the control store was showing a data
+   word (cache test 1, fault 4 in `CACHE-STATUS.md`). Two other variants (registered term
    for both codes, or comb AND registered) were tried first and both killed
    OPCOM console input - the extra window lands in the next microinstruction's
    IDB data phase. The IDBS and DGA-top unit tests model the split.
@@ -177,7 +186,7 @@ fixes the message came between the banner and the HELP line.)
 DEVICECORE_FLOPPY=1 PANEL_CLOCK=1 EXTRA_VDEFINES="-DND120_PANEL_CLOCK_TRACE"
 EXTRA_CFLAGS="-DSCRIPT_INPUT -DSCRIPT_CMD_FBOOT"` then
 `ND120_FLOPPYCORE_IMG=FLOPPY1.IMG ND120_MAX_CNT=400000000 ./obj_dir/VND120_TOP`
-boots the TPE Monitor B01 floppy with `1560&`. NOTE: at HEAD the Verilator
+boots the TPE Monitor B01 floppy with `1560&`. NOTE: on 28-AUG-2026 the Verilator
 builds in `sim/` and `runSim/` stop on 82 pre-existing `-Wall` warnings
 (IMPLICIT `DBG_PPN`/`DBG_PTW`/`PF_CAPTURED`/`DBG_WDSTAGE`, PINMISSING
 `DBG_PTW_LVL`/`DBG_PANEL`, all from the 25-AUG squash); the runs above passed
@@ -205,5 +214,6 @@ TWO TRAPS, both of which produced convincing false results first:
    nothing reboots - a `@DATCL` afterwards then reads the still-running
    software clock and looks like a pass. `@OPCOM` is the way there.
 
-Still open: the Nexys round trip, and the power-up preset (the clock starts at
+Still open: the Nexys round trip (the Nexys README still says "Proven on the
+Tang" only), and the power-up preset (the clock starts at
 1979-01-01, so the first boot after power-on always reports it incorrect).

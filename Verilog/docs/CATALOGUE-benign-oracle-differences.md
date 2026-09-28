@@ -99,6 +99,14 @@ contexts, **all 25 visible differences were this artifact and nothing else.**
 **Suppression:** treat `next_pc == pc` where the next row's opcode equals the
 register value as an EXR emission, not a control-flow difference.
 
+## B8. nd100x updates PGS only on a fault
+
+nd100x updates PGS ONLY on a fault (all four `UpdatePGS` call sites in
+`src/cpu/cpu_mms.c` are error paths); the real ND-120 PGS follows every
+VACC-qualified access. A PGS value that differs between the two traces
+outside a fault is expected. (Recorded 23-AUG-2026 in a retired Tang plan,
+git `043c460`; not re-checked against nd100x since.)
+
 ## Note on key tightness - it cuts BOTH ways
 
 A tight key removes false positives but can also HIDE real differences: the

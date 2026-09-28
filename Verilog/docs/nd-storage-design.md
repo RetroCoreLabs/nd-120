@@ -1,206 +1,71 @@
 # nd_storage - RTL design and implementation plan
 
-Status: PLAN OF RECORD 11-JUL-2026. Derived from nd-storage-interface-spec.md; amendments from nd-storage-spec-validation.md are folded in. Implementation proceeds step by step per section 7; every step ends in a registered passing test.
+Status: BUILT and in use - SINTRAN III boots on the Tang Nano 20K from a
+Winchester image on the SD card through this stack (24-AUG-2026). Written as
+the plan of record on 11-JUL-2026, derived from nd-storage-interface-spec.md;
+the decisions of the 11-JUL spec review are folded in.
 
-IMPLEMENTATION STATUS (11-JUL-2026):
-  step 1 DONE  nds_sync.v + CDC word bridge      gate: SD-FAT/sim test-nds-cdc
-  step 2 DONE  nds_mem_model.v + engine read path gate: SD-FAT/sim test-nds-engine
-               (round-robin arbiter, client front-ends, range check)
-  step 3 DONE  engine write path vs real sd_writer gate: SD-FAT/sim test-nds-write
-               (card-first/SDRAM-second proven mid-flight; injected CMD24
-               failure leaves SDRAM intact; found+fixed a one-cycle-early
-               client-buffer sample that shifted blocks by one word)
-  step 4 DONE  nd_storage_mount.v + nd_storage.v top gate: SD-FAT/sim test-nds-mount
-               (full stack vs a real FAT16 image: preload byte-exact incl
-               zero-padded tail word, n_blocks=ceil, missing-file and
-               oversize-file open_err with zero payload traffic, SMD
-               clients refused via PRELOAD_MASK with zero SD traffic,
-               block read through the client port, reopen/rewind; the
-               engine's client indices widened to 3 bits / SLOT4..6 added
-               as flagged above; SDFAT_STORAGE added to sd_fat_features.vh;
-               M_CHK is a pass-through placeholder until step 5)
-  step 5 DONE  nd_storage_fatchk.v contiguity gate  gates: SD-FAT/sim
-               test-nds-fatchk-unit (checker vs scripted engine stub:
-               FAT16+FAT32 entry formats, EOC thresholds, sector-cache
-               read counts, hop cap, err/no-wedge) and test-nds-fatchk
-               (full stack vs the image's deliberately fragmented
-               FRAG.IMG - built and SELF-VERIFIED by
-               make_storage_image.sh, which refuses to emit an
-               accidentally-contiguous image: open_err/no open_ok,
-               contiguous neighbor still opens, failed open retryable;
-               plus a -DSDFAT_NO_STORAGE_CHECK elaboration lint).
-               SDFAT_STORAGE_CHECK is live; mount M_CHK pulses
-               chk_start and follows chk_ok; the checker owns the
-               sd_writer command mux (rd_mode=1) while chk_busy. The
-               mount latch set grew fs_is_fat32 + the file size
-               (chk_is_fat32/chk_size), as anticipated. Split into its
-               own registered target to keep test-nds-mount's runtime.
-  step 6 DONE  Verilator system gate               gate: SD-FAT/sim
-               test-storage (registered): nd_storage_vtop.v (the full
-               stack; SD lines resolved WITHOUT 'z' - DUT oe wins, then
-               the card model, then the pullup; clients 0..3 wired out,
-               client 3 put inside PRELOAD_MASK for the missing-file
-               case) + test_nd_storage.cpp: C++ SD card model adapted
-               from the proven sd-fat-test model (CMD17/18/24/25/
-               ACMD23/CMD12, CRC both ways) with the always-on illegal-
-               write assertion TIGHTENED to "only the mounted files'
-               data sectors are legal", plus a C++ mem model (the
-               nds_mem_model contract, randomized 4..40-cycle latency);
-               clocks 27.03/23.04 MHz (CDC stress). Acceptance 1 (open
-               + preload byte-exact incl. the zero-padded tail word,
-               size_bytes exact, n_blocks proven behaviorally at both
-               edges), 2 (block reads byte-exact; post-run fsck in C++:
-               boot-sector snapshot, root dir entries, contiguous
-               chains + EOC, and a whole-image compare against an
-               expected image patched only at the verified writes;
-               fsck.vfat -n on the dumped post image in the Makefile),
-               3 (simultaneous requests on all mountable clients,
-               served exactly once each, distinct patterns, no cross-
-               leak, ZERO SD traffic - v1 has 3 preloadable clients,
-               so "4 clients" = 3 concurrent + the SMD/missing-file
-               open), write-through (4 CMD24 commits, LAST card commit
-               measurably before the FIRST SDRAM write, neighbors
-               untouched on card and SDRAM, read-back exact), 5
-               (injected CMD24 CRC-status "101" -> done+err, SDRAM slot
-               intact, card image unchanged, open_ok STAYS UP, sd_status
-               ERROR, retry succeeds; missing file -> open_err;
-               out-of-range -> err with zero mem AND zero SD traffic).
-               make_storage_image.sh extended with a SELF-VERIFIED
-               nds_storage_full.img (TAPE.BPUN 3001 B + FLOPPY1.IMG
-               12288 B + FLOPPY2.IMG 8192 B; contiguity re-walked +
-               fsck before emit; the step-4/5 image is unchanged).
-               First green run was against the clean-room
-               sd_file_reader.v replacement (CMD18 run streaming).
-               FLAG for steps 7/8: writing the partial TAIL block of a
-               file whose size is not a 2048 multiple (e.g. TAPE.BPUN
-               block 1) would spill CMD24s past the file's cluster
-               chain into the NEXT file's sectors - adapters must never
-               write the tail block of an unaligned file (tape is
-               read-only; floppy/SMD images are block multiples).
-  step 7 DONE  nd_storage_tape_adapter.v            gate: SD-FAT/sim
-               test-nds-tape (registered): single-clock (clk_cpu)
-               byte-stream adapter per section 2.5, pin-for-pin against
-               ND_TAPE_400's byte port (byte_req/byte_valid/byte_data/
-               source_rewind) plus one client port and an open_start
-               pulse input; 1024x16 local block buffer, s_bptr byte
-               position, big-endian even-byte-high serve (4.1); EOF
-               (bptr >= size_bytes) and not-open = SILENCE with zero
-               client/mem traffic; rewind = bptr 0 + buffer invalidated
-               (an in-flight fetch is discarded on completion, no card
-               access); c_err = drop have_blk, stay silent, retryable.
-               READ-ONLY by construction (c_wr and c_buf_rdata tied 0),
-               so the step-6 partial-tail-write FLAG holds trivially.
-               Two-tier tb (nd_storage_tape_adapter_tb.v): tier A vs a
-               scripted client-port stub with a 0xEE-poisoned tail
-               (full 3001-byte stream byte-exact, explicit block-
-               boundary fetch at byte 2048, EOF silence on the
-               non-2048-multiple size, mid-stream rewind, c_err
-               no-wedge + retry, rewind during an in-flight fetch);
-               tier B = the adapter on client 0 of the REAL stack vs
-               nds_storage.img (TAPE.BPUN streamed whole and byte-
-               compared, EOF silence with zero req/mem traffic, rewind
-               + first-100-byte re-read, card health clean).
-  step 8 DONE  nd_storage_floppy_adapter.v          gate: SD-FAT/sim
-               test-nds-floppy (registered): single-clock (clk_cpu)
-               block adapter against ND_FLOPPY_DMA's disk-image backend
-               port AS FOUND IN THE SOURCE (one logical SECTOR per
-               disk_req: disk_wr/lsect[15:0]/format[1:0]/drive[1:0]/
-               wordcount[10:0] -> disk_done + disk_err, dbuf_addr/
-               wdata/we fill the device's sector buffer on reads,
-               combinational dbuf_rdata on writes - NOT the
-               disk_start/blkaddr1/blkaddr2/unit shape the interview
-               note guessed; section 2.6 documents the real contract).
-               Parameter DRIVE selects the served drive; a mismatching
-               disk_drive is ignored with all outputs 0 so two
-               instances (FLOPPY1.IMG=client 1, FLOPPY2.IMG=client 2)
-               can OR their outputs. Block math: word offset =
-               lsect << log2(wps), block = off[24:10]; every sector
-               size divides 1024 so no block straddle. 1024x16 local
-               buffer doubles as a one-block cache (sequential-read
-               hits skip the client fetch). Writes are RMW (pre-read
-               unless cached or a full aligned 1024-word block), and
-               the step-6 tail FLAG is a hard gate: a write errs
-               unless (block+1)*2048 <= size_bytes. Not-open/
-               out-of-range/c_err all end in disk_done WITH disk_err,
-               cache dropped, retryable, never a wedge. Two-tier tb:
-               tier A vs scripted client stub + disk driver replaying
-               the device tb's handshake (full expectation-shadow
-               compare after every write proves RMW preservation;
-               tail rule, c_err on fetch AND commit, drive-mismatch
-               silence); tier B on client 1 of the REAL stack vs
-               nds_storage.img (reads byte-exact, sector + RMW writes
-               verified IN THE CARD IMAGE at first_sector and read
-               back through the disk port, whole-4MB card shadow
-               compare against stray writes, card health clean).
-               OWNER DECISIONS 11-JUL (interview): (i) the adapter
-               targets ND_FLOPPY_DMA's backend, NOT ND_FLOPPY_PIO's
-               sector port: 1560& mass boot is the proven path; a PIO
-               adapter is optional later work.
-               (ii) SMD images are 75 MB real-world - SMD stays Phase 4
-               (tag-based caching), no small-image shortcut.
-               (iii) Step 10 integration into ND120_TOP/Tang top is
-               owned by the DEVICE workstream; this side delivers
-               nd_storage + adapters as a black box with a written
-               interface handoff. (iv) Order stands: 6 then 7 then 8.
-  step 9 DONE  storage device port in the SDRAM bridge  gate:
-               fpga/tang-nano-20k/sdram-bridge/sim :: test-storage-port
-               (registered). New build define ND_STORAGE_PORT (requires
-               ND_SDRAM_PACK16; set by the step-10 Tang storage build and
-               the gate only - every existing build is bit-identical):
-               sdram18.v grew a full-location access path (acc32/din32/
-               dout32 ports: rd/wr with acc32=1 moves the whole 32-bit
-               location at addr[21:1], writes drive all four DQM lanes,
-               same 5-cycle state machine, acc32=0 bit-identical);
-               MEM_RAM_49_SDRAM grew the section-5.2 mem port (stor_clk
-               domain: mem_start/we/addr[19:0]/wdata[31:0]/rdata[31:0]/
-               busy/done, toggle-CDC into clk2x) whose ops are granted
-               EXACTLY like refresh - B_POST slot after each CPU access,
-               B_TAIL during absent-row accesses, B_IDLE behind the
-               idle_cnt watchdog guard, always behind refresh priority -
-               so CPU accesses always win. Device address D is issued as
-               half-word {1'b1, D, 1'b0}: the leading 1 is FORCED in the
-               grant, so device traffic physically cannot reach the CPU
-               half of the chip (the caveat below is handled: the port
-               speaks full-location addresses, bit 0 of the CPU-side
-               half-word address never exists on the device side). The
-               tb runs device traffic CONCURRENTLY with the 2000-access
-               CPU protocol replay (1800+ device ops served) with the
-               late-N+4/N+5 sampling still asserting every CPU access,
-               plus directed first/last-location ops, a below-partition
-               write attempt proven to land in the storage half with the
-               CPU alias words intact, idle-slot service, and a 1M-
-               location mirror integrity check. Existing gates test /
-               test-pack16 / test-pack16-part re-run green unmodified.
-               Historical unblock note (11-JUL, commit d26fd66):
-               ND_SDRAM_PACK16 stores two 16-bit ND words per 32-bit
-               location (DQM lane-masked single-access writes, parity
-               computed on read - the self-test is PROVEN parity-free,
-               see docs/nd120-parity-analysis.md). CPU keeps the full
-               4 MB; storage owns the upper 4 MB as 32-bit locations
-               {1'b1, addr[19:0]} - exactly this design's mem-port
-               address contract. ND_STORAGE_PARTITION is SUPERSEDED.
-               The CPU/storage boundary knob is MEM_RAM_49_SDRAM
-               #(CPU_PART_ROWS) (1K-word ND rows, default 2048 = full
-               4 MB CPU; keep multiples of 1024; never hardcode the
-               boundary). CAVEAT for the device-port implementer:
-               under pack16 sdram18.v's CPU-side address is a 22-bit
-               HALF-word address (bit 0 = which 16-bit half); the
-               device port must use the full-location (32-bit word)
-               view. Bridge gates: sdram-bridge/sim test (legacy),
-               test-pack16, test-pack16-part - all registered.
-  step 10      device-workstream handoff (Tang top wiring: define
-               ND_STORAGE_PORT, connect stor_clk/stor_rst_n + the mem_*
-               group of MEM_RAM_49_SDRAM to nd_storage's mem port 1:1)
+**Two parts of the original plan were replaced after it was built. Read this
+first - some sections below still describe the old model and say so:**
+
+- **Nothing is preloaded any more (04-AUG-2026).** A mount only finds the file
+  and latches its geometry. Disc clients (SMD, Winchester) are served through
+  one shared block cache; tape and floppy are DIRECT (every request goes to the
+  card). Image size is no longer bounded by a slot. See section 2.7.
+- **Files no longer have to be contiguous (07-AUG-2026).** The engine walks the
+  FAT chain on every access (section 2.2, "FAT-chain resolve"). The mount-time
+  contiguity checker (section 2.4) is retired from every build and kept only
+  as a diagnostic.
+
+Build steps (each ended with a registered passing test; the per-step test
+notes are in git history):
+
+| step | what | gate |
+|---|---|---|
+| 1 | `nds_sync.v` + CDC word bridge | `SD-FAT/sim test-nds-cdc` |
+| 2 | `nds_mem_model.v` + engine read path (round-robin arbiter, client front-ends, range check) | `test-nds-engine` |
+| 3 | engine write path against the real `sd_writer` (card first, region second) | `test-nds-write` |
+| 4 | `nd_storage_mount.v` + `nd_storage.v` top; the engine's client indices widened to 3 bits | `test-nds-mount` |
+| 5 | `nd_storage_fatchk.v` contiguity gate (now a diagnostic only, see above) | `test-nds-fatchk-unit`, `test-nds-fatchk` |
+| 6 | Verilator system gate: `nd_storage_vtop.v` + `test_nd_storage.cpp` (C++ card and mem models, clocks 27.03/23.04 MHz to stress the CDC) | `test-storage` |
+| 7 | `nd_storage_tape_adapter.v` | `test-nds-tape` |
+| 8 | `nd_storage_floppy_adapter.v` (targets `ND_FLOPPY_DMA`'s backend) | `test-nds-floppy` |
+| 9 | storage device port in the SDRAM bridge (`ND_STORAGE_PORT`) | `fpga/tang-nano-20k/sdram-bridge/sim test-storage-port` |
+| 10 | board wiring: the Tang build defines `ND_STORAGE_PORT` (`tang20k_defines.v`) and wires `nd_storage` in `ND120_TANG20K_TOP.v` | SINTRAN boots from the card |
+| Phase 4 | shared block cache (`nd_storage_cache.v`) | `test-nds-cache`, `test-nds-cachepath` |
+| FAT walk | runtime FAT-chain resolve in the engine | `nd_storage_tb.v` case d2 (reads byte-exact across a relocated cluster of `FRAG.IMG`) |
+
+Facts from the build steps that still hold:
+
+- **Never write the partial tail block of a file** whose size is not a
+  multiple of 2048 bytes: the card writes would spill past the file's
+  clusters into the next file. Tape is read-only; the floppy adapter refuses
+  a write unless `(block+1)*2048 <= size_bytes`.
+- Owner decisions 11-JUL: (i) the floppy adapter targets `ND_FLOPPY_DMA`'s
+  backend, not `ND_FLOPPY_PIO` (`1560&` mass boot is the proven path; a PIO
+  adapter is optional later work); (ii) SMD images are real-world size
+  (75 MB), so SMD is served by the cache - no small-image shortcut.
+- Step 9, the SDRAM bridge port: `ND_STORAGE_PORT` requires
+  `ND_SDRAM_PACK16`. Device ops are granted exactly like refresh - the B_POST
+  slot after each CPU access, B_TAIL during absent-row accesses, B_IDLE behind
+  the `idle_cnt` guard, always behind refresh - so CPU accesses always win.
+  Device address D is issued as half-word `{1'b1, D, 1'b0}`; the leading 1 is
+  forced in the grant, so device traffic cannot reach the CPU half of the
+  chip. Under PACK16 the CPU keeps its 4 MB and storage owns the upper 4 MB as
+  32-bit locations `{1'b1, addr[19:0]}`. The CPU/storage boundary knob is
+  `MEM_RAM_49_SDRAM #(CPU_PART_ROWS)` (1K-word ND rows, default 2048 = full
+  4 MB for the CPU; keep multiples of 1024; never hard-code the boundary).
+  Under PACK16 `sdram18.v`'s CPU-side address is a 22-bit half-word address;
+  the device port uses the full-location (32-bit word) view.
+  `ND_STORAGE_PARTITION` (section 1.3) is superseded.
 
 Design for the multi-client storage facade specified in
 `Verilog/docs/nd-storage-interface-spec.md` (the binding contract).
-Companions: `Verilog/docs/device-bus-todo.md` (master plan),
-`Verilog/docs/sd-bpun-device-plan.md` (SD pins/card recipe),
+Companions: `Verilog/docs/sd-bpun-device-plan.md` (SD pins, tape-400 facts),
 `Verilog/SD-FAT/README.md` (library state), `Verilog/docs/nd120-dram-memory.md`
 (memory bridge). All paths relative to the repository root.
 
-Everything generic lands in `Verilog/SD-FAT/circuit/` (MIT project code next
-to the vendored GPL reader, same arrangement as today); board glue lands in
+Everything generic lands in `Verilog/SD-FAT/circuit/`; board glue lands in
 `Verilog/fpga/tang-nano-20k/sdram-bridge/`. Nothing touches DELILAH-CPU/,
 DECODE-GateArray/ or CPU-BOARD-3202/.
 
@@ -240,77 +105,58 @@ nd_storage itself never sees sdram18. It talks to an abstract **mem port**
 (section 5.2) in `clk_stor`; board glue (`sdram-bridge`) implements it, sim
 uses a behavioral model.
 
-### 1.3 SDRAM partition (the concrete map)
+### 1.3 The storage region (as built)
 
-Fact from the current bridge: `s_addr = {bank_q, row_q[9:0], AA_9_0}` covers
-the ENTIRE 2M-word SDRAM (ND BANK0 -> addr[20]=0, ND BANK1 -> addr[20]=1).
-There is no spare word-address space today; the "spare" is only the unused
-DQ[31:18] bits (14 bits - too narrow for a 16-bit disk word, and dropping
-parity was already rejected because the self-test writes bad parity).
+The storage region is 2048 blocks of 2048 bytes = 4 MB, addressed as
+`mem_addr[19:0] = {blk_abs[10:0], word[8:0]}` (32-bit words). It cannot be
+made larger cheaply: `s_blk_abs` in `nd_storage_engine.v` is 11 bits and the
+address feeds `ND120_CORE`, `ND3202D`, `MEM_43` and the SDRAM bridge. On the
+Tang the region is the upper 4 MB of the SDRAM (PACK16, see the step-9 note
+at the top); the CPU keeps its full 4 MB.
 
-Decision: **give up ND BANK1 when storage is enabled** (new build define
-`ND_STORAGE_PARTITION`, set only by the Tang storage build):
+Layout (parameters of `nd_storage.v`, defaults):
 
-```
-SDRAM word address space (2M x 32):
-  0x000000 - 0x0FFFFF  addr[20]=0  ND-120 BANK0, 1M x 18-bit words = 2 MB main memory
-  0x100000 - 0x1FFFFF  addr[20]=1  disk-image region, 1M x 32-bit words = 4 MB payload
-```
+| blocks | use |
+|---|---|
+| 0 (`STAGE_BASE_BLK`) | one shared staging line for every DIRECT client (tape, floppy) - safe because the arbiter serves one client at a time and a DIRECT line never outlives its own operation |
+| 1 .. 1024 (`POOL_BASE_BLK`, `CACHE_SETS` x `CACHE_WAYS` = 256 x 4) | the shared cache pool for the cached clients |
+| 1025 .. 2047 | unused (~2 MB) - see the open item in section 2.7 |
 
-With the define set, MEM_RAM_49_SDRAM treats BANK1 like BANK2 (`bsel_q <=
-BANK0` only, access falls into B_TAIL); the ND-120's boot-time memory sizing
-detects one bank - exactly how the machine shipped with less memory. Device
-data uses the FULL 32 bits per SDRAM word (two 16-bit disk words), so the
-4 MB region holds 2048 blocks of 2048 bytes.
+Card file set (root directory, fixed names, 8 clients):
 
-Default slot map (all values in 2048-byte blocks, parameters of nd_storage;
-the spec's "tape 64 KB / floppy 2 MB" defaults do not fit two floppies in a
-4 MB partition, so the Tang defaults use 1.25 MB floppy slots - real ND
-floppy images are <= 1.2 MB; SLOT_* are generics per spec section 6, so any
-board can override):
+| client | device | file | default |
+|---|---|---|---|
+| 0 | tape-400 | `TAPE.BPUN` | DIRECT |
+| 1 | floppy unit 1 | `FLOPPY1.IMG` | DIRECT |
+| 2 | floppy unit 2 | `FLOPPY2.IMG` | DIRECT |
+| 3-5 | SMD units 0-2 | `SMD0.IMG` .. `SMD2.IMG` | cached |
+| 6-7 | Winchester units 0-1 | `WD0.IMG`, `WD1.IMG` | cached |
 
-OWNER UPDATE 11-JUL-2026: the card file set is fixed as TAPE.BPUN,
-FLOPPY1.IMG, FLOPPY2.IMG (floppies are 1-based), SMD0.IMG..SMD3.IMG.
-That makes SEVEN clients. SMD images (tens of MB) cannot be fully
-preloaded into the 4 MB region: the SMD clients keep the same client
-port contract but their slots are CACHE WINDOWS - full-slot preload
-does not apply, they are served by the Phase-4 tag-based cache (spec
-section 8 scope fence). v1 implements full preload for clients 0-2
-only; SMD clients may be parameterized in but return open_err until
-Phase 4 lands. N_CLIENTS therefore grows to 7 (grant_id and any
-2-bit client indices in the engine widen to 3 bits - flag for the
-step-4+ implementer; the step-1..3 engine is parameterized but was
-exercised at N=2..4).
+`CACHE_MASK[c]` selects cached (1) or DIRECT (0) per client; the default is
+`8'b11111000`. Boards override the file names and the mask (see
+`nd_storage_devices.v` and the board tops).
 
-| client | device | file (root, fixed) | SLOTn_BASE_BLK | SLOTn_SIZE_BLK | bytes | preload |
-|---|---|---|---|---|---|---|
-| 0 | tape-400 | TAPE.BPUN | 0 | 32 | 64 KB | full (v1) |
-| 1 | floppy unit 1 | FLOPPY1.IMG | 32 | 640 | 1.25 MB | full (v1) |
-| 2 | floppy unit 2 | FLOPPY2.IMG | 672 | 640 | 1.25 MB | full (v1) |
-| 3 | SMD unit 0 | SMD0.IMG | 1312 | 160 | 320 KB | cache window (Phase 4) |
-| 4 | SMD unit 1 | SMD1.IMG | 1472 | 160 | 320 KB | cache window (Phase 4) |
-| 5 | SMD unit 2 | SMD2.IMG | 1632 | 160 | 320 KB | cache window (Phase 4) |
-| 6 | SMD unit 3 | SMD3.IMG | 1792 | 160 | 320 KB | cache window (Phase 4) |
-
-(blocks 1952..2047 = 192 KB spare. The parity refactor LANDED
-(ND_SDRAM_PACK16, commit d26fd66): the CPU keeps 4 MB and this whole
-4 MB region exists without sacrifice; CPU_PART_ROWS is the knob for
-trading CPU rows for a bigger cache region if SMD caching needs it.)
+The old model, for reading the history: the plan gave up ND BANK1 for a disk
+partition (`ND_STORAGE_PARTITION`) and preloaded tape and floppy images whole
+into fixed slots (`SLOTn_BASE_BLK`/`SLOTn_SIZE_BLK`). PACK16 removed the need
+for the partition, and Phase 4 removed the preload. The `SLOTn_*` parameters
+are still in `nd_storage.v` but bound nothing.
 
 ## 2. Module breakdown (Verilog/SD-FAT/circuit/ unless noted)
 
 | File | Responsibility (one line) | approx size |
 |---|---|---|
-| `nd_storage.v` | Top: SD reader+writer instances, SD pin mux (phase_write), mount/engine/fatchk wiring, status outputs | ~450 lines |
-| `nd_storage_engine.v` | Round-robin arbiter, per-client pending latches + clk_cpu front-ends (generate), CDC word bridge, block read/write engine, 512x32 staging BRAM | ~750 lines |
-| `nd_storage_mount.v` | Open/preload FSM: drive sd_file_reader per open, capture geometry/size/first-sector, stream file bytes -> 32-bit packer -> mem port, park reader | ~320 lines |
-| `nd_storage_fatchk.v` | Mount-time contiguity walker: verify FAT[c]=c+1 over the whole chain + EOC, via sd_writer read mode; ok/bad flag (SDFAT_STORAGE_CHECK) | ~180 lines |
+| `nd_storage.v` | Top: SD reader+writer instances, SD pin mux (phase_write), mount/engine/cache wiring, status outputs | ~450 lines |
+| `nd_storage_engine.v` | Round-robin arbiter, per-client pending latches + clk_cpu front-ends (generate), CDC word bridge, block read/write engine, cache fill, FAT-chain resolve, 512x32 staging BRAM | ~750 lines (plan) |
+| `nd_storage_mount.v` | Open FSM: drive sd_file_reader per open, capture geometry/size/first-sector/first cluster, park reader (no preload since Phase 4) | ~320 lines (plan) |
+| `nd_storage_fatchk.v` | Mount-time contiguity walker (diagnostic only since 07-AUG, section 2.4) | ~180 lines |
+| `nd_storage_cache.v` | Tag/LRU directory of the shared block cache (section 2.7) | - |
 | `nd_storage_tape_adapter.v` | Byte-stream adapter (spec section 5): one 1024x16 block buffer over one client port; byte_req/byte_valid/rewind, EOF = silence | ~230 lines |
-| `nd_storage_floppy_adapter.v` | Sector-device glue: ND_FLOPPY_PIO disk_*/dbuf_* onto one client port; read = stream filter, write = read-modify-write with internal 1024x16 buffer | ~280 lines |
+| `nd_storage_floppy_adapter.v` | Sector-device glue: ND_FLOPPY_DMA disk_*/dbuf_* onto one client port (section 2.6); write = read-modify-write with internal 1024x16 buffer | ~280 lines |
 | `nds_sync.v` | 2-flop toggle/pulse synchronizer primitive (one module, instantiated everywhere) | ~50 lines |
 | `Verilog/SD-FAT/sim/nds_mem_model.v` | Behavioral mem-port model: 1M x 32 array, parameterized/randomized ack latency, $readmem preload + hierarchical checking | ~110 lines |
 | `Verilog/fpga/tang-nano-20k/sdram-bridge/sdram18.v` (edit) | Add 32-bit data path: `din` widened to [31:0] internally via new `din32`, new `dout32` (nand2mario's sdram.v already has the dout32 pattern); CPU 18-bit path bit-identical | ~25 line diff |
-| `Verilog/fpga/tang-nano-20k/sdram-bridge/MEM_RAM_49_SDRAM.v` (edit) | Device port: mem-port toggles synced into clk2x, grant in B_POST/idle slots (same policy as refresh), `ND_STORAGE_PARTITION` bank gating | ~90 line diff |
+| `Verilog/fpga/tang-nano-20k/sdram-bridge/MEM_RAM_49_SDRAM.v` (edit) | Device port (`ND_STORAGE_PORT`): mem-port toggles synced into clk2x, grant in B_POST/B_TAIL/idle slots (same policy as refresh) | ~90 line diff |
 
 ### 2.1 nd_storage.v (top)
 
@@ -322,9 +168,9 @@ sd_fat_test_top pattern:
   (per-open full re-init = the proven rewind/card-swap recovery).
   `target_name`/`target_len` muxed from the granted client's FILE parameters.
 - `sd_writer` instance: `rst_n = rst_stor_n`, always alive. Its command pins
-  are muxed: fatchk owns it while `chk_busy`, otherwise the engine's
-  write-through path (the arbiter serializes mount and block ops, so there is
-  never contention).
+  are muxed: fatchk owns it while `chk_busy` (diagnostic builds only),
+  otherwise the engine - write-through, cache fill and FAT-walk reads (the
+  arbiter serializes mount and block ops, so there is never contention).
 - Pin mux (the ONLY consumers; tristate stays at the board top):
 
 ```
@@ -386,6 +232,50 @@ pull).
 Every SD/mem wait state carries the WD_MAX watchdog (sd-fat-test pattern);
 timeout -> E_DONE err=1 plus `sd_status <= SD_ERROR`.
 
+**Changes since the FSM above was written.** `E_GRANT` no longer maps a
+client block 1:1 onto a region block. A cached client goes through the cache
+directory (`C_LOOK`); a miss fetches 4 card sectors through `sd_writer`
+`rd_mode=1` (`C_SEC_GO`/`C_SEC_WAIT`), writes the line with `W_MEM`,
+publishes the tag (`C_ALLOC`) and then serves. A DIRECT client fetches into the
+staging line and serves from it inside its own grant. Bytes at or past
+`size_bytes` read as zero (the fill zero-fills them), so the slack at the end
+of a file's last cluster never reaches a client. See section 2.7.
+
+**FAT-chain resolve (07-AUG-2026).** The card sector is no longer
+`first_sector + block*4 + sec`, which assumed a contiguous file. Both
+card-sector paths - the cache fill (`C_SEC_GO`) and the write-through
+(`W_SEC_GO`) - get a resolve step in front (states `F_RES`, `F_STEP`,
+`F_FAT_GO`, `F_FAT_WAIT` in `nd_storage_engine.v`):
+
+- `target_sector_in_file = block*4 + sec`,
+  `target_cluster_idx = target_sector_in_file >> log2(cluster_size)`;
+- resolve the cluster index to a cluster by walking the FAT from the nearest
+  known point, then
+  `lba = data_start + (cluster-2)*cluster_size + (target_sector_in_file & (cluster_size-1))`;
+- a per-client walk memo `(memo_idx, memo_cluster)` plus `first_cluster`
+  (small registers, no RAM). A forward target walks from the memo; a backward
+  target restarts at `first_cluster`. Sequential and block-local access costs
+  0 or 1 FAT hops;
+- one hop = CMD17 of the FAT sector that holds the current cluster's entry
+  (`fat0_sector + (cluster*ENTSZ)/512`, ENTSZ 4 for FAT32, 2 for FAT16),
+  keeping only the entry's 2 or 4 bytes as the read stream passes offset
+  `(cluster*ENTSZ)%512`. No sector buffer; consecutive clusters usually share
+  a FAT sector but the hop re-reads on purpose (zero RAM, and the memo keeps
+  the steady state at about one hop). Entry masks and end-of-chain rules are
+  those of `nd_storage_fatchk.v` (FAT16 end at >= 0xFFF7; FAT32 uses bits
+  [27:0], end at >= 0x0FFFFFF7). An end of chain or an entry < 2 before the
+  target index is reached answers done+err - never a wrong-sector access;
+- geometry: the mount exports per-client `first_cluster` (captured at that
+  client's `open_ok`); cluster size, FAT start and FAT32 flag are
+  volume-global. `data_start = first_sector[c] - (first_cluster[c]-2)*cluster_size`
+  (cluster size is a power of two, so this is a shift).
+
+Ordering: the resolve runs BEFORE the write path commits client data to the
+card (`W_SEC_GO`) and before the cache-fill CMD17s (`C_SEC_GO`). Both paths
+already go through single-request serialization, so the resolve is a straight
+state insertion; the only shared resource is the `sd_writer` command port,
+which the engine already owns in those states.
+
 **Per-client front-end** (clk_cpu, generate block, one per client):
 
 ```
@@ -410,24 +300,22 @@ busy[c] = fe_busy[c]   (covers arbiter wait, per the spec waveform)
 
 ### 2.3 nd_storage_mount.v
 
-FSM (clk_stor), invoked by the engine per granted open:
+FSM (clk_stor), invoked by the engine per granted open. Since Phase 4 the
+mount establishes geometry only - it never moves file data:
 
 ```
 M_IDLE  -> M_INIT : phase_write<=0; release reader reset; clear open_ok[c]
 M_CARD  : wait card_stat>=8 (card_ready) | watchdog -> M_FAIL(SD_NOCARD)
 M_SCAN  : file_found -> latch {size, found_file_first_sector, fs geometry,
-          found_file_cluster}; size > SLOT_SIZE_BLK[c]*2048 -> park+M_FAIL
-          (before the first outen byte - the reader needs hundreds of
-          cycles to start READ_A_FILE, checked combinationally at latch)
+          found_file_cluster}; NO size-versus-slot check (an image is
+          limited only by the 16-bit block count, 128 MB). The reader
+          runs with no_stream=1, so it stops after the directory match
+          instead of streaming the file.
+          scan_done after a match -> M_PARK (clean command boundary)
           scan_done without file_found | watchdog -> M_FAIL
-M_LOAD  : consume outen/outbyte -> 4-byte big-endian packer -> 8x32 sync
-          FIFO -> mem writes at {SLOT_BASE_BLK[c],9'b0}+byte_cnt[21:2];
-          until scan_done & fifo empty (pad tail word with 0x00)
-          (rates: 1 byte per ~64 clk_stor from the reader vs ~20 clk_stor
-          per 4-byte mem write - the FIFO only absorbs jitter; tb asserts
-          no overflow)
 M_PARK  : reader rstn low (parked), phase_write<=1
-M_CHK   : `ifdef SDFAT_STORAGE_CHECK: chk_start; ok -> M_OK, bad -> M_FAIL
+M_CHK   : only with SDFAT_STORAGE_CHECK (diagnostic build):
+          chk_start; ok -> M_OK, bad -> M_FAIL
 M_OK    : open_ok[c]<=1; n_blocks[c]<=ceil(size/2048); mnt_done
 M_FAIL  : open_err[c]<=1; mnt_done (engine converts to done)
 ```
@@ -435,16 +323,29 @@ M_FAIL  : open_err[c]<=1; mnt_done (engine converts to done)
 `open_ok` stays up across later write errors (spec section 7); only a new
 open_req clears/rebuilds it.
 
-### 2.4 nd_storage_fatchk.v
+Two facts that cost time:
 
-sd_fat_check emits a human report, not a machine verdict, so mount uses a
-dedicated walker (reusing sd_fat_check's `fat_sec`/`fat_off`/`is_eoc`
-functions and its cache-one-FAT-sector pattern): for
-`n = ceil(size_bytes / (cluster_size*512))` clusters starting at
-`first_cluster`, require `FAT[first+i] == first+i+1` for i<n-1 and EOC at
-`FAT[first+n-1]`. Output `ok` level with `done`. Reads via sd_writer
-rd_mode=1 (reader parked). This enforces the v1 contiguity requirement at
-open (spec sections 6/8).
+- **Never stop the SD reader in the middle of a transfer.** Stopping
+  `rd_run` the moment `file_found` rises left the card inside a CMD17, and
+  the next card user failed. `no_stream` makes the reader stop at `H_DIR_NX`,
+  which is entered with the card idle, and the mount waits for `scan_done`.
+  So an open costs one directory scan, not one file read.
+- `M_LOAD`, the old preload streamer (8x32 FIFO, 24-bit byte packer), is
+  still in the file but can no longer be reached. `s_slot_bytes` is unused.
+  Both are open clean-up items.
+
+### 2.4 nd_storage_fatchk.v (retired from builds)
+
+The mount-time contiguity checker. For
+`n = ceil(size_bytes / (cluster_size*512))` clusters from `first_cluster` it
+requires `FAT[first+i] == first+i+1` for i<n-1 and an end mark at
+`FAT[first+n-1]`, reading through `sd_writer` `rd_mode=1` with the reader
+parked. Since 07-AUG-2026 the engine walks the FAT chain itself, so a
+fragmented file is simply correct and nothing is left for this gate to
+protect. `sd_fat_features.vh` only builds it under
+`-DSDFAT_FORCE_STORAGE_CHECK`; its testbenches force it so the diagnostic
+keeps its coverage. Removing it returned its logic to the Tang budget (the
+tape+floppy+WD build was 114 cells over with it).
 
 ### 2.5 nd_storage_tape_adapter.v (clk_cpu, single clock)
 
@@ -461,7 +362,8 @@ c_size_bytes` -> never answer (EOF = RFT stays low, C-model behavior);
 hit (`bptr[26:11]==cur_blk && have_blk`) -> byte_valid with
 `bptr[0] ? word[7:0] : word[15:8]` (big-endian), bptr++; miss -> c_req with
 c_block=bptr[26:11], wait c_done, then serve. `rewind`: bptr<=0,
-have_blk<=0 - **no card access** (image lives in SDRAM). c_err on done:
+have_blk<=0 - no card access until the next byte_req (since Phase 4 the
+tape client is DIRECT, so that fetch goes to the card). c_err on done:
 drop have_blk, stay silent (tape runout).
 
 ### 2.6 nd_storage_floppy_adapter.v (clk_cpu) - AS BUILT (step 8)
@@ -523,27 +425,113 @@ open_start (board/boot pulse) passes through as c_open_req, as in the tape
 adapter. This module is used both by acceptance test 6 (gate
 test-nds-floppy) and by the real Tang build.
 
+### 2.7 nd_storage_cache.v - the shared block cache (Phase 4, as built 04/05-AUG-2026)
+
+**Why.** v1 mapped an image block straight onto a region block
+(`s_blk_abs <= slot_base + op_block`), so an image could never be larger than
+its slot, and the mount refused it. A real Winchester image (`WD0.IMG`,
+78,643,200 bytes) against a 128-block (256 KB) slot failed to mount; every
+block request then took the zero-fill error path, and DISC-TEMA reported a
+controller that finished with no error bit and all-zero data (status
+`060010b`). The controller was not at fault.
+
+**Owner's rules (04-AUG-2026):** no image is preloaded; a dynamic read cache
+with write-through that keeps the most used blocks; floppy and tape are not
+cached (the SD card is quick enough for them), the SMD and the Winchester are,
+so SINTRAN runs quickly; caching can be turned on and off per device class.
+The owner chose one SHARED pool over all cached clients, 4-way
+set-associative, true LRU, write-through and write-allocate. Shared rather
+than per unit, so the disc doing the work gets the whole pool and an idle
+second unit costs nothing.
+
+**Organisation** (the module header of `SD-FAT/circuit/nd_storage_cache.v`
+is the detailed reference):
+
+- `set = client_block[SETIDX-1:0]`, `tag = {client[2:0], client_block[15:SETIDX]}`,
+  `region block = POOL_BASE_BLK + set*WAYS + way`. The client id is inside the
+  tag, so unit 0 block 5 and unit 1 block 5 cannot alias.
+- One array, `dir_ram`, holds `{ valid(WAYS) | rank(WAYS*2) | tag(WAYS*TAGW) }`
+  per set: one write port, one registered read, no reset. All ways of a set
+  compare in the same cycle.
+- After reset a walking clear (one set per cycle) empties the directory.
+- Interface: `lookup_req/done/hit/way/line`, `alloc_req/done`,
+  `inval_req/done`; one outstanding lookup (the engine serialises anyway).
+- Enabling the floppy later is one bit in `CACHE_MASK`.
+
+**Measured with yosys `synth_gowin` on the module alone, 512 sets x 4 ways:**
+
+| version of the directory | result |
+|---|---|
+| separate `rank_ram`/`valid_ram` flip-flop arrays, read combinationally | 187,283 AND gates |
+| merged into one word, but written inside the async-reset process | 844,694 AND gates |
+| merged, written in its own reset-free process | ~700 LUT-class cells + 2 BSRAM + ~190 FF |
+
+512 sets cost no more logic than 256, because it all lives in block RAM.
+
+Four faults found while building it, all fixed:
+
+1. Stopping the SD reader in the middle of a transfer corrupts the next card
+   access (section 2.3).
+2. The engine first gave each DIRECT client its own staging line at
+   `STAGE_BASE_BLK + client`, which overlapped the pool at `POOL_BASE_BLK = 1`:
+   silent cross-corruption. Now one shared staging line.
+3. A fill pulls whole 2048-byte blocks, so the last block of a file that is
+   not a multiple of 2048 dragged in cluster slack (`TAPE.BPUN`, 3001 bytes,
+   returned junk from byte 3001). The fill now zero-fills at and past
+   `size_bytes`.
+4. Dropping the reset loop to get block RAM left the LRU ranks undefined;
+   early eviction tests had passed by luck. The walking clear gives every way
+   a defined rank.
+
+What `test-nds-cachepath` (`nd_storage_cachepath_tb.v`, 2 sets x 2 ways)
+proves: a cold fill returns the card's bytes; a re-read is a hit with zero
+card and zero region traffic; a cold set fills both ways before evicting; the
+third tag in a set evicts the LRU way (the survivor is checked before the
+victim is re-read); write-allocate; write-through to a resident line returns
+the new data; an out-of-range block answers done+err with no traffic; a
+DIRECT client never raises a lookup. Built with `CACHE_MASK = 0` it fails
+with 6 errors, so the checks have teeth.
+
+**Open (listed in `Verilog/TODO.md`):**
+
+- Remove the dead `M_LOAD` path and `s_slot_bytes` from
+  `nd_storage_mount.v` (frees an 8x32 FIFO, the byte packer and counters).
+- Remove the vestigial `SLOTn_*` parameters from `nd_storage.v`.
+- The pool uses 1024 of the 2048 region blocks; ~2 MB is unused. A
+  power-of-two pool plus one staging line cannot reach 2048. The options are
+  to accept it, or `CACHE_WAYS = 3` with `CACHE_SETS = 512` (1536 lines,
+  3-way LRU - the 2-bit rank field and the `WAYW` derivation already handle
+  3). The geometry is the owner's call.
+
+Measured null result (Tang, 6.75 MHz / 9600-baud era, 23-AUG-2026): cache on,
+`-DiscsUncached` and `-NoStorageCache` all reached the same point at 143 s -
+no boot-speed difference at 1 s resolution over ~30 disc operations.
+
 ## 3. Parameterization and feature flags
 
 `nd_storage` parameters (Verilog-2001, per-index pairs like the existing
 FILE2_NAME/FILE3_NAME pattern; N_CLIENTS <= 4 uses the first N):
 
 ```
-parameter         N_CLIENTS   = 4
-parameter [2:0]   RD_CLK_DIV  = 3'd2          // sd_file_reader (27 MHz class)
-parameter [7:0]   WR_CLKDIV   = 8'd5          // sd_writer bit clock
-parameter [31:0]  WD_MAX      = 32'd270_000_000
-parameter         SIMULATE    = 0             // short SD init in sim
-parameter         N_CLIENTS   = 7   (owner file set, 11-JUL-2026)
-parameter [52*8-1:0] FILE0_NAME = "TAPE.BPUN"   , parameter [7:0] FILE0_LEN = 8'd9
-parameter [52*8-1:0] FILE1_NAME = "FLOPPY1.IMG" , parameter [7:0] FILE1_LEN = 8'd11
-parameter [52*8-1:0] FILE2_NAME = "FLOPPY2.IMG" , parameter [7:0] FILE2_LEN = 8'd11
-parameter [52*8-1:0] FILE3_NAME = "SMD0.IMG"    , parameter [7:0] FILE3_LEN = 8'd8
-parameter [52*8-1:0] FILE4_NAME = "SMD1.IMG"    , parameter [7:0] FILE4_LEN = 8'd8
-parameter [52*8-1:0] FILE5_NAME = "SMD2.IMG"    , parameter [7:0] FILE5_LEN = 8'd8
-parameter [52*8-1:0] FILE6_NAME = "SMD3.IMG"    , parameter [7:0] FILE6_LEN = 8'd8
-SLOT bases/sizes per the client map table above (v1 preload only for
-clients 0-2; SMD slots reserved as Phase-4 cache windows)
+parameter            N_CLIENTS    = 8
+parameter [2:0]      RD_CLK_DIV   = 3'd2          // sd_file_reader (25-50 MHz clk)
+parameter [7:0]      WR_CLKDIV    = 8'd1          // sd_writer bit clock divider
+parameter integer    USE_4BIT     = 0             // 1 = 4-bit SD data bus
+parameter [31:0]     WD_MAX       = 32'd270_000_000
+parameter            SIMULATE     = 0             // short SD init in sim
+parameter [7:0]      CACHE_MASK   = 8'b11111000   // disc classes cached
+parameter [31:0]     STAGE_BASE_BLK = 32'd0
+parameter [31:0]     POOL_BASE_BLK  = 32'd1
+parameter            CACHE_SETS = 256, CACHE_SETIDX = 8, CACHE_WAYS = 4
+parameter [52*8-1:0] FILE0_NAME = "TAPE.BPUN"   , FILE0_LEN = 8'd9
+parameter [52*8-1:0] FILE1_NAME = "FLOPPY1.IMG" , FILE1_LEN = 8'd11
+parameter [52*8-1:0] FILE2_NAME = "FLOPPY2.IMG" , FILE2_LEN = 8'd11
+parameter [52*8-1:0] FILE3_NAME = "SMD0.IMG"    , FILE3_LEN = 8'd8
+parameter [52*8-1:0] FILE4_NAME = "SMD1.IMG"    , FILE4_LEN = 8'd8
+parameter [52*8-1:0] FILE5_NAME = "SMD2.IMG"    , FILE5_LEN = 8'd8
+parameter [52*8-1:0] FILE6_NAME = "WD0.IMG"     , FILE6_LEN = 8'd7
+parameter [52*8-1:0] FILE7_NAME = "WD1.IMG"     , FILE7_LEN = 8'd7
+SLOTn_BASE_BLK / SLOTn_SIZE_BLK: vestigial since Phase 4 (section 1.3)
 ```
 
 The name parameters are left-justified string literals converted to the
@@ -561,16 +549,14 @@ fatchk/mount read path):
   `endif
 `endif
 `ifdef SDFAT_STORAGE
-  `ifdef SDFAT_CHECK
-    `ifndef SDFAT_NO_STORAGE_CHECK
-      `define SDFAT_STORAGE_CHECK        // mount-time contiguity gate
-    `endif
+  `ifdef SDFAT_FORCE_STORAGE_CHECK
+    `define SDFAT_STORAGE_CHECK        // diagnostic contiguity gate only
   `endif
 `endif
 ```
 
-Without SDFAT_STORAGE_CHECK, mount skips M_CHK (card recipe still guarantees
-contiguity; the flag only strips the enforcement area).
+Without SDFAT_STORAGE_CHECK (every normal build since 07-AUG-2026) the mount
+skips M_CHK; the engine's FAT walk makes contiguity unnecessary.
 
 ## 4. Data-path definition and exact timing
 
@@ -586,13 +572,16 @@ client word w  = {byte 2w, byte 2w+1}        big-endian, byte 2w = [15:8]
                                               pattern: even byte = high byte)
 SDRAM word m   = {word 2m, word 2m+1}
                = {byte 4m, byte 4m+1, byte 4m+2, byte 4m+3}   byte 4m = dq[31:24]
-SD sector addr = found_file_first_sector[c] + 4*block + s
+SD sector addr = the card sector the FAT-chain resolve finds for file
+                 sector 4*block + s (section 2.2); for a contiguous file
+                 this equals found_file_first_sector[c] + 4*block + s
 SDRAM word addr= mem_addr[19:0] = {blk_abs[10:0], m[8:0]},
-                 blk_abs = SLOT_BASE_BLK[c][10:0] + block
+                 blk_abs = the cache line (POOL_BASE_BLK + set*WAYS + way),
+                 or STAGE_BASE_BLK for a DIRECT client
 ```
 
-The mount preload packer and the engine both use this order, so a byte on
-the card, in SDRAM and in a client buffer always corresponds 1:1.
+The cache fill and the engine both use this order, so a byte on the card, in
+SDRAM and in a client buffer always corresponds 1:1.
 
 ### 4.2 Read op (spec section 4 waveform, annotated)
 
@@ -736,7 +725,7 @@ unit tbs; heavyweight iverilog full-system stays a manual target):
 | 3 concurrency, 4 clients, distinct patterns, no starvation/leak | same program, phase 3 | Verilator | part of `test-storage` |
 | 4 tape adapter (stream/rewind/EOF) | `SD-FAT/sim/nd_storage_tape_tb.v` - adapter against a SCRIPTED client-port stub serving an array image (no SD, no SDRAM - pure unit tb) | iverilog | `SD-FAT/sim :: test-nds-tape` |
 | 5 errors (range, injected write fail) | range-err asserted in the engine unit tb (below); write-fail injected via the C++ card model's error flag in `test-storage` (verify done+err, SDRAM word unchanged) | both | `test-nds-engine` + `test-storage` |
-| 6 system: ND_FLOPPY_PIO through the full stack | `ND-BUS-DEVICES/FLOPPY/sim/nd_floppy_storage_tb.v`: ND_FLOPPY_PIO + nd_storage_floppy_adapter + nd_storage + sd_card_model (image with FLOPPY0.IMG) + nds_mem_model; drives the same iox_* sequences as the existing floppy tb (seek/read/write/read-back), compares against the card image | iverilog | `ND-BUS-DEVICES/FLOPPY/sim :: test-floppy-storage` |
+| 6 system: floppy through the full stack | as built: tier B of the floppy adapter testbench - the adapter on client 1 of the real stack against `nds_storage.img` (sector and read-modify-write writes checked in the card image, whole-card compare against stray writes). The planned ND_FLOPPY_PIO `test-floppy-storage` was not built: the adapter targets ND_FLOPPY_DMA | iverilog | `SD-FAT/sim :: test-nds-floppy` |
 
 Plus engine-level unit tbs that need no card: `nd_storage_cdc_tb.v` (word
 bridge + toggle sync across skewed clocks, x1000 words, random stalls) and
@@ -748,61 +737,9 @@ sd_card_model as in the existing `sd_writer_tb`). Every tb prints
 mount + 2 opens + interleaved ops with tiny files, SIMULATE=1) exists as a
 manual `test-system`-style target, mirroring the sd-fat-test arrangement.
 
-## 7. Implementation order (one-session increments, each ends green)
-
-1. **CDC primitives + word bridge.** `nds_sync.v`, the shared word bridge
-   and one client FE skeleton; `nd_storage_cdc_tb.v` at 23/27 MHz.
-   Register `SD-FAT/sim :: test-nds-cdc`.
-2. **Mem model + engine read path.** `nds_mem_model.v`; `nd_storage_engine.v`
-   with arbiter, pending latches, FEs, R_* states (open state forced by tb
-   hierarchy); `nd_storage_engine_tb.v`: preload model, two clients
-   interleaved reads, round-robin order, range->err with zero mem traffic.
-   Register `test-nds-engine`.
-3. **Engine write path.** Staging BRAM, W_* states, real sd_writer +
-   sd_card_model on a raw image; verify card-first/SDRAM-second ordering and
-   the wr_err -> SDRAM-intact path. Extend `test-nds-engine`.
-4. **Mount + top.** `nd_storage_mount.v`, `nd_storage.v` (SD cores, pin mux,
-   phase_write/reset ownership), features `SDFAT_STORAGE`; iverilog
-   `nd_storage_tb.v` with a small 2-file FAT16 image: open both, verify
-   SDRAM preload + size_bytes + open_err on missing/oversized file.
-   Register `SD-FAT/sim :: test-nds-mount`.
-5. **fatchk.** `nd_storage_fatchk.v` + fragmented-file image case ->
-   open_err; contiguous -> open_ok. Extend `test-nds-mount`
-   (SDFAT_STORAGE_CHECK on).
-6. **Verilator system gate.** `nd_storage_vtop.v` + `test_nd_storage.cpp`
-   (C++ card + mem models): acceptance 1, 2 (+fsck), 3, 5-inject in one
-   program. Register `SD-FAT/sim :: test-storage`. This is the
-   run-before-hardware gate.
-7. **Tape adapter.** `nd_storage_tape_adapter.v` + `nd_storage_tape_tb.v`
-   (acceptance 4: byte-compare, mid-stream rewind, EOF silence).
-   Register `test-nds-tape`.
-8. **Floppy adapter + system test 6.** `nd_storage_floppy_adapter.v` +
-   `nd_floppy_storage_tb.v`. Register
-   `ND-BUS-DEVICES/FLOPPY/sim :: test-floppy-storage`.
-9. **Board glue.** sdram18 din32/dout32 edit, MEM_RAM_49_SDRAM device port +
-   `ND_STORAGE_PARTITION` gating; extend
-   `fpga/tang-nano-20k/sdram-bridge/sim` tb with concurrent CPU protocol
-   traffic + device-port traffic, assert CPU N+4 deadline still met and
-   device data intact. Existing registration
-   `sdram-bridge/sim :: test` stays the gate. Baseline build with the
-   define OFF must remain bit-identical.
-10. (Hands off to the device workstream: Tang top instantiation of
-    nd_storage + ND_TAPE_400/ND_FLOPPY_PIO behind ND120_VERILOG_DEVICES,
-    per device-bus-todo Phase 2/3 - not part of this library plan.)
-
-Risks to keep visible: (a) the BANK1 partition halves ND main memory to
-2 MB on Tang when storage is enabled - flag to the owner, it is the only
-option that doesn't touch parity semantics; (b) spec's 2 MB floppy slot
-default is board-overridden to 1.25 MB here; (c) block read latency is
-~0.5-1 ms (CDC word handshake), not "microseconds" as the spec's rationale
-sketches - still far inside all device budgets, with a documented pipelining
-hook if it ever matters.
-
----
-
-### Critical Files for Implementation
+### Key files
 - Verilog/docs/nd-storage-interface-spec.md (binding contract: ports, handshake, tests)
 - Verilog/fpga/tang-nano-20k/sd-fat-test/src/sd_fat_test_top.v (proven reader/writer pin-mux, park/re-init, geometry-latch and watchdog patterns to lift)
 - Verilog/SD-FAT/circuit/sd_file_reader.v (mount source: target_name port, geometry/first-sector exports, outen/outbyte stream semantics)
 - Verilog/SD-FAT/circuit/sd_writer.v (write-through engine contract: start/busy/done/err, registered rd_addr/rd_data timing)
-- Verilog/fpga/tang-nano-20k/sdram-bridge/MEM_RAM_49_SDRAM.v (device-port + partition edits; B_POST/idle grant slots)
+- Verilog/fpga/tang-nano-20k/sdram-bridge/MEM_RAM_49_SDRAM.v (device port; B_POST/idle grant slots)

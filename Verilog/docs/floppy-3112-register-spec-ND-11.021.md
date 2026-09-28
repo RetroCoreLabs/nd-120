@@ -119,13 +119,10 @@ values in both emulators are un-sourced TODO guesses.
 (01-04, 31, 34-37, 47, 52, 54-57 = Not used)
 ```
 
-## Implications for our code (to be applied, cross-checked vs the C-vs-C# diff)
-1. **Split the two status words.** IOX +2/+4 must return the §3.7 Hardware Status Word
-   (bit 15 dual-density, NO error code). The CB+6 writeback must be the §3.4 Status Word 1
-   (error code bits 9-14, bit 15 not used). Our Verilog currently uses one `s_rsr1` for both.
-2. **M2:** error code = bits **9-14** of Status Word 1 (CB+6), not bits 8-14.
-3. **M3:** IOX +4 = hardware status word (same as +2), NOT the format word. The format word
-   is Status Word 2, delivered at CB+7 (which we already write).
-4. **M11:** +0 idle value undocumented — leave as-is; do not invent.
-5. **Error codes:** replace invented 1/2 with the real octal table above (oct 20 not-ready,
-   40/41/42 bus errors, 43 illegal command, etc.).
+## Applied
+
+All of it is applied (July 2026): `ND_FLOPPY_DMA.v` returns the hardware
+status word (`s_hwstat`) on IOX +2 and +4 and writes Status Word 1 (`s_sw1`,
+error code in bits 9-14) at CB+6, with the octal error codes above; nd100x has
+the same fix (nd100x commit efed8ae, "floppy DMA status words"). The +0 idle
+value is still undocumented in the manual - left as it is, not invented.

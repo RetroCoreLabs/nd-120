@@ -1,242 +1,56 @@
-# Plan - cache (CUP) and the operator panel
+# Plan - cache and operator panel: what is left
 
 **Full path:** `Verilog/docs/PLAN-cache-and-panel.md`
 Living plan. Outstanding work only - finished items are deleted, not ticked.
-Findings live in [`CACHE-STATUS.md`](CACHE-STATUS.md), not here.
+The cache is fixed and board-confirmed (all 8 `CACHE-1X0-A00` tests pass,
+31-AUG-2026); the root causes and how to test are in
+[`CACHE-STATUS.md`](CACHE-STATUS.md). The ACTIVE LEVEL row is driven by the
+ACTLV word from `PANCAL_68705_CLOCK.v` (commit `4c9855a`, hold time
+`ACTLV_HOLD_FRAMES = 2` in `term_panel.v`) and the MIPS counter is built
+(`ND120_MIPS_TAP`, see `build-defines.md`).
 
-> **Next:** three things are WSL-GATED (WSL crashed 30-AUG after a process
-> pile-up; Ronny restarts it when ready, nothing touches it until then):
->  1. TEST 3 golden trace in Verilator - the board-specific hang
->     (P=124563B; the disassembly pinned the exact mechanism: the first
->     newly-cacheable instruction fetch after TRR LCIL, before the CCL
->     cache clear - see CACHE-STATUS and scratchpad test3-disasm/
->     RECONSTRUCTION.md). The first trace attempt was stopped (agent
->     drifted); rerun with the proven fifo/setsid recipe, ONE job at a
->     time - Ronny's hard limit: never more than 5 concurrent processes.
->  2. MIPS: the panel number is STILL WRONG on builds 9-11 - both tapped
->     nets (DEBUG_FETCH, then board MAP_n = PAL_44307C's FORM-gated bus
->     signal) are memory-cycle qualifiers a warm cache starves. The real
->     event is CFETCH inside the CGA (add a debug output like XMIC_DBG -
->     but ONLY after a sim run proves it pulses once per macro
->     instruction; two unvalidated taps already wasted two flash cycles,
->     and the CGA's own comments record two older probes lost the same
->     way. Validation recipe: count edges vs ND120_TRACE_VERIFY lines -
->     the [map] probe pattern in Run120.cpp is the template).
->  3. The N=2 multicycle derivation's one assertion check (see
->     fpga/nexys4ddr/docs/wcs-multicycle-analysis.md, weakest link).
->
-> BOARD: build 11 = cache + VT100 + (wrong) MIPS at 33.333 MHz, WNS
-> +0.037, flashed 14:37. 45.45 MHz with the real cache is PARKED - full
-> record in fpga/nexys4ddr/timing.md 30-AUG section (N=2 exception is in
-> nd120_timing.xdc and stays; the wall is the un-relaxable WRF->WCS cone,
-> a routing-pressure/restructuring problem).
->
-> UNCOMMITTED in the tree: the MAP re-tap trio (ND3202D, ND120_CORE,
-> nexys top) + ND120_TOP sim tap + Run120.cpp [map] probe + the MAP
-> comment fixes (6 files) + nd120_timing.xdc + the multicycle analysis
-> doc + timing.md/plan updates. Commit when Ronny says.
+> **Next:** decode the duty-cycle loop in `Code/68705/MC68705U3_35C.BIN`
+> (section 1) before touching the meters.
 
-Findings and evidence: `CACHE-STATUS.md`. Faults 1 (CUP), 2 (44511A CWR
-> pin), the Am9150 dropped write and the EPANS data-window leak are all
-> fixed and board-confirmed; finished detail lives in the status doc, not
-> here.
+## 1. Panel meters are not faithful
 
----
+`Terminals/rtl/terminal_top.v` feeds both bars through `rate_meter` with 8
+steps, a 2^24 window (`WINDOW_BITS(24)`) and a linear fall. The real MC68705
+samples LHIT at 400 Hz over a 128-tick (320 ms) window in steps of 32,
+carrying over half of the previous window (ROM-checked,
+`Code/68705/U3/U3-COMPLETE.MD` sections 3, 4, 12) - wrong on every axis.
 
-## 1. Cache - fault 2
+## 2. Known broken, not blocking
 
-Fault 1 is fixed (29-AUG-2026, see `CACHE-STATUS.md`): `PAL_44511A_EN.v` /
-`PAL_44511A.v` now hold CWR as the level latch the listing describes, so CUP
-sets on a cache write. Verified: PAL suite green, CACHE-1X0-A00 test 2 in
-Verilator no longer reports "CUP does not work".
+- **`-tclargs ila` is dead.** Its probe list in
+  `fpga/nexys4ddr/build.tcl` still names `s_ila_ram_addr`, which does not
+  exist in this configuration, so it exits before building a debug core.
+  `ilacache` and `ilaslim` are unaffected. Fix by pruning that list when
+  someone next needs the floppy/IOX probe set.
+- **`term_panel.v`:** `s_ruler_reversed` is `(s_row == 3'd3) && s_in_levels
+  && ...`, and `s_in_levels` already requires `s_row == 3'd2`. Always false,
+  so the ruler row never highlights. Cosmetic.
+- **`Verilog/sim` `make test_nd120`** failed on 29-AUG with 80 missing-pin
+  warnings promoted to errors (`DBG_PANEL` and `DBG_CACHE` unconnected in
+  `ND120_TOP.v`); it failed the same way at `54f30ca`. Not re-checked since.
+- **The N=2 multicycle derivation's one assertion** is still to be written
+  (weakest link and the check are in
+  `fpga/nexys4ddr/docs/wcs-multicycle-analysis.md`).
 
-**Where it stands.** With CUP alive, test 2 still reports that hits return
-memory data, reads do not fill the cache, and the instruction and data halves
-are mixed up; the run then crashes with an illegal instruction at 177006B.
+## 3. Open question on the 44155A listing
 
-**Do next, in order:**
-
-1. **Read the write-then-read capture.** Build and run as below with
-   `ND120_CACHE_WIN="8:1500"` (from the 8th WCA on, 1500 evals: the boot has
-   4-5 writes, the test's first ones come next). Per eval it prints CA, PPN,
-   the tag and data the cache RAMs read back, the used bits, both HIT
-   comparators, WCA/CWR/CUP and the CD bus into MMU and CPU. Look for: does the
-   tag written on WCA equal the PPN read back on the next access to the same
-   CA; does HIT assert on that access; does `cd_cpu` carry the cache word or
-   the memory word; does the used bit set.
-2. **Two RTL facts to check against the capture** (not measured yet): the
-   TMM2018D model reads synchronously (`data_out_reg` one sysclk after the
-   address), and `CPU_MMU_CACHE_25.v` gates the cache's CD output with HIT
-   (26-JUL banner fix). A HIT decided one sysclk late, or on a stale tag,
-   returns memory data and reads as "taken FROM MEMORY".
-3. **Then the board.** Once test 2 passes in the sim, build the Nexys `cache`
-   bitstream from the fixed tree and re-run CACHE-1X0-A00 there. The board
-   captures so far are consistent with everything measured in the sim (an
-   all-inhibited map after power-up / a `0:37777` sweep) and add nothing on
-   their own.
-
-**How to run the diagnostic in the sim** (what finally worked, 29-AUG-2026):
-
-```
-cd Verilog/runSim
-make compile VERILOG_TAPE=0 SD_STORAGE=0 DEVICECORE=1 DEVICECORE_FLOPPY=1      USE_LATCHES=0 EXTRA_VDEFINES="-DND120_SIM_RAM_64K"      SDFAT_SUPPRESS="-Wno-PINMISSING -Wno-IMPLICIT -Wno-DECLFILENAME -Wno-BLKSEQ -Wno-TIMESCALEMOD"
-mkfifo /tmp/nd_in; sleep 100000 > /tmp/nd_in &
-ND120_FLOPPYCORE_IMG=FLOPPY1.IMG ND120_CACHE_TRACE=1 ./obj_dir/VND120_TOP < /tmp/nd_in > out.log &
-printf '1560&' > /tmp/nd_in                       # wait for TPE>
-printf 'LOAD-PROGRAM CACHE-1X0-A00
-' > /tmp/nd_in  # wait for the 2nd TPE>
-printf 'RUN 2
-' > /tmp/nd_in                      # NO answer needed at "Initialize memory : >"
-```
-
-`Initialize memory : >` is NOT a prompt - it is TPE initialising all memory
-before the run, one `>` per bank, and it takes ~600M sim cycles (~35 min)
-regardless of the sim RAM size. Anything typed there lands on TPE afterwards
-as a command. The program never echoes. `-Wno-PINMISSING -Wno-IMPLICIT` are
-needed because the `run-tpe` flag set trips on the newer `DBG_*` ports.
-`--public-flat-rw` is NOT needed and makes the sim ~4x slower.
-
-**Do NOT re-check these.** Each was measured, not inspected:
-
-| Excluded | Evidence |
-|---|---|
-| inhibit-map addressing / data / write strobe | full sweeps measured in the sim, map counted after each: power-up = all inhibited; `TRR LCIL/UCIL 100:200` = exactly 65 inhibited |
-| the WCHIM -> WCLIM gate | WCLIM_n strobes once per swept page at cycle state d (`ND120_CYC_WINDOW`) |
-| CUP PAL set path | fixed; CUP now sets on every WCA (`ND120_CACHE_TRACE`) |
-| FMISS | 0 in all 1024 board samples, twice |
-| LSHADOW | 0 throughout |
-| BRK_n | high in all but 7 of 1024 |
-| CON | tied high, `ND120_CORE.v:1184` |
-| PAL_44402D transcription | both WCA product terms + the registered/combinational split checked against `44402D.txt` |
-| WCA routing to the CUP PAL | `s_wca_n` driven by CPU_MMU_24, consumed by CPU_PROC_32 - same net |
-| "cache RAMs not instantiated" | that block is inside `ifdef ND120_NO_CACHE`; `cache` builds take the `else` branch |
-
-**Probe trap, written down so nobody loses another hour to it:** the probe
-block in `runSim/Run120.cpp` runs once per sysclk period with
-`top->sysclk == 1`. A probe gated on `top->sysclk == 0` never fires and reads
-as "this never happens".
-
----
-
-## 3. Panel - the meters
-
-`rate_meter` uses 8 steps, a 2^24 window and a linear fall. The real MC68705
-samples LHIT at 6400 Hz over a 128-tick (20 ms) window in 5 steps with a
-halving carry-over decay. Ours is wrong on every axis.
-
-**Not started, and not to be started on the relayed numbers alone.** Decode the
-duty-cycle loop in `Code/68705/MC68705U3_35C.BIN` first and confirm them
-directly - the current values came from another session's reading, and this
-plan has already been burned once by acting on an unverified claim.
-
-## 4. Decisions waiting on Ronny
-
-1. **Flash the peer's DGA fixes on the Nexys?** They are committed now
-   (`1a8c0e1`, `d80ef7f`), so the "wait until they commit" condition is met.
-   Unconditional in every build - they change the EPANSN window and the FIFO
-   clocking, so the console is the first thing to re-check after flashing.
-2. **ACTIVE LEVEL row - now driven by ACTLV, needs a Nexys build.** Ronny
-   said it plainly (29-AUG-2026 evening): the row was still wrong on the board
-   with the per-frame change. It had to be: the ILA shows the CGA's level bus
-   stepping through 12..15 every few hundred clocks, so any view of PIL lights
-   the row. The real panel never looks at PIL - the microcode sends the
-   68705 the ACTIVE LEVEL word (LDPANC 0x0A + two bytes, low byte first,
-   measured with ND120_PANEL_CLOCK_TRACE) and the 68705 shows that. Wired
-   29-AUG-2026: `PANCAL_68705_CLOCK.v` captures the word (output `ACTLV`),
-   it travels `IO_PANCAL_40 -> IO_37 -> ND3202D -> ND120_CORE -> Nexys top ->
-   terminal_top -> term_panel` as `PANEL_ACTLV` / `panel_actlv` / `actlv`,
-   and `term_panel.v` shows it (latched per frame) as soon as the first word
-   has arrived; the PIL view is only the fallback for builds without the
-   panel processor (MiSTer ties it to 0). Terminal lint clean, panel tb
-   green. NOT YET ON THE BOARD - the next Nexys build carries it (the panel
-   clock is a default there now, so ACTLV is live).
-
-## 4b. ACTIVE LEVEL row - hold time (done in RTL, not yet on the board)
-
-Ronny, 29-AUG-2026 late: the all-16-lit bug is fixed on the Nexys, but the
-row "flickers like stupid when there is a lot of changes". The row sampled
-ACTLV once per frame tick and showed it for one frame (16 ms). Now
-(`term_panel.v`, `ACTLV_HOLD_FRAMES = 2`): ACTLV is OR-ed over the whole
-frame and every lamp stays lit 2 frames (33 ms) from the frame it was last
-seen in - his "double it". Panel tb has a check for it (check 9), terminal
-lint clean. If it still flickers, raise `ACTLV_HOLD_FRAMES` (3 bits, up to 7
-frames = 117 ms) - one line, no other change. Goes out with Nexys build 3.
-
-Also reported by Ronny in the same message: the CACHE HIT RATE bar "is
-showing signs of working" on the board.
-
-## 7. Panel - MIPS counter (queued, not started)
-
-Ronny wants a MIPS figure on the panel, right after the FLOPPY lamps:
-million macro instructions per second, updating itself while the machine
-runs. Not started. What it needs, in order:
-
-1. **Count the FETCH signal** (Ronny, 29-AUG-2026: "you can probably count
-   when there is a FETCH signal", and "don't change the original design, we
-   have signals enough"). `CFETCH` already exists as an input of
-   `DELILAH-CPU/CGA_MIC/circuit/CGA_MIC.v:27` - tap it where it is driven,
-   outside the gate array; add NOTHING inside the CGA/DGA. Count its rising
-   edges over a known TPE loop and check the number against the instruction
-   count of that loop before trusting it.
-2. **A counter with a 1-second window** in the CPU clock domain (the board
-   clock is known per build - 45.45 MHz Nexys, 20.25 MHz Tang - so a 1 s
-   window is a fixed count), latched into a per-second result and synced to
-   the video clock like `panel_actlv` is (2-flop, it is a slow-changing word).
-3. **Rendering**: a `XX.XX` field after FLOPPY in `term_panel.v`. Ronny's
-   sizing note: the ND-120 does under 1 MIPS at 6.75 MHz, but the Nexys runs
-   at 45 MHz, i.e. up to ~7 MIPS, so leave TWO integer digits (up to 99.99).
-   Hundredths of a MIPS = per-second count / 10^4.
-4. Per-frame latch like every other field, a tb check that a known pulse
-   rate gives the expected digits, and the same plumbing as ACTLV
-   (`IO_37 -> ND3202D -> ND120_CORE -> Nexys top -> terminal_top`, MiSTer
-   tied to 0).
-
-## 5. Known broken, not blocking
-
-- **`-tclargs ila` is dead at HEAD.** Its probe list still names
-  `s_ila_ram_addr`, which does not exist in this configuration, so it exits
-  before building a core. `ilacache` and `ilaslim` are unaffected. Fix by
-  pruning that list when someone next needs the floppy/IOX probe set.
-- **`Verilog/sim` `make test_nd120` fails** with 80 missing-pin warnings
-  promoted to errors. Pre-existing - it fails identically at `54f30ca`, before
-  any of this work. `DBG_PANEL` and `DBG_CACHE` are both unconnected there.
-- **`term_panel.v`**: `s_ruler_reversed` is
-  `(s_row == 3'd3) && s_in_levels`, and `s_in_levels` already requires
-  `s_row == 3'd2`. Always false, so the ruler row never highlights. Cosmetic,
-  found while reading; not investigated further.
-
-## 6. Open question on the 44155A listing
-
-Ronny's friend found a PAL 44155A with the same signal set as our 44511A. Its
-CUP function matches ours once CWR's inverted polarity is accounted for, which
-is useful independent confirmation. To say anything more, two things are
-needed and neither is in hand:
+A PAL 44155A was found with the same signal set as our 44511A, LEV0
+byte-identical. Its CUP function matches ours once CWR's inverted polarity is
+accounted for (its CWR means "no cache write happened", ours "a cache write
+happened"), which is useful independent confirmation. To say more, two things
+are needed and neither is in hand:
 
 - its **pin list** (the line above the equations) - without it the polarity
-  convention is unknown, so whether its CWR pin matches ours or is the
-  complement cannot be determined;
-- its **DESCRIPTION block** - date and board reference, which would say whether
-  it is an earlier revision, a different board, or a fix we are missing.
+  convention of its CWR pin is unknown;
+- its **DESCRIPTION block** - date and board reference, which would say
+  whether it is an earlier revision, a different board, or a fix we are
+  missing.
 
-Do not adopt its equations into `PAL_44511A.v`. Its CWR means "no cache write";
-ours means "a cache write happened", and ours drives pin 19 declared `/CWR`
-which `CPU_MMU_CACHE_25.v:197` consumes as `!s_cwr` for HIT. Mixing halves
-inverts HIT silently.
-
----
-
-## Working rules learned the hard way this session
-
-- **Build from the detached worktree** `E:\Dev\Repos\Ronny\nd-120-build`
-  pinned to a commit, never the shared tree. Building the shared tree with
-  another session's in-flight work produced a dead-console bitstream once.
-- **Launch Vivado via WMI** (`Invoke-CimMethod Win32_Process Create`), not from
-  a foreground tool call. A foreground call that hits its timeout returns
-  exit 143 and takes Vivado down with it - that killed three builds.
-- **Clear `.Xil` after any killed run.** Leftover directories make Chipscope
-  fail with "Config Param 'mark_debug' is already registered".
-- **Arm and read an ILA in ONE Vivado session.** `hw_ila` properties are
-  software-side and re-initialise per batch run, so a second run cannot tell an
-  armed core from a never-armed one.
-- **Compare ILA status case-insensitively.** Vivado returns `FULL`; comparing
-  against `"Full"` reported "never triggered" on a run that had triggered.
+Do not adopt its equations into `PAL_44511A.v`. Ours drives pin 19 so that
+it FOLLOWS CWR (see fault 2 in `CACHE-STATUS.md`), and `CPU_MMU_CACHE_25.v`
+consumes it as `!s_cwr` for HIT. Mixing halves inverts HIT silently.

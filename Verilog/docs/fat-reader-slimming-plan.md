@@ -1,10 +1,21 @@
-# ND-120 SD/FAT reader slimming plan (analysis only)
+# ND-120 SD/FAT reader slimming plan
 
 Target: shrink the hardware FAT reader
 `Verilog/SD-FAT/circuit/sd_file_reader.v`, the
 single biggest logic block on the Tang Nano 20K (GW2AR-18C) and the reason the
-OSS (yosys/nextpnr) placer runs out of room. **This is a plan only. No RTL,
-build, or bitstream is modified by this document.**
+OSS (yosys/nextpnr) placer runs out of room (July 2026).
+
+**Status (checked against the code, 28-SEP-2026):** Lever 1 is DONE
+(`SDFAT_NO_LFN`, set in `fpga/tang-nano-20k/src/tang20k_defines.v`).
+Lever 2 is DONE and went further than planned: the contiguity checker is
+retired from every build since the engine walks the FAT chain itself
+(07-AUG-2026; it now needs `-DSDFAT_FORCE_STORAGE_CHECK`). Lever 3 was NOT
+done and no longer applies: since the block cache (04-AUG-2026) `sd_writer`
+is also the engine that reads every block from the card, so a storage build
+cannot drop it (`SDFAT_NO_WRITE` exists in `sd_fat_features.vh` but only the
+sd-fat-test lint build uses it). Lever 4 (raw-LBA boot) is not built and is
+the one lever still open. The defines are documented in
+`Verilog/docs/build-defines.md` and `tang20k_defines.v`.
 
 ## How the numbers were produced (so they can be trusted / reproduced)
 
@@ -86,34 +97,20 @@ subdirectory-traversal logic to remove — that lever yields 0 LUT.**
 
 ---
 
-## (b) What is dead weight in the Tang build right now
+## (b) What was dead weight in the Tang build (July 2026)
 
-The Tang gprj
-(`Verilog/fpga/tang-nano-20k/nd120_tang20k.gprj`)
-compiles the **full** SD-FAT stack. `tang20k_defines.v` sets **no** `SDFAT_NO_*`
-macro, so `sd_fat_features.vh` turns **everything on** by default:
-`SDFAT_WRITE`, `SDFAT_STORAGE`, `SDFAT_CHECK`, `SDFAT_STORAGE_CHECK`.
+At the time the Tang build compiled the full stack with no `SDFAT_NO_*`
+macro. Measured with yosys, for the tape-only case:
 
-The tape boot path is **read-only** (loads TAPE.BPUN/BOOT.BPUN and streams it).
-Yet the build carries:
+| block | LUT | ALU | LUT+ALU | outcome |
+|---|---:|---:|---:|---|
+| `sd_writer` (CMD24 write engine) | 954 | 127 | 1081 | still in every storage build - it is the block read engine too since Phase 4 |
+| `nd_storage_fatchk` (contiguity checker) | 868 | 309 | 1177 | retired from builds |
+| VFAT long-name parser in the reader | 1751 | 51 | ~1800 | stripped by `SDFAT_NO_LFN` on the Tang |
 
-| Dead-weight block | file / instance | LUT | ALU | LUT+ALU | Why it's dead for tape |
-|---|---|---:|---:|---:|---|
-| **`sd_writer`** (CMD24 write engine) | `nd_storage.v:225-251` (instantiated **unconditionally**) | 954 | 127 | **1081** | Tape never writes the card. Only floppy/SMD write-back needs it. |
-| **`nd_storage_fatchk`** (mount-time contiguity checker) | `nd_storage.v:405-431` under `SDFAT_STORAGE_CHECK` | 868 | 309 | **1177** | Reads the FAT via the writer's read path to prove the file is contiguous. Redundant if the card recipe guarantees a contiguous image. |
-| **VFAT LFN parser** inside the reader | `sd_file_reader.v:554-623, 640-647` | 1751 | 51 | **~1800** | TAPE.BPUN and BOOT.BPUN are valid **8.3** names; long-name support is never exercised. |
-
-- `sd_writer` has **no write logic inside `sd_file_reader`** — the reader never
-  drives DAT0 (confirmed `sd_file_reader.v:45-47`, no CMD24 anywhere). The whole
-  write path is the separate `sd_writer` instance in `nd_storage.v`.
-- FAT32 is compiled even when the boot card is FAT16, but per (a) it costs
-  essentially nothing, so leave it in (dual-format robustness for free).
-- Not in the Tang gprj at all (already excluded — good): `sd_fat_rewrite.v`,
-  `sd_fat_check.v`, `sd_fat_freescan.v`, `nd_storage_floppy_adapter.v`.
-
-**Total easily-recoverable dead weight for the tape-only case: ~1800 (LFN) +
-1177 (fatchk) + 1081 (writer) ≈ 4058 LUT+ALU**, while still keeping full
-FAT16/FAT32 root-directory read-by-name of the boot file.
+The reader never drives DAT0 and has no CMD24 of its own; the write path is
+the separate `sd_writer` instance in `nd_storage.v`. FAT32 costs essentially
+nothing (section (a)), so it stays.
 
 ---
 
@@ -121,49 +118,16 @@ FAT16/FAT32 root-directory read-by-name of the boot file.
 
 Ordered by (saving ÷ risk). Savings are yosys LUT+ALU deltas.
 
-### Lever 1 — Strip VFAT long-filename parsing (8.3 names only)  ~1800 LUT
-- **Saving:** ~1751 LUT + 51 ALU (baseline 9147 → 7345, measured).
-- **Edit point (new define, e.g. `SDFAT_NO_LFN`):** wrap three regions of
-  `sd_file_reader.v`:
-  1. the `else if (pattr == 8'h0F)` VFAT block `:554-593` — replace with a
-     one-line skip (`lfn_have<=0; pbusy<=0;`) when LFN is off;
-  2. state `P_LFNU` `:606-623` and the `lfn_off` function `:198-214`,
-     `lfn_buf`/`lfn_len`/`lfn_ck`/`lfn_next`/`lfn_have` registers `:324-328`;
-  3. the LFN-accept branch in `P_PICK` `:640-647` — force the 8.3 `else` path.
-- **Functional cost:** files must have 8.3 short names. TAPE.BPUN (`TAPE`+`BPUN`)
-  and BOOT.BPUN are 8.3-legal, so **none** for the boot use case. A file saved
-  only under a long name whose 8.3 alias differs would not match — mitigate by
-  the card recipe (name the boot file in pure 8.3).
-- **Risk:** low. Root-dir 8.3 matching is unchanged; only the long-name overlay
-  is removed. Needs a small, self-contained set of `ifdef`s.
+### Lever 1 — Strip VFAT long-filename parsing (8.3 names only)  ~1800 LUT - DONE
+`SDFAT_NO_LFN` in `sd_file_reader.v`; measured 9147 -> 7345. Files must have
+8.3 short names (all the fixed card names are).
 
-### Lever 2 — Drop the contiguity checker (`SDFAT_NO_STORAGE_CHECK`)  ~1177 LUT
-- **Saving:** ~868 LUT + 309 ALU = 1177 (whole `nd_storage_fatchk` instance).
-- **Edit point (existing knob, no new code):** define **`SDFAT_NO_STORAGE_CHECK`**
-  in `fpga/tang-nano-20k/src/tang20k_defines.v`. `sd_fat_features.vh:69-71`
-  already gates it, and `nd_storage.v:436-444` already provides the `else`
-  branch that ties off `m_chk_done`/`m_chk_ok` and lets the mount FSM's `M_CHK`
-  pass straight through.
-- **Functional cost:** no mount-time verification that the file is contiguous.
-  The reader's run-merge streaming (`H_RUN0`..`H_RUNEND`) still follows the FAT
-  chain correctly for a fragmented file; the checker only *gated* the open.
-- **Risk:** low-medium. The card recipe must lay the boot image down
-  contiguously (it already does; a freshly-copied small .BPUN on a fresh FAT is
-  contiguous). If a card ever fragments the file, streaming still works — you
-  just lose the up-front guard.
+### Lever 2 — Drop the contiguity checker  ~1177 LUT - DONE (retired from builds)
 
-### Lever 3 — Remove the write engine for a read-only (tape-only) build  ~1081 LUT
-- **Saving:** ~954 LUT + 127 ALU = 1081 (`sd_writer` instance).
-- **Edit point (needs a new `ifdef`, currently unconditional):** the `sd_writer`
-  instance `nd_storage.v:225-251`, plus the engine's `sdw_*` command wiring
-  (`:433-441`) and the `sd_dat0_o/oe` mux (`:258-259`). Gate all on
-  `SDFAT_WRITE`. **Depends on Lever 2** — `fatchk` uses the writer's read path,
-  so the writer can only go once the checker is also gone.
-- **Functional cost:** no card write-back at all — floppy and SMD image writes
-  are disabled. Acceptable now (only tape read is needed).
-- **Risk:** medium. Requires touching `nd_storage.v` wiring, and the
-  `nd_storage_engine` must have no write-capable client active. Tape is
-  read-only, so for the tape-only target this holds.
+### Lever 3 — Remove the write engine for a read-only build  ~1081 LUT - NOT APPLICABLE
+The planned `SDFAT_WRITE` gate on the `sd_writer` instance in `nd_storage.v`
+was never added, and since Phase 4 `sd_writer` in `rd_mode` fetches every
+block from the card, so it cannot be removed from a storage build.
 
 ### Lever 4 (ultimate) — RAW-BLOCK boot mode: reserved LBAs, NO FAT parse  ~7500 LUT
 - **Saving (analytic estimate):** everything except the SD bit engine + card
@@ -239,25 +203,10 @@ Sources:
 
 ---
 
-## (e) Recommended minimal-reader config for tape-boot-only
+## (e) What remains: raw-LBA boot
 
-Two tiers, depending on how far you want to go:
-
-### Tier A — keep FAT, strip the fat (recommended first step, low risk)
-Apply Levers 1 + 2 + 3. Still finds TAPE.BPUN by name in the FAT root dir;
-just no long names, no contiguity gate, no write engine.
-
-- **Est. saving: ~1800 + 1177 + 1081 ≈ 4058 LUT+ALU.**
-- Reader itself drops from ~9147 to ~7345; the two sibling blocks (writer +
-  fatchk, ~2258) disappear from the storage stack entirely.
-- Exact changes:
-  - add `SDFAT_NO_LFN` gating in `sd_file_reader.v` (Lever 1 regions above) —
-    **new define**;
-  - add `` `define SDFAT_NO_STORAGE_CHECK `` in
-    `fpga/tang-nano-20k/src/tang20k_defines.v` — **existing knob**;
-  - gate the `sd_writer` instance + `sdw_*`/dat0 wiring in `nd_storage.v` on
-    `SDFAT_WRITE` — **new ifdef** (Lever 3).
-- Card recipe: boot file named in pure 8.3, written contiguously (already true).
+Tier A of this plan (levers 1-3) is done as far as it applies (see the status
+at the top). Tier B is still open:
 
 ### Tier B — raw-LBA boot (maximum saving, needs new RTL)
 Lever 4: a lean `sd_card_ctrl`-based block reader that streams a fixed reserved
@@ -269,13 +218,12 @@ LBA range. No FAT at all.
   reserved-physical-block plan), so the cost is amortized across every future
   device — build it once.
 
-**Suggested path:** ship Tier A now to get the OSS placer to fit (it is the
-lowest-risk ~4000-LUT win and keeps the drop-a-file-on-the-card workflow), and
-schedule Tier B as the shared lean reader for floppy/SMD, at which point the FAT
-brain can become an optional feature rather than the always-on default.
+Note: the storage stack now walks the FAT chain per access and serves disc
+images from the card by name, so the case for a raw-LBA reader is only the
+LUT saving; it would give up the drop-a-file-on-the-card workflow.
 
 ---
 
 *Analysis produced from source at `SD-FAT/circuit/sd_file_reader.v`,
 `nd_storage.v`, `sd_fat_features.vh` and the Tang gprj; LUT figures from yosys
-`synth_gowin` in `/tmp/fatscan`. Plan only — no RTL/build/bitstream changed.*
+`synth_gowin` in a scratch tree. Line numbers refer to the July 2026 sources.*

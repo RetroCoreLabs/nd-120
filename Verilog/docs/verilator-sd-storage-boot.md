@@ -1,6 +1,13 @@
 # Booting SINTRAN in Verilator THROUGH the SD/FAT stack
 
 Status: **built and lint-clean; not yet run to a banner.** Added 21-AUG-2026.
+Whether a `probe-wd-sd` run has reached the banner since is not recorded
+anywhere (UNVERIFIED). The same SD Winchester path WAS run in the dmaSim rig
+on 24-AUG-2026 (target `rig-nexys-wd`, see
+`Verilog/fpga/nexys4ddr/HANDOFF-floppy-dma-investigation.md`, "24-AUG ~18:45",
+retired 28-SEP-2026, in git at `c4896a4`):
+the mass load, the seek and the following reads complete with correct
+end-address readbacks.
 
 ## 1. The hole this closes
 
@@ -105,8 +112,13 @@ NOT proven - do not report these as working until someone has measured them:
 
 ## 6. Related
 
-- `Verilog/docs/HANDOFF-storage-cache-phase4.md` - the block cache this
+- `Verilog/docs/nd-storage-design.md` section 2.7 - the block cache this
   exercises, and why the region stopped being a copy of the image.
-- `Verilog/SD-FAT/CARD-LAYOUT.md`, `Verilog/SD-FAT/HANDOFF-nd-storage.md`
+- `Verilog/SD-FAT/CARD-LAYOUT.md`, `Verilog/SD-FAT/README.md`
 - `Verilog/SD-FAT/sim/make_storage_image.sh` - the 16 KB testbench cards this
   is the full-size counterpart to.
+- `Verilog/dmaSim/` target `rig-nexys-wd` - run-time controls read by
+  `dma_p3_main.cpp`: `ND120_OPCOM_SCRIPT` (types a script into OPCOM),
+  `ND120_OPCOM_PACE` (keep it >= 20000 or characters drop), `ND120_OPCOM_BIT`
+  (3472 = 2 x `ND120_UART_DELAY_FRAMES=1736`, 16.67 MHz / 9600),
+  `ND120_FLP_TRACE`, `ND120_WCS_DUMP`, `ND120_INTP_TRACE`.

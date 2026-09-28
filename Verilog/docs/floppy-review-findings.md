@@ -1,49 +1,55 @@
-## RESOLUTION STATUS (13-JUL-2026)
+# Floppy stack review (12-JUL-2026) - open items only
 
-Settled against the ND-11.021.01 manual (spec: `floppy-3112-register-spec-ND-11.021.md`):
-- **C1 (sector-count), C3 (partial-write tail), M1 (real error codes)** — FIXED in
-  `ND_FLOPPY_DMA.v`, tb-verified.
-- **M2 (error-code bits)** — RESOLVED: bits **9-14** (not 8-14). Manual §3.4/§3.9;
-  RetroCore C# agrees. FIXED in Verilog.
-- **M3 (IOX +4)** — RESOLVED: +4 = hardware status word (§3.7), same as +2; the
-  format word is Status Word 2 at CB+7, not an IOX register. FIXED in Verilog.
-  Root cause was conflating two distinct status words (hardware §3.7 vs memory §3.4).
-- **M11 (+0 constant)** — NO manual basis for 1 or 0x0F; left as 1 (do not invent).
-- **C2 (no-drive wedge)** — watchdog added (param, default off; needs real backend latency).
-- Emulator fixes captured as handoffs: `HANDOFF-nd100x-floppy-dma-manual-fixes.md`,
-  `HANDOFF-floppy-pio-c-and-csharp-fixes.md`.
-- OPEN (need a backend-input contract, not bugs): Status Word 2 extra bits
-  (5.25"/96tpi/sector-track, §3.5.2.2), write-protect input, streamer port.
+## Status (13-JUL-2026, re-checked against the code 28-SEP-2026)
+
+Settled against the ND-11.021.01 manual (spec:
+`floppy-3112-register-spec-ND-11.021.md`) and FIXED in `ND_FLOPPY_DMA.v`,
+testbench-verified; the detail is in git history:
+
+- C1 sector-count mode (command-block word 4), C3 stale tail on a partial
+  write, M1 real octal error codes, M2 error code in bits 9-14, M3 IOX +4 =
+  hardware status word (the format word is Status Word 2 at CB+7). Root cause
+  of M2/M3: two distinct status words (hardware section 3.7 vs memory
+  section 3.4) had been merged into one.
+- M11 (+0 read constant): no manual basis for 1 or 0x0F; left as 1 on
+  purpose (do not invent).
+- The `== 1` BINT harness bug quoted in the NEVER-READY section below is
+  fixed (`NDBus.cpp`, see `BUG-tape400-sd-level12-storm.md`).
+
+Still open:
+
+- C2 (below): a watchdog exists (`DISK_TIMEOUT`) but defaults to 0 = off.
+- M4 and M5 (below): checked in code 28-SEP-2026 - `s_test_mode` is latched
+  and never used, and `disk_media_fmt` is one input for all drives.
+- M6-M10, the MINOR list, the stub table and the TESTGAP list were not
+  re-checked item by item after the fixes above; treat them as UNVERIFIED.
+- Need a backend-input contract, not bugs: Status Word 2 extra bits
+  (5.25"/96tpi/sector-track, section 3.5.2.2), a write-protect input, the
+  streamer port.
+- Emulator-side fixes for the other repositories:
+  `HANDOFF-floppy-pio-c-and-csharp-fixes.md` (the nd100x DMA fixes landed as
+  nd100x commit efed8ae).
 
 ---
 
-# Adversarial review: Verilog floppy stack vs reference code (12-JUL-2026)
+## The review (12-JUL-2026; line numbers are from that date)
 
 Reviewed RTL: ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v (octal
 1560), ND-BUS-DEVICES/FLOPPY/circuit/ND_FLOPPY_PIO.v,
 SD-FAT/circuit/nd_storage_floppy_adapter.v.
-References: /mnt/e/Dev/Emulators/ND/nd100x/src/devices/floppy/
+References: the nd100x repository, `src/devices/floppy/`
 deviceFloppyDMA.{c,h} + deviceFloppyPIO.{c,h} (the stated port source);
-$ND_REPOS/RetroCore/Emulated.HW/ND/CPU/NDBUS/
+the RetroCore repository, `Emulated.HW/ND/CPU/NDBUS/`
 NDBusFloppyDMA.cs + NDBusFloppyPIO.cs (richer register-level reference);
 Verilog/simDevices/NDBus.cpp + NDDevices.cpp;
 docs/nd100x-device-semantics.md; FLOPPY-DMA/NEVER-READY-ANALYSIS.md.
-Every finding verified against both sides. Companion: SMD review report.
+Every finding verified against both sides.
 
 ## CRITICAL (would break SINTRAN/boot or corrupt data)
 
-C1. DMA command-block word 4 (OPWCH) fetched and THROWN AWAY -
-    sector-count mode does not exist.
-    ND_FLOPPY_DMA.v:153-159 (s_cb[4] never read; count always words,
-    16-bit) vs deviceFloppyDMA.c:297-303,346-348 (w4 b15 = WC/SC select,
-    SC multiplies by words/sector; w4[7:0] = count HIGH byte = 24-bit
-    counts); NDBusFloppyDMA.cs identical; driver contract spelled out in
-    deviceFloppyDMA.h:224-236 (SINTRAN BFDIS).
-    Failure: sector-count transfer of N sectors moves N WORDS, clean
-    status - silent data starvation. >64K-word transfers impossible.
-    tb only ever writes 16'h8000 to w4.
+C1. FIXED (sector-count mode) - see the status above.
 
-C2. Selecting a drive with no adapter instance WEDGES the controller
+C2. Selecting a drive with no adapter instance HANGS the controller
     forever - no error, no timeout, only device clear recovers.
     Adapter nd_storage_floppy_adapter.v:209 answers only its own DRIVE
     (silence otherwise, by design); controller E_DISK_RD/:420 and
@@ -54,31 +60,11 @@ C2. Selecting a drive with no adapter instance WEDGES the controller
     NDBus.cpp process_verilog_floppy() ignores FDISK_DRIVE and serves
     every unit from FLOPPY.IMG - passes runSim, hangs silicon.
 
-C3. WRITE with wordcount not a whole number of sectors commits STALE
-    BUFFER contents to the tail of the last sector.
-    ND_FLOPPY_DMA.v:480-496: partial chunk loads chunk words; E_DISK_WR
-    always runs disk_wordcount = full sector (:237); adapter overlays
-    the full sector - tail words are leftovers from the previous sector
-    (or reset garbage). C# writes exactly wordsToRead*2 bytes; nd100x C
-    truncates (differently wrong, but never leaks stale data).
-    Real data corruption; tb writes only whole-sector counts.
+C3. FIXED (partial-write stale tail) - see the status above.
 
 ## MAJOR
 
-M1. Error codes are INVENTED (1 = CB-fetch bus error, 2 = disk error;
-    ND_FLOPPY_DMA.v:378,423,503). Documented repertoire: DRIVE_NOT_READY
-    = 16 (oct 20), CRC = 5, bus-error CB fetch = oct 41, etc.
-    (deviceFloppyDMA.h:121-185). Also s_hard_err (b7 "no memory
-    contact") raised for a plain not-ready - C sets only the code.
-M2. Error-code BIT POSITION unresolved reference conflict: nd100x =
-    bits 8-14 (Verilog follows); RetroCore C# = errorCode << 9 =
-    bits 9-15; the ND doc block contradicts itself. If C# is right,
-    every code reads doubled. Settle vs the 3112 manual (ND-11.021)
-    before trusting any error path.
-M3. IOX +4 three-way conflict: C# returns RSR1 duplicated at +2 AND +4
-    ("to make Binary Format Load and Mass Storage Load possible,
-    1560& & 21560&"); nd100x + Verilog return the format word. If the
-    21560& microcode polls +4 for ready, Verilog never shows ready.
+M1-M3. FIXED (error codes, their bit position, IOX +4) - see the status above.
 M4. execute+testMode / execute+streamer run a REAL command (only
     iox_wdata[8] checked, ND_FLOPPY_DMA.v:349-358); reference routes to
     ExecuteTest / streamer (no CB fetch). FLOPPY-STREAM/TPE test
@@ -107,10 +93,7 @@ M10. PIO same-write control-bit ordering bugs: b5 clear-buffer +
     (ND_FLOPPY_PIO.v:262-265 vs :280); b4 device-clear + command uses
     the OLD drive select (C deselects first -> not-ready). Drivers
     combine WCWD bits in one IOX routinely.
-M11. +0 read constant = 1 (nd100x TODO value). C# comment: "0x0F at
-    least allow enter-directory from SINTRAN to work"
-    (NDBusFloppyDMA.cs:405). SINTRAN @ENTER-DIRECTORY may fail against
-    the Verilog constant.
+M11. +0 read constant: left as 1 on purpose - see the status above.
 
 ## MINOR
 m1. Reset RFT: Verilog 1, C reference 0 (assignment commented out).

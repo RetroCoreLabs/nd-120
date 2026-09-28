@@ -148,7 +148,7 @@ From the repo (all read for this report):
    target"). Never timing-validated; evaluated in section 4.3, and its
    Pmod-transplanted variant in 4.2.
 3. **16-bit SDRAM, burst-of-2 bridge** - the QMTECH XC7A35T stage-3 plan:
-   `Verilog/fpga/qmtech-a35t/HANDOFF-qmtech-a35t-bringup.md`
+   `Verilog/fpga/qmtech-a35t/docs/board-notes.md`
    (W9825G6KH-6, BL=2, per-ND-word data beat + parity beat; superseded on
    the Tang by `ND_SDRAM_PACK16` per `nd120-dram-memory.md` section 6).
 4. **Tang Nano 20K SDRAM 2x-clock bridge** - implemented and
@@ -298,7 +298,7 @@ dedicated short traces a byte access can be done in **one** clock cycle
   budget at any frequency - the internal-fast-clock form is mandatory.
 - **pack16 rescue (2 bytes, parity computed - the same refactor already
   adopted for the Tang as `ND_SDRAM_PACK16`,
-  `Verilog/docs/nd120-parity-refactor-order.md`):**
+  `Verilog/docs/nd120-parity-analysis.md`):**
   captures at N+2 and N+3, held-register presentation -> meets start of
   N+4 at 40 MHz **with zero slack**, comfortable at <= 33 MHz. This is the
   only shape in which the CMOD SRAM ever reaches 40 MHz, and it is
@@ -447,7 +447,7 @@ signalling.**
    and the QMTECH XC7A35T (32 MB SDRAM; section 4.4 shows its planned
    BL=2/CL2 bridge is in-spec at 40 MHz OSC) are the memory boards. This
    is already the direction of
-   `Verilog/fpga/qmtech-a35t/HANDOFF-qmtech-a35t-bringup.md`
+   `Verilog/fpga/qmtech-a35t/docs/board-notes.md`
    - this report just confirms it with arithmetic.
 2. **On the Basys3, run BRAM at full speed and maximize it.** Raise
    `BANK_ADDR_BITS` in
@@ -470,8 +470,7 @@ signalling.**
 5. **Carry the pack16 lesson everywhere:** every byte- or beat-serial
    backend only fits the 3-cycle budget when an ND word costs at most 2
    backend beats. The parity-computed pack16 contract
-   (`Verilog/docs/nd120-parity-refactor-order.md`,
-   `Verilog/docs/nd120-parity-analysis.md`)
+   (`Verilog/docs/nd120-parity-analysis.md`)
    is what makes the SDRAM boards work and is the precondition for any
    future SRAM bridge.
 
@@ -484,7 +483,7 @@ Repo ground truth (all absolute paths):
 - `Verilog/docs/nd120-dram-memory.md` - measured protocol, no-wait-state property, backend family, Tang bridge math
 - `Verilog/TODO.md` - CMOD A7 section, SD-card plan
 - `Verilog/fpga/cmod-a7-35t/README.md` - 512 KB SRAM plan, IS61WV5128BLL-10BLI facts
-- `Verilog/fpga/qmtech-a35t/HANDOFF-qmtech-a35t-bringup.md` - stage-3 16-bit BL=2 SDRAM bridge plan
+- `Verilog/fpga/qmtech-a35t/docs/board-notes.md` - board facts; the 16-bit bridge was built as `ND_SDRAM_DQ16`
 - `Verilog/fpga/basys3/README.md` - XC7A35T BRAM totals, ~1,044 Kbit utilization
 - `Verilog/fpga/basys3/mem-test/basys3_mem_test_top.v` - standalone BRAM-path protocol test
 - `Verilog/Shared/support/SIP1M9.v` - proven ramSize=3 BRAM path (registered read, first both-low edge)

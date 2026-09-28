@@ -6,17 +6,25 @@ from one microSD card + the spare SDRAM. Written for the SD-FAT
 workstream to implement; the device side (ND-BUS-DEVICES/) is already
 built against the client contract in section 4.
 
-Companion docs: Verilog/docs/device-bus-todo.md (master plan, SDRAM
-cache design rules), Verilog/docs/sd-bpun-device-plan.md (SD pins,
-card recipe), Verilog/docs/nd100-bus-dma.md (bus/DMA protocol).
+Status: the contract (client port, no-queue arbiter, write-through before
+done) is what the built stack implements. Two things in the first version of
+this spec were replaced by owner decision and are corrected below: images are
+no longer preloaded into SDRAM (04-AUG-2026, block cache instead), and files
+no longer have to be contiguous (07-AUG-2026, the engine walks the FAT chain).
+The as-built design is `Verilog/docs/nd-storage-design.md`.
+
+Companion docs: Verilog/docs/nd-storage-design.md (as-built design),
+Verilog/docs/sd-bpun-device-plan.md (SD pins, tape-400 facts),
+Verilog/docs/nd100-bus-dma.md (bus/DMA protocol).
 
 ## 1. The one-sentence contract
 
 nd_storage gives N independent client ports, each bound to one file on
 the FAT card; a client reads and writes its file in 2048-byte blocks
-(1 kiloword = 4 SD sectors); all reads come from an SDRAM-resident
-copy preloaded at open; all writes go to SDRAM and are written through
-to the card before the client sees done.
+(1 kiloword = 4 SD sectors); disc clients are served through a shared
+block cache in SDRAM, tape and floppy clients read straight from the
+card (DIRECT); every write is written through to the card before the
+client sees done.
 
 ## 2. Placement and layering rules (from the master plan)
 
@@ -27,7 +35,8 @@ to the card before the client sees done.
 - One physical SD slot, one sector engine, ONE nd_storage instance.
   The devices in ND-BUS-DEVICES/ are the clients.
 - SDRAM is shared with the ND-120 main memory: fixed partition, low
-  region = CPU memory (as today), high region = disk-image slots.
+  region = CPU memory (as today), high region = the storage region
+  (one staging line + the shared cache pool).
   The CPU port of the SDRAM controller has ABSOLUTE priority;
   nd_storage takes leftover cycles only.
 
@@ -58,16 +67,17 @@ Decision (11-JUL-2026): there is NO request queue.
 All signals in the storage clock domain; the bus-device side runs in
 the CPU sysclk domain - the CDC (clock domain crossing) is INSIDE
 nd_storage (2-flop synchronizers on the strobes, data is stable while
-the handshake crosses). N_CLIENTS is a parameter, 4 for now:
-client 0 = tape-400, client 1 = floppy unit 0, 2 = floppy unit 1 /
-HDD, 3 = spare.
+the handshake crosses). N_CLIENTS is a parameter, 8 as built:
+client 0 = tape-400, 1-2 = floppy units, 3-5 = SMD units 0-2,
+6-7 = Winchester units 0-1 (design section 1.3).
 
 Per client c:
 
     // --- binding / mount ---
-    open_req[c]      in   pulse: (re)open the file, preload to SDRAM
-    open_ok[c]       out  level: file open, preload complete
-    open_err[c]      out  level: file not found / FS error / too big
+    open_req[c]      in   pulse: (re)open the file (find it, latch its
+                          geometry - no data is moved)
+    open_ok[c]       out  level: file open
+    open_err[c]      out  level: file not found / FS error
     size_bytes[c]    out  [31:0] file size after open
 
     // --- block operations (2048-byte blocks within the file) ---
@@ -119,29 +129,36 @@ nd_storage_tape_adapter holds one 2048-byte block buffer, exposes the
 tape core's byte port (byte_req pulse -> byte_valid pulse + byte_data,
 plus rewind), and behind the scenes issues sequential block reads on
 its client port; rewind resets the block/byte pointers (no card
-access - the image is in SDRAM anyway). EOF: byte_req past
+access until the next byte is asked for). EOF: byte_req past
 size_bytes simply never answers valid, which leaves the tape's
 ready-for-transfer flag low - exactly the C model's EOF behavior.
 
-## 6. SDRAM slot map and preload
+## 6. Storage region and block access (as built)
 
-- Disk-image region divided into fixed slots by generic parameters:
-  SLOT_BASE[c], SLOT_SIZE[c] (defaults: tape 64 KB, floppy 2 MB each).
-- open_req: FAT-mount (reusing the existing sd_file_reader mount
-  logic), locate the file by its FIXED name (parameter, 8.3 root
-  entry - same limitation as sd-fat-test), stream the whole file
-  into the slot block-by-block, then raise open_ok. A file larger
-  than the slot -> open_err (no partial mount).
-- Block read = SDRAM burst read from SLOT_BASE[c] + block*2048.
-- Block write = SDRAM write of the block + write-through of the same
-  2048 bytes to the card (4 sectors at file_first_sector + 4*block -
-  the same framing sd-fat-test WRBLK1 already proved on hardware).
-  Contiguous files are REQUIRED in v1 (the card recipe already
-  produces them; sd_fat_check can verify at mount and fail open_err
-  on a fragmented file).
-- The SDRAM port used is the leftover-cycles device port defined in
-  the master plan (CPU absolute priority). One block = one burst
-  sequence; the arbiter in nd_storage never holds the SDRAM port
+The first version of this section gave every client a fixed SDRAM slot,
+streamed the whole file into it at open, and refused a file larger than
+its slot. That was replaced on 04-AUG-2026 (owner decision: no image is
+preloaded). Now:
+
+- open_req: FAT-mount (reusing the sd_file_reader mount logic), find the
+  file by its FIXED root name (parameter), latch size, first sector,
+  first cluster and the volume geometry, then raise open_ok. No data
+  moves at open; an image is limited only by the 16-bit block count
+  (128 MB).
+- Per client, CACHE_MASK selects CACHED (disc classes: SMD, Winchester)
+  or DIRECT (tape, floppy). A cached block read is served from the
+  shared, 4-way set-associative, LRU, write-allocate cache in the
+  storage region; a miss fetches the block's 4 sectors from the card
+  first. A DIRECT read fetches from the card into one shared staging
+  line and serves from there.
+- Block write = write-through: the 2048 bytes go to the card first
+  (4 sectors), then to the region, then done.
+- Card sectors are found by walking the file's FAT chain (per-client
+  memo, so sequential access costs 0 or 1 FAT reads). Fragmented files
+  are correct; an end of chain before the wanted block answers
+  done+err.
+- The SDRAM port used is the leftover-cycles device port (CPU absolute
+  priority). The arbiter in nd_storage never holds the SDRAM port
   across blocks.
 
 ## 7. Error and hot-swap rules
@@ -149,8 +166,9 @@ ready-for-transfer flag low - exactly the C model's EOF behavior.
 - Card errors during write-through: done+err to the client; open_ok
   stays up (the SDRAM copy is intact); a status output pin/register
   reports the SD state for the board top to show on LEDs.
-- Card removal is only detected at the next card access (write or
-  open). Reads keep working from SDRAM by design.
+- Card removal is only detected at the next card access (a write, an
+  open, a cache miss or any DIRECT read). Cached blocks keep reading
+  from SDRAM.
 - Re-inserting a card requires open_req again (same as the sd-fat-test
   per-command re-init, which doubles as tape rewind-to-card).
 
@@ -160,10 +178,9 @@ ready-for-transfer flag low - exactly the C model's EOF behavior.
   filenames per client.
 - No request queue, no out-of-order completion, no per-client
   priority levels (round-robin only).
-- No caching logic beyond the full-image slot (tag-based caching
-  arrives only with SMD/HDD images that exceed the slot - Phase 4).
-- No FAT chain following on the write path - contiguous files only,
-  enforced at open.
+- (Two items of the first scope fence were lifted: tag-based caching
+  was built for the disc classes on 04-AUG-2026, and FAT-chain walking
+  replaced the contiguous-files rule on 07-AUG-2026.)
 
 ## 9. Acceptance tests (each self-checking, registered in
 tests/run_all_tests.sh per the standing rule)
@@ -181,6 +198,7 @@ tests/run_all_tests.sh per the standing rule)
    EOF behavior (no byte_valid past end).
 5. Error: block out of range -> done+err without SD traffic; write
    failure injected in the card model -> done+err, SDRAM intact.
-6. System: ND_FLOPPY_PIO's disk backend port wired to a client port
+6. System: the floppy disk backend port wired to a client port
    (the disk_*/dbuf_* signals map 1:1) - sector read/write through
-   the full stack against the card model.
+   the full stack against the card model. As built this is
+   ND_FLOPPY_DMA's backend (`test-nds-floppy`), not ND_FLOPPY_PIO.

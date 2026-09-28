@@ -1,7 +1,7 @@
 # SKIP_WCS_LOAD — Preload the WCS and Skip the Microcode Load Phase
 
 **Full path:** `Verilog/docs/skip-wcs-load.md`
-**Last updated:** 2026-07-04
+**Last updated:** 2026-09-28
 
 How to preload the Writable Control Store (WCS) directly and skip the ~573K-cycle
 runtime microcode load, behind one compile-time define `SKIP_WCS_LOAD`. Derived
@@ -14,10 +14,10 @@ PROM->WCS data format.
 - **Tang Nano 20K fit** — if the load is skipped, the microcode PROM
   (`CPU_CS_PROM_19`) is never read, so its ~512 Kbit BRAM can be dropped. Combined
   with the WCS staying in BSRAM, this is what makes the microcode fit the Tang's
-  828 Kbit (see `docs/tang-nano-20k-port.md`).
-- **NOT a timing fix** — the FPGA still fails timing because of the derived-clock
-  nets (`docs/fpga-debug-methodology.md` 3.2). This is an orthogonal
-  simplification.
+  828 Kbit (see `fpga/tang-nano-20k/BSRAM-BUDGET.md`).
+- **NOT a timing fix** — it removes a load phase, not a slow path. It is the
+  default on every FPGA build: Nexys, Tang, Basys3, MiSTer, MEGA65, QMTECH
+  and Cmod A7.
 
 ## How the load phase works (so we can skip it safely)
 
@@ -70,6 +70,13 @@ So the preload needs the 64-bit image demuxed into 32 nibble-wide 4096-deep file
 
 Validated against the real PROMs: 8192 non-zero words; `word[0x0401]` (o02001) =
 `1b80008780203050`. Re-run whenever the microcode hex changes.
+
+**Two image sets (decided 02-SEP-2026).** The boards preload the raw PROM
+words from `Code/Microcode/wcs/`. The simulators use
+`gen_wcs_image.py --sim`, which writes `Code/Microcode/wcs-sim/` with the
+2024 simulator patch of word 0o2002 (a 64x shorter power-on wait, nothing
+else). `make test-microcode-sync` checks every copy against the set its
+directory must hold. Details: `docs/nd120-facts.md`.
 
 ## Implementation (three RTL edits + build wiring)
 

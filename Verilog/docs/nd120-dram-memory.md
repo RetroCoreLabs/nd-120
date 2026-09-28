@@ -147,14 +147,18 @@ nothing in the sim exercises it. Conclusion for real dynamic memory backends:
 ## 5. The aligned backend family (implemented 8-JUL-2026)
 
 All main-memory backends share the **sheet-49 interface** and are selected in
-`MEM_43.v` by one define chain:
+`MEM_43.v` by one define chain, checked in this order. A build that selects
+none of them fails at elaboration (`MEM_43.v:699-715`); there is no silent
+default. The define table with who sets what is `docs/build-defines.md`
+section 1.
 
 | Define | Module | Backend |
 |--------|--------|---------|
-| `MAIN_RAM_SDRAM` | `fpga/tang-nano-20k/sdram-bridge/MEM_RAM_49_SDRAM.v` | Tang Nano 20K embedded 8 MB SDRAM (2 banks = 4 MB) |
-| `MAIN_RAM_BLOCKRAM` | `CPU-BOARD-3202/circuit/MEM_RAM_49_BLOCKRAM.v` | One clean synchronous BRAM, parameterized size (Basys3 default 3 banks x 4K words; CMOD A7 etc. raise `BANK_ADDR_BITS`) |
-| `VERILATOR_SIM` (else) | `CPU-BOARD-3202/circuit/MEM_RAM_49_SIM.v` | Zero-delay DRAM model, 3 banks x 1M = 6 MB; C++ preload via `RAM.b0_lo/b0_lo_p/b0_hi/b0_hi_p` |
-| (none) | `CPU-BOARD-3202/circuit/MEM_RAM_49.v` | Original six SIP1M9 chips - historical reference, FPGA default until a board opts in |
+| `MAIN_RAM_SDRAM` | `fpga/tang-nano-20k/sdram-bridge/MEM_RAM_49_SDRAM.v` | SDRAM through the sheet-49 bridge: Tang Nano 20K embedded 8 MB SDRAM (2 banks = 4 MB), and with `ND_SDRAM_DQ16` the 16-bit modules of the MiSTer, MEGA65 R4-R6 and QMTECH |
+| `MAIN_RAM_DDR2` | `fpga/nexys4ddr/ddr2/MEM_RAM_49_DDR2.v` | BRAM cache in front of external memory: Nexys 4 DDR (DDR2), MEGA65 R3 (HyperRAM behind the same seam) |
+| `MAIN_RAM_BLOCKRAM` | `CPU-BOARD-3202/circuit/MEM_RAM_49_BLOCKRAM.v` | One clean synchronous BRAM, parameterized size (Basys3 default 3 banks x 4K words; CMOD A7 etc. raise `BANK_ADDR_BITS`). Too small for SINTRAN on any board here |
+| `VERILATOR_SIM` | `CPU-BOARD-3202/circuit/MEM_RAM_49_SIM.v` | Zero-delay DRAM model, 3 banks x 1M = 6 MB; C++ preload via `RAM.b0_lo/b0_lo_p/b0_hi/b0_hi_p` |
+| `MAIN_RAM_SIP1M9` | `CPU-BOARD-3202/circuit/MEM_RAM_49.v` | Original six SIP1M9 chips - schematic-faithful reference only; no build selects it |
 
 **Hardware-truth rules baked into the FPGA backends** (from the 8-JUL Tang
 write debugging - three builds of evidence):
@@ -189,18 +193,11 @@ is the nand2mario byte-based one: `rd`/`wr` pulse -> 5-cycle operation, read
 data 4 cycles after `rd`, CL=2, auto-precharge, max 66.7 MHz, plus an explicit
 `refresh` command (one per 15 us needed).
 
-### Structure: replace MEM_RAM_49 per board
+### Structure: one sheet-49 body per board
 
-Rather than growing more `ifdef` branches inside `SIP1M9`, swap the **whole
-sheet-49 body** per target (this also cleans up the existing split):
-
-```
-MEM_RAM_49.v            thin wrapper: selects an implementation by define
- ├─ (default)           6x SIP1M9 as today (Verilator DRAM model / Basys3 BRAM)
- └─ MAIN_RAM_SDRAM      MEM_RAM_49_SDRAM.v - protocol bridge + nand2mario sdram.v
-                        (enabled only by the Tang build; Verilator and Basys3
-                        builds are untouched)
-```
+The **whole sheet-49 body** is swapped per target; `MEM_43.v` picks it by
+define (section 5). The SDRAM one is `MEM_RAM_49_SDRAM.v`: the protocol
+bridge plus `sdram18.v` (derived from the nand2mario controller).
 
 ### The bridge (MEM_RAM_49_SDRAM)
 
@@ -231,39 +228,35 @@ worst case - a refresh started on the same edge RAS falls - delays the read
 issue by ~2.5 OSC and the data to ~N+5, which is why post-access refresh is
 the primary mechanism and the watchdog only covers an idle CPU.
 
-### Word width: 18 bits into a 32-bit SDRAM
+### Word width: `ND_SDRAM_PACK16` (since 11-JUL-2026)
 
-The SDRAM is 2M x 32. The original mapping is **one 18-bit ND word per 32-bit
-SDRAM word** (needs the controller's 32-bit port instead of the byte port - a
-small modification; `dout32` already exists, writes need a 4-lane DQM=0000
-variant). Capacity: 2M words = **2 banks of 1M words = 4 MB**. The populated pair is
-**BANK0 + BANK2**; **BANK1** is the one that reports absent, and the ND-120's
-boot-time size probing handles missing banks (that is how the machine was sold
-with less than max memory).
+The SDRAM stores only the 16 DATA bits, TWO ND words per 32-bit location
+(one per location on a 16-bit module, `ND_SDRAM_DQ16`), with DQM
+lane-masked single-access writes (no read-modify-write, protocol timing
+untouched) and parity COMPUTED on the read path. The earlier "one 18-bit
+word per 32-bit location" mapping is gone; the reason it was believed
+necessary ("the self-test deliberately writes bad parity") was wrong - the
+microcode self-test never touches memory parity. Evidence and the pinned
+contract: `docs/nd120-parity-analysis.md`.
 
-> **Corrected 24-AUG-2026.** This paragraph and the one below used to say
-> BANK2 was the absent bank and that BANK0+BANK1 were populated. That is
-> backwards, and `MEM_RAM_49_SDRAM.v:17-21` has always said so. The board
-> decode PAL wires the three 1M-word banks in PHYSICAL-ADDRESS order
-> BANK0, BANK2, BANK1 - see `PAL/PAL_44445B.v:65-67`, where PPN[21:20] decodes
-> 00 -> BANK0 (words 0-1M), 01 -> BANK2 (1M-2M), 10 -> BANK1 (2M-3M). So the
-> contiguous first 2M words are BANK0+BANK2 and the absent bank sits at the
-> TOP of the range, not in the middle of it.
+Capacity: 2 banks of 1M words = **4 MB**. The populated pair is
+**BANK0 + BANK2**; **BANK1** is the one that reports absent, and the
+ND-120's boot-time size probing handles missing banks (that is how the
+machine was sold with less than max memory). The board decode PAL wires the
+three 1M-word banks in PHYSICAL-ADDRESS order BANK0, BANK2, BANK1 - see
+`PAL/PAL_44445B.v:65-67`, where PPN[21:20] decodes 00 -> BANK0 (words
+0-1M), 01 -> BANK2 (1M-2M), 10 -> BANK1 (2M-3M). So the contiguous first 2M
+words are BANK0+BANK2 and the absent bank sits at the TOP of the range.
+(Corrected 24-AUG-2026; this file used to say BANK0+BANK1.)
 
-**Superseded 11-JUL-2026 by `ND_SDRAM_PACK16`** (work order
-`nd120-parity-refactor-order.md`): store only the 16 DATA bits, TWO ND words
-per 32-bit location, DQM lane-masked writes (single access, no
-read-modify-write, protocol timing untouched), parity COMPUTED on the read
-path. The old "rejected: the self-test deliberately writes bad parity"
-rationale was folklore - the microcode self-test never touches memory parity
-and runtime software only consumes the PES/PEA/IIC error machinery; see
-`docs/nd120-parity-analysis.md` for the evidence and the pinned contract.
-With the define on, BANK0+BANK2 (still the full 4 MB, boot sizing unchanged)
-occupy the LOWER half of the chip (location bit 20 = 0) and the upper 4 MB
-is reserved for the nd_storage disk-image cache (`nd-storage-design.md`
-section 5.2). The CPU/storage split is parameterized at ND-row granularity
-(`MEM_RAM_49_SDRAM` parameter `CPU_PART_ROWS`, default 2048 = 4 MB) so a
-future build can trade CPU memory for cache without another refactor.
+BANK0+BANK2 occupy the LOWER half of the Tang chip (location bit 20 = 0)
+and the upper 4 MB is the nd_storage region (`nd-storage-design.md`
+section 5.2). The CPU/storage split is set at ND-row granularity by the
+`MEM_RAM_49_SDRAM` parameter `CPU_PART_ROWS` (default 2048 = 4 MB). Two
+bridge details from that work are commented in the code: DQM is restored
+to 0 right after each masked write burst (`sdram18.v:16-19`, read DQM
+latency is 2 cycles), and the absent-bank access `B_TAIL` hosts a refresh
+slot (`MEM_RAM_49_SDRAM.v`).
 
 ## 7. Frequencies and how to adjust per board
 
@@ -294,7 +287,7 @@ SDRAM ~= 66 MHz** until the controller timing parameters are revisited.
 - `CPU-BOARD-3202/circuit/MEM_RAM_49.v`, `MEM_RAMC_50.v`, `MEM_ADDR_44.v`,
   `MEM_LBDIF_48.v`, `MEM_DATA_46.v` - the memory subsystem sheets
 - `PAL/PAL_44902A.v` (RAS/CAS state machine), `PAL/PAL_44803A.v` (grants)
-- `Shared/support/SIP1M9.v` - both existing backends + `DBG_MEM` instrumentation
+- `Shared/support/SIP1M9.v` - the original chip model + `DBG_MEM` instrumentation
 - [`../fpga/tang-nano-20k/sdram-test/`](../fpga/tang-nano-20k/sdram-test/README.md) -
   hardware-validated SDRAM controller + board bring-up findings
 - `Verilog/TODO.md` - "Tang Nano 20K bring-up" section tracks this work

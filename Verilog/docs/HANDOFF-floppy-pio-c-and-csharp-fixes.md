@@ -3,18 +3,18 @@
 **For:** whoever owns the nd100x C emulator and/or the RetroCore C# emulator.
 **Subject:** the OLDER **PIO** (programmed-I/O) floppy controller "3027" — device
 octal 1560/1570, ident 021/022, interrupt level 11. This is a *different* device
-from the 3112 DMA controller (that one has its own handoff,
-`HANDOFF-nd100x-floppy-dma-manual-fixes.md`).
+from the 3112 DMA controller (whose nd100x fixes landed as nd100x commit
+efed8ae; spec in `floppy-3112-register-spec-ND-11.021.md`).
 
 **Files:**
-- C: `/mnt/e/Dev/Emulators/ND/nd100x/src/devices/floppy/deviceFloppyPIO.c` + `.h`
-- C#: `$ND_REPOS/RetroCore/Emulated.HW/ND/CPU/NDBUS/NDBusFloppyPIO.cs`
+- C: the nd100x repository, `src/devices/floppy/deviceFloppyPIO.c` + `.h`
+- C#: the RetroCore repository, `Emulated.HW/ND/CPU/NDBUS/NDBusFloppyPIO.cs`
 
 **Manual:** there is **no dedicated 3027 / ND-11.015 / ND-11.012 PIO manual** in
 NDInsight (confirmed). The authoritative register spec used here is **§B.4
 "ND-100 Floppy Disk Programming Specification" in
-`/mnt/e/Dev/Ronny/NDInsight/Reference-Manuals/ND-06.015.02 ND-100 Functional
-Description.md`** (lines ~9747-9990). Line numbers below are approximate — the
+`Reference-Manuals/ND-06.015.02 ND-100 Functional Description.md` in the
+NDInsight repository** (lines ~9747-9990). Line numbers below are approximate — the
 implementer should confirm each against current source before editing.
 
 **Rule:** no guessing. Every defect is grounded in a manual line or a

@@ -1,7 +1,8 @@
 # ND-120 Boot Golden Spec — Microcode Execution Reference
 
 **Full path:** `Verilog/docs/boot-golden-spec.md`
-**Last updated:** 2026-07-03
+**Last updated:** 2026-07-03 (stale FPGA-failure notes removed 28-SEP-2026:
+the Tang Nano 20K and Nexys 4 DDR boot SINTRAN, so the phase 3 stall below is history)
 
 Ground-truth description of the ND-120 microcode boot flow: what address the
 CPU executes, in what order, and the per-phase assertions that let tooling
@@ -10,7 +11,7 @@ three sources that agree:
 
 1. **Observed trace** — `MA/CSA` path from microcode address 0, extracted from
    the Verilator run (`sim/trace_latch.csv`, `sim/waveform.fst`).
-2. **ND-120 microcode listing** (OCR) — `Code/Microcode/ND-120 Mikroprogramlisting-L-ocr.md`.
+2. **ND-120 microcode listing** (version L, what the ROMs hold) — `Code/Microcode/ND-120-DELILAH-L.LISTING.txt` (column 2 = octal WCS address).
 3. **ND-110 microcode source** (clean, ROM-validated) —
    `$ND_REPOS/ND110Compile/ND110Compile/uCode/ND-110-RASK.uc`.
    Same label names as ND-120; use it to decode OCR ambiguities. NOTE: ND-110 is
@@ -23,9 +24,12 @@ three sources that agree:
 
 - The microcode address the CPU is executing is **`MA_12_0[12:0]`**, produced in
   `CGA_MIC` (`DELILAH-CPU/CGA_MIC/circuit/CGA_MIC.v`, port line 63).
-- **A microinstruction is committed on the `MACLK` rising edge (0 -> 1).** To get
-  one record per executed microinstruction, **sample `MA_12_0` at `posedge MACLK`**
-  — NOT every sysclk (that oversamples ~68x).
+- **Trace convention: sample `MA_12_0` once per microinstruction at
+  `posedge MACLK`** — NOT every sysclk (that oversamples ~68x). This is only a
+  sampling point. `MACLK` is the micro-address latch strobe: the address
+  latches are transparent while it is high and capture on its **falling**
+  edge (`SIGNALS.md`, `RETRACTED.md`). Do not read the rising edge as the
+  moment a microinstruction "commits".
 - `CSA_12_0` at board level is the same address: `SignalReport.md:178` —
   `XMA_12_0 from CGA <= MA_12_0 from CGA.MIC`. So `MA` (inside CGA) and `CSA`
   (board) are the same value; sample whichever is convenient at `posedge MACLK`.
@@ -97,14 +101,14 @@ All addresses verified against the Verilator trace from address 0. Ticks are
   falling through `002042 -> 002044`.
 - This is CPU + MOPC (operator comms) variable init.
 
-### Phase 3 — Delay loop (ALU countdown)  [CURRENT FPGA FAILURE POINT]
+### Phase 3 — Delay loop (ALU countdown)
 - `MA=002045 / 002046` (labels `SEQFS` / `STRSW`). ALU countdown: `Q` preloaded
   (e.g. 0x3FFF), each iteration `F = A - Q`; loop while `ZF=0`.
 - Reusable subroutine, called 3x during boot (136 / 6 / ~180,213 iters). The big
   3rd call is the ~0.5-1 s power-up delay.
 - **SHOULD:** at `002046`, when `ZF=1` (F reached 0), branch to **`002047`**.
-- **FPGA BUG:** stuck oscillating `002045/002046` (hex 0x0425/0x0426), never
-  reaches `002047` (0x0427). This is the divergence the whole effort targets.
+- Historical: in July 2026 the FPGA build stuck oscillating `002045/002046`
+  here and never reached `002047`. Solved; the Tang and Nexys boot SINTRAN.
 
 ### Phase 4 — CPU self-test
 - Exit `002047 -> 003710` (util) `-> 001035-001037 -> 002050 ... 002115` (setup)
@@ -123,8 +127,20 @@ All addresses verified against the Verilator trace from address 0. Ticks are
 - CPU reaches OPCOM (operator communication) ready and waits for a UART command.
 - **RTC interrupt** now fires periodically -> trap vector -> **`MA=000016`**
   = PANEL INTERRUPT: `IDBS,PANEL COMM,LDLC T,JMP -> PANEL -> PANVC`
-  (`ND-110-RASK.uc:90` `16/`, and lines 234-250). The `COMM,LDLC` (load loop
-  counter) at o16 is the subject of `LDLCN_o000016_investigation.md`.
+  (`ND-110-RASK.uc:90` `16/`, and lines 234-250; ND-120:
+  `Code/Microcode/ND-120-DELILAH-L.LISTING.txt` lines 90-96). The trap vector
+  reaches o000016 through the `CGA_MIC_IPOS` override (`MA = TVEC`), not
+  through MASEL. `COMM,LDLC` (CSCOMM o17; `LDLCN` = CSCOMM o17 AND `LCS_n`=1,
+  decoded in `CGA_DCD.v`) loads the loop counter LC from `CD[5:0]` at the next
+  MCLK rise; LC then indexes the PANVC jump table at o003760 (L listing lines
+  10254-10278): `0:STOP 1:MS20 2:PRQ 3:SING2 4:LOAD 5:CONT 6:RSTRT 7:MACL`.
+  The 20 ms RTC interrupt loads LC = o01, so it runs o003761 -> MS20
+  (o002333 in DELILAH-L, o002261 in RASK). Path:
+  `PANEL(o000050) -> o000051 -> o000052 -> o003761 -> MS20 -> MOPC/MRET1`.
+  Verilator shows LC = o01 loaded at the first PANVC dispatch (14-APR-2026);
+  the ND110Compile emulator asserts the same in its unit test
+  `PanelInterruptDispatch_TakesPanvcEntry1_MS20` (commit 4376d46, both RASK
+  and DELILAH-L).
 - Observed RTC/PANVC dispatches begin ~cycle 755,233 in the trace.
 
 ---
@@ -139,7 +155,7 @@ above. Classify every divergence:
   - Phase 2: first post-load `MA != 002001`, or the `002017 -> 005660 -> 005670
     -> 002020` jump chain is wrong -> IPOS/MASEL address selection broken.
   - **Phase 3: `MA` stays in {002045, 002046} beyond the max expected iteration
-    count and never reaches `002047`** -> the current FPGA stall. Concretely: at
+    count and never reaches `002047`** -> the July 2026 FPGA stall. Concretely: at
     `002046` with `ZF=1`, observed next `MA=002045` instead of `002047`.
   - Phase 4: self-test loop `002116-002123` does not exit after LC reaches 0.
 - **BENIGN divergence = IGNORE** — different delay-loop iteration counts,
@@ -171,8 +187,7 @@ same form, and `compare_boot_trace.py` applies the Section 3 rule.
 - `Verilog/cycle_clock.md` — `MACLK_n`/`MCLK_n` cycle-state timing.
 - `Verilog/sim/boot_analysis.md` — boot timeline Phases 1-5.
 - `Verilog/boot-sequence.md` — PROM -> WCS microcode load.
-- `Verilog/DELILAH-CPU/CGA_MIC/LDLCN_o000016_investigation.md` — o16 PANVC/RTC path.
 - `Verilog/SignalReport.md` — signal cross-ref (`CSA_12_0 = MA_12_0`).
-- `Code/Microcode/ND-120 Mikroprogramlisting-L-ocr.md` — ND-120 listing (addresses).
+- `Code/Microcode/ND-120-DELILAH-L.LISTING.txt` — ND-120 listing, version L (addresses).
 - `$ND_REPOS/ND110Compile/ND110Compile/uCode/ND-110-RASK.uc` — clean ND-110 source (label/semantic decode).
-- `Verilog/FPGA-BRINGUP-PLAN.md` — overall phase plan (sections 11-12: golden model + capture automation).
+- `Verilog/sim/FPGA_DEBUG_RUNBOOK.md` — last section: the golden-model comparison method and scripted ILA capture (moved from the retired FPGA-BRINGUP-PLAN.md).

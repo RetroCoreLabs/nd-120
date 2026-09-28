@@ -31,7 +31,8 @@ ND-110 golden trace exists for it:
    project established that the FP block (CSA 3167-3460) is bit-identical
    in both the K (OCR listing) and L (EPROM) microcode versions and
    **both implement 32-bit float**
-   (`/mnt/e/Dev/Ronny/nd120uc/docs/CLAUDE_HANDOFF_2026-07-10.md`).
+   (the nd120uc repository, the handoff note dated 2026-07-10 in its `docs/`
+   folder).
 
 ## Consequence for the instruction-verify campaign
 

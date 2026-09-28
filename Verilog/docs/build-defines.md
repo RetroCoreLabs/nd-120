@@ -1,8 +1,7 @@
 # ND-120 Verilog build options - the one reference
 
 **Full path:** `Verilog/docs/build-defines.md`
-**Last updated:** 2026-08-30 (was a 04-JUL unification plan; that plan is kept
-at the bottom, with its stale parts marked)
+**Last updated:** 2026-09-28
 
 Every knob that changes what gets built or how the built machine behaves,
 grouped by the LAYER where you meet it:
@@ -13,10 +12,13 @@ grouped by the LAYER where you meet it:
 4. [Tang Nano 20K switches](#4-tang-nano-20k-switches) (gowin_build.ps1, OSS Makefile, tang20k_defines.v)
 5. [Basys3 vivado_build.tcl arguments](#5-basys3-vivado_buildtcl-arguments)
 6. [MiSTer](#6-mister)
-7. [Debug and trace build defines](#7-debug-and-trace-build-defines) (pointers, not copies)
-8. [Runtime environment variables](#8-runtime-environment-variables-runsim-harness) - runSim probes; runtime, NOT build options
+7. [MEGA65](#7-mega65)
+8. [QMTECH A35T](#8-qmtech-a35t)
+9. [Cmod A7-35T](#9-cmod-a7-35t)
+10. [Debug and trace build defines](#10-debug-and-trace-build-defines) (pointers, not copies)
+11. [Runtime environment variables](#11-runtime-environment-variables-runsim-harness) - runSim probes; runtime, NOT build options
 
-Every `define` here is normally set by a build flow (layer 2-6), never by
+Every `define` here is normally set by a build flow (layer 2-9), never by
 editing RTL. The one exception is `fpga/tang-nano-20k/src/tang20k_defines.v`,
 which IS a build file - the Tang's per-board configuration lives there as
 hand-edited defines.
@@ -47,6 +49,9 @@ hand-edited defines.
 | `ND_SDRAM_DQ16` | (needs `ND_SDRAM_PACK16`) The SDRAM module is 16 bits wide: one ND word per 16-bit location, both DQM lanes always on, `addr[20:0]` is the location. The MiSTer's DE10-Nano module. 2M words = 4 MB | `fpga/mister/nd120.qsf` |
 | `ND_SDRAM_REFRESH_US` | Auto-refresh cadence of `MEM_RAM_49_SDRAM` in microseconds (default 15, the Tang's 2K-row die). An 8192-row module needs 7 | `fpga/mister/nd120.qsf` = 7 |
 | `ND_STORAGE_PORT` | nd_storage device port on the SDRAM backend (own `stor_clk` domain, upper-half storage region only) | `tang20k_defines.v` |
+| `ND120_DDR2_CACHE_BITS` | Index width of the BRAM cache in front of the DDR2 (`MEM_43.v:560`, passed to `MEM_RAM_49_DDR2` as `CACHE_IDX_BITS`) | fallback 14 in `MEM_43.v`; no build sets it |
+| `QUARTUS_RAM_INFER` | Quartus-only: take the RAM-inference arm of `Shared/support/IDT6168A_20.v` (WCS) and `MEM_RAM_49_BLOCKRAM.v` that Quartus maps to M10K. Its altsyncram predecessor was deleted 01-SEP-2026. Gate: `test-quartus-ram-equiv` | `fpga/mister/nd120.qsf` |
+| `QUARTUS_LATCH_RENAME` | Quartus-only: renames `Shared/ndlib/LATCH.v`'s module, whose name collides with a Quartus built-in primitive (header comment there) | `fpga/mister/nd120.qsf` |
 | `ND120_SIM_RAM_64K` | Sim-only: shrink the sim RAM to 64K words per bank (`MEM_RAM_49.v:22`) to reproduce the BRAM-aliasing class of bug in Verilator | `EXTRA_VDEFINES="-DND120_SIM_RAM_64K"` (runSim) |
 
 ### Microcode load
@@ -89,18 +94,51 @@ Status and open faults: `docs/CACHE-STATUS.md`.
 |---|---|---|---|
 | `BOARD_CLK_FREQ` | The CPU/bus clock in Hz. Every derived count (UART baud divisor, RTC tick, watchdogs) comes from it - it MUST match the real clock or the console garbles | `Shared/support/SC2661_UART.v:140` fallback; Nexys clk table; Basys3 `=16666667`; runSim `EXTRA_VDEFINES` | fallback 100000000 |
 | `UART_BAUD_RATE` | Console wire speed. The emulated SC2661 times bits off `DELAY_FRAMES = BOARD_CLK_FREQ / UART_BAUD_RATE` (`SC2661_UART.v:157`), regardless of the 9600-max thumbwheel the microcode believes - so the machine can THINK 9600 while the wire runs 115200 | `SC2661_UART.v:143` fallback; Nexys `baud` arg; Basys3 `=9600` | 115200 (Basys3: 9600) |
+| `ND120_UART_DELAY_FRAMES` | Console UART clocks per bit, stated outright instead of `BOARD_CLK_FREQ / UART_BAUD_RATE` (so a missing `BOARD_CLK_FREQ` cannot silently fall back to 100 MHz) | `fpga/mister/nd120.qsf` = 173 (20 MHz / 115200) | derived |
+| `ND120_CONSOLE_DATA_BITS` / `ND120_CONSOLE_PARITY` | Data bits and parity of the Nexys console receivers (serial and VGA terminal). SINTRAN sends 7E1 (software parity in bit 7) | fallback in `nd120_nexys4ddr_top.v:490-495` | 7 / 1 (even parity on) |
 | `ND120_N4DDR_MMCM_DIV` | Nexys MMCM divider off the 1000 MHz VCO; the CPU period in ns equals the divider. Set together with `BOARD_CLK_FREQ` by the clk table, never alone | `build.tcl` clk table; fallback `nd120_nexys4ddr_top.v:128` | 60.0 (16.667 MHz) |
+| `ND120_CMOD_MMCM_DIV` | Cmod A7 MMCM divider off the 756 MHz VCO (`ND120_TOP.v:370`). 28.0 = 27 MHz, 56.0 = 13.5 MHz, 42.0 = 18 MHz. Change `BOARD_CLK_FREQ` with it | `fpga/cmod-a7-35t/build.tcl` | 28.0 (27 MHz) |
+| `RTC_REAL_PERIOD` | Force the real board-clock RTC period (20 ms / 5 ms from `BOARD_CLK_FREQ`) in a Verilator build, to reproduce real-time behavior such as OPCOM output pacing (`DECODE_DGA_POW.v:352`, also `IO_PANCAL_40.v:182`) | `EXTRA_VDEFINES` (runSim) | off: sims use 8192 sysclk |
+| `RTC_SIM_20MS` | Sim-only: override the sim RTC period in sysclk cycles (the 5 ms tick follows at 1/4). Leave it undefined for the historical 8192 baseline - every golden trace assumes it. OPCOM input is serviced once per RTC tick, so scale `ND120_SEND_GAP` with it (`DECODE_DGA_POW.v:356-371`) | `EXTRA_VDEFINES` (runSim) | undefined = 8192 |
 | `ND120_CONSOLE_VGA` / `ND120_CONSOLE_BAUD` | The Nexys VGA console + USB keyboard next to the serial console (serial keeps working in parallel) | `build.tcl:359-360` | Nexys: ON (`novgaconsole` to drop) |
-| `ND120_MIPS_TAP` | Builds the CGA-side tap that feeds the panel MIPS counter (`CGA_ALU.v` `XGPRLOAD_DBG` = `ALUCLK_EN & GPRC[0] & ~GPRC[1]`, the instruction-register load). Set automatically with the VGA console, since that panel is the only thing that displays it; without it the net is tied to 0, keeping the extra fanout off `ALUCLK_EN` and `GPRC` on boards with no panel (Tang, Basys3, sims) | Nexys `build.tcl` with `vgaconsole` | ON with the VGA console |
+| `ND120_MIPS_TAP` | Builds the CGA-side tap that feeds the panel MIPS counter (`CGA_ALU.v` `XGPRLOAD_DBG` = `ALUCLK_EN & GPRC[0] & ~GPRC[1]`, the instruction-register load). Set automatically with the VGA console, since that panel is the only thing that displays it; without it the net is tied to 0, keeping the extra fanout off `ALUCLK_EN` and `GPRC` on boards with no panel (Tang, Basys3, sims). Validation recipe below the table | Nexys `build.tcl` with `vgaconsole`; `fpga/mister/nd120.qsf`; MEGA65 `build.tcl` | ON with the VGA console |
 | `ND120_TERMINAL_VT100` | Selects which of the two SEPARATE, compile-time-only terminal modules the VGA console builds: VT100 (SINTRAN type 6) if defined, TDV2200/type 93 if not. `terminal_ctrl.v`/`ps2_ascii_table.v`/`key_vt100.v` vs `terminal_ctrl_tdv.v`/`ps2_ascii_table_tdv.v`/`key_tdv2200.v` - never both elaborated in the same build (`ifdef` in `terminal_top.v` and `nd120_nexys4ddr_top.v`). PED/LED are built for the Tandberg keyboard's own key set, not VT100 CSI input (`Terminals/docs/SPEC-tdv2200.md`) | Nexys `-VT100Terminal` (only matters with the VGA console on) | TDV2200 (undefined) |
 | `TANG_VARIANT_CRAWL` / `_MID` / `_FULL` / `_FAST20` | Tang clock variants, consumed by `tang20k_defines.v`. No variant define = slow (6.75 MHz) | generated `build\tang20k_variant.v` (ps1) or `-DTANG_VARIANT_*` (OSS Makefile) | slow |
+
+**Validating a MIPS tap before it goes to a board (31-AUG-2026).** Three
+earlier taps were picked from a signal's name and all read 00.00 on the
+panel. `CFETCH` counted 0 pulses in 460 executed instructions: `CGA_DCD.v`
+`CFETCH_FF` ties `.D` to its own `.Q` and only reloads through the BRK scan
+path. That is correct as transcribed (DELILAH.pdf page 69, `/CGA/DCD` sheet 5
+of 10) - do not "fix" it; a rewrite on 01-SEP broke the SINTRAN boot and was
+reverted. The recipe: run `tests/instruction-verify/run_area_test.sh <AREA>`
+with the environment variable `ND120_COUNT_CFETCH=1` (read by `Run120.cpp`)
+on TWO areas with different instruction mixes. `REGISTER-OPERATIONS` and
+`MEMORY-REFERENCE` both gave 469 pulses against 460 reference instructions.
+The offset is constant, not proportional, which proves the tap is not
+counting operand fetches (the reference trace cannot see a load whose opcode
+equals the previous one).
 
 ### Sim device stack
 
 | Define | What it does | Who sets it |
 |---|---|---|
+| `ND120_INCLUDE_WD` | Opt the Winchester controller (IOX 500-507) into the sim device stack. Off by default because 500 is also the CDC cartridge disc's block. `ND120_SD_WD` needs it | `EXTRA_VDEFINES`; `dmaSim/Makefile` `WD_SD_DEFINES` |
+| `ND120_SMD_15MHZ` | Strap the SMD controller as the 15 MHz two-write card (24-bit registers loaded HI then LO). Default is the ECC single-write card that boots the image (`ND120_CORE.v:61`) | `EXTRA_VDEFINES`; commented out in `tang20k_defines.v` |
 | `ND120_VERILOG_DEVICES` | The real Verilog device stack in the sim: `ND_BUS_SLAVE` + `ND_TAPE_400` inside `ND120_TOP`, fed by the SD-FAT RTL - the same RTL that runs on Tang. Also passed to the C++ harness | `runSim/Makefile` `VERILOG_TAPE=1` (default) |
 | `ND120_SD_STORAGE` / `ND120_SD_CARD_IMG` | Feed the tape device from the real SD-FAT stack reading a simulated card image (implies Verilator `--timing`) | `runSim/Makefile` `SD_STORAGE=1` (default) |
+
+### SD-FAT and storage feature strips
+
+Every SD-FAT feature is ON unless stripped. The list and the dependency
+rules are in the header of `SD-FAT/circuit/sd_fat_features.vh`.
+
+| Define | What it does | Who sets it |
+|---|---|---|
+| `SDFAT_NO_WRITE` / `_NO_REWRITE` / `_NO_CHECK` / `_NO_SPEED` / `_NO_FREESCAN` / `_NO_STORAGE` | Strip the card write engine, the FAT rewriter, the chain checker, the speed tests, the free-space scan, the nd_storage facade. Stripping a prerequisite strips its dependents | sd-fat-test builds (`SDFAT_FEATURES=`) |
+| `SDFAT_NO_LFN` | Remove the VFAT long-filename parser from `sd_file_reader.v` (about 1800 LUTs); files match by 8.3 name only. Consumed directly by the reader, not by the header | `tang20k_defines.v`; QMTECH `build.tcl` |
+| `SDFAT_FORCE_STORAGE_CHECK` | Build the old mount-time contiguity checker. Retired as a default 07-AUG-2026: the storage engine walks the FAT chain at run time, so fragmented files work. Its testbenches still build it | SD-FAT testbenches only |
+| `ND_STORAGE_NO_CACHE` / `ND_STORAGE_DISCS_UNCACHED` | Leave the storage block-cache directory out of the netlist / make every disc client uncached. Use them together (`nd_storage.v:495`) | Tang `-NoStorageCache` / `-DiscsUncached`; QMTECH `build.tcl` |
 
 ### Behavior escape hatches (default OFF - defined by no build; set via `EXTRA_VDEFINES` only to reproduce old behavior)
 
@@ -170,20 +208,22 @@ both `clk=10` and `clk 10` are accepted.
 | `physopt` | off | Post-place physical optimization (26-AUG clock-up work) |
 | `timingexplore` | off | `opt_design -directive ExploreWithRemap`, `place_design -directive ExtraTimingOpt`, `route_design -directive AggressiveExplore`. Measured 31-AUG on clk=45 with cache: WNS -6.780 -> -6.440, i.e. 0.34 ns of the 6.4 ns needed. Routing effort is not the lever |
 
-Clock table (`build.tcl:70`): `clk=` 8, 10, 12, 16, 20, 25, 27, 33, 35, 38,
-40, 42, 45, 50, 100. The deployed proven speed is 45 (45.45 MHz); the build
-gate refuses to write a bitstream with negative slack. The deployed
-configuration rule (cache + VGA, matching the newest `build-*.log`) is in the
-project memory note `project_nexys_deployed_config`.
+Clock table (`build.tcl:66`): `clk=` 8, 10, 12, 16, 20, 25, 27, 33, 35, 38,
+40, 42, 45, 50, 100. The build gate refuses to write a bitstream with
+negative slack. The deployed configuration is `clk 33` + `physopt` with the
+cache ON (33.333 MHz, 7.52 MIPS); 45.45 MHz also boots. See
+`fpga/nexys4ddr/README.md` and `fpga/nexys4ddr/timing.md`.
 
 ---
 
 ## 4. Tang Nano 20K switches
 
 Two flows, one source of truth: both put their pre-defines ahead of
-`src/tang20k_defines.v` in the one ordered compilation unit. Primary flow is
-the OSS suite (`make` in `fpga/tang-nano-20k/`); Gowin EDA is the backup
-(`docs/tang20k-build-flows.md`).
+`src/tang20k_defines.v` in the one ordered compilation unit. Gowin EDA
+(`gowin_build.ps1`) builds every variant, including the deployed `fast20`;
+the OSS suite (`make` in `fpga/tang-nano-20k/`) builds slow, crawl and full
+only, and CI builds its bitstream. Install and flow notes:
+`fpga/tang-nano-20k/README.md`.
 
 ### `gowin_build.ps1` (Windows PowerShell, Gowin EDA)
 
@@ -201,7 +241,7 @@ the OSS suite (`make` in `fpga/tang-nano-20k/`); Gowin EDA is the backup
 
 | Variable / target | Default | What it does |
 |---|---|---|
-| `VARIANT=slow\|crawl\|full` | slow | Clock variant via `-DTANG_VARIANT_*`. NOTE: does NOT accept `mid`/`fast20` (the ps1 does) - see the stale list at the bottom |
+| `VARIANT=slow\|crawl\|full` | slow | Clock variant via `-DTANG_VARIANT_*`. Does NOT accept `mid`/`fast20` (`Makefile:45-53`; the ps1 does) |
 | `CACHE=1` | 0 (cache OUT) | `-DND120_FORCE_CACHE` |
 | `make check` | - | Netlist gates: `IO_sdram_dq` tristate + latch census |
 | `make load` / `flash` | - | Program SRAM / config flash |
@@ -225,8 +265,8 @@ authority and every define carries its own long comment:
 
 ## 5. Basys3 vivado_build.tcl arguments
 
-`fpga/basys3/` drives the out-of-repo Vivado project
-`F:/Xilinx/ND120/ND3202D`. This board synthesizes but does not meet timing
+`fpga/basys3/` drives a Vivado project that lives outside the repository
+(its location is set in `vivado_build.tcl`). This board synthesizes but does not meet timing
 and does not boot.
 
 | Argument | What it does |
@@ -245,15 +285,23 @@ this board stays at the thumbwheel-true 9600).
 
 ## 6. MiSTer
 
-`fpga/mister/` (Quartus, `nd120.qpf`/`nd120.qsf`) is the early Cyclone V
-port. ND-side defines in the .qsf so far: `FPGA_FF_MODE=1` only
-(`nd120.qsf:102`, with the explicit warning that `VERILATOR_SIM` must never
-be set there). The commented `MISTER_*` macros above it are the standard
-MiSTer framework options, not ND-120 options. No `MAIN_RAM_*` backend is
-selected in the .qsf yet.
+`fpga/mister/` (Quartus 17.0.2, `nd120.qpf`/`nd120.qsf`). SINTRAN boots on
+the DE10-Nano (02-SEP-2026, `fpga/mister/README.md`). There are no
+command-line switches: the ND-side defines are `VERILOG_MACRO` lines in
+`nd120.qsf` - `FPGA_FF_MODE`, `BOARD_CLK_FREQ=20000000`,
+`UART_BAUD_RATE=115200`, `ND120_UART_DELAY_FRAMES=173`, `MAIN_RAM_SDRAM`,
+`ND_SDRAM_PACK16`, `ND_SDRAM_DQ16`, `ND_SDRAM_REFRESH_US=7`,
+`QUARTUS_RAM_INFER`, `ND120_PANEL_CLOCK`, `ND120_MIPS_TAP`,
+`ND120_NO_CACHE` (the cache plus the three disc devices do not fit the
+Cyclone V), `SKIP_WCS_LOAD` and `QUARTUS_LATCH_RENAME`. Each line carries
+its reason in a comment there. `VERILATOR_SIM` must never be set. The
+commented `MISTER_*` macros are the standard MiSTer framework options, not
+ND-120 options. `ND120_STORAGE_PROBE` (commented out, default OFF) prints
+the mount flags and WDISK request/done/error counters on the console
+(`rtl/nd120_storage_probe.v`) - debug only.
 
-**Storage (01-SEP-2026):** no `SD_STORAGE`, no SD card, no FAT. The images
-are files mounted from the OSD; `nd120.sv` instantiates `hps_io` with
+**Storage:** no `SD_STORAGE`, no SD card, no FAT. The images are files
+mounted from the OSD; `nd120.sv` instantiates `hps_io` with
 `VDNUM=5, BLKSZ=2, WIDE=1` and `rtl/nd_storage_mister_devices.v` serves the
 core's FDISK/WDISK/TAPE seams from them through `rtl/nd_storage_hps.v`
 (hps_io's block interface, one 2048-byte storage block = one 4-block HPS
@@ -261,15 +309,53 @@ transaction). Slot map = OSD `S<n>` line = hps_io index: 0 floppy drive 0,
 1 floppy drive 1, 2 Winchester unit 0, 3 Winchester unit 1, 4 paper tape
 (`.BPU`/`.TAP`, the HPS matches 3-character extension groups). One
 parameter matters: `BYTE_SWAP` on `nd_storage_hps` (default 1: HPS words
-little-endian, ND image words big-endian) - it is a reading of the
-framework, to be confirmed by the Phase-4 board test in
-`docs/PLAN-mister-storage.md`. Gates: `fpga/mister/sim` `test-storage-hps`,
-`test-storage-devices`. The `INCLUDE_*` parameters of `ND120_CORE` in
-`nd120.sv` are TAPE/FLOPPY/WD = 1, SMD = 0.
+little-endian, ND image words big-endian). Gates: `fpga/mister/sim`
+`test-storage-hps`, `test-storage-devices`. The `INCLUDE_*` parameters of
+`ND120_CORE` in `nd120.sv` are TAPE/FLOPPY/WD = 1, SMD = 0.
 
 ---
 
-## 7. Debug and trace build defines
+## 7. MEGA65
+
+`fpga/mega65/build.tcl` (Vivado, MiSTer2MEGA65 framework). Arguments:
+
+| Argument | Default | What it does |
+|---|---|---|
+| `board=r3\|r4\|r5\|r6` | r6 | Board revision. R3 uses the HyperRAM (through the Nexys `MEM_RAM_49_DDR2` seam, `MAIN_RAM_DDR2`) and a 13.333 MHz CPU; R4-R6 use the SDRAM (`MAIN_RAM_SDRAM`, `ND_SDRAM_PACK16`, `ND_SDRAM_DQ16`, `ND_SDRAM_REFRESH_US=7`) at 20 MHz |
+| `nocache` | cache IN | Adds `ND120_NO_CACHE` |
+| `nopanelclock` | panel clock ON | Drops `ND120_PANEL_CLOCK` |
+
+Always set: `FPGA_FF_MODE`, `BOARD_CLK_FREQ` (13333333 or 20000000),
+`UART_BAUD_RATE=115200`, `SKIP_WCS_LOAD`, `ND120_MIPS_TAP`. Build notes and
+toolchain traps: `fpga/mega65/docs/00-plan.md`.
+
+---
+
+## 8. QMTECH A35T
+
+`fpga/qmtech-a35t/build.tcl` (Vivado, in-memory flow). Arguments:
+`-promload` (runtime PROM->WCS load instead of `SKIP_WCS_LOAD`),
+`-nopanelclock`, `-noburn`. Fixed defines: `FPGA_FF_MODE`,
+`MAIN_RAM_SDRAM`, `ND_SDRAM_PACK16`, `ND_SDRAM_DQ16`,
+`ND_SDRAM_REFRESH_US=7`, `ND_STORAGE_NO_CACHE` together with
+`ND_STORAGE_DISCS_UNCACHED` (neither is optional without the other),
+`SDFAT_NO_LFN`, `ND120_PANEL_CLOCK`, `BOARD_CLK_FREQ=20000000`,
+`UART_BAUD_RATE=115200`. The reason for each is commented in the script.
+
+---
+
+## 9. Cmod A7-35T
+
+`fpga/cmod-a7-35t/build.tcl` (Vivado, in-memory flow). Arguments:
+`-promload` (runtime PROM->WCS load; WCS preload is the default since
+04-SEP-2026) and `-noburn`. Fixed defines: `TARGET_CMOD_A7`,
+`FPGA_FF_MODE`, `MAIN_RAM_BLOCKRAM`, `BOARD_CLK_FREQ` (27 MHz),
+`UART_BAUD_RATE=115200`. The CPU clock divider is `ND120_CMOD_MMCM_DIV`
+(section 1); a slower clock needs it and `BOARD_CLK_FREQ` changed together.
+
+---
+
+## 10. Debug and trace build defines
 
 These change observability, not the machine. They are documented where they
 live - this section only says where that is:
@@ -289,7 +375,7 @@ live - this section only says where that is:
 
 ---
 
-## 8. Runtime environment variables (runSim harness)
+## 11. Runtime environment variables (runSim harness)
 
 These are NOT build options: `Run120.cpp` reads them with `getenv()` when the
 already-built sim starts, so no recompile is needed. Grep `runSim/Run120.cpp`
@@ -314,26 +400,3 @@ for the name to see each one's exact behavior. Grouped:
 - **Run limits:** `ND120_MAX_TICKS`, `ND120_MAX_CNT`.
 - **DMA test rig:** `ND120_DMA_TEST`, `ND120_DMA_GAP`, `ND120_DMA_XCHECK`.
 
----
-
-## Appendix: the 04-JUL-2026 unification plan (historical)
-
-The original version of this file was a plan to collapse sim-vs-FPGA `ifdef`s
-to one code path. Status of its points as of 30-AUG-2026:
-
-- **Retire `USE_TRANSPARENT_LATCHES` / `FPGA_FF_MODE` / `USE_LATCHES`** - NOT
-  done, and the split is now load-bearing the other way around: FF mode is
-  the shipped path everywhere (runSim default, every FPGA), while `sim/`
-  keeps latch mode as the original-hardware reference and `make compare`
-  (latch-vs-FF golden trace diff) is a standing `make test-full` gate. The
-  plan's "delete the latch branches" step is superseded by keeping both as a
-  proof tool.
-- **Delete `_OLD_WAY_` dead code** (`CGA_MAC_APOS_INC.v`, `CGA_MIC_IINC.v`) -
-  still present, still dead (the symbol is defined nowhere).
-- **`BOARD_CLK_FREQ` / `UART_BAUD_RATE` as parameters with defaults** -
-  confirmed as the right pattern and now used by every flow (section 1).
-- **`VERILATOR_SIM` narrowed to bus ports + RAM** - not narrowed; its three
-  roles (harness bus ports, sim RAM size, fast UART) all remain under the one
-  symbol.
-- The plan's use counts (e.g. "`FPGA_FF_MODE`: 1 use") are long stale - the
-  symbol appears at ~69 RTL sites today.

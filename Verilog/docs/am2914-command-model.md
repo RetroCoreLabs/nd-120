@@ -4,7 +4,7 @@ Definitive reference for building command-SEQUENCE functional tests against the
 ND-120 DELILAH interrupt controller (`CGA_INTR` / `CGA_INTR_CNTLR`). Every claim
 here is traced to one of: the **AMD 1978 *Am2900 Family Data Book*** (the Am2914
 datasheet, Table I and the block-diagram text), the **RTL** (file:line), the
-**microcode** (`/mnt/e/Dev/Ronny/nd120uc/source/ND-120-DELILAH-L.LISTING.txt`
+**microcode** (the nd120uc repository, `source/ND-120-DELILAH-L.LISTING.txt`
 and `.../scripts/nd120_tokens.json`), or a **measured iverilog probe** of
 `CGA_INTR_CNTLR`. Anything not so grounded is marked **unknown / inferred**.
 
@@ -52,6 +52,10 @@ path is an ND extension (`FIDBO`+`EMPID` in `CGA_INTR_IRSRC`), **not** an Am2914
 instruction; and a full-`CGA_INTR_CNTLR` event-sim can **oscillate/hang** on
 X-initialised set/reset latches unless you issue Master Clear + several `MCLK`
 pulses first (or test submodules individually, as the existing tbs do).
+Since 15-JUL-2026 the 16 request bits use the loop-free `RQBIT_V2`
+(`CGA_INTR_CNTLR_IRQ_REG.v` header), so the request-latch case below no longer
+applies as written; whether any other latch in the block (e.g. `MASKBIT`) can
+still oscillate from X has not been measured since.
 
 ---
 
@@ -117,8 +121,8 @@ Datasheet facts that the tests depend on (block-diagram text, book p. 2-107):
 listings as an *octal* digit (e.g. `PIC,LMSK` = "A-OP IS 16" octal = 0xE000 in
 microword `w1` → top nibble `E` = **14** decimal = Am2914 **LDM**). All A-OP
 values below are taken from
-`/mnt/e/Dev/Ronny/nd120uc/source/scripts/nd120_tokens.json` (`w1` field) and the
-JS `PIC_COMMANDS` table in `/mnt/e/Dev/Ronny/nd120uc/docs/index.html:876`.
+the nd120uc repository, `source/scripts/nd120_tokens.json` (`w1` field) and the
+JS `PIC_COMMANDS` table in the nd120uc repository, `docs/index.html:876`.
 
 The per-LAA decoder strobes come from
 `DELILAH-CPU/CGA_INTR/circuit/CGA_INTR_CNTLR_MDCD.v` (two `ND38GLP` 3→8 decoders
@@ -321,7 +325,9 @@ ROM(7)              -> EPICMASKN=0 (OEM active), PICMASK unchanged (read-only)
 MCLR(0)             -> PICMASK=0000000000000000   (clears mask)
 ```
 
-**CAUTION — event-sim hazard.** Driving the *whole* `CGA_INTR_CNTLR` with
+**CAUTION — event-sim hazard (measured before 15-JUL-2026, when the request
+bits were still the cross-coupled `RQBIT`; they are now the loop-free
+`RQBIT_V2`).** Driving the *whole* `CGA_INTR_CNTLR` with
 interrupt-request latching from an X-initial state can make the set/reset latches
 (`IRQ_REG_RQBIT` NAND feedback) **oscillate and hang** iverilog (observed: a
 2-minute timeout on a request-latching probe; the mask-only probe above runs
@@ -407,10 +413,10 @@ RTL (`Verilog/DELILAH-CPU/CGA_INTR/`):
 Datasheet: AMD *Am2900 Family Data Book* (1978), Am2914 section, Table I
 (book p. 2-108) and block-diagram text (p. 2-107).
 
-Microcode: `/mnt/e/Dev/Ronny/nd120uc/source/ND-120-DELILAH-L.LISTING.txt`
+Microcode: the nd120uc repository, `source/ND-120-DELILAH-L.LISTING.txt`
 (AIIC/`TRA IIC` scan at CS 000725; APID scan at CS 000716),
-`/mnt/e/Dev/Ronny/nd120uc/source/scripts/nd120_tokens.json` (PIC A-OP `w1`
-fields), `/mnt/e/Dev/Ronny/nd120uc/docs/index.html:876` (`PIC_COMMANDS`).
+the nd120uc repository, `source/scripts/nd120_tokens.json` (PIC A-OP `w1`
+fields), the nd120uc repository, `docs/index.html:876` (`PIC_COMMANDS`).
 
 Cross-refs: `Verilog/docs/RUN-level14-livelock-analysis.md`
 (IIC architecture, measured hivec/status values, FIDBO-swap fix);

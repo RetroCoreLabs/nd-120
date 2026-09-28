@@ -140,8 +140,9 @@ USB full-speed (12 Mbit/s) MSC sustains ~0.5-1 MB/s with multi-sector
 READ(10) (~167 KB/s if done sector-at-a-time). Modern USB 2.0/3.x sticks
 are REQUIRED to fall back to full-speed operation, so they will work.
 That is 4-7x our measured 137 KB/s SD-SPI - but the SD speed ladder
-(13.5 MHz + CMD18/CMD25 multi-block, already in progress per
-`docs/sd-speed-plan.md`) lands in the same league. **USB wins on connector
+(13.5 MHz + CMD18/CMD25 multi-block) lands in the same league - and the
+4-bit bus measured 3418 KB/s write, 5981 KB/s read on the Tang on 12-JUL-2026
+(`sd-cmd18-block-gap-research.md`, last section). **USB wins on connector
 convenience, not on speed.**
 
 ## 5. Recommendation

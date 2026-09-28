@@ -107,8 +107,12 @@ retraction with no evidence behind it is just another claim.
   early, contradicting the premise - while EWCA drops at state 1100 and MACLK
   does not fall until 1111.
 - **Also retracted with it:** "ECSL drops before TERM". It does not.
-- **Corrected:** 08-AUG-2026. The open question is now specific: what captures
-  the IDB during the EWCA/ECSL overlap? Nothing in the current RTL does.
+- **Corrected:** 08-AUG-2026. The follow-on question (what captures the IDB
+  during the EWCA/ECSL overlap?) is answered: the control-store read path
+  captures the word on the falling edge of ECSL~ and holds it on the IDB until
+  TERM. That capture was missing from the RTL and was added the same day
+  (`CPU_CS_TCV_20.v` header, "root cause of TRA CS returning 000000";
+  guarded by `test-cs-rwcs` and `test-cs-rwcs-cycle`).
 
 ### "PAL_44307C's fourth MACLK term is an OCR artefact"
 

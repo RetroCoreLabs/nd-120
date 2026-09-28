@@ -1,12 +1,13 @@
 # ND-120 FPGA Debug Methodology — Step-by-Step
 
 **Full path:** `Verilog/docs/fpga-debug-methodology.md`
-**Last updated:** 2026-07-03
+**Last updated:** 2026-09-28 (written 2026-07-03, when no board booted yet)
 
-A followable procedure for finding and fixing why the ND-120 boots in the
-Verilator latch reference but not on the Basys3 FPGA. Working hypothesis:
-**the divergence comes from timing/semantic differences between transparent
-latches (original hardware) and the edge-triggered flip-flops the FPGA needs.**
+A followable procedure for finding and fixing any divergence between a
+board and the Verilator reference. SINTRAN now boots on the Tang, Nexys and
+MiSTer boards; the method is the same for the next divergence. The usual
+suspect: **timing/semantic differences between transparent latches
+(original hardware) and the edge-triggered flip-flops the FPGA needs.**
 This doc gives the mental model, a triage decision tree, and per-step commands
 to isolate the buggy module(s) and drive them to a fix.
 
@@ -15,7 +16,8 @@ Companion docs:
 - `sim/SIGNAL-COMPARISON-HOWTO.md` — the `make compare` latch-vs-FF tool.
 - `sim/FPGA_DEBUG_RUNBOOK.md` — Verilator-vs-FPGA workflow + signal map.
 - `sim/FPGA_REFACTORING_GUIDE.md` — the async-clock -> synchronous conversion pattern.
-- `FPGA-BRINGUP-PLAN.md` — build/flash/validate loop + capture automation.
+- `Verilog/sim/FPGA_DEBUG_RUNBOOK.md` — build/flash/validate loop + capture automation.
+- `docs/ILA-PROBE-SEMANTICS.md` — the Nexys ILA rules.
 
 ---
 
@@ -92,7 +94,7 @@ combinational-clock paths likely cannot close) -> prioritise Section 3.2.
 ### 1c. Fresh ILA capture of the CURRENT bitstream  (Windows + WSL)
 
 Do not trust old captures. Program the current `.bit`, capture the ILA, export
-CSV (see `FPGA-BRINGUP-PLAN.md` Section 12), and confirm where the FPGA actually
+CSV (see `sim/FPGA_DEBUG_RUNBOOK.md`, last section), and confirm where the FPGA actually
 stalls today. Compare against `docs/boot-golden-spec.md` phases.
 
 ---
@@ -205,26 +207,19 @@ does not model. Check these in order:
 > Note also that the FPGA-does-not-boot framing is Xilinx-only now: the **Tang
 > Nano 20K boots SINTRAN III** (24-AUG-2026).
 
-The Basys3 build **fails timing** — this, not a functional bug, is why that
-board does not boot. From the Vivado logs, 2026-07 (historical, superseded):
-- `CRITICAL WARNING [Timing 38-282]: design failed to meet timing requirements`
-- **WNS approx -65 to -101 ns, TNS approx -50,000 ns**, plus hold violations
-  (THS approx -163 ns). A generated clock with **period < 2 ns** is reported.
-- There is an `MMCME2_BASE` CPU clock (`ND120_TOP.v:264`); the `sys_clk`
-  constraint lives in the Vivado-managed project XDC
-  (`ND3202D.srcs/constrs_2/new/constraints.xdc`), not in the repo.
+**What was fixed, and what is left.** In 2026-07 the Xilinx builds failed
+timing by 65-101 ns because dozens of flip-flops were clocked on DERIVED
+signals (`posedge s_aluclk`, `s_clock`, `s_clkab` ...): each became its own
+clock net that STA could not constrain. That class is fixed: the CYC_36
+clocks are clean generated flip-flop clocks (`docs/clock-enable-refactor.md`)
+and the rogue clock nets were converted one by one
+(`docs/plan-fix-unconstrained-clocks.md`, 0 unconstrained clocks on the Tang
+since 10-JUL-2026). The violations measured on 21-AUG (above) are inside
+the CPU clock domain and are real logic depth, not constraint gaps. Current
+per-board timing work: `fpga/nexys4ddr/timing.md` and
+`docs/HANDOFF-cga-idb-ring-cut.md` (the CGA IDB ring).
 
-**Mechanism:** ~35 files still clock flip-flops on **derived signals**, e.g.
-`always @(posedge CK / CP / s_aluclk / s_clock / s_clkab / s_clkba ...)`, not on
-`sysclk`. Synthesis turns each into its own clock net -> dozens of gated/derived
-clock domains STA cannot constrain -> massive negative setup AND hold slack ->
-logic never settles -> boot fails/stalls on hardware.
-
-**This is distinct from the latch->FF work.** That fixed FUNCTIONAL behavior
-(FF sim boots). Eliminating the derived-clock *nets* is the TIMING fix and is
-still outstanding. It is board-independent (the Tang won't fix it).
-
-**The fix (Section 2.4 pattern), applied to every derived-clock site:** replace
+**The fix pattern that was used (Section 2.4), for any derived-clock site that turns up again:** replace
 `always @(posedge <derived>) q <= d;` with
 `always @(posedge sysclk) if (<derived>_rising_edge) q <= d;` so there is ONE
 clock domain (`sysclk`) and the derived signals become clock *enables*. Then STA
@@ -295,36 +290,30 @@ only see on the board costs an hour per iteration.
 
 ---
 
-## 6. The current bug as a worked example (Phase 3 stall)
+## 6. Traps (each cost real time in the SINTRAN-boot and Winchester hunts)
 
-**Symptom (FPGA + likely FF sim):** microcode stuck oscillating `o002045/o002046`
-(hex 0x0425/0x0426), never reaching `o002047` (0x0427). If FF sim is stuck even
-earlier at CSA=0 (per the Mar 30 trace), fix that FIRST — it is upstream.
-
-**What SHOULD happen (from `boot-golden-spec.md` Phase 3):** at `o002046`, when
-`ZF=1` (ALU countdown `F` reached 0), branch to `o002047`.
-
-**Candidate root causes, cheapest to check first:**
-1. `Q` register not loaded with 0x3FFF before the loop (probe `s_q_15_0`).
-2. ALU `F = A - Q` not computing (probe `s_f_15_0`) — combinational logic broke.
-3. `ZF` not asserting when `F=0` (probe `DELILAH.ALU.ZF`).
-4. `COND` not propagating through the CSEL condition latch (`ALUCLK` timing) —
-   the `CSEL_LATCH` refactor is directly here.
-5. Condition not reaching the MASEL address mux (`SC5/SC6` control) — your MASEL
-   Variant F work targets this.
-
-**How to bisect:** run 2.1 to see which of CSA / MCLK / MACLK / (add ZF, COND, Q,
-F) diverges first between latch and FF. That single first-divergence signal tells
-you which of 1-5 it is, instead of guessing. Note o002046 -> o002047 is a
-condition-driven branch, so items 3-5 (condition path) are most likely.
-
----
-
-## 7. Open questions to confirm (fill in when known)
-
-- [ ] Fresh `make compare`: is FF sim still stuck at CSA=0, or does it now reach a
-      later phase? (Determines Branch A vs B and the upstream-most bug.)
-- [x] FPGA WNS at the CPU clock: **negative, approx -100 ns (fails badly)** — root
-      cause is derived-clock nets (Section 3.2). This is the primary blocker.
-- [ ] Fresh ILA: where does the CURRENT bitstream actually stall?
-- [ ] Prime suspect module confirmed by 2.1 first-divergence (MASEL? ALU? CSEL?).
+- Never report a finding from a single instrument; cross-check against the
+  oracle or a second signal first.
+- Know the instrument's semantics before reading it (the trace prints P-1;
+  OP=000027 is the trap signature, not an instruction; a gate signal is not
+  an event).
+- A probe that never fires is a RESULT, not a broken probe.
+- Timing differences against an emulator are not bugs: the oracle's disc is
+  instant and its boot load bypasses the card.
+- Judge progress by instructions and landmarks, never by device-op counts.
+- Testbenches, not boots, for module questions: a boot costs hours and
+  answers one bit; a testbench costs seconds and stays as a regression test.
+- A testbench that samples `iox_rdata` with a blocking read AFTER the clock
+  edge is one delta late; the real slave latches it AT the edge
+  (`ND_BUS_SLAVE.v`). Mirror it:
+  `always @(posedge clk) if (iox_rd) capture <= iox_rdata;`
+- A check placed after a status read proves nothing: the status read itself
+  resets flip-flops and hides the fault being tested.
+- `uniq` destroys evidence in a trace dump: each access appears twice (the
+  tap spans two clk2x capture cycles) and a diagnostic may legitimately
+  write the same word twice. Collapse exact pairs only.
+- Trace trigger: anchor on an operation completing plus about 1 s of quiet,
+  not on a register access and not on quiet alone (both fire at the start
+  and dump an empty ring).
+- `TANG_WD_TRACE_DUMP` does not fit with everything else on (95% logic /
+  98% CLS, routing 25+ minutes; without it 91%/94%, about ten minutes).

@@ -3,6 +3,8 @@
 **Full path:** `Verilog/docs/PREREQUISITES.md`
 **Last verified:** 20-AUG-2026 — every version below was read off this machine
 with the command shown next to it, not copied from documentation.
+**Corrected 28-SEP-2026:** the open-source Tang flow, the MiSTer and the
+MEGA65 entries (§3.1-§3.3).
 
 This document is written so that a person **or an LLM** can bring a fresh
 machine to a working state without guessing. Every section gives:
@@ -169,7 +171,9 @@ Per-board build instructions live **with the board** in
 ### 3.1 Xilinx / AMD Artix-7 boards — Vivado
 
 **Boards:** Nexys 4 DDR (`xc7a100tcsg324-1`), Basys3 (`xc7a35tcpg236-1`),
-Cmod A7-35T, QMTECH XC7A35T.
+Cmod A7-35T, QMTECH XC7A35T, MEGA65 (the MEGA65 build is recorded as working
+on **Vivado 2026.1**, `Verilog/fpga/mega65/README.md`; its toolchain traps
+are in `Verilog/fpga/mega65/docs/00-plan.md`).
 
 **Version here: Vivado 2025.2.1 (64-bit)** — read from a build log
 (`****** Vivado v2025.2.1`).
@@ -186,7 +190,7 @@ Disk: budget ~50 GB for a Vivado install with one device family.
 
 ```bash
 # add to ~/.bashrc
-export VIVADO_BIN='F:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat'   # adjust to your install
+export VIVADO_BIN='<your Vivado install>\bin\vivado.bat'   # a Windows path
 ```
 
 **Validate from WSL:**
@@ -218,30 +222,37 @@ needs a free licence file tied to your NIC MAC address.
 
 ```bash
 # add to ~/.bashrc
-export GOWIN_BIN='C:\Utils\Gowin\Gowin_V1.9.10.02_x64\IDE\bin\gw_sh.exe'
-export GOWIN_LICENSE='D:\gowin_<your-id>.lic'
+export GOWIN_BIN='<your Gowin install>\IDE\bin\gw_sh.exe'   # a Windows path
+export GOWIN_LICENSE='<path to>\gowin_<your-id>.lic'
 ```
 
 **Validate:**
 
 ```bash
-ls "/mnt/c/Utils/Gowin/Gowin_V1.9.10.02_x64/IDE/bin/gw_sh.exe" && echo "gw_sh present"
+ls "$(wslpath "$GOWIN_BIN")" && echo "gw_sh present"
 ```
 
-**Important:** the **open-source flow (yosys + nextpnr) cannot build the full
-CPU** — the TTL flip-flop primitives use multiple edge-sensitive events that
-yosys rejects. Gowin EDA only. This is stated in
-`Verilog/fpga/tang-nano-20k/README.md:170-172`.
+**Open-source flow (second option).** The Tang can also be built with the
+oss-cad-suite (yosys + nextpnr-himbaechel + gowin_pack), from WSL, with
+`make` in `Verilog/fpga/tang-nano-20k/`. It covers the `slow`, `crawl` and
+`full` variants only; the deployed `fast20` variant needs Gowin EDA. The
+full-CPU OSS place-and-route is slow: the CI job `tang-oss` in
+`.github/workflows/verilog-ci.yml` runs it only on release tags, with a
+300-minute limit, after two runs were killed at 120 minutes. Install
+instructions (one prebuilt tarball, no sudo) are in
+`Verilog/fpga/tang-nano-20k/README.md`, section "Toolchain". That flow needs
+the oss-cad-suite yosys (0.4x+), not the distro 0.9 of §2.3.
 
 **How this repo uses it:** `Verilog/fpga/tang-nano-20k/gowin_build.ps1` and
 `gowin_build.tcl`; `make` / `make load` in that folder.
 
-### 3.3 Intel Cyclone V — MiSTer (DE10-Nano), future target
+### 3.3 Intel Cyclone V — MiSTer (DE10-Nano)
 
-**Quartus Lite 17.0.2** — free, no licence. Either install natively or use the
-Docker image the project references (`raetro/quartus:17.0`). Not yet installed
-on this machine; the MiSTer target is a plan, not a build. See
-`Verilog/fpga/mister/docs/00-overview.md`.
+**Quartus Prime Lite 17.0.2** exactly — free, no licence. MiSTer standardizes
+on that version. Nothing needs installing on the host: the community Docker
+image `raetro/quartus:17.0` carries it. The core boots SINTRAN on the board
+(02-SEP-2026). Build and deploy: `Verilog/fpga/mister/README.md` and
+`Verilog/fpga/mister/docs/02-building.md`.
 
 ---
 
@@ -538,7 +549,7 @@ hard-coded into committed scripts.
 | **Vivado** | **2025.2.1** | Windows host |
 | **Gowin EDA** | **V1.9.10.02 x64** | Windows host |
 | usbipd-win | present | Windows host |
-| Quartus | not installed | (MiSTer target is a plan) |
+| Quartus | 17.0.2 through Docker (`raetro/quartus:17.0`) | see §3.3 |
 | Doxygen | **not installed — deliberately, see §7.1** | — |
 | netlistsvg / vcd2wavedrom / wavedrom-cli | not installed — optional, see §7.2, §7.3 | — |
 

@@ -1,9 +1,15 @@
 # nd100x device semantics - reference for the Verilog device port
 
-Extracted 11-JUL-2026 from the nd100x emulator (~/repos/nd100x, local
-WSL checkout). This is the semantics source for ND-BUS-DEVICES; the
-other reference is Verilog/simDevices/NDDevices.cpp (the C models
-runSim boots with). File/line references below are into nd100x.
+Extracted 11-JUL-2026 from the nd100x emulator (the nd100x repository).
+This was the first semantics source for ND-BUS-DEVICES; the other
+reference is Verilog/simDevices/NDDevices.cpp (the C models runSim boots
+with). File/line references below are into nd100x as of that date.
+
+Not every device follows nd100x any more: `ND_SMD.v` follows the RetroCore
+C# model (`NDBusDiscControllerSMD.cs`) and its C port
+`ND-BUS-DEVICES/portable/src/nd_smd.c` (see the `ND_SMD.v` header), and the
+floppy status words follow the ND-11.021.01 manual
+(`floppy-3112-register-spec-ND-11.021.md`).
 
 ## Interrupt mechanism (device levels 10-13)
 
@@ -26,9 +32,7 @@ Two layers:
   (IOX error) - devicemanager.c:290-334.
 
 For the FPGA: BINT<level>_n = NOR of all device pending flags for that
-level, continuously - this matches the PID-mirroring model. (The
-NDBus.cpp `== 1` comparison bug meant the runSim C sim never asserted
-the BINT lines at all; devices worked by polling only.)
+level, continuously - this matches the PID-mirroring model.
 
 ## IDENT mechanism
 
@@ -62,7 +66,7 @@ the BINT lines at all; devices worked by polling only.)
   Device_GenerateInterrupt. Interrupts fire at COMPLETION, not at
   command issue.
 
-## Floppy PIO (deviceFloppyPIO.{h,c}) - the Phase 3 target
+## Floppy PIO (deviceFloppyPIO.{h,c})
 
 Base 1560 (tw0), ident 021, level 11. Registers (offset from base):
 0 R read data buffer (word, auto-incr pointer), 1 W write data buffer,
@@ -104,7 +108,7 @@ write, 0x21 format, 0x38 identify, etc. Several functions are TODO
 stubs; FLOPPY-STREAM C03 test fails. Known rough edge: 18-vs-8
 sectors_pr_track inconsistency in the disk-address math.
 
-## SMD (deviceSMD.{h,c}) - Phase 4
+## SMD (deviceSMD.{h,c})
 
 Base 1540, ident 017, level 11. Pure DMA (core-address + word-count +
 block-address registers in the controller). Most register offsets are

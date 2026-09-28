@@ -1,9 +1,9 @@
 # ND-120 memory-parity semantics: what the self-test and runtime actually require
 
 **Full path:** `Verilog/docs/nd120-parity-analysis.md`
-**Date:** 11-JUL-2026. Section-2 deliverable of
-`Verilog/docs/nd120-parity-refactor-order.md` (the 18-bit -> 16-bit SDRAM
-packing work order). Every claim below carries a microcode reference; the
+**Date:** 11-JUL-2026 (section 6 corrected 28-SEP-2026). Written for the
+18-bit -> 16-bit SDRAM packing work (`ND_SDRAM_PACK16`, done 11-JUL-2026,
+commits d26fd66..2c44efb). Every claim below carries a microcode reference; the
 semantics are pinned by testbench (see section 6), not by this prose.
 
 ---
@@ -36,7 +36,7 @@ no side-band SDRAM region is required.
   `$ND_REPOS/ND110Compile/ND110Compile/uCode/ND-110-RASK.uc`,
   self-test at lines 4859-5199.
 - **L-EPROM decode** (bit-exact):
-  `/mnt/e/Dev/Ronny/nd120uc/source/nd-120-delilah.uc`, self-test at
+  the nd120uc repository, `source/nd-120-delilah.uc`, self-test at
   octal o2053-o2156. (Labels/comments in this range are OCR-polluted -
   trust the bits, not the labels.)
 - **Address-annotated listing**:
@@ -170,8 +170,8 @@ convention:
 
 The old Basys3 behaviour was not merely "not stored" - constant 0 is the
 WRONG parity for every byte of even population, i.e. **128 of 256 values**
-(measured, see the tb below). It survived only because `MEM_43.v` masks
-`LPERR_n`. The sim backends were changed too, deliberately: a backend that
+(measured, see the tb below). It survived only because `MEM_43.v` masked
+`LPERR_n` at the time (fixed later in 148594d, see below). The sim backends were changed too, deliberately: a backend that
 stores parity in Verilator while the FPGA regenerates it is the sim-vs-silicon
 split that the golden reference exists to prevent.
 
@@ -190,17 +190,49 @@ Gates:
   back, so storing, zeroing or inverting all fail. Teeth-proven 3-AUG-2026: a
   build with Q9 forced back to 0 fails 35 checks.
 
-Still open, and NOT fixed by this work: `MEM_43.v` masks `LPERR_n`, and
-`AM29833A.v` evaluates its parity check only when `!ReceiveMode` while
-`MEM_DATA_46` wires the memory bus to T and LBD to R - so a memory READ is
-receive mode and the board's check does not evaluate there at all. See
-`Verilog/TODO.md`.
+Two reasons parity was never CHECKED:
+
+1. `MEM_43.v` forced `LPERR_n` inactive with an OR with 1. **Fixed** in
+   148594d ("sheet 43 LPERR~ was forced inactive by an OR with 1");
+   `MEM_43.v:270` is now `assign LPERR_n = s_lperr_n;`.
+2. **Still open:** `AM29833A.v` evaluates its parity check only when
+   `!ReceiveMode` while `MEM_DATA_46` wires the memory bus to T and LBD to
+   R - so a memory READ is receive mode and the board's check does not
+   evaluate there at all. See `Verilog/TODO.md`.
+
+## 6c. The forced-parity-error probe path (TRR ECCR), 11-AUG-2026
+
+From the retired `HANDOFF-mpm5-parity-eccprobe.md` (git `202c606`).
+
+- Links 1-3 of the probe path exist and are correct: TRR ECCR (IOX 100115)
+  is decoded in `CGA_MAC_APOS_CALCA.v:99` and reaches the memory sheets;
+  PAL_45008B latches TST/DISB and drives both AM29833A output enables on a
+  test write; `AM29833A.v` forced-error mode inverts the parity bit (fixed
+  30-JUL).
+- Link 4 is the break: every backend regenerates parity on read, so the
+  injected error is healed. Two downstream slips were fixed: 6d95b09
+  (MEM_DATA_46 gated the AM29833A ERR pins on OET_n, not on the drawing,
+  sheet 46 E2-F3) and 148594d (MEM_43 `LPERR_n = s_lperr_n | 1`).
+- Verilator only: `MEM_RAM_49_SIM.v` stores a per-byte-lane "deliberately
+  corrupted" flag (b0_lo_bad .. b2_hi_bad), set only by a forced-error
+  write and used to invert the computed parity on read; it does not
+  self-clear (nd100x consumes its latch on read - if TPE MEMORY hangs at
+  PIL 14 after the parity-detection subtest, try consuming it). Whether
+  CONFIGURATION then shows "Local" in Verilator was never measured.
+- Not done: (1) the FPGA path still regenerates parity, so silicon reports
+  Mpm 5 (a flag there costs SDRAM and reverses 451b05b - the owner's call);
+  (2) `ND3202D.v` `s_ibperr_n = 1'b1` (ND-bus parity, left alone); (3) PGS
+  has no lock (reference: errors lock PGS, TRA PGS unlocks;
+  CGA_IDBCTL_PGSREG has none and EPGSN never reaches it); (4) VEX is
+  commented "Violation exception" in `CGA_DCD.v:34` but "Vector EXecute" in
+  `CGA_MAC.v:45` - one is wrong, not settled; (5) `CGA.v:620` ORs the IDBCTL
+  output into FIDBO where the drawings do not.
 
 ## 7. References
 
-- Work order: `Verilog/docs/nd120-parity-refactor-order.md`
-- Bridge design: `Verilog/docs/nd120-dram-memory.md` (section 6's "rejected
-  for now: recompute parity" note is superseded by this analysis)
+- Work order: the 11-JUL-2026 PACK16 commits (d26fd66..2c44efb) in git
+  history
+- Bridge design: `Verilog/docs/nd120-dram-memory.md` section 6
 - Storage consumer of the freed half: `Verilog/docs/nd-storage-design.md`
 - Parity transceiver RTL: `Verilog/Shared/support/AM29833A.v`;
   instantiation `Verilog/CPU-BOARD-3202/circuit/MEM_DATA_46.v`

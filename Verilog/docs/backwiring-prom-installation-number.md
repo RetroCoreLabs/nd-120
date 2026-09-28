@@ -83,7 +83,7 @@ inference, resting on three independent legs:
    an 8-bit input on the same connector, used by the same instruction.
 
 3. **SINTRAN reads exactly 8 bytes, one per interrupt level 0..7.**
-   `E:\Dev\Ronny\NDInsight\SINTRAN\NPL-SOURCE\NPL\PH-P2-OPPSTART.NPL:3534-3570`
+   the NDInsight repository, `SINTRAN/NPL-SOURCE/NPL/PH-P2-OPPSTART.NPL:3534-3570`
    (VERIFIED, quoted in §5) — and its own comment says the level *is* the byte
    number.
 
@@ -128,7 +128,7 @@ CPU board presents. Both behaviours read the right bytes.
 
 ## 5. How SINTRAN consumes it — `GCPUNR`
 
-**VERIFIED**, `E:\Dev\Ronny\NDInsight\SINTRAN\NPL-SOURCE\NPL\PH-P2-OPPSTART.NPL:3534-3570`:
+**VERIFIED**, the NDInsight repository, `SINTRAN/NPL-SOURCE/NPL/PH-P2-OPPSTART.NPL:3534-3570`:
 
 ```
 %       G C P U N R
@@ -181,7 +181,7 @@ is explicitly open-ended (`OPPSTART.NPL:3440`) — there is **no ND-120-specific
 system-type value documented anywhere we found**; the CPU identity proper lives
 in `HWINFO(0)`, not `HWINFO(2)`. One live-verified pair exists:
 `SYSNO=102 / HWINFO(2)=9883`
-(`E:\Dev\Ronny\NDInsight\SINTRAN\SINTRAN Structures\SINTRAN-STRUCTURES.md:2036-2039`).
+(the NDInsight repository, `SINTRAN/SINTRAN Structures/SINTRAN-STRUCTURES.md:2036-2039`).
 
 **`SYSNO` is functional, not cosmetic** — COSMOS local-vs-remote routing keys on
 it, so it must be **unique per machine** on a site.

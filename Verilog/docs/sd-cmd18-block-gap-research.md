@@ -5,8 +5,9 @@ Background: on Tang Nano 20K hardware, CMD18 multi-block READ failed
 1575 KB/s and CMD17 single reads passed - all three green in sim.
 Root-cause theory: the burst-read FSM re-arms start-bit detection too
 late for a real card that streams blocks back-to-back. This research
-confirmed the theory and collected the proven fixes. Companion:
-Verilog/docs/sd-speed-plan.md.
+confirmed the theory and collected the proven fixes. The speed facts
+from the same work (formerly in sd-speed-plan.md) are in the last
+section below.
 
 ## Spec timing facts (SD Physical Layer FULL spec v3.01)
 
@@ -60,16 +61,11 @@ misbehavior.
   64-clock RTAIL wait after each block, which would swallow the next
   start bit in any real CMD18 stream.
 
-## Tang Nano 20K SD slot facts (schematic v1.3)
+## Tang Nano 20K SD slot facts
 
-- Pins: 80=DAT2, 81=DAT3, 82=CMD, 83=CLK, 84=DAT0, 85=DAT1.
-- External 10K pull-ups on CMD and DAT0-3 (R53-R57); 22-ohm series
-  resistor on CLK (R49). MiSTeryNano uses PULL_MODE=NONE on all six
-  pins on this slot (proven 4-bit at 16 MHz there).
-- The six SD nets ALSO route to the BL616 companion chip (tri-stated
-  in stock firmware, but a reflashed BL616 can disturb the bus), and
-  DAT2/pin 80 additionally routes to the 20-pin edge header - keep
-  the header clear when testing 4-bit.
+Pins, the on-board pull-ups (R53-R57), the CLK series resistor (R49),
+`PULL_MODE=NONE`, the BL616 sharing and the DAT2 edge-header trap are in
+`Verilog/fpga/tang-nano-20k/doc/SD-SLOT-WIRING.md`.
 
 ## Recommendations adopted for our sd_writer fix
 
@@ -84,3 +80,22 @@ misbehavior.
    discards a partial trailing block (card releases DAT after NSD=2).
 6. License hygiene: only LiteSDCard is vendorable (BSD-2); everything
    else in this survey is GPL-encumbered - patterns only, own RTL.
+
+## Speed facts (11/12-JUL-2026 speed work, formerly sd-speed-plan.md)
+
+- Where the time goes on a single-sector write: at a 2.7 MHz bit clock one
+  sector is 1.52 ms of data on the wire + 0.04 ms of command overhead + about
+  2.2 ms of card programming busy = 3.74 ms. The programming busy dominates,
+  so a faster clock alone gives less than 2x; CMD25 multi-block write hides
+  the busy across a burst (SD Speed Class ratings are defined that way).
+- 25 MHz default speed is mandatory on every card, so our 13.5 MHz data clock
+  needs no CMD6 and depends on no card feature.
+- CMD6 mode 1 (argument 0x80FFFFF1, a 512-bit status block on DAT, an 8-clock
+  switch window) unlocks 50 MHz high speed. Not built: the 4-bit bus at
+  13.5 MHz already exceeds every device budget in nd-storage-design.md.
+- Multi-block write CRC status and busy stay on DAT0 in every bus width.
+  Block-gap busy timeout budget: 250-500 ms.
+- Measured on the Tang (sd-fat-test menus 6/7, 12-JUL-2026, 32 GB SDHC FAT32,
+  4-bit): WRITE 3418 KB/s, READ 5981 KB/s against a 137 KB/s 1-bit baseline.
+  The three silicon-only bugs that had to be fixed first are in
+  `Verilog/fpga/tang-nano-20k/sd-fat-test/README.md`.
