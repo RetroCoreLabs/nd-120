@@ -55,10 +55,12 @@ Compressed history of the work progress on the ND-120 recreation:
 | 13. July 2026 | TEST | Instruction validation campaign complete: 13/13 testable INSTRUCTION-B areas pass vs ND-110 golden traces; MACL self-test clean (STERR=0); two CPU transcription bugs found and fixed (MPY product low word, ROT/shift control) |
 | 14. July 2026 | SILICON | Board-independent `ND120_CORE` extracted from `ND120_TOP`; Tang Nano 20K boots the papertape from a real SD card - proven on silicon |
 | 15. July 2026 | CPU | RUN test area unblocked: Am2914 interrupt status fence made default, MOR (memory-out-of-range) wired to level 12; 29 new interrupt/trap gate-level testbenches |
+| 18. July 2026 | SILICON | Tang masked level-10 grant root cause: a stale-INTRQN panel pulse taken as a macro interrupt; fixed faithfully (IO_37 STAT3 from real panel activity) - `Verilog/fpga/tang-nano-20k/ANALYSIS-cga-intr-masked-grant-root-cause.md` |
 | 19. July 2026 | SILICON | **First CPU boot on FPGA silicon** (Tang Nano 20K) - WCS read-address transparent-latch fix |
 | 20. July 2026 | DEV | Portable C device cores (NDDeviceCore) added as a submodule; ND-BUS seam gate validates the C cores against the real `ND_BUS_SLAVE.v` in Verilator |
 | 23.-26. July 2026 | DEV | ND-BUS device campaign: floppy/SMD/DMA IOX conformance testbenches; DMA master validated against the real bus arbiter |
 | 27. July 2026 | DEV | Floppy boot (`1560&`) works in Verilator - FLOMON + TPE monitor load from a floppy image (DMA zero-word capture fix) |
+| 27. July 2026 | TEST | TPE CONFIGURATION D05 runs to NO ERRORS DETECTED in Verilator (trap-vector TVGEN_P2 muxIn_3, cache HIT gate, CUP fixes) |
 | 30. July 2026 | SILICON | PAL transcription audit vs the original PALASM: 8 equation fixes; PAGING test suite passes 11/11 on Tang silicon (MMU page-table fix in PAL 44306A) |
 | 31. July 2026 | SILICON | MOVEW APT-to-APT word-drop and double-trap phantom-vector-7 fixed; full INSTRUCTION multi-level run (levels 1-9) passes clean on Tang silicon |
 | 03.-04. August 2026 | DEV | SMD illegal-load and status-read conformance with real CHS->LBA mapping; ST506/8-inch Winchester disc controller written in RTL at IOX 500 |
@@ -90,6 +92,30 @@ Compressed history of the work progress on the ND-120 recreation:
 | 1-2. September 2026 | FPGA | Board-independent TDV2200 terminal core: 800x600 screen, PS/2 keyboard, console UART (7E1/8N1), the real TDV2200 box-drawing font (set 2, dumped from RetroCore) embedded in `font_rom.v` so every board carries the glyphs; wired on the Nexys with the physical keyboard (incl. the Left-arrow bridge fix). Console framing settled at 7E1 - the SC2661 sends one stop bit, so the earlier 7E2 in the docs was documentation only |
 | 2. September 2026 | SILICON | SINTRAN III boots on the MiSTer (DE10-Nano): the whole machine, 4 MB in the DE10-Nano SDRAM module, TDV2200 console on its own screen and keyboard, storage from the OSD; boot, CPU self-test (green G lamp), font and keyboard all confirmed |
 | 2. September 2026 | FPGA | MEGA65 cores built for both revisions on the MiSTer2MEGA65 framework (R3 HyperRAM 13.33 MHz / R4-R6 SDRAM 20 MHz), timing-clean, not yet run on hardware. Release 2 (`bitstreams-2026-09`) published with the MEGA65 and MiSTer binaries and per-board quickstarts |
+
+## Retired documents
+
+Plans, worklogs and handoffs whose work is finished were removed on
+28-SEP-2026. Git history keeps their full text; this table says what each one
+was and where its still-useful facts went.
+
+| Document | Dated | What it was | Facts now in |
+|----------|-------|-------------|--------------|
+| `LATCH_ANALYSIS.md` | 7 Nov 2025 | Inventory of the six latch kinds (F595, TTL_74373, AM29841, generic LATCH, PAL_44401B DAP, CGA_INTR LAA) and a plan to turn them into flip-flops | Done as the dual latch/flip-flop build (`USE_TRANSPARENT_LATCHES`, `FPGA_FF_MODE`): `Verilog/docs/build-defines.md`, `DEVELOPMENT.md` "Build modes" |
+| `VIVADO_FIX_PLAN.md` | 7 Nov 2025 | First Vivado campaign: synthesis failed on 3496 RAMB18 (35x the `xc7a35t`), 66 latch warnings, declaration order, port widths | RAM sizing done in `MEM_RAM_49.v` (`Verilog/readme.md` "RAM Configuration"); Basys3 state in `Verilog/fpga/basys3/README.md` |
+| `verilog-code.md` | 2024 figures | Module-by-module tour of the 2024 tree (75,511 lines in 259 files) | The per-module docs in `*/circuit/doc/` and `HARDWARE.md` |
+| `Verilog/verilog-remove-latch.md` | 29 Mar 2026 | Latch-to-flip-flop migration plan; phase 0 complete (dual mode, PAL_45001B stray-semicolon fix, `sys_rst_n` threaded to the PALs, `latch_ff_compare.cpp`) | Why the flip-flop mode is safe: `DEVELOPMENT.md` "Build modes"; the defines: `Verilog/docs/build-defines.md` |
+| `Verilog/worklog-latch-refactor.md` | Mar-Apr 2026 | Branch `redo-idb` worklog for `LATCH.v`: the edge-detect version stopped the LCS load at CSA o000231 (ALUCLK is held constant during the load), so the level-sensitive `sysclk` capture was kept | The comment in `Verilog/Shared/ndlib/LATCH.v` |
+| `Verilog/fast-clock-design-ida.md` | Apr 2026 | Idea only, never built: run the CPU on a slower clock than the latch-sampling clock to catch 1-sysclk enable pulses (MCLK, MACLK, ALUCLK) | Overtaken - the boards run 20-45 MHz in flip-flop mode with one `sysclk` and clock-enables |
+| `Verilog/FPGA-BRINGUP-PLAN.md` | 3 Jul 2026 | Basys3 bring-up plan on branch `redo-idb` (boot stuck in phase 3 at CSA 0x0425/0x0426; the "MASEL Variant F" experiment, a second try after the revert in `0e4be9d`) | The comparison method, the boot golden-model idea and the ILA capture notes: `Verilog/sim/FPGA_DEBUG_RUNBOOK.md` |
+| `Verilog/DELILAH-CPU/CGA_MIC/LDLCN_o000016_investigation.md` | 14 Apr 2026 | LDLCN / o000016 PANVC dispatch check: LC loads o01 at the first PANVC dispatch in Verilator; MASEL "Variant F" sysclk stage | Dispatch path and LC value: `Verilog/docs/boot-golden-spec.md` Phase 5; the analysis scripts: `Verilog/sim/VCD_ANALYSIS_GUIDE.md` last section; Variant F is in `CGA_MIC_MASEL.v` |
+| `Verilog/sim/IDB_ANALYSIS.md` | 6 Apr 2026 | "Before" map of every IDB driver and reader, made ahead of the sysclk refactor | The IDB as it is now: `Verilog/docs/HANDOFF-cga-idb-ring-cut.md` |
+| `Verilog/sim/HANDOFF-session-2026-07-22.md` | 22 Jul 2026 | Session handoff: built the scriptable probe (`nd120_probe`), captured the real INSTRUCTION-B paging set-up (`sim/tpe_paging.csv`, never committed: identity page table, PON after the table is filled, VPN 63 -> PPN o77, PT 162000), added `CPU_MMU_PT_29_replay_tb.v`, fixed the probe's UART `send` pacing | `Verilog/sim/PROBE-README.md`; the 177777 question is in `Verilog/TODO.md` |
+| `Verilog/sim/HANDOFF-csharp-paging-capture.md` | Jul 2026 | Request to the C# ND-120 team for a reference capture of the TPE `INSTRUCTION` paging set-up, because every paged store to logical 177777 (the top page) read back 0 while the same store with paging off worked | The open question is in `Verilog/TODO.md` |
+| `Verilog/floppyTester/PLAN-floppy-validation.md` | 20 Jul 2026 | Floppy validation campaign, phases 0-6, goal a full `1560&` boot | Goal met 27 Jul 2026 (above); ground rules and ownership split in `Verilog/floppyTester/CONFORMANCE.md`; testbenches in `Verilog/ND-BUS-DEVICES/FLOPPY-DMA/sim/` |
+| `Verilog/tests/TESTBENCH-COVERAGE-CATALOG.md` | 31 Jul 2026 | One-off coverage sweep (109 registered entries then) | Generated `Verilog/tests/TESTBENCH-CATALOGUE.md` and `UNTESTED-MODULES.txt` (`make catalog`) |
+| `Verilog/tests/doc-examples/COLOR-STANDARDS.md` | - | Byte-identical copy of `Verilog/docs/COLOR-STANDARDS.md` | `Verilog/docs/COLOR-STANDARDS.md` |
+| `Verilog/sim/PROBE-DESIGN.md` | 22 Jul 2026 | Design note for the probe, implemented | Folded into `Verilog/sim/PROBE-README.md` |
 
 ## Area tags
 

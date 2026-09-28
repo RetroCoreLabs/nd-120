@@ -404,7 +404,7 @@ Again: **no `IONI`** in this derivation.
 
 ## 9. Answers to the six open questions
 
-After tracing the Verilog sources and the microcode listing in `Code/Microcode/ND-120 Mikroprogramlisting-L-ocr.md`, here is what the code actually says.
+After tracing the Verilog sources and the microcode listing in `Code/Microcode/ND-120-DELILAH-L.LISTING.txt`, here is what the code actually says.
 
 ### Q1 — How does `IOF` actually suppress interrupts, if not via hardware gating on `IONI`?
 
@@ -593,14 +593,14 @@ Pattern `00001` binary = **CSCOMM=01 octal**. So `LDPILN` asserts when the micro
 
 ### 11.3 The `IOF` instruction microcode routine
 
-**Verified (partial).** From the entry-point index at line 500 of `Code/Microcode/ND-120 Mikroprogramlisting-L-ocr.md`:
+**Verified (partial).** From the symbol (label -> address) index of the scanned listing `Code/Microcode/ND-120 Mikroprogramlisting-L-ocr.pdf` (the re-typed `ND-120-DELILAH-L.LISTING.txt` has no symbol index; the PDF page was not looked up):
 
 ```
 IOF  → microcode address 003461
 ION  → microcode address 003462
 ```
 
-The microcode listing at `003461` (lines 11271–11274) reads:
+The microcode listing at `003461` (`ND-120-DELILAH-L.LISTING.txt` lines 9422-9425) reads:
 
 ```
 003461   STSST;
@@ -709,7 +709,7 @@ None of these remaining uncertainties change the top-level answer: **MPV and PF 
 
 ---
 
-## 10. Files referenced
+## 12. Files referenced
 
 - `Verilog/DELILAH-CPU/CGA/circuit/CGA.v`
 - `Verilog/DELILAH-CPU/CGA_ALU/circuit/CGA_ALU.v`

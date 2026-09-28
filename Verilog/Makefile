@@ -511,7 +511,12 @@ test-dma-xcheck:
 #    Its golden gate (first-400 window) happens to pass because the window
 #    ends before the float instructions run, but the deep area can never
 #    pass; 32-BITS-FLOATING is the float gate here.
-#  - RUN needs level-12/14 stress-interrupt device models in runSim first.
+#  - RUN is not gated. Its level-14 livelock and the FIDBO status-fence
+#    swap were fixed 15-JUL-2026 (commit 3acef36), after which RUN in runSim
+#    handled IOX-ERROR and reached LEVEL 13 / ARGUMENT == END OF TEST ==
+#    (docs/RUN-level14-livelock-analysis.md). No error count was committed
+#    and no pass pattern exists for it, so it is neither here nor in
+#    tests/run_all_tests.sh.
 INSTR_AREAS = ARGUMENT STACK BYTE-STRING MEMORY-REFERENCE SEQUENCE \
               REGISTER-OPERATIONS BIT-OPERATIONS SHIFT-INSTRUCTIONS \
               32-BITS-FLOATING BCD ND100-24BIT ND100-CX PRIVILEGED

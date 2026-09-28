@@ -847,7 +847,7 @@ int main(int argc, char **argv)
 #endif
 
 #ifdef ND120_PROBE_STSCHG
-			// BFILL STS-corruption probe (docs/bfill-sts-static-analysis.md):
+			// BFILL STS-corruption probe (BYTE-STRING, July 2026; analysis in git history):
 			// change-triggered log of the hardware STS register (CGA_ALU_STS
 			// output s_sts_15_0) with the executing CSA, the CSTS load code,
 			// LDPILN and FIDBO. Armed at the first visit to BFILL (CSA 01333)
@@ -884,7 +884,7 @@ int main(int argc, char **argv)
 #endif
 
 			// Cache-inhibit map write probe (ND120_WCLIM_TRACE=1, run-time, no
-			// rebuild). Context: docs/HANDOFF-cache-and-panel-29AUG.md. On the
+			// rebuild). Context: docs/CACHE-STATUS.md. On the
 			// Nexys the ILA showed the inhibit RAM (CPU_MMU_PT_29 CHIP_20G, an
 			// IMS1403 16Kx1) IS written - 69 WCLIM_n strobes in one window -
 			// yet WCINH_n reads "inhibited" for ~90% of accesses, and the

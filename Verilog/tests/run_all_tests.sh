@@ -367,7 +367,8 @@ REGISTRY=(
   "CPU-BOARD-3202/circuit/sim :: test-mmupt        :: TB_RESULT: PASS"
   # committed access to a ZERO page-table entry must dispatch the page-fault
   # trap (MA forced to vector 0001 at the mid-cycle MACLK strobe) - the unit
-  # gate for hypothesis H1 of PLAN-zero-read-nonresident-page.md, through the
+  # gate for hypothesis H1 of PLAN-zero-read-nonresident-page.md (git
+  # 043c460), through the
   # real cycle PALs + PT RAM + BRKDET + TVGEN + IPOS with real BRK/TRAP
   # feedback; both build modes
   "CPU-BOARD-3202/circuit/sim :: test-pgf-committed    :: TB_RESULT: PASS"

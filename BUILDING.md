@@ -34,9 +34,9 @@ For viewing simulation waveforms:
 
 ### System Requirements
 
-Development is done on **Linux / WSL2 with bash**. The one exception is Vivado,
-which runs on a Windows host and is driven by the `.ps1` / `.tcl` scripts under
-`Verilog/fpga/basys3/`.
+Development is done on **Linux / WSL2 with bash**. The exceptions are the
+vendor FPGA tools (Vivado, Gowin EDA), which run on a Windows host and are
+driven by the `.ps1` / `.tcl` scripts under `Verilog/fpga/<board>/`.
 
 ## Building the Project
 
@@ -213,25 +213,23 @@ GTKWave opens with the pre-configured signal groups in `top_3202d.gtkw`. See
 
 ## FPGA build
 
-Board flows live under `Verilog/fpga/<board>/`; see `Verilog/fpga/README.md`.
+Every board has its own folder under `Verilog/fpga/<board>/` with its build
+script, constraints and README. The board list, which boards boot SINTRAN,
+their clocks and limits are in `Verilog/fpga/README.md`; ready-built
+bitstreams and per-board quickstarts are on the Releases page it links to.
 
-### Basys3 (Xilinx, Vivado on the Windows host)
+Two notes that apply across boards:
 
-```
-vivado -mode batch -source vivado_build.tcl -tclargs [flags...]
-```
-
-Useful flags: `full_synth` (required for a full re-synthesis, roughly an hour;
-otherwise the existing `synth_1` checkpoint is reused), `skip_program`,
-`no_reset_synth`, `backup_bit`. `vivado_lint.tcl` runs lint only. The part is
-`xc7a35tcpg236-1`. The microcode hex files must be copied in first or the ROM
-is empty.
-
-### Tang Nano 20K (GoWin)
-
-Built with Gowin EDA (`make gowin`, `make load-gowin`). The open-source
-yosys/nextpnr flow currently fails to place and route this design. Power-cycle
-the board after every programming operation.
+- **Vivado boards** (Basys3, Cmod A7, Nexys 4 DDR, QMTECH, MEGA65) build on the
+  Windows host from each folder's `.tcl` / `.ps1` script. The microcode hex
+  files must be where the build expects them or the ROM is empty.
+- **Tang Nano 20K** has two flows. `make` in `Verilog/fpga/tang-nano-20k/` runs
+  the open-source flow (yosys + nextpnr-himbaechel + gowin_pack), which its
+  Makefile names as primary; `make gowin` / `gowin_build.ps1` runs Gowin EDA.
+  The `fast20` variant that boots SINTRAN at 20.25 MHz is built with Gowin
+  EDA only. Power-cycle the board after every programming operation.
+  Never run two Gowin builds into the same build directory at once - one
+  bitstream was a mix of both.
 
 ## Troubleshooting
 

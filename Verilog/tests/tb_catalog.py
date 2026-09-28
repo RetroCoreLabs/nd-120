@@ -152,11 +152,12 @@ ORPHAN_BASELINE = {
         "register.",
 
     "DECODE-GateArray/DGA/sim/DECODE_DGA_COMM_tb.v":
-        "has NO make target at all, and its verdict line is currently red - but "
-        "note errors=0; the failure is a stale CHECK-COUNT constant (got "
-        "240865, expected 219100). The DUT is not implicated. TO FIX: find out "
-        "why the count moved (do NOT just update the constant), add a make "
-        "target, then register.",
+        "has a make target since 09-AUG-2026 (make test-dga-comm in "
+        "DECODE-GateArray/DGA/sim) and builds in all four ifdef modes, but its "
+        "verdict line is red - note errors=0; the failure is a stale "
+        "CHECK-COUNT constant (got 240865, expected 219100). The DUT is not "
+        "implicated. TO FIX: find out why the count moved (do NOT just update "
+        "the constant), then register.",
 
     # --- board bring-up harnesses, not unit tests --------------------------
     "fpga/basys3/mem-test/sim/basys3_mem_test_tb.v":
@@ -167,7 +168,7 @@ ORPHAN_BASELINE = {
     "fpga/qmtech-a35t/mem-test/sim/qmtech_mem_test_tb.v":
         "board bring-up harness for the QMTECH A35T memory test; the directory "
         "has no Makefile. The QMTECH board work is PAUSED "
-        "(see HANDOFF-qmtech-a35t-bringup.md).",
+        "(see qmtech-a35t/docs/board-notes.md).",
 
     "fpga/tang-nano-20k/sd-fat-test/sim/sd_fat_test_tb.v":
         "top-level Tang SD-FAT harness. The sd-fat-test/sim directory IS "

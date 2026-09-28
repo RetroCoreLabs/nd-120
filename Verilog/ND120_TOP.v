@@ -528,7 +528,7 @@ module ND120_TOP
   *  SIM-ONLY. sd_card_model / nds_mem_model are testbench models and must
   *  never reach an FPGA build, hence the VERILATOR_SIM guard: on hardware
   *  the byte source is nd_storage_devices on the BOARD, wired to a real
-  *  card and to the SDRAM device port (see docs/PLAN-nd120-storage-phases.md).
+  *  card and to the SDRAM device port (see docs/nd-storage-design.md).
   *
   *  The TAPE_BYTE_* ports stay in place either way so the C harness still
   *  compiles; under SD_STORAGE its VALID/DATA inputs are simply ignored

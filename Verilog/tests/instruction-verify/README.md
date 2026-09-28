@@ -3,8 +3,9 @@
 Goal: validate and bug-fix ALL macro instructions by comparing our ND-120
 RTL (Verilator, runSim) against reference traces from a known-good ND-110
 emulator running Norsk Data's INSTRUCTION-B verify program (204384B).
-One unit test per instruction group, registered in tests/run_all_tests.sh,
-plus the final full RUN.
+One gate per instruction group: `make test-instr-<AREA>` in `Verilog/`
+(heavy, ~15-25 min each). These are NOT in `tests/run_all_tests.sh`; the
+validated set is `INSTR_AREAS` in `Verilog/Makefile`.
 
 ## Reference material (delivered by the ND-110 side)
 
@@ -128,38 +129,28 @@ Row counts: ours is shorter than golden's 400 because our normalization folds
 service interludes and merges EXR sections; a fully-matching aligned prefix
 (>=300, or the whole of the shorter trace) is a pass.
 
-## Status (12-JUL-2026)
+## Status
 
-**9 instruction groups PASS - all 400 golden instructions match EXACTLY**
-(architectural registers A D T X B L P STS + instruction stream), against the
-regenerated golden: ARGUMENT, STACK, BYTE-STRING, MEMORY-REFERENCE, SEQUENCE,
-REGISTER-OPERATIONS, BIT-OPERATIONS, SHIFT-INSTRUCTIONS, 48-BITS-FLOATING.
-Each: `400 aligned instructions match exactly (golden tail=0)`, plus ~25-37
-non-fatal `Q` scratch warnings (panel display-refresh noise). No CPU bugs found.
+The live per-area status is [CAMPAIGN-STATUS.md](CAMPAIGN-STATUS.md). This
+README keeps only how the gate works.
+
+What the automated gate checks: `run_area_test.sh` compares the first 400
+test-level instructions of an area against the golden (architectural registers
+A D T X B L P STS + instruction stream). It does not run the area to its own
+`== END OF TEST ==` and does not count the area's error lines. A missing golden
+file is a FAIL (since 28-SEP-2026; it used to print a PASS without testing).
 
 Coverage note: our emitter double-logs EXR (executed instruction as a second
 same-address row) and logs panel interludes, so to cover the golden's 400 unique
 test-level instructions we run with ND120_TVERIFY_MAX=460 (~440 rows after
-normalization); the extra tail is harmless.
+normalization); the extra tail is harmless. A passing area typically also
+shows ~25-37 non-fatal `Q` scratch warnings (panel display-refresh noise).
 
-NOTE: the ND-110 side regenerated all golden traces ~19:00 12-JUL with a changed
-arming rule (the 14 area traces now arm on the first test-code-region fetch at
-PIL 0; RUN arms strictly at the first PIL 1-9). Our emitter matches each golden's
-window via `ND120_TVERIFY_ARM_ADDR` (run_area_test.sh reads the golden's first
-`### #1` address). Per-area aligned counts are refreshed by rerunning the gates.
+Arming: since the ND-110 side regenerated the goldens (~19:00 12-JUL-2026) the
+14 area traces arm on the first test-code-region fetch at PIL 0; RUN arms
+strictly at the first PIL 1-9. Our emitter matches each golden's window via
+`ND120_TVERIFY_ARM_ADDR` (`run_area_test.sh` reads the golden's first `### #1`
+address).
 
-**RUN is deferred** - not a golden or instruction problem. RUN starts the stress
-interrupt sources live (clock @ PIL 13, dummy-output @ 14, IOX-error @ 12). Our
-runSim C device harness (NDBus/NDDevices) has no device registered for levels
-12/14, so those interrupts are never acknowledged ("No device found for IDENT
-level: 12"), the CPU interrupt-storms and never returns to the level-1 test
-(0 macros). The ND-110 emulator models those stress sources; ours does not.
-RUN needs level-12/14 IDENT responders added before it can run - separate device
-work, tracked apart from instruction validation.
-
-Blocked on the ND-110 side: 32-BITS-FLOATING, PRIVILEGED, ND100-24BIT, BCD,
-ND100-CX have **0-macro (empty) golden files**. Add each to `INSTR_AREAS` in
-`Verilog/Makefile` once its trace arrives and passes.
-
-Gates: `make test-instr-<AREA>` runs one area; `make test-instr` runs the full
-validated sweep; `make test-full` runs ARGUMENT as a smoke gate.
+Gates: `make test-instr-<AREA>` runs one area; `make test-instr` runs the
+`INSTR_AREAS` sweep (13 areas); `make test-full` runs ARGUMENT as a smoke gate.

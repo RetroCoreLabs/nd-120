@@ -20,10 +20,16 @@ OUT="${TMPDIR:-/tmp}/nd120_iverify_${AREA}"
 TRACE="$OUT.md"
 LOG="$OUT.log"
 
+# A missing golden is a FAILURE, never a skip: a gate that prints PASS
+# without comparing anything would report a green area that was never tested.
+# The ND-110 reference traces live in the ND110Compile repository, outside
+# this one; check that it is checked out where GOLDEN points.
 if [ ! -f "$GOLDEN" ]; then
-    echo "SKIP: golden trace not found: $GOLDEN"
-    echo "TB_RESULT: PASS (skipped - no golden)"
-    exit 0
+    echo "FAIL: golden trace not found: $GOLDEN"
+    echo "      The ND-110 reference traces come from the ND110Compile repository."
+    echo "      Without the golden file this area cannot be checked."
+    echo "TB_RESULT: FAIL (no golden trace - area NOT tested)"
+    exit 1
 fi
 
 cd "$RUNSIM" || exit 1

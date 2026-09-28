@@ -243,15 +243,21 @@ On real hardware (10 MHz clock): 8192 × 100 ns = 819.2 µs ≈ 1.2 kHz interrup
 ### Simulation Parameter
 
 ```verilog
-// DECODE_DGA_POW.v
-`ifdef VERILATOR_SIM
-    localparam RTC_20MS = 21'd8192;   // Matches TESTE=1 baseline
+// DECODE_DGA_POW.v (shortened - read the file for the full set)
+`ifdef RTC_REAL_PERIOD                 // real period even in Verilator
+    localparam RTC_20MS = (`BOARD_CLK_FREQ / 50) - 1;    // 20 ms
+`elsif VERILATOR_SIM
+    localparam RTC_20MS = 21'd8192;    // TESTE=1 baseline (RTC_SIM_20MS overrides)
     localparam RTC_5MS  = 21'd2048;
-`else
-    localparam RTC_20MS = 21'd1_999_999;  // 100MHz × 20ms
-    localparam RTC_5MS  = 21'd499_999;
+`else                                  // every FPGA build
+    localparam RTC_20MS = (`BOARD_CLK_FREQ / 50) - 1;    // 20 ms of the real board clock
+    localparam RTC_5MS  = (`BOARD_CLK_FREQ / 200) - 1;   // 5 ms
 `endif
 ```
+
+The FPGA period used to be a fixed 1_999_999 (20 ms at 100 MHz); on a board
+whose CPU clock is slower that stretched the tick (16.67 MHz on the Basys3 gave
+~120 ms), so it is now derived from `BOARD_CLK_FREQ`.
 
 **Note**: If RTC is set too fast (e.g., 256 cycles), RTC interrupts (~3906 per million ticks) starve the CPU of execution time and instruction verify hangs. 8192 cycles is the correct calibration.
 
@@ -383,25 +389,27 @@ After OPCOM is active, the boot sequence is complete. The CPU is in the `STOP` s
 | Reset window | 100 ticks | 256 cycles |
 | Clock | sysclk = 100 MHz (simulated) | 100 MHz actual |
 | RTOSC | sysclk/256 = 390.6 kHz | sysclk/256 = 390.6 kHz |
-| RTC period | 8192 sysclk cycles | 8192 sysclk cycles |
+| RTC period | 8192 sysclk cycles | `BOARD_CLK_FREQ / 50` sysclk cycles (20 ms real time) |
 | Microcode load | ~573K ticks (8192 words × ~70 cycles/word) | Same (hardware-dependent) |
 | OPCOM ready | tick ~739,217 | Similar wall-clock time |
 
-The `VERILATOR_SIM` macro is injected by the Makefile (`-DVERILATOR_SIM`) and controls only the `RTC_20MS`/`RTC_5MS` localparams. All other logic is identical between simulation and FPGA.
+The `VERILATOR_SIM` macro is injected by the Makefile (`-DVERILATOR_SIM`). Besides the `RTC_20MS`/`RTC_5MS` period it also enables the bus ports, the fast UART and the large simulation RAM (`MEM_RAM_49.v`), so simulation and FPGA builds are NOT otherwise identical. The full list of defines is in `docs/build-defines.md`.
+
+This table was written for the Basys3 at a 100 MHz sysclk; the boards now run other clocks (per-board figures in `fpga/README.md`).
 
 ### Running Simulation (WSL required)
 
 The oss-cad-suite Verilator in Git Bash has a broken Perl environment (missing `Pod::Usage`). Always use WSL:
 
 ```bash
-wsl --cd "E:/Dev/Repos/Ronny/nd-120/Verilog/sim" -- bash -c "make compile"
-wsl --cd "E:/Dev/Repos/Ronny/nd-120/Verilog/sim" -- bash -c "make run"
+# inside WSL, from the repo checkout
+cd Verilog/sim && make compile && make run
 ```
 
 For the full CPU simulation (with UART/OPCOM):
 
 ```bash
-wsl --cd "E:/Dev/Repos/Ronny/nd-120/Verilog/runSim" -- bash -c "make compile && make run"
+cd Verilog/runSim && make compile && make run
 ```
 
 ---

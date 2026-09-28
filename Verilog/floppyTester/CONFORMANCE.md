@@ -2,15 +2,48 @@
 
 Full path: `Verilog/floppyTester/CONFORMANCE.md`
 Date: 20-JUL-2026. Sources: three cited extractions —
-(A) C oracle `/home/ronny/repos/nd100x/src/devices/floppy/deviceFloppyDMA.c` + `.h`,
+(A) C oracle `src/devices/floppy/deviceFloppyDMA.c` + `.h` in the nd100x repository,
 (B) Verilog `Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v`,
 (C) Microcode `Code/Microcode/ND-120-DELILAH-L.LISTING.txt`
-(cross-verified against the EPROM words in `microcode.md` and the nd120uc token JSON).
+(cross-verified against the EPROM words in `Code/Microcode/AM27256_4513{2,3}L.bin` and the nd120uc token JSON).
 Every claim below carries its origin (A/B/C + line/CSA). Tags: **BUG** (must fix),
 **DEVIATE** (differs from oracle, decide), **QUIRK** (oracle oddity, probably keep ours),
 **UNKNOWN** (needs manual/NDInsight).
 
 ---
+
+## Ground rules of the campaign
+
+Kept from the retired `PLAN-floppy-validation.md` (20-JUL-2026; its goal, a
+full `1560&` boot, was met 27-JUL-2026 - see `HISTORY.md`). The testbenches it
+planned live in `Verilog/ND-BUS-DEVICES/FLOPPY-DMA/sim/`, not in this folder.
+
+- **Oracle:** the nd100x C device (`deviceFloppyDMA.c` + `.h`) is the
+  behavioural truth for floppy semantics. When the C code and the 3112 manual
+  disagree, ND-11.021 decides (`Verilog/docs/floppy-3112-register-spec-ND-11.021.md`).
+- **Test diskette:** `Verilog/runSim/FLOPPY.IMG` (1,261,568 bytes, FLOMON
+  boot sector, TPE-MON-100-A02:BPUN + 20 :TEST programs), named `FLOPPY1.IMG`
+  on SD cards.
+- **Pass pattern for a real boot:** TPE ends at a `TPE>` prompt.
+- **Who owns what (agreed 20-JUL-2026 with the NDDeviceCore work).** The
+  NDDeviceCore side tests its portable C floppy by driving raw ND-bus signals
+  from C in Verilator, with all Verilog devices disconnected.
+
+  | NDDeviceCore side | Verilog device side |
+  |---|---|
+  | NDDeviceCore repo, `simDevices/NDCoreShim*`, `NDCoreBlockBackend*`, `NDDeviceCoreAdapter` | `ND_FLOPPY_DMA.v`, `ND_BUS_SLAVE.v`, `ND_DMA_MASTER.v`, `ND_TAPE_400.v`, SD-FAT stack, `floppyTester/` |
+  | flags `DEVICECORE`/`DEVICECORE_FLOPPY`, env `ND120_FLOPPYCORE_IMG`, gates `test-floppy-core-iox` / `test-floppy-core-boot` (`Verilog/Makefile`) | env `ND120_FLOPPY_IMG`, gates `test-floppy-dma` / `-iox` / `-p2` / `-boot` / `-sdfat` (`ND-BUS-DEVICES/FLOPPY-DMA/sim/Makefile`) |
+
+  Neither side edits the other's cores. Shared files, additive edits only:
+  `runSim/Makefile`, `Run120.cpp`, `Verilog/Makefile`, and possibly
+  `ND120_TOP.v` (sim-only master-signal ports behind `ifdef VERILATOR_SIM`).
+  Their autoload is to be modelled on the nd100x oracle, not on our
+  `ND_FLOPPY_DMA.v`.
+- In `Run120.cpp`, `ND120_FLOPPYCORE_IMG` also counts as a mounted boot medium
+  (it suppresses the DEBUG.BPUN default pre-deposit), and `ND120_PRELOAD_BPUN`
+  set but empty means no pre-deposit in any build.
+- `make run-floppy` pre-deposits `FILSYS-INV-Q04.BPUN` (the file-system
+  investigator) so `20!` starts it against the mounted diskette.
 
 ## 0. HEADLINE — the `1560&` mystery is SOLVED (C)
 
@@ -54,8 +87,8 @@ Every claim below carries its origin (A/B/C + line/CSA). Tags: **BUG** (must fix
 | 6 | read +4 | bit 1 = error → retry FOREVER from step 1 | |
 | 7 | — | CPU sets P := 0, `COMM,START` | boot code must be at core 0 |
 
-**RESOLVED by NDInsight** (`/mnt/e/Dev/Ronny/NDInsight/SINTRAN/Devices/FloppyDMA/`
-`04-boot-and-autoload.md`, from the reverse-engineered Z80 firmware ROM):
+**RESOLVED by NDInsight** (`SINTRAN/Devices/FloppyDMA/04-boot-and-autoload.md`
+in the NDInsight repository, from the reverse-engineered Z80 firmware ROM):
 
 - The REAL diskette boot is performed by the **card's Z80 firmware**
   (`Autoload_BootstrapLoad @ram:1ae8`, firmware-verified): RESTORE to track 0 →
@@ -76,7 +109,7 @@ Every claim below carries its origin (A/B/C + line/CSA). Tags: **BUG** (must fix
   play (it IS the card).
 - Exact firmware header arithmetic is COULD-NOT-DETERMINE; §4.6(b) sanctions
   parsing the format from its own spec — we have that: the ndfs FLOMON parser
-  (`/mnt/e/Dev/Ronny/norskdata-ndfs/ndfs-py/src/ndfs/boot_loader.py`) + real
+  (`ndfs-py/src/ndfs/boot_loader.py` in the norskdata-ndfs repository) + real
   diskettes to validate against. Ground-truth memory images for validation:
   `$ND_REPOS/RetroGhidra/N100-FLOPPY-3112/ND Code\` (Load_error.txt,
   wrong_bootstrap.txt, `DEPOSIT 0 77400.txt` = a working bootstrap image).
@@ -93,7 +126,7 @@ builder as reference).
 ### Practical consequences
 
 - **Today, without new RTL:** a real diskette can be booted by repacking its
-  FLOMON payload as BPUN with ndtool (`/mnt/e/Dev/Ronny/norskdata-ndfs`) →
+  FLOMON payload as BPUN with ndtool (norskdata-ndfs repository) →
   `1560&` boots it. TPE-MON extraction is the same workflow.
 - **To boot real diskettes AS-IS:** implement MASS autoload + FLOMON parsing in
   `ND_FLOPPY_DMA.v` (the device plays the Z80 firmware's role), per NDInsight §4.3.
@@ -194,7 +227,7 @@ builder as reference).
 1. Boot +0 read gated on neither `s_rft` nor `s_buf_valid` → stale-data window,
    over-consumption if `iox_rd` is >1 cycle (depends on ND_BUS_SLAVE strobe width
    — VERIFY in P2).
-2. **Bootptr overrun wedge**: refill only fires at `s_bootptr == 512` exactly; one
+2. **Bootptr overrun hang**: refill only fires at `s_bootptr == 512` exactly; one
    extra read → 513 → refill unreachable until device-clear. (Candidate for the
    silicon "silent after 1560&" symptom.)
 3. Autoload disk-error leaves `s_boot_active=1` and raises RFT — CPU reads stale
@@ -209,10 +242,12 @@ builder as reference).
 
 - **Tang silent `1560&`**: now EXPLAINED as most likely correct-behavior chain:
   FLOMON diskette → stream parse loads ~64 words to address 0 → checksum `?`
-  (possibly unseen on the wedged console) — with bug-candidates 7.2/7.3 available
+  (possibly unseen on the hung console) — with bug-candidates 7.2/7.3 available
   as aggravators. The `002000` RAM contents seen on the Tang were never verified
   against the image and are likely stale. P5/P6 re-tests with known media.
-- **Combined-tb 7/8 DMA errors**: unresolved — P3's job (hand-BCU vs real board RTL).
+- **Combined-tb 7/8 DMA errors**: RESOLVED 26-JUL-2026 - the device is correct; the
+  errors were a harness ACK-sampling artifact, and the `MIN_GAP_TICKS` recovery gap
+  was proven load-bearing. Measured results: `PLAN-P3-dma-master-validation.md` §0.
 
 ## 9. Actions out of Phase 0
 

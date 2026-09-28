@@ -5,10 +5,12 @@ comparison workflow from scratch. It is self-contained and does not assume prior
 
 ## Problem Statement
 
-The ND-120 CPU boots correctly in Verilator simulation and **boots SINTRAN III on
-the Tang Nano 20K** (24-AUG-2026), but fails to boot on the Xilinx boards, which
-do not meet timing (Basys3 WNS -29.778 ns at 16.667 MHz, measured 21-AUG-2026).
-The workflow below was written for the Basys3 and still applies there.
+The ND-120 CPU boots correctly in Verilator simulation. On silicon it boots
+SINTRAN III on the Tang Nano 20K (24-AUG-2026), the Nexys 4 DDR (25-AUG-2026)
+and the MiSTer (02-SEP-2026); the Basys3 boots OPCOM only (its 24K-word memory
+cannot hold an OS). Board state per target: `Verilog/fpga/README.md`.
+The workflow below was written for the Basys3 during the 2026 bring-up and still
+applies to any board whose behaviour differs from Verilator.
 The Verilator VCD trace serves as the "golden reference". The FPGA behavior is captured via
 Vivado ILA (Integrated Logic Analyzer) and exported as CSV. The goal is to find where the
 FPGA diverges from the reference and fix the Verilog.
@@ -97,7 +99,7 @@ clockTick formula: `tick = time_ps / 10 + 1`
 
 In Vivado Hardware Manager after capturing:
 ```tcl
-write_hw_ila_data -csv_file -force C:/temp/ila_capture.csv [upload_hw_ila_data hw_ila_1]
+write_hw_ila_data -csv_file -force <capture-dir>/ila_capture.csv [upload_hw_ila_data hw_ila_1]
 ```
 
 ## Signal Name Mapping
@@ -247,7 +249,7 @@ cd Verilog
 2. Program the FPGA with the new bitstream
 3. Set ILA trigger (e.g., CSA rising edge from 0x0424)
 4. Arm and capture
-5. Export: `write_hw_ila_data -csv_file -force C:/temp/ila_capture.csv [upload_hw_ila_data hw_ila_1]`
+5. Export: `write_hw_ila_data -csv_file -force <capture-dir>/ila_capture.csv [upload_hw_ila_data hw_ila_1]`
 
 ### Step 5: Compare ILA CSV against Verilator reference
 Load the CSV in Python and compare CSA sequences, ALU values, and flag transitions
@@ -397,3 +399,84 @@ When adding a new regression check:
 | 0x0BB0-0x0BB8 | 05660-05670 | Trap/interrupt handlers |
 | 0x0C00-0x0FFF | 06000-07777 | Instruction decode dispatch |
 | 0x1000-0x1FFF | 10000-17777 | Instruction microcode handlers |
+
+## Comparing a whole boot: the golden-model method (designed, not built)
+
+Moved here on 28-SEP-2026 from the retired `Verilog/FPGA-BRINGUP-PLAN.md`
+(sections 8, 11 and 12). Of the parts below only `docs/boot-golden-spec.md`
+exists; `boot_trace.json`, `compare_boot_trace.py` and `capture_ila.tcl` were
+never written. Kept because the reasoning still holds for the next board.
+
+### Why a tick-by-tick diff gives false alarms
+
+The boot path is not fully timing-deterministic. Every external event that can
+steer the microcode address (`CSA`) meets in one 4:1 address mux in
+`CGA_MIC_IPOS.v` (through `TRAP_n` selecting the `TVEC_3_0` branch, or
+`MR_n -> LCS_n` for the load sequence). At boot they sort like this:
+
+| Event | Steers CSA via | Deterministic at boot? |
+|---|---|---|
+| Master Clear / power-on | `MR_n -> LCS_n` load, start at o02001 | yes (once) |
+| Traps (page fault / protect violation) | `TRAP_n -> TVEC` | yes (fault-driven) |
+| Panel / keylock / ALD | `PANN` / PANVC vector | yes in the build this was written for (68705 stubbed `STAT=0`, buttons tied inactive) |
+| Hardware interrupts / PIL | `INTRQ -> TVEC` (LEV3) | quiet - external bus interrupt lines idle |
+| **RTC / 20 ms clock** | `s_rtc_n -> PANN/PANVC -> TVEC` -> microcode o016 | **no - the one truly async source** |
+
+So in a clean boot the RTC interrupt is the only source of timing difference
+(re-armed by the microcode `CLRTC`; the RTC counter is in `DECODE_DGA_POW.v`). Its timing relative to
+microcode progress differs between Verilator and a board, so it can dispatch to
+the PANVC handler at o016 at different points. Everything else must match
+exactly: compare the microcode state machine, not the timeline.
+
+Note: the panel row is from before the 68705 panel-clock emulation
+(`PANCAL_68705_CLOCK.v`, `ND120_PANEL_CLOCK`); with it enabled, check whether
+the panel adds a second async source before relying on this table.
+
+### Comparator rule
+
+Reduce both sides (sim trace and board ILA CSV) to one record per microcode
+basic-block transition, with the reason each branch was taken, then:
+
+- **Structural divergence = a real bug**: the same `(csa, branch cause, state)`
+  gives a different next address. Example: the board at o02046 with `ZF=1`
+  loops back to o02045 instead of leaving for o02047.
+- **Harmless divergence = ignore**: a different loop count (it depends on the
+  clock), a different number or timing of RTC dispatches, a different absolute
+  tick.
+
+A count-down loop (for example o02045/o02046 x 180,213) is one record whose
+entry and exit must match but whose count may differ. `docs/boot-golden-spec.md`
+is the ground truth: a trace that passes the diff but breaks the spec is still
+flagged.
+
+### Scripted ILA capture over hw_server
+
+- Windows runs `hw_server` (it owns the USB-JTAG cable); WSL drives captures
+  over TCP `localhost:3121`, so the Digilent device never has to be passed into
+  WSL. `hw_server.bat` is in the Vivado install's `bin` folder.
+- A capture script does `connect_hw_server -url`, selects the ILA, sets a real
+  **trigger condition** (not `-trigger_now`), runs `run_hw_ila` /
+  `wait_on_hw_ila` / `upload_hw_ila_data`, then exports in one step with
+  `write_hw_ila_data -csv_file` (do not use the fragile two-step
+  `list_hw_samples`).
+- **The trigger matters most.** The ILA is only 2048 samples deep (commit
+  `f618a9b`), while boot runs hundreds of thousands of ticks. `-trigger_now`
+  catches a random window. Trigger on a landmark (for example `s_debug_csa ==
+  o02047`, or entry to o02045/o02046) and use the same landmark to line the
+  capture up with the golden trace.
+- Longer term, a UART debug-event streamer (a short record per microcode step:
+  marker + CSA + flags) escapes the 2048-sample limit and gives a full-length
+  boot trace in the same form. The ILA stays the tool for zooming into one
+  failure.
+
+### Build gotchas (Vivado)
+
+- A logic change must let `synth_1` really re-run (the `vivado_build.ps1`
+  default). Reusing the old checkpoint is fine only for probe or constraint
+  changes.
+- The microcode hex files must sit where Vivado's `$readmemh` looks, or the ROM
+  is empty (see the board README for the exact place).
+- The `.ltx` must match the `.bit`; both are written by each build, and a stale
+  `.ltx` labels the probes wrongly.
+- For the debug loop use the volatile JTAG load (`flash.ps1 -Quick`); program
+  the SPI flash only when the image must survive a power cycle.

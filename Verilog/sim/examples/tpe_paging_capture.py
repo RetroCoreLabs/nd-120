@@ -7,7 +7,8 @@ the nd120 PROBE (Verilog floppy autoload `1560&`, image = runSim/FLOPPY1.IMG),
 drives it to the memory-reference test, and CAPTURES the real MMU paging bring-up
 plus the store to logical 177777 (VPN 63) - the store that the RTL reads back as 0.
 
-WHY (see sim/HANDOFF-csharp-paging-capture.md + memory nd120-mmu-shadow-ram):
+WHY (the retired sim/HANDOFF-csharp-paging-capture.md, summarised in HISTORY.md
+"Retired documents", + memory nd120-mmu-shadow-ram):
 the RTL fails every TPE memory-WRITE op that touches logical 177777 under PAGING.
 This script gets the GROUND TRUTH from the RTL itself: every page-table / shadow
 write (s_wmap_n==0) with its logical-page index (s_la_20_10) and the PPN/PT data

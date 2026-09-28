@@ -58,7 +58,7 @@ registered instead - the historical runSim behavior.
 `make test-smd-boot` - each compiles this simulator in a scripted
 configuration and checks a hard verdict (console landmarks, RAM
 contents, executed-code proof). See the top-level `Verilog/Makefile`
-header and `docs/device-bus-todo.md`.
+header.
 
 `make test-floppy-stdin` additionally proves the INTERACTIVE input
 path: it pipes `1560&` into the exact `make run-floppy` binary

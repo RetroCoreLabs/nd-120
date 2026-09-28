@@ -7,6 +7,13 @@ to debug the ND-120 CPU boot sequence. The working Verilator simulation produces
 (~500MB, ~67M lines, ~35K signals). A custom Python tool `vcd_extract.py` was built to parse
 this efficiently since the standard `vcdvcd` library takes 67+ seconds just for header parsing.
 
+> **Waveform format today: FST, not VCD.** The `sim/` harness now builds with
+> `--trace-fst` (`sim/Makefile`) and `test_nd120.cpp` writes `waveform.fst`.
+> `vcd_extract.py` still works: it opens both formats through `sim/fst.py`,
+> which pipes a `.fst` file through `fst2vcd` (part of GTKWave). The sizes and
+> timings in this guide were measured on the older `waveform.vcd`; the examples
+> run the same with `waveform.fst` in place of `waveform.vcd`.
+
 ## Files
 
 | File | Path | Description |
@@ -243,3 +250,30 @@ When TRAP_n=0, IPOS overrides normal address with trap vector address.
 3. Compare CSA_12_0 sequence against the reference in boot_analysis.md
 4. First divergence point indicates the bug location
 5. Use the debugging decision tree in boot_analysis.md to narrow down the cause
+
+## The analysis scripts in `Verilog/sim/`
+
+All read `waveform.fst` from `make run` by default and print addresses and
+values in OCTAL (`o{v:06o}` for CSA/CD/IDB, `o{v:02o}` for CSCOMM/CSIDBS/LC).
+Run the simulator under WSL (the Git Bash verilator does not work).
+
+| Script | Purpose |
+|--------|---------|
+| `fst.py` | `open_wave(path)`: reads `.fst` through `fst2vcd` (ships with GTKWave), `.vcd` directly. New trace scripts should `from fst import open_wave`. |
+| `nd120_vcd.py` | Older signal-discovery helper (`find_ids`, `extract`), used by older scripts. |
+| `fst_query.py` | FST signal query with octal output and named markers (CSA, LCS_n, MCLK, LC, LDLCN, CSCOMM, CSIDBS, IDB, PAN_n, CONN_n). A good start for a new `trace_*.py`. |
+| `vcd_extract.py` | The CLI extractor described above (`-s`, `-p`, `--gtkw`, `--tstart/--tend`, `--json`, `--table`, `--list`). |
+| `list_sigs.py` / `find_sigs.py` | Dump every signal name / grep names for substrings (edit `SUBS` at the top). |
+| `find_wcs_signals.py`, `find_epans.py`, `find_panvc.py` | `find_sigs.py` pre-set for WCS / EPANS / PANVC signals. |
+| `decode_mcode.py` | Decode a 64-bit microword into CSIDBS (bits 41:37) and CSCOMM (bits 36:32). |
+| `analyze_ila.py` | Parse a Vivado ILA CSV and list CSA at MCLK rising edges (CSV path as argv[1]). |
+| `compare_boot.py` | Line up an ILA CSV against the Verilator boot trace and find where they part; labels addresses from the DELILAH-L listing. Its `LISTING_PATH` and `ILA_CSV_PATH` constants hold one machine's paths - set them before use. |
+
+The ~34 `trace_*.py` scripts are one-off captures from past investigations
+(LDLCN/LC, PANVC/TVEC dispatch, PROM->WCS handoff, MOPC, MACL, signal
+routing). Copy the closest one (`trace_ldlc2.py` is the cleanest template:
+edit `WANT`, `T_START`, `T_END`) rather than treating them as a stable API.
+FST timestamps are picoseconds; `tick = t_ps // 10 + 1` gives the tick
+number `make run` prints. `s_debug_*` signals are debug taps brought out of
+`ND120_TOP.v`; CGA signals sit under
+`TOP.ND120_TOP.CPU_BOARD.CPU.PROC.CGA.DELILAH.*`.

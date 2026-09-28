@@ -24,7 +24,7 @@ def decode_word(addr_oct, word_hex):
     # Try to extract fields by examining known words
     return csidbs, cscomm
 
-# Known microcode words from microcode.md
+# Known microcode words from the raw EPROM dumps (Code/Microcode/AM27256_4513{2,3}L.bin)
 # o000016: IDBS,PANEL COMM,LDLC T,JMP T.HOLD PANEL
 decode_word("000016", "0x1B800080800040FF")
 

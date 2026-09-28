@@ -1,322 +1,376 @@
-# ND-120 CPU
+# ND-120: The Norsk Data ND-120 CPU, Rebuilt in Verilog
 
-## Content
+[![Verilog CI](https://github.com/RetroCoreLabs/nd-120/actions/workflows/verilog-ci.yml/badge.svg)](https://github.com/RetroCoreLabs/nd-120/actions/workflows/verilog-ci.yml)
+[![Release](https://img.shields.io/github/v/release/RetroCoreLabs/nd-120?label=bitstreams)](https://github.com/RetroCoreLabs/nd-120/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-This repo contains:
+A full rebuild of the 1988 **Norsk Data ND-120** CPU card (the 3202D board) from
+the original design documents - first drawn in Logisim-Evolution, now in
+Verilog - that runs the original operating system, **SINTRAN III**, on FPGA
+boards you can buy today.
 
-* Original **Norsk Data** ND-120 CPU Design Documents from 1988. Scanned in 2023
-* Modern Logisim and HDL implementation from 2023.
+**Note:** read more about this [CPU](https://www.ndwiki.org/wiki/3202) and the rest of the ND range in [NDWiki](https://www.ndwiki.org/), and on the official [Norsk Data](http://sintran.com/) site.
 
-You can read more about this [CPU](https://www.ndwiki.org/wiki/3202) and much more in [NDWiki](https://www.ndwiki.org/) and the official website for [Norsk Data](http://sintran.com/)
+---
 
-The goal of this repo is to re-create the schematics and create the HDL files so we can program an FPGA to run as the original ND-120 CPU Card.
+## 🎉 **SINTRAN III runs on real hardware**
 
-On the way to the FPGA code, there will be testable Logisim Circuits and Logisim code that can be converted and tested in C++ using Verilator.
+**The machine boots SINTRAN III from a Winchester disc image on an SD card, and
+you can log in and run programs.**
 
-## Current Status
+📥 **[Releases page](https://github.com/RetroCoreLabs/nd-120/releases)** - ready-built bitstreams, no FPGA tools needed
 
-### Where the project stands (02-SEP-2026)
+- ✅ **Tang Nano 20K** - boots SINTRAN, 20.25 MHz, timing-clean - [quickstart](Verilog/fpga/QUICKSTART-tang-nano-20k.md)
+- ✅ **Nexys 4 DDR** - boots SINTRAN, 33.333 MHz with the cache on - [quickstart](Verilog/fpga/QUICKSTART-nexys4ddr.md)
+- ✅ **MiSTer / DE10-Nano** - boots SINTRAN, 20 MHz - [quickstart](Verilog/fpga/QUICKSTART-mister.md)
+- 🚧 **MEGA65** - builds for both board revisions, timing-clean, not yet run on a real MEGA65 - [quickstart](Verilog/fpga/QUICKSTART-mega65.md)
 
-The machine runs the original operating system on real hardware - on **three
-boards**. **SINTRAN III boots on the Tang Nano 20K** (24-AUG), the **Nexys 4
-DDR** (25-AUG) and the **MiSTer / DE10-Nano** (02-SEP), each from a Winchester
-disc image, and you can log in and run programs. The Tang is the primary
-target. A fourth machine, the **MEGA65**, builds for both board revisions and
-is timing-clean, but has not yet run on a real MEGA65 - the release cores are
-its first hardware test.
+---
 
-Verilator is no longer "the thing that works while hardware doesn't" - it is
-the **signal-level reference**: waveforms, unit testbenches, and the
-latch-versus-flip-flop comparison that proves a refactor changed nothing. The
-Xilinx boards that only reach OPCOM (Basys3, Cmod A7) are held back by memory
-capacity or timing, not by the CPU.
+## 📋 Table of Contents
 
-**Simulation (Verilator - the signal-level reference):**
-- Microcode loads, Master Clear executes, and the CPU self-test passes
-  clean: **0 execution-phase STERR visits** (measured with the
-  `ND120_COUNT_STERR` probe in `Verilog/runSim/Run120.cpp`).
-  An older status here read "self-test runs, 7 of 14 subtests passing".
-  **That figure is retracted** - it predated the fixes and was never
-  re-measured (`Verilog/docs/RETRACTED.md`). Careful when measuring: the
-  WCS loader walks past the STERR address once while loading, so only
-  execution-phase visits count.
-- The self-test result is **not** a memory-parity question. Microcode
-  analysis proved the self-test never touches memory parity, which is why
-  FPGA targets compute parity on the read path instead of storing it
-  (`Verilog/docs/nd120-parity-analysis.md`).
-- **13 of 13 testable INSTRUCTION-B areas pass** on both layers - each
-  area's own end-of-test with zero error lines, and the 400-instruction
-  golden-trace comparison against the ND-110 reference
-  (`Verilog/tests/instruction-verify/CAMPAIGN-STATUS.md`). The
-  48-bit floating area is not applicable: our PROM microcode implements
-  the 32-bit float option.
-- OPCOM console works; `INSTRUCTION-B` loads and runs from the Verilog
-  papertape device; DMA bus mastering against the real arbiter
-- Golden-console and latch-vs-FF regression gates keep it all pinned
+- [Overview](#-overview)
+- [Quick Start](#-quick-start)
+- [FPGA Boards](#-fpga-boards)
+- [Simulation](#-simulation)
+- [Original Diagnostics](#-original-diagnostics)
+- [What the Cache Is Worth](#-what-the-cache-is-worth)
+- [Inside the Machine](#-inside-the-machine)
+- [Documentation](#-documentation)
+- [Project Status](#-project-status)
+- [License](#-license)
 
-### TPE diagnostic programs - what actually runs
+---
 
-These are the original Norsk Data test programs, not our own testbenches.
-Each row says where the result was measured; nothing here is inferred from
-a passing run somewhere else.
+## 🎯 Overview
 
-| Program | Result | Measured on |
-|---|---|---|
-| **CONFIGURATION** (`load conf`) | **Passes** - runs to completion with `NO ERRORS DETECTED` and correctly enumerates the machine (ND-120/CX, 32-bit float, MMS-2, cache present, ALD 400B, print number 3202). Version D05, 1988-11-08 | Verilator (logged, 27-JUL-2026); confirmed working on the Tang |
-| **INSTRUCTION** | **Passes.** In Verilator, **13 of 13** testable INSTRUCTION-B areas - each area's own deep end-of-test with zero error lines, plus a golden 400-instruction trace gate against the ND-110 reference. On the board, the full multi-level run over interrupt **levels 1-9 passes clean** | Verilator (13-JUL-2026) + Tang silicon (31-JUL-2026) |
-| **PAGING** | **Passes 11 of 11**, including test 3 (PGU/WIP), test 4 (alternative PIT) and test 11 (physical address generation) | Tang silicon (30-JUL-2026) |
-| **MEMORY** | **Passes.** An earlier open item here - the TPE Monitor's memory diagnostic returning a corrupted banner string (23-JUL) - was closed by the MMU cache fix on 27-JUL: the cache data output was not gated by `HIT`, so a stale line jammed the wired-OR `CD` bus. That is the same defect that produced the garbled `INST??CTION` banner | Tang silicon |
-| **CACHE** (`CACHE-1X0-A00`) | **Passes all 8 tests**, including test 3 "Inhibit limits", which used to hang the board at `P=124563B`. Four faults had to be fixed first, all single-input transcription errors: the PAL 44511A `CWR` feedback latch, that PAL's pin-19 polarity (sheet 25 forms `HIT` with a 74S260 NOR that needs the net LOW on a read, so with `~CWR` no read could ever hit), a dropped Am9150 used-bit write, and a DGA `EPANS` data-window leak that accounted for all 20062 of test 1's errors | Nexys 4 DDR silicon (31-AUG-2026) |
-| **TPE Monitor B01** | Boots from a floppy image (`1560&` at the OPCOM `#` prompt), reaches the `TPE>` prompt and accepts its own commands - this is the harness the diagnostics above are loaded and run from | Verilator (27-JUL-2026) + Tang silicon |
-| **RUN** | Reaches its `== END OF TEST ==` after the Am2914 interrupt status fence was made default and MOR (memory-out-of-range) was wired to level 12 | Verilator (15-JUL-2026) |
-| **48-BITS-FLOATING** | **Not applicable** - this machine's PROM microcode implements the 32-bit float option, so the area cannot apply (`Verilog/docs/48bit-float-not-configured.md`) | - |
-| **DISC-TEMA J02** | **Not passing.** Loads and transfers real data off the disc image, register-for-register matching the reference model, but still reports `Memory address Register not as expected`. Unexplained, and the one known open diagnostic | Verilator + Tang silicon |
+This repository holds:
 
-The five that pass clean on the board - **CONFIGURE, INSTRUCTION, PAGING,
-MEMORY and CACHE** - are the machine's own acceptance suite: they check the CPU
-identifies itself correctly, executes every instruction group correctly, that
-the MMU translates and faults correctly, and that main memory is sound. With
-those green and SINTRAN III booting, the ND-120 is a working machine rather
-than a partially working one.
+- the original **Norsk Data ND-120 design documents** from 1988, scanned in 2023;
+- **Logisim-Evolution** schematics of every part of the board;
+- the **Verilog** version of the whole card, which runs in Verilator and on FPGAs.
 
-These campaigns are also what found the real CPU bugs, which is the argument
-for running the original diagnostics rather than only our own testbenches:
-INSTRUCTION caught a multiply bug (every product's low word was zero) and a
-shift-control bug (all rotate and sign-extending shifts ran as plain shifts);
-PAGING caught an MMU fault where the physical-page map RAM was never written
-at all; CONFIGURATION caught a trap-vector generator that resolved a
-simultaneous page-fault-plus-PGU to an unimplemented vector and self-jumped
-forever.
-
-### What enabling the cache is worth (31-AUG-2026)
-
-The ND-120's cache can be compiled in or out (`cache` / `nocache` on the Nexys
-build, `ND120_NO_CACHE`; see `Verilog/docs/build-defines.md`). Measured on the
-Nexys 4 DDR with the operator panel's own MIPS counter, running SINTRAN III:
-
-| build | CPU clock | cache | MIPS running SINTRAN | clocks per instruction |
-|---|---|---|---|---|
-| 15 | 45.45 MHz | off | 2.44 | 18.6 |
-| 16 | 33.33 MHz | **on** | **> 7.0** | **< 4.8** |
-
-**Enabling the cache is worth about 2.9x the real throughput - on a clock 26%
-SLOWER.** Per instruction it is close to a 4x saving. Both figures are the same
-workload (ordinary SINTRAN operation) read off the same counter, so it is a
-like-for-like comparison rather than a benchmark.
-
-**Why it is so large: this machine is memory-latency bound, not clock bound.**
-With the cache out, every instruction fetch is a DDR2 read, and DDR2 does not
-get faster when the CPU clock rises. The evidence is a one-word loop
-(`124000` = `JMP` to its own address - no operand fetch, no write, no I/O),
-deposited from the panel and therefore running on a page the cache-inhibit RAM
-has not been set up for:
-
-- at 45.45 MHz it ran at 2.66 MIPS - **17.1 clocks for a single `JMP`**
-- at 33.33 MHz it ran at 1.95 MIPS - **17.1 clocks**, the identical figure
-
-Three independent uncached measurements agreeing at 17.1 clocks per
-instruction, with throughput scaling exactly with the clock (2.66/1.95 =
-1.364 = 45.45/33.33), is what pins the bottleneck on memory rather than on the
-CPU.
-
-**A caution worth repeating, because it cost a day.** The opposite conclusion
-was reached on 30-AUG - "speed beats cache", cache dropped to buy 45 MHz - and
-it was wrong. The MIPS counter was then fed from a signal that counts MEMORY
-CYCLES, so it went blind precisely when the cache started working: both
-configurations read 2.44 and the cache looked worthless. Only after the counter
-was re-tapped to a true per-instruction event (the instruction register taking
-a new opcode) did the 3x difference appear. Never compare two numbers taken
-with different instruments, and prove an instrument before trusting what it
-says (`Verilog/docs/HANDOFF-mips-and-clock.md`).
-
-**What this makes valuable.** Cache and a fast clock together is the real
-machine: at under 4.8 clocks per instruction, the cache running at 45.45 MHz
-would be roughly **9.5 MIPS**. It is not reachable today - with the cache in,
-the routed worst path is 28.039 ns, a hard ceiling near **35.6 MHz** - and that
-one path (`WRF -> ALU -> TVGEN -> ACAL -> WCS` address, 75% routing) is now the
-highest-value optimisation target on the board. Details and the three possible
-routes: `Verilog/fpga/nexys4ddr/timing.md`.
-
-**FPGA hardware:**
-
-> **Ready-built bitstreams:** grab them from the
-> [Releases page](https://github.com/RetroCoreLabs/nd-120/releases) - no FPGA
-> toolchain needed. Quickstarts: `Verilog/fpga/QUICKSTART-nexys4ddr.md`
-> (incl. the no-software SD-card path),
-> `Verilog/fpga/QUICKSTART-tang-nano-20k.md`,
-> `Verilog/fpga/QUICKSTART-mister.md` and
-> `Verilog/fpga/QUICKSTART-mega65.md` (MEGA65 cores: built, not yet run on
-> a MEGA65 - the first testers are you).
-
-- **Tang Nano 20K - SINTRAN III BOOTS (24-AUG-2026).** The operating system
-  runs on the FPGA from a Winchester disc image on the SD card: banner in
-  **29.4 s**, login, `LIST-FILES`, and the S3 program (cold start 13.2 s).
-  Full CPU bitstream with **4 MB SDRAM main memory** (packed 16-bit storage,
-  computed parity - `ND_SDRAM_PACK16`), the other 4 MB for the SD disk-image
-  cache; SD/FAT stack proven on hardware (read + write, safety-gated).
-  **Clocked up 26-AUG-2026: the `fast20` variant boots SINTRAN at
-  20.25 MHz with a 115200 console, timing-clean (TNS 0)** - 3x the
-  long-validated 6.75 MHz. Timings and clock variants:
-  `Verilog/fpga/tang-nano-20k/README.md`.
-- **Nexys 4 DDR - SINTRAN III BOOTS (25-AUG-2026), clocked up to
-  45.45 MHz with a 115200 console (26-AUG-2026), SD-card deployment
-  end to end (27-AUG-2026: the board configures itself from the microSD
-  and boots from the same card - no PC software).** Full CPU, deployed at
-  **45.45 MHz** (50 MHz also booted; frequency search and bottleneck
-  analysis in `Verilog/fpga/nexys4ddr/timing.md`), main memory in **DDR2
-  through a BRAM cache** (`MEM_RAM_49_DDR2`), boot disc on the on-board
-  microSD:
-  banner in ~40 s, console login verified, 7/7 boot cycles. The blocker
-  was a dropped cache-hit update on late DDR2 write strobes - root cause,
-  fix and validation in `Verilog/fpga/nexys4ddr/SINTRAN-BOOT-25AUG.md`.
-  The board carries a debug panel (RGB health LEDs incl. a DDR2 watchdog,
-  8-digit live state display): `Verilog/fpga/nexys4ddr/DEBUG-PANEL.md`.
-- **MiSTer (DE10-Nano) - SINTRAN III BOOTS (02-SEP-2026).** The whole ND-120
-  machine on the MiSTer framework: boots to OPCOM and, with a Winchester image
-  mounted in the OSD, boots SINTRAN. CPU at 20 MHz, **4 MB main memory in the
-  DE10-Nano SDRAM module**, the TDV2200 terminal on the MiSTer's own screen and
-  keyboard, floppy/Winchester/tape as image files from the OSD. Confirmed on the
-  board: boot, self-test (green `G` lamp), the box-drawing font and the keyboard.
-  Quickstart: `Verilog/fpga/QUICKSTART-mister.md`.
-- **Basys3**: OPCOM boots on the board (tag `fpga-opcom-working-basys3`);
-  active debug line at 16.67 MHz. Does not meet timing (WNS -29.778 ns at
-  16.667 MHz, measured 21-AUG-2026), so it does not boot the OS.
-- **Dual toolchain**: the Tang builds with the OSS CAD Suite
-  (yosys/nextpnr, primary) and Gowin EDA (backup) - all clock variants;
-  nextpnr closes the full 27/54 MHz target with >2x margin
-  (`Verilog/docs/tang20k-build-flows.md`)
-- **Cmod A7-35T**: first build ready (BRAM memory, CPU at 27 MHz);
-  512 KB SRAM main-memory bridge planned
-- **MEGA65 - the whole machine builds for BOTH board revisions
-  (02-SEP-2026), timing-clean, NOT YET RUN ON A MEGA65.** On the
-  MiSTer2MEGA65 framework: ND-120 CPU with 4 MB main memory (R3: in the
-  HyperRAM through the Nexys cache seam and a new Avalon port, CPU
-  13.33 MHz; R4/R5/R6: in the 64 MB SDRAM through the MiSTer sheet-49
-  bridge, CPU 20 MHz), the TDV2200 terminal on the MEGA65's own keyboard
-  and screen (VGA + HDMI), floppy 0/1, Winchester 0/1 and paper tape as
-  image files on the SD card through the framework's virtual drives, one
-  `.cor` per revision flashed from the MEGA65's own menu. Every new block
-  has a self-checking bench; the port and its facts:
-  `Verilog/fpga/mega65/README.md`, `Verilog/fpga/mega65/docs/00-plan.md`.
-  (`Verilog/fpga/cmod-a7-35t/SRAM-BRIDGE-PLAN.md`)
-- Memory-backend speed rules for every board (what meets the no-wait-state
-  protocol at 40 MHz and what cannot):
-  `Verilog/docs/basys3-memory-speed-validation.md`
-
-## Quick Start
-
-```bash
-cd Verilog/sim
-make clean
-make all  # Compiles, runs, and opens GTKWave
-```
-
-**Prerequisites:** [Verilator](https://www.veripool.org/verilator/), Icarus Verilog, GTKWave (optional). Development is done on Linux / WSL2 with bash.
-
-See [BUILDING.md](BUILDING.md) for detailed build and test instructions.
-
-## Requirements
-
-The minimum requirements to make the CPU work:
+### Main Components
 
 | Component | Schematic | HDL | Status |
 |-----------|-----------|-----|--------|
-| [DELILAH CPU Gate Array (CGA)](DesignDocuments/DELILAH-CPU/readme.md) | Completed | Logisim generated Verilog | QA on schematic/Verilog ongoing |
-| [NEC Decoder Gate Array (DGA)](DesignDocuments/DECODE-GateArray/Readme.md) | Completed | Logisim generated Verilog | QA on schematic/Verilog ongoing |
-| [ND 3202 CPU Board revision D](DesignDocuments/CPU-BOARD-3202/Readme.md) | Completed | Logisim generated Verilog | QA on schematic/Verilog ongoing |
-| [PAL Chips](DesignDocuments/PAL-Code/Readme.md) | All PALASM code has been validated | Verilog and testcode created | QA on Verilog ongoing |
+| [DELILAH CPU Gate Array (CGA)](DesignDocuments/DELILAH-CPU/readme.md) | ✅ Complete | Verilog (first made from Logisim, now kept by hand) | ✅ Boots SINTRAN III |
+| [NEC Decoder Gate Array (DGA)](DesignDocuments/DECODE-GateArray/Readme.md) | ✅ Complete | Verilog (first made from Logisim, now kept by hand) | ✅ Boots SINTRAN III |
+| [ND 3202 CPU Board revision D](DesignDocuments/CPU-BOARD-3202/Readme.md) | ✅ Complete | Verilog (first made from Logisim, now kept by hand) | ✅ Boots SINTRAN III |
+| [PAL chips](DesignDocuments/PAL-Code/Readme.md) | ✅ PALASM checked | Verilog with test benches | ✅ Boots SINTRAN III |
 
-In the CPU Board we will plug in the DELILAH CPU and the Decoder, all PAL chips and several other support chips (74-series, RAM and UART).
+The CPU board carries the DELILAH CPU, the decoder, all PAL chips and the
+support chips (74-series logic, RAM and the UART).
 
-## History
+### What's Included
 
-The compressed history of the work progress has moved to [HISTORY.md](HISTORY.md).
+```
+nd-120/
+├── DesignDocuments/     # Original 1988 design documents (scanned)
+├── NorskData-Doc/       # Functional description, instruction set, microprogramming guide
+├── Logisim/             # Logisim-Evolution schematics
+├── Code/
+│   ├── Microcode/       # Microcode PROM images, sources (.uc) and listings (version L)
+│   ├── 68705/           # Panel controller ROM dumps and analysis
+│   └── RTC/             # Real-time clock notes
+└── Verilog/
+    ├── DELILAH-CPU/     # CPU gate array (ALU, microcode control, MMU access, interrupts)
+    ├── DECODE-GateArray/# Instruction decoder gate array
+    ├── CPU-BOARD-3202/  # The full 3202D board
+    ├── PAL/             # PAL chips, converted from PALASM
+    ├── Shared/          # TTL chips, memories, support logic
+    ├── ND-BUS-DEVICES/  # Floppy, Winchester, tape and other bus devices
+    ├── SD-FAT/          # SD card and FAT file system for the disc images
+    ├── Terminals/       # TDV2200 terminal (screen + keyboard)
+    ├── sim/  runSim/    # Verilator harnesses
+    ├── tests/           # Test registry and instruction checks
+    ├── docs/            # Design notes and analyses
+    └── fpga/            # One folder per FPGA board
+```
 
-## Design documents
+---
 
-All the design documents are in the [Design Documents](DesignDocuments/Readme.md) folder.
+## 🚀 Quick Start
 
-## Norsk Data documents
+### Run it on a board (no tools needed)
 
-Functional Description, Instruction set, Microprogramming guide and more are in the [NorskData-Doc](NorskData-Doc/Readme.md) folder.
+1. Download the bitstream for your board from the
+   [Releases page](https://github.com/RetroCoreLabs/nd-120/releases).
+2. Follow the quickstart for your board:
+   [Tang Nano 20K](Verilog/fpga/QUICKSTART-tang-nano-20k.md) ·
+   [Nexys 4 DDR](Verilog/fpga/QUICKSTART-nexys4ddr.md) (incl. the SD-card-only path) ·
+   [MiSTer](Verilog/fpga/QUICKSTART-mister.md) ·
+   [MEGA65](Verilog/fpga/QUICKSTART-mega65.md) ·
+   [QMTECH XC7A35T](Verilog/fpga/QUICKSTART-qmtech-a35t.md)
 
-## Microcode
+### Run it in the simulator
 
-The [Microcode](Code/Microcode/readme.md) dump is from a ND-120 3202 CPU Board is Version 14/L
-The source code is also for the L version.
+```bash
+# Clone the repository
+git clone https://github.com/RetroCoreLabs/nd-120.git
+cd nd-120
 
-## Panel Controller - 6805 CPU CHIP
+# Waveform simulation: compiles, runs, and opens GTKWave
+cd Verilog/sim
+make clean
+make all
 
-[ROM dump](Code/68705/readme.md)
+# Full CPU: microcode load + self-test + OPCOM console
+cd ../runSim
+make clean
+make compile
+make run
 
-The ND-120/CX CPU Board has an on-board MC68705-U3 CPU.
+# All self-checking test benches (fail-fast)
+cd ..
+make test
+```
 
-The physical front panel also has an MC68705 CPU, however this chip is not identical to the on on the 3202D CPU Board - its an MC68705-P3 with fewer I/O pins.
+**Prerequisites:** [Verilator](https://www.veripool.org/verilator/), Icarus
+Verilog, GTKWave (optional). Development is done on Linux / WSL2 with bash.
 
-The MC68705 is an MC 6805 8-bit CPU with on-chip RAM, I/O and Timer. [Motorola 68HC05](https://en.wikipedia.org/wiki/Motorola_68HC05)
+**Want the details?** See [BUILDING.md](BUILDING.md) for build, test and
+troubleshooting steps.
 
-* P3 version = 28 pins, 2x 8 bits I/O ports, 1x 4 bit I/O port
-* U3 version = 40 pins, 4x 8 bits I/O ports
+---
 
-We have a ROM dumps from both the *MC68705-U3* chip (from the 3202D CPU Board) and the *MC68705-P3* (from an ND-5000C panel controller).
+## 🔧 FPGA Boards
 
-**Big thanks to Matthieu Benoit for reading the data out of the chips**
+Each board has its own folder of build scripts, pin files and notes under
+[Verilog/fpga/](Verilog/fpga/README.md) - that page holds the full per-board
+status and priority order.
 
-Reverse engineering has been done using the free SRE tool [GHIDRA](https://ghidra-sre.org/) from NSA.
+| Board | Status | CPU clock | Main memory | Console | Disc images | Tools | Docs |
+|-------|--------|-----------|-------------|---------|-------------|-------|------|
+| **Tang Nano 20K** | ✅ Boots SINTRAN III - primary target | 20.25 MHz (`fast20`), timing-clean | 4 MB SDRAM | Serial, 115200 | SD card | OSS CAD Suite + Gowin EDA | [README](Verilog/fpga/tang-nano-20k/README.md) · [quickstart](Verilog/fpga/QUICKSTART-tang-nano-20k.md) |
+| **Nexys 4 DDR** | ✅ Boots SINTRAN III | 33.333 MHz, cache on (7.52 MIPS) | DDR2 behind a BRAM cache | TDV2200 on VGA + USB keyboard, and serial | microSD - boots with no PC | Vivado | [README](Verilog/fpga/nexys4ddr/README.md) · [quickstart](Verilog/fpga/QUICKSTART-nexys4ddr.md) · [timing](Verilog/fpga/nexys4ddr/timing.md) |
+| **MiSTer (DE10-Nano)** | ✅ Boots SINTRAN III | 20 MHz | 4 MB SDRAM module | TDV2200 on the MiSTer screen and keyboard | Picked in the OSD | Quartus | [README](Verilog/fpga/mister/README.md) · [quickstart](Verilog/fpga/QUICKSTART-mister.md) |
+| **MEGA65** | 🚧 Built and timing-clean, not yet run on a MEGA65 | 13.33 MHz (R3) / 20 MHz (R4-R6) | 4 MB in HyperRAM (R3) / SDRAM (R4-R6) | TDV2200 on the MEGA65 keyboard and screen | SD card | Vivado | [README](Verilog/fpga/mega65/README.md) · [quickstart](Verilog/fpga/QUICKSTART-mega65.md) |
+| **QMTECH XC7A35T** | 🚧 Built, timing met, not yet run | 20 MHz | 4 MB SDRAM | Serial | SD card (Pmod) | Vivado | [README](Verilog/fpga/qmtech-a35t/README.md) · [quickstart](Verilog/fpga/QUICKSTART-qmtech-a35t.md) |
+| **Basys3** | ⚠️ Reaches OPCOM only - too little memory for the OS | - | 24K words BRAM | Serial | - | Vivado | [README](Verilog/fpga/basys3/README.md) |
+| **Cmod A7-35T** | ⚠️ Misses timing, no bitstream - SRAM bridge planned | - | BRAM | - | - | Vivado | [README](Verilog/fpga/cmod-a7-35t/README.md) |
 
-## Schematic drawings
+---
+
+## 🧪 Simulation
+
+Verilator is the **signal-level reference**: waveforms, unit test benches, and
+the latch-versus-flip-flop comparison that proves a change altered nothing.
+
+- ✅ **Microcode loads, Master Clear runs, and the CPU self-test passes clean:
+  0 execution-phase STERR visits** (the `ND120_COUNT_STERR` probe in
+  `Verilog/runSim/Run120.cpp`). An older "7 of 14 subtests" figure is retracted
+  ([RETRACTED.md](Verilog/docs/RETRACTED.md)).
+- ✅ **The self-test does not touch memory parity**, which is why the FPGA
+  builds compute parity on read instead of storing it
+  ([nd120-parity-analysis.md](Verilog/docs/nd120-parity-analysis.md)).
+- ✅ **13 of 13 testable INSTRUCTION-B areas pass the automated gate:** the first
+  400 instructions of each area match the ND-110 reference trace (`make
+  test-instr`). RUN and 48-bit floating are not among the 13. Each area was
+  also run by hand to its own end of test with zero error lines; those logs
+  were not kept ([CAMPAIGN-STATUS.md](Verilog/tests/instruction-verify/CAMPAIGN-STATUS.md)).
+- ✅ OPCOM console works; `INSTRUCTION-B` loads and runs from the Verilog paper
+  tape device; DMA bus mastering works against the real arbiter.
+- ✅ Golden-console and latch-vs-FF regression gates guard all of it.
+
+```bash
+cd Verilog
+make test          # every self-checking test bench, fail-fast
+make test-instr    # the INSTRUCTION-B trace gate
+make test-full     # adds the heavy system gates
+```
+
+---
+
+## 🔬 Original Diagnostics
+
+These are the original Norsk Data test programs, not our own test benches.
+Each row says where the result was measured.
+
+| Program | Result | Measured on |
+|---------|--------|-------------|
+| **CONFIGURATION** | ✅ **Passes** with `NO ERRORS DETECTED`, and names the machine correctly (ND-120/CX, 32-bit float, MMS-2, cache, ALD 400B, print number 3202) | Verilator, Tang |
+| **INSTRUCTION** | ✅ **Passes.** In Verilator, 13 of 13 testable areas pass the automated trace gate. On the board, the full run over interrupt **levels 1-9** passed clean (no log in the repository) | Verilator, Tang |
+| **PAGING** | ✅ **Passes 11 of 11**, incl. test 3 (PGU/WIP), test 4 (alternative PIT) and test 11 (physical address generation) | Tang |
+| **MEMORY** | ✅ **Passes.** The corrupted-banner fault was the cache data output not gated by `HIT` | Tang |
+| **CACHE** (`CACHE-1X0-A00`) | ✅ **Passes all 8 tests**, incl. test 3 "Inhibit limits" | Nexys 4 DDR |
+| **TPE Monitor B01** | ✅ Boots from a floppy image (`1560&` at the OPCOM `#` prompt) and reaches `TPE>` - the harness the diagnostics run from | Verilator, Tang |
+| **RUN** | ⚠️ **Not proven.** Reached one area's `== END OF TEST ==` once (commit `3acef36`); no error count kept, and RUN is in neither `make test-instr` nor the test registry | Verilator |
+| **48-BITS-FLOATING** | ➖ **Not applicable** - the PROM microcode is the 32-bit float version ([why](Verilog/docs/48bit-float-not-configured.md)) | - |
+| **DISC-TEMA J02** | ❌ **Not passing.** Transfers real data off the disc image, matching the reference model register for register, but still reports `Memory address Register not as expected`. Unexplained - the one known open diagnostic | Verilator, Tang |
+
+The five that pass clean on the board - **CONFIGURATION, INSTRUCTION, PAGING,
+MEMORY and CACHE** - are the machine's own acceptance suite: the CPU names
+itself correctly, runs every instruction group correctly, the MMU translates
+and faults correctly, and main memory is sound.
+
+**These programs found the real CPU bugs:**
+- INSTRUCTION caught a multiply bug (every product's low word was zero) and a
+  shift bug (all rotate and sign-extending shifts ran as plain shifts);
+- PAGING caught an MMU fault where the physical-page map RAM was never written;
+- CONFIGURATION caught a trap-vector fault that sent a page fault plus PGU to an
+  unused vector, which then jumped to itself forever;
+- CACHE needed four fixes, all single-input copying errors from the
+  schematics: the PAL 44511A `CWR` feedback latch, that PAL's pin-19 polarity,
+  a dropped Am9150 used-bit write, and a DGA `EPANS` data-window leak.
+
+---
+
+## 📊 What the Cache Is Worth
+
+Measured on the Nexys 4 DDR with the operator panel's own MIPS counter, running
+SINTRAN III. The cache is a build option (`cache` / `nocache`,
+`ND120_NO_CACHE` - see [build-defines.md](Verilog/docs/build-defines.md)).
+
+| Build | CPU clock | Cache | MIPS running SINTRAN | Clocks per instruction |
+|-------|-----------|-------|----------------------|------------------------|
+| 15 | 45.45 MHz | off | 2.44 | 18.6 |
+| 16 | 33.33 MHz | **on** | **> 7.0** | **< 4.8** |
+
+**The cache gives about 2.9x the throughput - on a clock 26% slower.** This
+machine is limited by memory speed, not by the clock: with the cache off, every
+instruction fetch is a DDR2 read, and DDR2 does not get faster when the CPU
+clock rises. A one-word loop (`124000`, a `JMP` to itself) took **17.1 clocks
+per instruction** uncached at both 45.45 and 33.33 MHz.
+
+⚠️ **A warning that cost a day:** once the opposite was concluded and the
+cache was dropped for speed. The MIPS counter was then counting memory cycles,
+so it went blind exactly when the cache started working. Only after it was moved
+to a true per-instruction event did the 3x difference show. Prove an instrument
+before trusting it.
+
+With the cache in, the routed worst path is 28.039 ns - a ceiling near
+**35.6 MHz**. That one path (`WRF -> ALU -> TVGEN -> ACAL -> WCS` address) is
+the most valuable thing to speed up on the board:
+[timing.md](Verilog/fpga/nexys4ddr/timing.md).
+
+---
+
+## ⚙️ Inside the Machine
+
+### Microcode
+
+The [microcode](Code/Microcode/readme.md) comes from an ND-120 3202 CPU board, version 14/L. 
+
+The repository has the PROM images, the microcode sources (`.uc`) and the listings for versions K and L.
+
+### Panel controller - MC68705
+
+The ND-120/CX CPU board has an on-board **MC68705-U3** CPU. The front panel has
+an **MC68705-P3** - a smaller chip with fewer I/O pins
+([Motorola 68HC05 family](https://en.wikipedia.org/wiki/Motorola_68HC05)).
+
+- P3 version = 28 pins, 2x 8-bit I/O ports, 1x 4-bit I/O port
+- U3 version = 40 pins, 4x 8-bit I/O ports
+
+We have ROM dumps from both the U3 (from the 3202D CPU board) and the P3 (from
+an ND-5000C panel controller), taken apart with
+[GHIDRA](https://ghidra-sre.org/): [ROM dumps and analysis](Code/68705/readme.md).
 
 ### Logisim
 
-All the Logisim files are stored in the [Logisim folder](Logisim/readme.md)
-
-#### Logisim Requirements
-
-You need to install the Logisim-Evolution design tool from [Logisim Evolution Repository](https://github.com/logisim-evolution/logisim-evolution)
-
-The Logisim diagrams has been drawn with [Version 3.8.0](https://github.com/logisim-evolution/logisim-evolution/releases/tag/v3.8.0)
-
-## FPGA
-
-### FPGA Hardware
-
-The project targets several FPGA boards, each with its own folder of build
-scripts, pin constraints, vendor documentation and bring-up plans under
-[Verilog/fpga/](Verilog/fpga/README.md).
-
-**For the current per-board FPGA status, target line-up and priority order,
-see [Verilog/fpga/README.md](Verilog/fpga/README.md).**
+The schematics are in the [Logisim folder](Logisim/readme.md), drawn with
+[Logisim-Evolution 3.8.0](https://github.com/logisim-evolution/logisim-evolution/releases/tag/v3.8.0).
 
 ### Verilog
 
-Most Verilog files were originally generated from the Logisim drawings using the
-Logisim-Evolution FPGA tools. They are **no longer regenerated** - the Verilog and
-the schematics are now both maintained by hand, so a fix has to be made in both
-places.
+Most Verilog files were first made from the Logisim drawings with the
+Logisim-Evolution FPGA tools. They are **no longer regenerated** - the Verilog
+and the schematics are both kept by hand now, so a fix has to be made in both
+places. All Verilog is in the [Verilog folder](Verilog/readme.md).
 
-All the Verilog files are stored in the [Verilog folder](Verilog/)
+---
 
-### Verilator
-
-To test the Verilog code using Verilator you need to install the [Verilator](https://www.veripool.org/verilator/) tool
-
-## Documentation
+## 📚 Documentation
 
 Paths in this repository are always relative to the repository root. Where a
-document has to point at one of the *other* ND repositories, it writes
-`$ND_REPOS/<repo>/...` - set `ND_REPOS` to the directory that holds your ND
+document points at one of the *other* ND repositories, it writes
+`$ND_REPOS/<repo>/...` - set `ND_REPOS` to the folder that holds your ND
 checkouts.
+
+### Primary Documentation
 
 | Document | Description |
 |----------|-------------|
-| [BUILDING.md](BUILDING.md) | Build instructions, testing, and troubleshooting |
+| [README.md](README.md) | This file - overview and quick start |
+| [BUILDING.md](BUILDING.md) | Build, test and troubleshooting |
+| [DEVELOPMENT.md](DEVELOPMENT.md) | Architecture, coding rules and how to contribute |
+| [HARDWARE.md](HARDWARE.md) | Hardware details, part by part |
 | [HISTORY.md](HISTORY.md) | Project history, milestone by milestone |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | Architecture, coding standards, and contribution guide |
-| [HARDWARE.md](HARDWARE.md) | Hardware specifications and component details |
+| [Verilog/TODO.md](Verilog/TODO.md) | Open work |
 
-## Acknowledgments
+### Technical Reference
 
-- **Lasse Bockelie** - Provided original 1988 design documentation
-- **Matthieu Benoit** - ROM chip reading and data extraction
-- **NDWiki Community** - Comprehensive ND-120 documentation
-- **GHIDRA Team** - Reverse engineering tools
+| Topic | Documentation |
+|-------|---------------|
+| **FPGA boards** | [Verilog/fpga/README.md](Verilog/fpga/README.md) |
+| **Build options** | [Verilog/docs/build-defines.md](Verilog/docs/build-defines.md) |
+| **Design notes** | [Verilog/docs/README.md](Verilog/docs/README.md) |
+| **Design documents** | [DesignDocuments/Readme.md](DesignDocuments/Readme.md) |
+| **Norsk Data manuals** | [NorskData-Doc/Readme.md](NorskData-Doc/Readme.md) - functional description, instruction set, microprogramming guide |
+
+---
+
+## 📊 Project Status
+
+### ✅ Complete & Working
+
+| Area | Status |
+|------|--------|
+| CPU, decoder, board and PAL chips in Verilog | ✅ Boots SINTRAN III |
+| Tang Nano 20K, Nexys 4 DDR, MiSTer | ✅ Boot SINTRAN III from an SD card |
+| CPU self-test | ✅ 0 errors |
+| Original diagnostics | ✅ CONFIGURATION, INSTRUCTION, PAGING, MEMORY, CACHE pass on the board |
+| Cache | ✅ ~2.9x throughput on the Nexys |
+
+### 🚧 In Progress
+
+- MEGA65 and QMTECH: first runs on real boards
+- DISC-TEMA J02: the `Memory address Register not as expected` fault
+- RUN: a proven clean run, and a gate that keeps it that way
+- SD-card write workloads at full speed
+
+### 🎯 Future Goals
+
+1. Cache and a fast clock together on the Nexys (~9.5 MIPS if the 28 ns path can be cut)
+2. The Cmod A7 SRAM bridge, so a small Xilinx board can run the OS
+
+The live task list is [Verilog/TODO.md](Verilog/TODO.md).
+
+---
+
+## 📜 License
+
+[MIT](LICENSE) for the Verilog, Logisim and tools in this repository. The
+original design documents and manuals are Norsk Data material, kept here for
+preservation.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Lasse Bockelie** - provided the original 1988 design documents
+- **Matthieu Benoit** - read the ROM data out of the MC68705 chips
+- **NDWiki community** - ND-120 documentation
+- **GHIDRA team** - reverse engineering tools
+
+---
+
+## 🔗 Related Projects
+
+- **[NDWiki](https://www.ndwiki.org/)** - everything Norsk Data
+- **[Logisim-Evolution](https://github.com/logisim-evolution/logisim-evolution)** - the schematic tool used here
+- **[MiSTer2MEGA65](https://github.com/sy2002/MiSTer2MEGA65)** - the framework behind the MEGA65 port
+
+---
+
+## 📞 Contact
+
+- **GitHub Issues:** [github.com/RetroCoreLabs/nd-120/issues](https://github.com/RetroCoreLabs/nd-120/issues)
+
+---
+
+**Historical note:** a 1988 minicomputer CPU card, rebuilt from its own design
+documents, running its own operating system on a hobby FPGA board.
+
+**Start exploring:** [Quick Start](#-quick-start) | [FPGA Boards](#-fpga-boards) | [Documentation](#-documentation)

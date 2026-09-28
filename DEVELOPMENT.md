@@ -6,7 +6,7 @@ follows, and what to read before changing anything.
 - Project history, milestone by milestone: [HISTORY.md](HISTORY.md)
 - Hardware components and specifications: [HARDWARE.md](HARDWARE.md)
 - Building, simulating and testing: [BUILDING.md](BUILDING.md)
-- Detailed CPU architecture: [Verilog/nd120-plan.md](Verilog/nd120-plan.md)
+- Microword field layout and CPU signal names: [Verilog/nd120-plan.md](Verilog/nd120-plan.md)
 - Current issues and task list: [Verilog/TODO.md](Verilog/TODO.md)
 
 ## Where the code lives
@@ -93,6 +93,30 @@ Two defines change behaviour and have to be understood before touching timing:
 
 The full list is in `Verilog/docs/build-defines.md`, and the build commands are
 in [BUILDING.md](BUILDING.md).
+
+Why the flip-flop mode is a fair copy of the latches (the reasoning from the
+2026 latch-to-flip-flop migration, kept here when its plan was retired):
+
+- A PAL16L8 has no clock; its self-referencing feedback terms act as latches
+  through the AND-OR array. In the original board they settle within the PAL
+  delay (about 25-35 ns), and the logic after them only reads their outputs on
+  the next OSC edge (39.3 MHz, about 25 ns; the AM29C821 pipeline in
+  `BIF_BCTL_SYNC_8` makes the *25/*50/*75 delayed copies on OSC edges). A
+  flip-flop on `posedge OSC` therefore captures the same settled state.
+- The real risk is not the clock but the rewrite: an OR of product terms
+  becomes an if/else chain, which adds a priority the PAL never had. Each PAL's
+  flip-flop logic has to be checked against its original equations. Example of
+  such a check: PAL_44304E `EBADR_n_reg` was first flagged as wrong and then
+  proved right by algebra (the clear term `!GNT_n & !IBAPR_n` already rules
+  out the set term, so the order does not matter); `BACT_reg` likewise.
+- There are no feedback loops between PALs that would need more than one OSC
+  cycle to settle: PAL_44302B takes Q0_n/Q2_n from PAL_44401B, PAL_44303B takes
+  BACT_n from PAL_44304E (both one way), and PAL_44304E and PAL_44401B take
+  only delayed copies from the AM29C821 pipeline.
+- `make compare` in `Verilog/sim` is the proof for a given change. At the end
+  of the migration (29-MAR-2026, 1M cycles) the two modes differed only in the
+  BDRY start-up value (cycles 0-2: the latch settles to 1, the flip-flop resets
+  to 0) and the CSA shift that follows from it at cycle 16415.
 
 ## Testing
 

@@ -1,7 +1,6 @@
 # ND-120 generic sim PROBE — build, protocol, driver API, examples
 
 **Full path:** `Verilog/sim/PROBE-README.md`
-**WSL path:** `Verilog/sim/PROBE-README.md`
 
 A ONE reusable, scriptable Verilator harness for the whole ND-120 CPU
 (`VND120_TOP`) that you point at *any* signal and *any* trigger **at runtime**,
@@ -9,9 +8,28 @@ driven from Python the way nd100x is driven by `tools/nd100x_expect.py`. It
 replaces the recompile-per-signal pattern of `latch_ff_compare.cpp` and the
 hardcoded post-trigger window of `test_nd120.cpp`.
 
-Implements the spec in `PROBE-DESIGN.md`. **REPORT-ONLY**: no RTL is edited — the
-probe is a NEW harness (`nd120_probe.cpp`) built with the non-invasive flags
-`--public-flat-rw --vpi`.
+**REPORT-ONLY**: no RTL is edited — the probe is a NEW harness
+(`nd120_probe.cpp`) built with the non-invasive flags `--public-flat-rw --vpi`.
+
+**Why it exists** (from the retired design note, folded in here
+28-SEP-2026): before it, `test_nd120.cpp` dumped the full FST with one
+hard-coded post-trigger window (`logwin=60` on CSA 06000..06003 ->
+`mic_trace.csv`), and `latch_ff_compare.cpp` wrote a per-cycle CSV of a
+hard-coded signal list through `top->rootp->ND120_TOP__DOT__...` root paths.
+Changing a signal meant editing C++ and a ~12 min Verilator rebuild, and there
+was no runtime trigger and no pre-trigger history - exactly what a
+store-routing bug needs. The probe fixes all three: signal list, trigger and a
+pre/post ring buffer are chosen at run time.
+
+```
+  Python example scripts  (examples/mmu_177777_probe.py, ...)   <- the investigation
+        |  import
+  nd120_probe.py   (pexpect-style driver; mirrors nd100x_expect.py; stdlib only)
+        |  spawn + line protocol over stdin/stdout (unbuffered)
+  obj_dir_probe/VND120_TOP   built from nd120_probe.cpp  (the ENGINE)
+        |  Verilator --vpi --public-flat-rw
+  VND120_TOP  (whole ND-120, report-only RTL - never edited)
+```
 
 Files:
 - `Verilog/sim/nd120_probe.cpp` — the engine.
@@ -23,8 +41,8 @@ Files:
 
 ## 1. Build (WSL ONLY)
 
-Everything Verilator/make/run happens inside WSL with `/mnt/e/...` paths. NEVER
-run a Verilator/Windows exe from Windows/MINGW.
+Everything Verilator/make/run happens inside WSL, working in the repo checkout
+as WSL sees it. NEVER run a Verilator/Windows exe from Windows/MINGW.
 
 ```bash
 wsl.exe -e bash -lc 'cd Verilog/sim && make probe USE_LATCHES=0'
@@ -198,3 +216,10 @@ The windowed `combo_win.fst` is read by `fst.py::open_wave` (pipes through
   "landed in shadow" is inferred from the shadow-write strobe, not read back.
 - If a signal doesn't resolve (registry miss + VPI miss), the tools say so — no
   fabricated values.
+- `send` paces characters: MOPC has no receive FIFO, so back-to-back characters
+  are lost (a `1560&` once arrived as just `&`, which autoloaded the papertape
+  instead of the floppy). The gap between characters is `ND120_SEND_GAP` sysclk
+  ticks, default 300000 (`nd120_probe.cpp`); `runSim/Run120.cpp` has the same
+  guard as `ND120_STDIN_GAP`.
+- Other probe builds in `sim/Makefile`: `probe-floppy` (Verilog floppy),
+  `probe-floppycore` (the portable C floppy core), `probe-wd` and `probe-wd-sd` (Winchester).

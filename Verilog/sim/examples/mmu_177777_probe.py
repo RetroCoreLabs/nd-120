@@ -2,7 +2,7 @@
 r"""
 mmu_177777_probe.py - investigate STA -> logical 177777 (top page) store routing.
 
-QUESTION (from PROBE-DESIGN.md): when a PAGED store targets logical address
+QUESTION (from the probe design note, now in ../PROBE-README.md): when a PAGED store targets logical address
 177777 (the very top word of the address space), does the write land in MAIN
 memory or in the MMU SHADOW map? A suspected top-page routing bug would send it
 to the wrong place.

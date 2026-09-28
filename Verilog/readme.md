@@ -15,24 +15,22 @@ with the runSim ND120_COUNT_STERR probe; the old "7 of 14" figure predated the
 07-JUL transparent-latch fix), after which OPCOM UART communication works (use
 the `runSim/` harness to interact with it).
 
-**SINTRAN III boots on FPGA silicon (Tang Nano 20K, 24-AUG-2026)** — see the
-`ND3202D.v:533` bus bank-decode fix in `HISTORY.md`. The board runs at
-6.75 MHz validated, 13.5 MHz timing-clean, and 27 MHz boots but does not close
-timing.
+**SINTRAN III boots on FPGA silicon**: Tang Nano 20K (24-AUG-2026, the
+`ND3202D.v:533` bus bank-decode fix in `HISTORY.md`), Nexys 4 DDR (25-AUG-2026)
+and MiSTer / DE10-Nano (02-SEP-2026). The Basys3 boots OPCOM only; the MEGA65
+cores and the QMTECH bitstream are built and timing-clean but have not run on
+their boards. Per-board state, clocks and limits: [`fpga/README.md`](fpga/README.md).
 
->  The "Status Vivado" column below refers to the XILINX boards and has NOT
->  been re-verified since the 24-AUG-2026 bus bank-decode fix
->  (`ND3202D.v:533`), which is shared board logic. Treat it as last-known,
->  not current.
+| Folder | Source | Comment |
+|--------|--------|---------|
+| [DELILAH-CPU](DELILAH-CPU) | Logisim drawing complete | CGA |
+| [DECODE-GateArray](DECODE-GateArray/readme.md) | Logisim drawing complete | DGA |
+| [CPU-BOARD-3202](CPU-BOARD-3202/readme.md) | Logisim drawing complete | Support chips TTL/MEMORY/++ |
+| [PAL](../DesignDocuments/PAL-Code/Readme.md) | No Logisim, PALASM source | Hand converted PALASM to Verilog for all PALs |
+| [Shared](Shared) | | Shared code between the CPU, DGA and 3202D CPU board. Mix of converted Logisim and hand-written modules |
 
-| Folder                                         | Status Logisim           |  Status Verilog                                | Status Vivado                         | Comment    |
-|------------------------------------------------|--------------------------|------------------------------------------------|---------------------------------------|------------|
-| [DELILAH-CPU](CPU-BOARD-3202/readme.md)        | Logisim drawing complete | Verilog compiles - Missing a lot of testcases  | Syntehesis OK, implementation fails   | CGA        |
-| [DECODE-GateArray](DECODE-GateArray/readme.md) | Logisim drawing complete | Verilog compiles - Missing a lot of testcases  | Syntehesis OK, implementation fails   | DGA        |
-| [CPU-BOARD-3202](CPU-BOARD-3202/readme.md)     | Logisim drawing complete | Verilog compiles - Missing a lot of testcases  | Syntehesis OK, implementation fails   | Need to validate support chips TTL/MEMORY/++   |
-| [PAL](../DesignDocuments/PAL-Code/Readme.md)   | No logisim, PALASM source| Verilog compiles - Missing a lot of testcases  | Syntehesis OK, implementation fails   | Hand converted PALASM to Verilog for all PAL's |
-| [Shared](Shared)                     |                          | Verilog compiles - Missing a lot of testcases  | Syntehesis OK, implementation fails   | Shared code between the CPU, DGA and 3202D CPU board. Mix of converted logisim and manually created modules |
-
+The Verilog is no longer generated from Logisim; both are kept by hand (see
+`../DEVELOPMENT.md`, "Source of truth").
 
 ## Reference documents
 
@@ -147,18 +145,20 @@ make run                                # loads DEBUG.BPUN, gives you the consol
 
 ### RAM Configuration for Verilator vs FPGA
 
-The design uses different RAM sizes for Verilator simulation vs FPGA synthesis:
+`MEM_RAM_49.v` (sheet 49, the on-board RAM) picks its size from compile-time
+defines. No manual changes needed.
 
-- **Verilator Simulation**: 6MB RAM (6×1MB = `ramSize=2`)
-  - Full memory for running complete programs
-  - Enabled by `-DVERILATOR_SIM` flag in Makefiles (already configured in `sim/Makefile` and `runSim/Makefile`)
-
-- **FPGA Synthesis**: 24KB RAM (6×4KB = `ramSize=3`)
-  - Reduced size to fit in FPGA BRAM (xc7a35t has only 100 RAMB18 blocks)
-  - 6MB would require 3496 RAMB18 blocks (35× device capacity)
-  - Sufficient for testing CPU logic and small programs
-
-The configuration is automatic based on compile-time defines in `MEM_RAM_49.v`. No manual changes needed.
+- **Verilator simulation**: 6 x 1M words (`RAM_SIZE=2`), enabled by
+  `-DVERILATOR_SIM` (already set in `sim/Makefile` and `runSim/Makefile`).
+  `-DND120_SIM_RAM_64K` gives 64K words per chip for faster TPE runs.
+- **FPGA builds that keep main memory in block RAM** (Basys3, Cmod A7): the
+  small setting (`RAM_SIZE=3`, 24 KB). The `xc7a35t` has only 100 RAMB18
+  blocks; 6 MB would need 3496 of them (35x the device). Enough for the CPU
+  logic and small test programs, never for SINTRAN.
+- **Boards with external memory** (Tang Nano 20K SDRAM, Nexys 4 DDR DDR2,
+  MiSTer and MEGA65 R4-R6 SDRAM, MEGA65 R3 HyperRAM, QMTECH SDRAM) replace the
+  block-RAM sheet with a memory backend and give the CPU 4 MB or more - see
+  each board's README.
 
 ## Devices, addresses and disc geometry
 
@@ -173,21 +173,11 @@ The configuration is automatic based on compile-time defines in `MEM_RAM_49.v`. 
 
 ## Supported hardware targets
 
-The same HDL source builds for one simulator and two FPGA boards. FPGA
-build/flow files live under [`fpga/`](fpga/README.md), one folder per board —
-only board-specific build scripts, constraints, and tool projects are
-per-target.
-
-| Target | Device | Toolchain | Status |
-|--------|--------|-----------|--------|
-| **Verilator** (reference) | — (simulation) | Verilator + GTKWave, Linux/WSL | **Works** — boots microcode, self-test clean (STERR=0), OPCOM UART |
-| [**Tang Nano 20K**](fpga/tang-nano-20k/README.md) *(primary FPGA)* | Gowin `GW2AR-18` (20,736 LUT4, 828 Kbit BSRAM, 8 MB SDRAM, 27 MHz) | Gowin EDA / OSS yosys+nextpnr (Linux-native) | **Boots SINTRAN III** (24-AUG-2026) - banner in 29.4 s, disc + SD/FAT stack proven on silicon |
-| [**Basys3**](fpga/basys3/README.md) | Xilinx Artix-7 `xc7a35tcpg236-1` (33,280 LUT6, ~1,800 Kbit BRAM, 100 MHz) | Vivado (Windows host) | Synthesis + bitstream OK; **fails timing** (WNS **-29.778 ns** at 16.667 MHz, measured 21-AUG-2026). OPCOM boots on the board; the OS does not |
-
-**The Tang Nano 20K is the working machine** - faster Gowin synthesis than Vivado,
-a Linux-native OSS toolchain, and 8 MB SDRAM that lets the FPGA run the full
-memory config like the simulator. It has booted SINTRAN III since 24-AUG-2026.
-The Xilinx boards are the second target and neither meets timing yet.
+The same HDL source builds for the Verilator simulator and for every FPGA board
+under [`fpga/`](fpga/README.md), one folder per board - only board-specific
+build scripts, constraints and tool projects are per-target. The board list,
+status, clocks and measured limits live in [`fpga/README.md`](fpga/README.md)
+and are not repeated here.
 
 ### Verilator (simulation — the working reference)
 
@@ -204,15 +194,15 @@ cd Verilog/runSim && make clean && make compile && make run
 
 ### Basys3 — synthesize & deploy (Vivado, Windows host)
 
-The repo lives on `E:`; the Vivado project is outside the repo at
-`F:/Xilinx/ND120/ND3202D/`. Run from **Windows PowerShell**:
+The Vivado project lives outside the repository (its location is set in the
+build script). Run from **Windows PowerShell**:
 
 ```powershell
 cd Verilog/fpga/basys3
 
 # Synthesize + implement + write bitstream (~1h full synth; copies microcode hex first)
 .\vivado_build.ps1
-#   -> F:\Xilinx\ND120\ND3202D\output\ND120_TOP.bit (+ .ltx for ILA probes)
+#   -> output\ND120_TOP.bit in the Vivado project (+ .ltx for ILA probes)
 
 # Deploy to the board:
 .\flash.ps1 -Quick     # JTAG only (volatile) - fast iteration
@@ -223,32 +213,29 @@ cd Verilog/fpga/basys3
 `backup_bit`; `vivado_lint.tcl` runs lint only. The microcode hex files
 `AM27256_4513{2,3}L.hex` must be in the project dir (the `.ps1` copies them from
 `Code/Microcode/`) or the ROM is empty. Details:
-[`fpga/basys3/README.md`](fpga/basys3/README.md).
+[`fpga/basys3/README.md`](fpga/basys3/README.md). The Nexys 4 DDR has its own
+build script (`fpga/nexys4ddr/build.tcl`, see its README).
 
 ### Tang Nano 20K — synthesize & deploy (Gowin)
 
-Two flows (details and current caveats in
+Two flows (details in
 [`fpga/tang-nano-20k/README.md`](fpga/tang-nano-20k/README.md)):
 
-- **Gowin EDA** (authoritative): the existing project `ND-120-Gowin/`
-  (`ND-120-Gowin.gprj`) via the GUI or `gw_sh`; its Synplify-based synthesis
-  handles the design's TTL-style flip-flops as-is. Program the board over the
-  onboard BL616 USB (Gowin Programmer or `openFPGALoader`).
-- **OSS flow** (Linux/WSL, no Windows round-trip):
+- **OSS flow** (Linux/WSL, no Windows round-trip) - marked PRIMARY in
+  `fpga/tang-nano-20k/Makefile`:
 
   ```bash
   source ~/oss-cad-suite/environment   # install: see fpga/tang-nano-20k/README.md
-  # yosys synth_gowin -> nextpnr-himbaechel --device GW2AR-LV18QN88C8/I7
-  #   -> gowin_pack -> deploy:
+  cd Verilog/fpga/tang-nano-20k && make   # yosys synth_gowin -> nextpnr-himbaechel -> gowin_pack
   openFPGALoader -b tangnano20k <bitstream>.fs        # SRAM (volatile)
   openFPGALoader -b tangnano20k -f <bitstream>.fs     # config flash (persistent)
   ```
 
-  Caveat: `yosys synth_gowin` currently rejects several TTL flip-flop primitives
-  (multiple edge-sensitive events); Gowin EDA handles them. Pin constraints:
-  `fpga/tang-nano-20k/ND120_TOP.cst`. Board build scripts are still being added
-  as the bring-up progresses.
+- **Gowin EDA**: `fpga/tang-nano-20k/gowin_build.ps1 -Variant <slow|crawl|mid|full|fast20>`.
+  The `fast20` variant (20.25 MHz, timing-clean) is the one that boots SINTRAN
+  with a 115200 console; it exists only in this flow.
 
+  Pin constraints: `fpga/tang-nano-20k/src/nd120_tang20k.cst`.
   Board hardware reference: [Sipeed wiki - Tang Nano 20K](https://wiki.sipeed.com/hardware/en/tang/tang-nano-20k/nano-20k.html).
   The 8 MB embedded SDRAM has a standalone bring-up test (nand2mario controller
   + ND-120 UART at 9600 baud) in
@@ -260,10 +247,10 @@ Two flows (details and current caveats in
 
 Key shared facts:
 
-- **The boot blocker is timing, not logic.** The FF-mode Verilator sim boots
-  correctly; both FPGAs fail because ~35 modules clock flip-flops on *derived*
-  signals instead of `sysclk`. The fix (single `sysclk` + clock-enables) is
-  board-independent. Details: [`docs/fpga-debug-methodology.md`](docs/fpga-debug-methodology.md).
+- **One clock.** FPGA builds run every flip-flop on `sysclk` with clock-enables
+  instead of clocking on derived signals. How board behaviour is compared
+  against Verilator: [`docs/fpga-debug-methodology.md`](docs/fpga-debug-methodology.md)
+  and [`sim/FPGA_DEBUG_RUNBOOK.md`](sim/FPGA_DEBUG_RUNBOOK.md).
 - **Microcode preload:** `SKIP_WCS_LOAD` bitstream-preloads the WCS and skips the
   runtime load phase (verified in Verilator; required to fit the Tang's BSRAM).
   Details: [`docs/skip-wcs-load.md`](docs/skip-wcs-load.md).
@@ -271,33 +258,11 @@ Key shared facts:
   build flags per board, and the runSim runtime probe env vars — in one
   reference: [`docs/build-defines.md`](docs/build-defines.md).
 - Expected boot sequence for validation: [`docs/boot-golden-spec.md`](docs/boot-golden-spec.md).
-- Overall plan: [`FPGA-BRINGUP-PLAN.md`](FPGA-BRINGUP-PLAN.md).
+- Open work: [`TODO.md`](TODO.md).
 - All design docs, handoffs, and plans are indexed in [`docs/README.md`](docs/README.md);
   the ND-100 bus protocol (IOX / IDENT / DMA) is written up in
   [`docs/nd100-bus-dma.md`](docs/nd100-bus-dma.md) with a slide deck at
   [`docs/nd100-bus-deck.pptx`](docs/nd100-bus-deck.pptx).
-
-## Verilog code status
-
-| Folder           | # of Verilog Files       | Lines of Verilog code  |
-|------------------|--------------------------|------------------------|
-| DELILAH-CPU      | 147                      | 22,976                 |
-| DECODE-GateArray |  28                      | 4,316                  |
-| CPU-BOARD-3202   |  84                      | 48,219                 |
-| TOTAL            | 259                      | 75,511                 |
-
-* [PAL's](PAL/Readme.md)
-
-Note: When all modules are merged, number of files and number of lines will be reduced as there is multiple copies of "base components" from Logisim
-
-## Tracking total code over time
-
-
-| Date       | Files | Lines of code | Lines of comments | Blank lines | Total lines |
-|------------|-------|---------------|-------------------|-------------|-------------|
-| 21.05.2024 | 262	 |    69,237	 |  10,453	         | 6,721	   |  86,411     |
-| 11.11.2024 | 263   |    69,686	 |  10,210	         | 6,807       |  86,703     |
-| 28.11.2024 | 264   |    69,731     |   9,853           | 6,694       |  86,278     |
 
 # CPU Boot process
 
