@@ -101,8 +101,7 @@ Three portable lessons from the Nexys campaign that apply to every row:
 
 Per-board detail lives **with the board** (README, vendor docs, plans and
 handoffs in each `<board>/` folder) - this file is only the directory. For
-the QMTECH resume instructions specifically, see
-[`qmtech-a35t/HANDOFF-qmtech-a35t-bringup.md`](qmtech-a35t/HANDOFF-qmtech-a35t-bringup.md).
+the QMTECH, see [qmtech-a35t/README.md](qmtech-a35t/README.md).
 
 ## Prerequisites
 
@@ -175,10 +174,9 @@ programmer GUI; QMTECH = Xilinx Platform Cable USB II on the JTAG header.
 
 ## Reference docs
 
-- [`../docs/tang-nano-20k-port.md`](../docs/tang-nano-20k-port.md) - Tang port analysis
 - [`../docs/fpga-debug-methodology.md`](../docs/fpga-debug-methodology.md) - Verilator-vs-FPGA debug
 - [`../docs/build-defines.md`](../docs/build-defines.md) - compile-time defines
 - [`../docs/skip-wcs-load.md`](../docs/skip-wcs-load.md) - preloaded-WCS microcode
 - [`../docs/boot-golden-spec.md`](../docs/boot-golden-spec.md) - expected boot sequence
 - [`../docs/basys3-memory-speed-validation.md`](../docs/basys3-memory-speed-validation.md) - which memory backends meet the no-wait-state protocol (per board)
-- [`../FPGA-BRINGUP-PLAN.md`](../FPGA-BRINGUP-PLAN.md) - overall bring-up plan
+- [`../sim/FPGA_DEBUG_RUNBOOK.md`](../sim/FPGA_DEBUG_RUNBOOK.md) - Verilator-vs-board comparison method

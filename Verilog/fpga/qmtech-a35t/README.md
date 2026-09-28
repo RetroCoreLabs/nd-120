@@ -74,8 +74,8 @@ MEGA65 R6, and the uncached storage path served every disc on the Tang for
 weeks.
 
 The two older stage tests (LED smoke test, mem-test port) are also written and
-sim-verified, and have never run on the board either. History and the original
-plan: [`HANDOFF-qmtech-a35t-bringup.md`](HANDOFF-qmtech-a35t-bringup.md).
+sim-verified, and have never run on the board either. Board facts and the smoke
+tests: [docs/board-notes.md](docs/board-notes.md).
 
 ### What to do next, in order
 
