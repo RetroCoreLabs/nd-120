@@ -39,7 +39,12 @@ press **HELP** - "MEGA65 MODEL" is on that screen.
 1. Format the micro-SD as FAT32 (the internal or the external slot both
    work).
 2. Copy the `.cor` file onto it (anywhere).
-3. Make a folder `/nd120` on the card and put your disc images in it.
+3. Make a folder `/nd120` on the card and put your disc images in it (the
+   Winchester image with SINTRAN III at least; floppy and tape images if you
+   have them). Also copy `nd120cfg` into it - the 35-byte settings file from
+   `Verilog/fpga/mega65/sdcard/nd120/` in this repository. With it the menu
+   settings survive a power cycle; without it they reset every time.
+   Writes to the images go to the card, so keep a copy of your images.
 
 ## 2. Flash the core (standard MEGA65 procedure)
 
@@ -90,12 +95,18 @@ operator panel".
 | Black screen, but HELP still opens the menu | the framework is alive, the ND-120 terminal is not - report it |
 | Banner shows, RETURN gives no OPCOM prompt, power LED stays amber | the CPU did not pass its self-test - report it with the banner line |
 | OPCOM answers, `20500&` prints nothing | no image mounted on Winch. 0, or the image is not a bootable SINTRAN disc |
-| SINTRAN boots but feels slow | disc images are served by the framework's small firmware CPU; that speed is unmeasured on this board - report timings |
+| SINTRAN boots but feels slow | disc images are served by the framework's small firmware CPU reading the SD card; SINTRAN paging speed on that path is unmeasured - report timings |
 
 ## What to report (the first testers)
 
-A photo of the screen with the banner, one after `20500&`, the power LED
-colour, VGA or HDMI, and your MEGA65 model. Please do not spend time
-debugging - what you saw is the data. The build's own facts (timing, what
+1. A **photo of the screen** with the banner, and one after `20500&` (the
+   SINTRAN start-up text, or whatever happened instead).
+2. The **power LED colour** after a few seconds (amber / green).
+3. Which output: **VGA or HDMI**.
+4. Your MEGA65 model.
+
+If the screen stays black: does the **HELP** menu still appear? That tells
+us whether the framework is alive and only the ND-120 is dark, or the whole
+core failed. Please do not spend time debugging - what you saw is the data. The build's own facts (timing, what
 is proven where) are in `Verilog/fpga/mega65/docs/00-plan.md`; the port
 itself in `Verilog/fpga/mega65/README.md`.

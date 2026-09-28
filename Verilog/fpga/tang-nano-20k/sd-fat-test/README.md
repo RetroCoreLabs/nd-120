@@ -1,12 +1,11 @@
 # Tang Nano 20K SD-FAT test
 
-Milestone 1 of the SD-BPUN device plan
-(`Verilog/docs/sd-bpun-device-plan.md`): prove the reusable SD/FAT
-library (`Verilog/SD-FAT/`) on real silicon with an interactive UART
-menu - no CPU, no ND-100 bus. Once this works on hardware, Milestone 2
-wires the same byte stream into an ND-100 paper tape reader device
-(400 octal) so the microcode binary loader can boot BPUN files from
-the card.
+A standalone test of the reusable SD/FAT library (`Verilog/SD-FAT/`) on
+real silicon with an interactive UART menu - no CPU, no ND-100 bus. It was
+Milestone 1 of `Verilog/docs/sd-bpun-device-plan.md`; both milestones are done
+(the SD stack was proven here 11-JUL-2026, and the ND-120 booted a BPUN tape
+from the card 14-JUL-2026 - see `HISTORY.md`). Use it to check a card or the
+library without the CPU in the way.
 
 ## What it does
 
@@ -289,7 +288,7 @@ Resource check (GW2AR-18): 32/46 BSRAM (the 64 KB buffer), Fmax
 ### USE_4BIT - SD bus width (speed switch)
 
 Top-level parameter in `src/sd_fat_test_top.v` (speed ladder rung c,
-see `Verilog/docs/sd-speed-plan.md`):
+see the "Speed facts" section of `Verilog/docs/sd-cmd18-block-gap-research.md`):
 
 | Setting | Data wires | Bulk transfer speed (sim) | When to use |
 |---|---|---|---|
@@ -318,8 +317,8 @@ silicon run and was parked at 0. That was true for one day. Three
 silicon-only bugs were then found and fixed - the nested-ternary pad
 idiom that yosys collapsed to an always-on OBUF, a mount reader parked
 mid-CMD17, and an RCA snooped off the CMD line instead of taken from
-the reader's CMD3 export. Full story in `Verilog/docs/sd-speed-plan.md`
-rung c.)
+the reader's CMD3 export. The speed plan these rungs came from,
+`Verilog/docs/sd-speed-plan.md`, was deleted 28-SEP-2026 - git history.)
 
 ## Simulation (run BEFORE hardware, in this order)
 

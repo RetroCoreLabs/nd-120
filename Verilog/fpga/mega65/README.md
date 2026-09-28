@@ -13,10 +13,10 @@ release is how it gets its first hardware test. The living plan, with a
 
 **Two memories, picked by the board revision at build** (Ronny, 02-SEP-2026):
 
-| Boards | Memory | Path |
-|---|---|---|
-| R3 / R3A | 8 MiB HyperRAM (the only memory it has) | the Nexys variable-latency seam (`MEM_RAM_49_DDR2` cache + MEM_HOLD) over `rtl/nd_avalon_port.v` on M2M's HyperRAM port |
-| R4 / R5 / R6 | 64 MB SDRAM ("the latest memory") | the MiSTer sheet-49 bridge + `sdram18`, unchanged; M2M itself never drives this chip, so `CORE/vhdl/framework-overrides/` hands the pins into the core |
+| Boards | CPU clock | Memory | Path |
+|---|---|---|---|
+| R3 / R3A | 13.33 MHz | 8 MiB HyperRAM (the only memory it has) | the Nexys variable-latency seam (`MEM_RAM_49_DDR2` cache + MEM_HOLD) over `rtl/nd_avalon_port.v` on M2M's HyperRAM port |
+| R4 / R5 / R6 | 20 MHz | 64 MB SDRAM ("the latest memory") | the MiSTer sheet-49 bridge + `sdram18`, unchanged; M2M itself never drives this chip, so `CORE/vhdl/framework-overrides/` hands the pins into the core |
 
 There is still no MEGA65 here; friends who own one test what we send. Each
 round trip costs days, so every bitstream must report its own result on the
@@ -69,7 +69,7 @@ Verified 27-AUG-2026 from the mega65-core build scripts and board XDCs
 | `rtl/` | the MEGA65 glue in Verilog: `m65_keys_to_ps2.v` (keyboard scan -> PS/2 events, keycap-faithful), `nd120_console_mega65.v` (the shared terminal on the framework's video/keyboard) |
 | `sim/` | their testbenches (`make test-keys`, `make test-console`, `make lint`), registered in `Verilog/tests/run_all_tests.sh` |
 | [`docs/01-using-the-core.md`](docs/01-using-the-core.md) | using the core: flashing, the SD card layout, every menu line (drives, colour, panel, cache, HDMI), what persists (`nd120cfg`) and what does not (mounts), booting, keys, differences from the MiSTer core |
-| [`docs/SEND-NOTE.md`](docs/SEND-NOTE.md) | what goes to a tester with the `.cor` files: which file, how to flash, how to boot SINTRAN, what to photograph |
+| [`../QUICKSTART-mega65.md`](../QUICKSTART-mega65.md) | what goes to a tester with the `.cor` files: which file, how to flash, how to boot SINTRAN, what to photograph and send back |
 | `sdcard/nd120/nd120cfg` | the 35-byte settings file for `/nd120/` on the card - with it the menu settings survive a power cycle |
 | `tools/` | gitignored; `make toolchain` fetches MEGA65's `coretool` (the `.cor` packer) here |
 
@@ -80,35 +80,15 @@ the same family, so it transfers).
 
 ## Ecosystem context (m65-altcores survey, 27-AUG-2026)
 
-Source: the community alternative-core catalogue at
-<https://kugelblitz360.github.io/m65-altcores/> (site last updated
-21-JUL-2026 at survey time). What it establishes for this port:
-
-- **~34 alternative cores exist, all community-built**, catalogued at
-  <https://kugelblitz360.github.io/m65-altcores/quick-core-overview.html>.
-  Non-Commodore machines are normal there: Amiga 500, ZX Spectrum,
-  Game Boy / Game Boy Color, TI-99/4A, Nascom2, MSX-1 all ship as
-  "fully/mostly functional"; Apple II, Sinclair QL and C128 are in
-  development. A non-Commodore core is established practice - but **no
-  minicomputer core exists in the catalogue**; the ND-120 would be the
-  first, consistent with the plan's note that no non-MiSTer core has yet
-  gone through the M2M framework.
-- **Most cores are MiSTer ports via MiSTer2MEGA65** ("Many of the Cores
-  for the MEGA65 started out as MiSTer projects, like the C64 and Game
-  Boy Cores" -
-  <https://kugelblitz360.github.io/m65-altcores/creating-new-cores-for-mega65.html>).
-- **Distribution convention:** one download entry per core on
-  **files.mega65.org** (per-core UUID URL) plus the author's GitHub repo.
-  Several cores ship separate R3 and R6 `.cor` files (Ghosts'n Goblins,
-  Xevious on the overview page), and repo names carry the compatibility
-  (`..._R3_R6`). Catalogue listing is by mail to the site maintainer
-  (boris@dreisechzig.net, per the site's contact note).
-- **Slot count note:** the install guide
-  (<https://kugelblitz360.github.io/m65-altcores/how-to-use-alternative-cores.html>)
-  says 8 slots numbered 0-7 - matching the "8 QSPI slots" claim in the
-  table above - while the site's front page says "seven slots"; the site
-  is internally inconsistent on this. The install guide recommends
-  keeping slot 1 for the stock MEGA65 core.
+From the community alt-core catalogue (Links below): about 34 alternative
+cores exist, all community-built, most of them MiSTer ports through
+MiSTer2MEGA65, several non-Commodore machines among them - but no
+minicomputer; the ND-120 would be the first. Released cores are
+distributed through files.mega65.org plus the author's repository, several
+ship separate R3 and R6 `.cor` files, and a catalogue listing is requested
+from the site maintainer by mail. The install guide says 8 flash slots
+(0-7) and recommends keeping slot 1 for the stock core (the site's front
+page says "seven slots"; it is inconsistent).
 
 ## Links
 

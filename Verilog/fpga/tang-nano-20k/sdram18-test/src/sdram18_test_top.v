@@ -8,7 +8,8 @@
 ** rd/wr/refresh handshake. The original sdram-test validated the 32-bit   **
 ** byte-based sdram.v at 27 MHz; THIS test validates the 18-bit adaptation **
 ** at the slow-bring-up frequency - the exact configuration the deposit    **
-** bug was localized to (see docs/HANDOFF-basys3-memory-write.md).         **
+** bug was localized to (fixed 10-JUL-2026, see                            **
+** docs/plan-fix-unconstrained-clocks.md).                                 **
 **                                                                         **
 ** Test sequence (started by S1 or any UART character, 9600 8N1):          **
 **   1. Verbose demo: 4 words at spread WORD addresses (col[9:8] bits      **

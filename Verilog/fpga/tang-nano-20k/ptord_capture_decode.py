@@ -6,7 +6,7 @@ ptord_capture_decode.py - boot the Tang and decode the ORDERING ring
 Full path:
   Verilog/fpga/tang-nano-20k/ptord_capture_decode.py
 
-WHAT IT ANSWERS (23-AUG-2026, Phase 1b of PLAN-pf-campaign-prio.md)
+WHAT IT ANSWERS (23-AUG-2026, Phase 1b of PLAN-pf-campaign-prio.md, git 043c460)
   Two facts measured on the same silicon boot cannot both describe the same
   moment: the handler WRITES a granting page-table entry (raw index 0o1032,
   data 066001) for the faulting page, and a COMMITTED ACCESS at that same page

@@ -89,7 +89,7 @@ docker run --rm raetro/quartus:17.0 quartus_sh --version
 ```
 
 Practical WSL2 notes **[inferred from experience, not from a doc]**: keep the core
-project on the ext4 side of WSL2 (not under `/mnt/e/...`) for sane compile times, and
+project on the ext4 side of WSL2 (not on a Windows drive under `/mnt/`) for sane compile times, and
 give WSL enough RAM in `.wslconfig` — a Cyclone V fit wants 8+ GB.
 
 ## 5. Dev machine: native Quartus Lite 17.0.2 (optional, needed for GUI work)

@@ -8,14 +8,19 @@
 > timing-clean (TNS 0)**; 6.75 MHz is the long-validated safe speed and `mid`
 > (13.5 MHz) also closes. Main memory is 4 MB of the embedded SDRAM (packed
 > 16-bit, `ND_SDRAM_PACK16`); the SD/FAT storage stack is proven on hardware.
+> From the Winchester image on the SD card it reaches the SINTRAN banner in
+> **29.4 s** from cold; login, `LIST-FILES` and the S3 program work (S3 cold
+> start 13.2 s). `fast20` is a Gowin EDA build only - the OSS `Makefile`
+> offers `slow`, `crawl` and `full`.
 > The old page-fault / silicon-hang / level-14 livelock / bank-decode
 > campaigns are all RESOLVED - that is why it boots. Details below.
 
 Gowin build/flow for the Sipeed **Tang Nano 20K**. This is the **primary FPGA
 target** going forward - chosen for faster synthesis than Vivado, a Linux-native
 open-source toolchain option, and 8 MB of SDRAM that lets the FPGA run the full
-memory config like the simulator. Full analysis and staged plan:
-`../../docs/tang-nano-20k-port.md`.
+memory config like the simulator. (The pre-port analysis and staged plan,
+`Verilog/docs/tang-nano-20k-port.md`, is finished and was deleted 28-SEP-2026;
+git history keeps it.)
 
 ## Bring-up: getting the board talking (do this first)
 
@@ -72,14 +77,14 @@ Use the committed driver rather than writing another one:
 python3 ../../tools/ndconsole.py --seconds 90 --out run.log '400$'
 ```
 
-Command reference: `Verilog/docs/opcom-console.md` and the `nd120-fpga` skill.
+Command reference: https://nd110.hackercorp.no/Terminal; boot commands in
+`NorskData-Doc/OPCOM-Boot-Reference.md`.
 
 ## Board / device
 
 **Hardware reference:** [Sipeed wiki - Tang Nano 20K](https://wiki.sipeed.com/hardware/en/tang/tang-nano-20k/nano-20k.html)
 (datasheets/schematics: [dl.sipeed.com](https://dl.sipeed.com/shareURL/TANG/Nano_20K/),
-official examples: [sipeed/TangNano-20K-example](https://github.com/sipeed/TangNano-20K-example),
-local clone: `/home/ronny/repos/TangNano-20K-example`).
+official examples: [sipeed/TangNano-20K-example](https://github.com/sipeed/TangNano-20K-example)).
 
 | Item | Value |
 |------|-------|
@@ -111,8 +116,8 @@ risk** (see [Memory architecture](#memory-architecture)).
 ## Toolchain (two options)
 
 ### Option 1 - Gowin EDA (authoritative)
-`gw_sh` (Tcl, scriptable) or the GUI, using the existing `../../ND-120-Gowin/`
-project. Uses a Synplify-based synth that tolerates the design's TTL-style
+`gw_sh` (Tcl, scriptable, driven by `gowin_build.ps1`) or the GUI, using
+`nd120_tang20k.gprj`. Uses a Synplify-based synth that tolerates the design's TTL-style
 flip-flops (clock + async preset + async clear). Has **GAO** (Gowin Analyzer
 Oscilloscope), the on-chip logic analyzer = Vivado ILA equivalent. This is the
 reliable path to a real bitstream today.
@@ -138,18 +143,8 @@ which nextpnr-himbaechel gowin_pack openFPGALoader
 ```
 (Lighter alternative for a yosys-only fit check: `pip install yowasp-yosys`.)
 
-**Known caveat (as of 2026-07):** `yosys synth_gowin` (even 0.66) rejects several
-TTL flip-flop primitives with **multiple edge-sensitive events** (clock + async
-preset + async clear in one `always`), e.g. `Shared/logisim/D_FLIPFLOP.v`,
-`T_FLIPFLOP.v`, `J_K_FLIPFLOP.v`, `DECODE-GateArray/DGA/circuit/F617.v`, `F714.v`,
-`Shared/support/TTL_74373.v`, `FIFO_8BIT.v`, `CGA_MIC_MASEL_REPEAT.v`. Error:
-`Multiple edge sensitive events found for this signal`. Gowin EDA (Option 1)
-handles these as-is. For the OSS flow these modules need synchronous rewrites
-(the same latch/derived-clock -> single-`sysclk` refactor that fixes FPGA timing
-overall - see `../../docs/fpga-debug-methodology.md`), or synth-friendly stubs for
-a rough fit estimate. Also note: `ND120_TOP.v` instantiates the Xilinx
-`MMCME2_BASE`/`BUFGMUX_CTRL` clock primitives (FPGA branch) - for Gowin these must
-be replaced by a `rPLL` clock module; a fit run stubs them as passthroughs.
+The full CPU builds with this flow since 12-JUL-2026; see
+[Two build flows](#two-build-flows) below.
 
 **OSS flow + embedded SDRAM:** nextpnr does **not** auto-connect the on-package
 SDRAM the way Gowin EDA does with the magic `O_sdram_*`/`IO_sdram_dq` port names -
@@ -158,47 +153,73 @@ list (from [Seyviour/sdram-tang-nano-20k-os-example](https://github.com/Seyviour
 is vendored at `sdram-test/src/sdram_pins_oss.cst` and must be kept **out** of
 the Gowin EDA constraints.
 
-Prior `../../Verilog.json`/`Verilog_pnr.json` (2024, gitignored) show an OSS run
-was attempted before.
+## Two build flows
 
-## Full ND-120 build (G1 bring-up, added 8-JUL-2026)
+Everything runs from `Verilog/fpga/tang-nano-20k/`. Both flows compile the
+same ordered file list parsed out of `nd120_tang20k.gprj`, with
+`src/tang20k_defines.v` first, so every `` `define `` comes from one place (yosys
+keeps defines across the files of one `read_verilog`, like Gowin's ordered
+compilation unit). The clock variant is chosen without editing a file:
+the OSS Makefile passes `-DTANG_VARIANT_*`; `gowin_build.ps1 -Variant ...`
+writes `build/tang20k_variant.v` as the first project file on every build.
+No variant define = `slow`.
 
-The complete ND-120 CPU now has a Tang top-level and Gowin project here:
+| | Gowin EDA | OSS CAD Suite |
+|---|---|---|
+| Runs on | Windows host (`gw_sh`) | WSL / Linux (`~/oss-cad-suite`, override `OSS_CAD=`) |
+| Build | `.\gowin_build.ps1 [-Variant slow\|crawl\|mid\|full\|fast20]` or `make gowin` | `make [VARIANT=slow\|crawl\|full]` (no mid/fast20) |
+| Bitstream | `build/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs` | `build/nd120_tang20k_oss-<variant>.fs` |
+| Load / flash | `make load-gowin` / `make flash-gowin` | `make load` / `make flash` |
+| Netlist gates | EX3988 empty-WCS check in the ps1 | `make check` (IO_sdram_dq tristate + latch census; also in CI) |
+
+What the OSS flow needed (all under `` `ifdef YOSYS ``, other flows untouched):
+
+1. `CPU_PROC_32.v` `registerBlock` selects distributed LUT RAM (yosys treats
+   `ram_style="block"` as a hard requirement, and the read port is async).
+2. `Shared/ndlib/SCAN_WITH_SET_N_EN.v` powers up to 1: yosys `dfflegalize`
+   rejects a power-up value that differs from the async-set value.
+3. nextpnr does not auto-connect the SDRAM ports: the Makefile appends
+   `sdram-test/src/sdram_pins_oss.cst` to the board .cst into `build/oss.cst`.
+4. The WCS preload hex files resolve against the yosys working directory;
+   `make wcs-hex` refreshes them. A missing file is a hard error.
+5. nextpnr takes no SDC: judge timing by the Fmax in `...-pnr.log`.
+   First OSS builds (12-JUL-2026): clk_cpu Fmax 47.98 (slow), 48.99 (crawl),
+   57.51 MHz (full, 27 MHz needed).
+6. On the Windows drive a WSL compile now and then misses a just-written
+   file ("No such file or directory"); re-run.
+
+The full-CPU OSS place-and-route is slow: CI job `tang-oss` runs it only on
+`bitstreams-*` tags with a 300-minute limit (two runs died at 120 min).
+
+## Full ND-120 build
+
+The complete ND-120 CPU has a Tang top-level and Gowin project here:
 
 | File | Purpose |
 |------|---------|
 | `src/ND120_TANG20K_TOP.v` | Board top: instantiates `ND3202D`, ties off the external bus, S1 = Master Clear, OPCOM UART 115200 on the BL616 (pins 69/70), 6 LEDs: block-read/write activity, tape byte served, SD status pair, heartbeat (see the LED table below) |
 | `src/tang20k_defines.v` | **Must stay FIRST in the project** - defines `GOWIN`, `TARGET_TANG20K`, `FPGA_FF_MODE`, `SKIP_WCS_LOAD`, `MAIN_RAM_SDRAM`, `BOARD_CLK_FREQ` (per clock variant), `UART_BAUD_RATE=115200` |
 | `src/gowin_rpll_27_54.v` | One rPLL: 54 MHz (SDRAM ctrl) + 54 MHz shifted (SDRAM chip) + 27 MHz (CPU/bus/OSC) |
-| `src/nd120_tang20k.cst` / `.sdc` | Pins (verified 20K pinout) + 27 MHz input clock |
+| `src/nd120_tang20k.cst` / `.sdc` | Pins (verified 20K pinout); the 27 MHz input clock plus three reasoned `set_false_path` exceptions (see [Clock variants](#clock-variants-and-measured-boot-timings-24-aug-2026), 31-AUG and 01-SEP notes) |
 | `nd120_tang20k.gprj` | Gowin GUI project - 247 files, generated from the Verilator dependency list (single source of truth for the tcl too) |
-| `gowin_build.tcl` / `gowin_build.ps1` | Scripted build on the Windows host: `.\gowin_build.ps1` copies the 32 WCS preload hex files (`Code/Microcode/wcs/`), runs `gw_sh` (`C:\Utils\Gowin\Gowin_V1.9.10.02_x64\IDE\bin\gw_sh.exe`) -> `build\impl\pnr\nd120_tang20k_build.fs` |
+| `gowin_build.tcl` / `gowin_build.ps1` | Scripted build on the Windows host: `.\gowin_build.ps1` copies the 32 WCS preload hex files (`Code/Microcode/wcs/`), runs `gw_sh` from the Gowin EDA install (its path is set in `gowin_build.ps1`) -> `build\impl\pnr\nd120_tang20k_build.fs` |
 | `lint/rpll_stub.v` | Lint-only rPLL stub (Verilator elaboration check; not in the Gowin build) |
 
 Build config: microcode is **bitstream-preloaded** (`SKIP_WCS_LOAD`, PROM never
 read), main memory is the **8 MB embedded SDRAM** through
-[`sdram-bridge/`](sdram-bridge/README.md) (2 banks = 4 MB), CPU/bus at 27 MHz.
-The whole file set elaborates cleanly under Verilator lint with all defines
-active; the Verilator sim build is unaffected (regression-checked). **The OSS
-yosys flow cannot build the full CPU** (TTL flip-flop primitives with multiple
-edge-sensitive events) - Gowin EDA only for now.
+[`sdram-bridge/`](sdram-bridge/README.md) (2 banks = 4 MB), CPU clock chosen by
+the variant (below; `slow` = 6.75 MHz is the default). The Verilator sim build is
+unaffected by the Tang defines.
 
-**First build results (8-JUL-2026):** synthesis + PnR + bitstream all pass.
-**Fit is confirmed**: logic 29% (5,851/20,736), registers 11%, **BSRAM 90%**
-(the `SKIP_WCS_LOAD` strategy fits the microcode). **Timing at 27 MHz fails as
-predicted**: CPU-domain Fmax 9.38 MHz (31 levels), derived-clock domains down
-to 4.7 MHz (`s_mclk`) - the same derived-clock architecture problem as Basys3.
-
-**Slow bring-up mode (default):** `TANG_SLOW_BRINGUP` in `src/tang20k_defines.v`
-runs CPU/bus at **6.75 MHz** and the SDRAM pair at 13.5 MHz - under every
-measured Fmax with margin - so G1 can validate a *booting* CPU while the
-clock-enable refactor closes 27 MHz separately. It switches the rPLL and
-`BOARD_CLK_FREQ` together, and the SDRAM bridge derives its refresh counts
-from `BOARD_CLK_FREQ` automatically. Comment the define out for 27/54 MHz.
-
-First light checklist: heartbeat LED blinking -> OPCOM console at **115200 7E1**
-on the board's USB serial -> compare boot behaviour against
-[`../../docs/boot-golden-spec.md`](../../docs/boot-golden-spec.md).
+**Which toolchain builds it (checked 28-SEP-2026):** the Makefile calls the OSS
+flow (yosys/nextpnr) its primary and its default target builds the full CPU
+file list. The full CPU was built with it locally on 12-JUL-2026 (all three
+variants; `Verilog/TODO.md` Tang section, Fmax in [Two build flows](#two-build-flows)),
+but the CI `tang-oss` job has never finished (every run so far stopped at
+about 2 hours) and no OSS build since is recorded.
+Release bitstreams are Gowin EDA builds by design (see the header of
+`.github/workflows/verilog-ci.yml`). The Fmax and
+violation figures in this README are Gowin EDA timing reports.
 
 ## Clock variants and measured boot timings (24-AUG-2026)
 
@@ -293,19 +314,14 @@ correcting. The usable rungs are 6.75, 13.5, 20.25 and 27 MHz.
 microcode-JUMP and TVEC routes. Those are real; see commit 9dc8507 for why
 they must not be constrained away.
 
-`fast20` also switches
-the console to **115200 baud** (7E1). NOTE: since 27-AUG-2026 EVERY variant
-runs 115200 - the sentence that slow/mid/full stay at 9600 was true only
-briefly and is no longer; `UART_BAUD_RATE` is unconditional in
-`src/tang20k_defines.v:554`. Originally this kept their
-tooling is untouched. The physical baud is the `UART_BAUD_RATE` build
-constant alone; the microcode's BAUDV thumbwheel value (8 = 9600) is stored
+Console: **115200 baud 7E1 on every variant** since 27-AUG-2026
+(`UART_BAUD_RATE` is unconditional in `src/tang20k_defines.v:554`). The
+physical baud is the `UART_BAUD_RATE` build constant alone; the microcode's BAUDV thumbwheel value (8 = 9600) is stored
 by the SC2661 emulation but never used for bit timing, proven on the Nexys
 and now here. **Silicon 26-AUG-2026: SINTRAN III boots on `fast20`,
 banner + Watchdog in ~40 s, clean text on a 115200 7E1 console. Soaked
-27-AUG: 4 unattended hours, 8/8 console probes.** Since 27-AUG the console
-is 115200 for EVERY variant, and all the python console tools in this
-directory default to it (`--baud 9600` for pre-27-AUG bitstreams).
+27-AUG: 4 unattended hours, 8/8 console probes.** All the python console tools
+in this directory default to 115200 (`--baud 9600` for pre-27-AUG bitstreams).
 
 ### Measured on silicon, SINTRAN III booting from WD0
 
@@ -344,15 +360,14 @@ so its margin over temperature and voltage is unquantified. `mid` (13.5 MHz)
 closes with zero violations and gives most of the gain: 1.41x on the banner
 against `slow`, versus 1.65x for `full`.
 
-Note the `.sdc` is a single `create_clock` line with no multicycle on the known
-52 ns WCS->ACAL path to a clock-enable pin, so these Fmax figures are a floor,
-not a verdict. Real constraints are the route to a fast build that is also
-defensible.
+The `full` row predates both the 31-AUG storage-crossing exceptions and the
+01-SEP WCS -> ACAL exception now in the `.sdc` (its comments give the proof),
+so the `full` figure is a floor, not a verdict. `fast20` is the timing-clean
+choice.
 
-Known clock-dependent constant, NOT slaved to `BOARD_CLK_FREQ`: the debug
-dumper baud divisor, `ND120_TANG20K_TOP.v` `DELAY_FRAMES(1406)`, assumes
-clk2x = 13.5 MHz. Capture dumps come out garbage at any other variant. The
-console UART and the RTC do scale correctly.
+The debug dumper's baud divisor used to be a fixed `DELAY_FRAMES(1406)` that
+was right only for `slow`; fixed 24-AUG-2026, it is now derived from
+`BOARD_CLK_FREQ` and `UART_BAUD_RATE` (`src/ND120_TANG20K_TOP.v:1747`).
 
 ## LEDs (active low, pins 15-20; map of 07-AUG-2026)
 
@@ -412,9 +427,8 @@ buffer is the last BSRAM block; dropping `TANG_SMD` alone is the intended escape
 hatch if something else needs one. **Register as Latch is 0** - no inferred
 latches, which is a standing gate for every build here.
 
-This supersedes the older claim below that floppy and SMD "need a sync-read
-refactor before they fit at all": that refactor was done, both sector buffers
-are synchronous-read now, and the build above is the measurement.
+Floppy and SMD fit because both 2 KB sector buffers are synchronous-read (the
+old asynchronous read ports could not map to BSRAM).
 
 Build and program (Gowin EDA flow, Windows host):
 
@@ -438,91 +452,60 @@ flashed bitstream comes up on its own at every power-on, so it can write
 |------|---------|
 | `ND120_TOP.cst` | **STALE - Tang Nano 9K pinout** (clock pin 52, LEDs 10-16). Superseded by `src/nd120_tang20k.cst`. Kept only until the 9K is ever targeted; do not use for the 20K. |
 | [`sdram-test/`](sdram-test/README.md) | **Standalone SDRAM bring-up test** - nand2mario controller + ND-120 UART (9600 8N1) reporting every read/write. Gowin EDA project + OSS Makefile + iverilog testbench. **PASSES on hardware** (2026-07-08, OSS-flow bitstream, **full 8 MB** write+verify OK). |
-| [`sdram18-test/`](sdram18-test/) | **Standalone sdram18.v hardware test** - drives the ND-120 18-bit-word controller with the full build's exact 13.5 MHz slow-bring-up clocking (same PLL module). 4-word demo + full 2M-word write/verify over UART. **PASSES on hardware** (2026-07-09, OSS flow) - exonerates the controller; the deposit bug is full-build cross-domain timing (see `../../docs/HANDOFF-basys3-memory-write.md`). |
-| [`sdram-bridge/`](sdram-bridge/README.md) | **ND-120 sheet-49 SDRAM backend** - `MEM_RAM_49_SDRAM.v` maps the measured ND-120 DRAM protocol onto the SDRAM (2x-clock bridge, self-scheduled refresh, 2 banks = 4 MB). Protocol-validated in simulation; awaits the Tang top-level (G1) for full integration. Design doc: [`../../docs/nd120-dram-memory.md`](../../docs/nd120-dram-memory.md). |
+| [`sdram18-test/`](sdram18-test/) | **Standalone sdram18.v hardware test** - drives the ND-120 18-bit-word controller with the full build's exact 13.5 MHz slow-bring-up clocking (same PLL module). 4-word demo + full 2M-word write/verify over UART. **PASSES on hardware** (2026-07-09, OSS flow) - exonerates the controller; the deposit bug was full-build cross-domain timing (fixed; the handoff is in git history). |
+| [`sdram-bridge/`](sdram-bridge/README.md) | **ND-120 sheet-49 SDRAM backend** - `MEM_RAM_49_SDRAM.v` maps the measured ND-120 DRAM protocol onto the SDRAM (2x-clock bridge, self-scheduled refresh, 2 banks = 4 MB). In the booting build (4 MB main memory). Design doc: [`../../docs/nd120-dram-memory.md`](../../docs/nd120-dram-memory.md). |
 
-**Existing Gowin EDA project:** `../../ND-120-Gowin/` (`ND-120-Gowin.gprj`). Its
-source files are referenced by absolute path, so it is independent of this
-folder's location. Whether to consolidate it here is an open decision. Gowin
-build scripts (a `gw_sh` tcl and/or an OSS `Makefile`) will be added to this
-folder as the flow is set up.
+**Older Gowin EDA project:** `../../ND-120-Gowin/` (`ND-120-Gowin.gprj`). The
+build scripts in this folder (`gowin_build.ps1`/`.tcl`, `Makefile`) use
+`nd120_tang20k.gprj` instead; whether to delete the older project is an open
+decision.
 
 ## Memory architecture (the key design point)
 
 BSRAM (828 Kbit) is too small to hold **both** the microcode PROM (~512 Kbit) and
-the WCS (~512 Kbit), unlike the Basys3. Plan:
+the WCS (~512 Kbit), unlike the Basys3. So:
 
 | Memory | Where on Tang |
 |--------|---------------|
-| Microcode | **Bitstream-preload the WCS** via `SKIP_WCS_LOAD` (see `../../docs/skip-wcs-load.md`); drop the separate PROM BRAM (never read once load is skipped). |
-| Writable Control Store (WCS) | BSRAM (~512 Kbit) |
-| Main memory | **8 MB SDRAM** via the [nand2mario Tang-Nano-20K controller](https://github.com/nand2mario/sdram-tang-nano-20k) - validated standalone in [`sdram-test/`](sdram-test/README.md) first |
+| Microcode | **Bitstream-preloaded WCS** via `SKIP_WCS_LOAD` (see `../../docs/skip-wcs-load.md`); no PROM BRAM (never read once load is skipped). |
+| Writable Control Store (WCS) | BSRAM (32 blocks) |
+| Main memory | **8 MB SDRAM** via the [nand2mario Tang-Nano-20K controller](https://github.com/nand2mario/sdram-tang-nano-20k), through [`sdram-bridge/`](sdram-bridge/README.md) |
 
-`SKIP_WCS_LOAD` is already implemented and verified in Verilator (preloaded WCS
-boots byte-identical to the normal load).
+**BSRAM is the binding resource on this board** - 96% in the storage build
+above. The one reclaim still open (repack the UUA half of the WCS, 8 blocks) is
+analysed in [`BSRAM-BUDGET.md`](BSRAM-BUDGET.md), not implemented.
 
-**BSRAM is the binding resource on this board** - the 10-JUL-2026 PnR measured
-**41 of 46 blocks (90%)**, of which **32 are the WCS** (logic 30%, registers 12%,
-DSP 0%). Full analysis: [`BSRAM-BUDGET.md`](BSRAM-BUDGET.md). Two things live
-there, both analysis-only / not implemented:
+## Resource budget (what uses the GW2AR-18, measured 16-JUL-2026, OSS flow)
 
-- **Reclaim 8 blocks (90% -> ~72%).** The UUA half of the WCS only holds real
-  microcode in words 0..1355 - the top two thirds is a computable address ramp -
-  so repacking that bank as one 2048x64 array frees 8 blocks. Note the naive fix
-  (just narrowing the chips to 2048 deep) saves *nothing*; the doc explains why.
-- **Floppy / SMD sync-read refactor - DONE, no longer a blocker.** Their 2 KB
-  sector buffers (`s_buffer[0:1023]`) once used three *asynchronous* read ports,
-  which BSRAM cannot do; they are synchronous-read now and both devices are in a
-  placed bitstream (see [Storage build](#storage-build-sd-fat--floppy--smd-measured-3-aug-2026)
-  - BSRAM 96% with both in). Same fix serves Basys3.
-
-## Planned build defines
-
-Introduce a board target (`TARGET_TANG20K`) that derives:
-`GOWIN` (vendor primitives), `BOARD_CLK_FREQ 27_000_000`, `SKIP_WCS_LOAD`
-(preloaded WCS), and a planned `MAIN_RAM_SDRAM` (SDRAM backend). See
-`../../docs/build-defines.md`.
-
-## New modules to build
-
-1. Tang top / board wrapper - 27 MHz input, `rPLL` for the CPU clock (+ a
-   phase-shifted SDRAM clock), Tang pinout.
-2. Gowin `rPLL` clock module (replaces the Xilinx MMCM).
-3. SDRAM adapter - bridge the ND-120 memory interface (`AA_9_0`, `BANK*`, `RAS`,
-   `CAS`, `MWRITE50_n` in `MEM_RAM_49.v`) to the nand2mario SDRAM controller.
-4. `.cst` / build scripts here.
+- BSRAM: the WCS is 32 of the 46 blocks (32 x IDT6168A_20 4096x4,
+  `CPU_CS_WCS_21_22.v`); MMU page table + cache 8, MMU IMS1403 1, and each
+  2 KB storage sector buffer 1. Main memory is in SDRAM (0 BSRAM); the CPU
+  register file is LUT RAM. Reclaiming 8 WCS blocks: `BSRAM-BUDGET.md` Part 1.
+- LUT: the SD-FAT/storage stack roughly doubled the LUT count (42% -> 88%
+  on 16-JUL); `sd_file_reader` alone was about 8930 LUTs. The FAT reader is
+  shared by all devices, so another device adapter is cheap (~176 LUTs).
+- Levers, with measured or estimated savings: `SDFAT_NO_LFN` (~1800 LUT,
+  in use), mount-time contiguity checker (~1177 LUT, retired as a default
+  07-AUG-2026), `SDFAT_NO_WRITE` (~1081 LUT, loses write-back),
+  `N_CLIENTS` of nd_storage (LUT/CLS relief), WCS repack (-8 BSRAM, not done).
+  Dropping FAT32 saves ~0 (the 32-bit cluster path serves FAT16 too).
+  Subdirectory traversal does not exist (root only), so there is nothing to cut.
 
 ## On-chip debug
 
 - **THE working method: [`TRACE-CAPTURE-GUIDE.md`](TRACE-CAPTURE-GUIDE.md)** -
   512-sample on-chip analyzer in the ND-120 top, dumped over the console UART;
-  full build/capture/decode walkthrough (usable by a person or an LLM). This is
+  full build/capture/decode walkthrough. This is
   what cracked the memory-write bug.
 - **GAO** (Gowin Analyzer Oscilloscope) - captures internal nets to BSRAM, read
   back over JTAG. But BSRAM is scarce here (WCS uses most of it), so GAO capture
   depth is shallow.
 - **Preferred: UART debug streamer** (BSRAM-free) for full-length boot traces;
-  fast Gowin roundtrip makes re-flashing to move probes cheap. See
-  `../../FPGA-BRINGUP-PLAN.md` (capture automation).
-
-## Staged plan (see docs/tang-nano-20k-port.md)
-
-- **G0 Fit check (first):** synth for `GW2AR-18`, read LUT + BSRAM utilization.
-  Go/no-go and decides microcode placement.
-- **G1 Minimal bring-up:** Tang top + `rPLL` + `.cst`; WCS preloaded; small BSRAM
-  main RAM. Goal: boot reaches the golden phases.
-- **G2 Validate:** GAO / UART capture -> compare against `../../docs/boot-golden-spec.md`.
-- **G3 SDRAM:** full 8 MB main memory (parity with the sim). Controller is
-  validated standalone in [`sdram-test/`](sdram-test/README.md).
-- **G4 Clock up:** validate at 27 MHz first, then raise the CPU/SDRAM clock
-  via the rPLL (54 MHz setting exists in the vendored `gowin_rpll.v`; the
-  SDRAM controller is good to 66.7 MHz, LiteX runs it at 48 MHz). See
-  `Verilog/TODO.md`.
+  fast Gowin roundtrip makes re-flashing to move probes cheap.
 
 ## Related docs
 
 - [`TRACE-CAPTURE-GUIDE.md`](TRACE-CAPTURE-GUIDE.md) - on-chip trace capture + analysis how-to (this board).
-- `../../docs/tang-nano-20k-port.md` - full port analysis (this board's design doc).
 - `../../docs/skip-wcs-load.md` - preloaded-WCS microcode (needed for the fit).
 - `../../docs/build-defines.md` - the board-target define scheme.
 - `../../docs/fpga-debug-methodology.md` - shared FPGA debug workflow.

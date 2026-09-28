@@ -3,8 +3,7 @@
 **Full path:** `Verilog/fpga/tang-nano-20k/TRACE-CAPTURE-GUIDE.md`
 
 How to capture 512-sample signal traces from the ND-120 running on the Tang
-Nano 20K silicon and decode them. Written to be followed by a person or an
-LLM, step by step. This is the tool that solved the memory-write mystery in
+Nano 20K silicon and decode them. Written to be followed step by step. This is the tool that solved the memory-write mystery in
 one evening after weeks of blind builds - prefer it over guessing.
 
 ---
@@ -16,7 +15,9 @@ write-path analyzer"), sampling a 16-bit debug bus on every `clk2x` edge
 (~74 ns per sample at the G1 slow-bring-up clock; two consecutive samples
 per CPU clock). After a trigger it keeps a configurable number of
 post-trigger samples, then dumps all 512 samples as hex lines over the
-9600-baud console UART (taking the TX pin over from the CPU).
+console UART at `UART_BAUD_RATE` - 115200 on every bitstream since
+27-AUG-2026, 9600 before (taking the TX pin over from the CPU; the divider is
+`src/ND120_TANG20K_TOP.v:1747`).
 
 - **Debug bus source:** `assign DBG_MEMW = {...}` in
   `CPU-BOARD-3202/circuit/ND3202D.v` (inside `ifdef MAIN_RAM_SDRAM`).
@@ -63,25 +64,25 @@ cd Verilog/fpga/tang-nano-20k
 # Optional fast gate: compile the EXACT Gowin file list with iverilog
 cd sim && make nd120_tang20k_tb.vvp && cd ..     # seconds; catches syntax/port errors
 
-# Bitstream (Gowin gw_sh on the Windows host, callable from WSL, ~3 min)
-/mnt/c/Utils/Gowin/Gowin_V1.9.10.02_x64/IDE/bin/gw_sh.exe \
-    'Verilog/fpga/tang-nano-20k/gowin_build.tcl'
+# Bitstream (Gowin gw_sh on the Windows host via gowin_build.ps1, callable
+# from WSL, ~3 min)
+make gowin VARIANT=slow
 
 # Verify the bitstream is FRESH before programming (stale .fs = wasted run)
 ls -la build/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs
 
-# Program into SRAM (volatile)
-PATH=$PATH:~/oss-cad-suite/bin make load
+# Program the Gowin bitstream into SRAM (volatile); 'make load' is the OSS one
+PATH=$PATH:~/oss-cad-suite/bin make load-gowin
 ```
 
 ## 4. Run a capture session
 
-One self-contained shell block (also LLM-runnable). Keep ONE listener
+One self-contained shell block (runnable as a script). Keep ONE listener
 attached for the entire session; never program while listening.
 
 ```bash
 SCRATCH=/tmp                                    # or your scratch dir
-stty -F /dev/ttyUSB1 9600 raw -echo -echoe -echok
+stty -F /dev/ttyUSB1 115200 raw -echo -echoe -echok   # 9600 for pre-27-AUG bitstreams
 timeout 75 cat /dev/ttyUSB1 > $SCRATCH/capture.log &
 sleep 6                                          # boot (~1 s) + 2.5 s arm + margin
 # examine cell 22 (OPCOM chars must be paced ~0.3 s/char or MOPC drops them)
@@ -130,8 +131,9 @@ Reading the trace:
   `WRITE` rises at next CLK -> `ECREQ` -> `CGNT_n` low (grant) -> `RAS`
   rises (row on AA) -> `CAS` rises (column on AA, write data on DD) ->
   window ends. See `../../docs/nd120-dram-memory.md` for the protocol
-  ground truth and the v1/v2 annotated traces in
-  `../../docs/HANDOFF-basys3-memory-write.md` for real examples.
+  ground truth (the v1/v2 annotated traces of the 8-JUL write bug were in
+  `Verilog/docs/HANDOFF-basys3-memory-write.md`, deleted 28-SEP-2026 - git
+  history keeps them).
 - Compare against the Verilator/iverilog sim of the same access when in
   doubt - the sim is the working reference.
 
@@ -180,3 +182,32 @@ one evening, each build ~10 min end-to-end:
 
 Each generation eliminated a whole subsystem by measurement instead of
 inference. That is the method: probe, decode, move one layer, repeat.
+
+## 9. The nd100x oracle traces (the reference side)
+
+Moved here 28-SEP-2026 from the finished page-fault campaign plans (git
+history keeps them). Recorded 23-AUG-2026; the files live outside the repo
+under `$ND120_ORACLE_DIR` and were not re-checked since.
+
+- **Oracle side = trace files, not debugger stepping.** `oracle_full.trc` =
+  25,000,001 lines with full register columns, past the banner threshold
+  (~17-18M instructions) - the reference boot trace. `oracle_simimg.trc` =
+  25,000,001 lines, compact mode. `oracle_trace_full.log` = 1,955,151 lines
+  only (~2M instructions, readable, NOT a full boot). The source disc image of
+  each existing trace is not recorded in the files - verify or regenerate
+  before any image-dependent conclusion.
+- **Regenerate** with `$ND120_ORACLE_DIR/oracle_make.sh <max-instr>
+  <abs-outfile> [compact] [img]` (nd100x `--trace`). FULL is ~104 B/line,
+  COMPACT ~63 B/line. Always trace a COPY of the disc image - booting
+  modifies it.
+- **Compare tools** in the same place: `lockstep.py` (timing-tolerant
+  lockstep, ND-120 trace vs oracle), `boot_compare.py`, `ctxdiff.py` /
+  `ctxdiff_tight.py` (first differing opcode/next-PC for the same context).
+  Both sides emit the same columns:
+  `PIL PC OPCODE A D T X B L STS PIE PID IIE IID PGS MMU INT SEX`.
+  The ND-120 side of that rig has always been Verilator, never the Tang.
+- **nd100x facts:** `--cputype=ND120CX` works; untraced speed ~2.9 M
+  instructions/s; boot to `SINTRAN III RUNNING` takes 10M-20M instructions;
+  `-t` costs ~190 B/instruction raw. `--watch=[phys:]ADDR[:r|w|rw]` (32 max)
+  and `-B ADDR` exist; octal needs a LEADING ZERO (`--watch=0175740:w`, not
+  `175740`).

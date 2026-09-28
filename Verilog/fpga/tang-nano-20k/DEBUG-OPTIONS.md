@@ -23,9 +23,9 @@ question; the heavier ones cost rebuilds, resources, or wiring.
 ## 1-2. OPCOM: the built-in software debugger (use this first)
 
 The microprogram's operator communication IS a debugger, live over
-/dev/ttyUSB1 at 9600 8N1. Full command reference:
-`/home/ronny/.claude/skills/nd120-fpga/references/opcom-commands.md`
-(source: https://nd110.hackercorp.no/Terminal). Highlights measured working
+/dev/ttyUSB1 at 115200 7E1 (9600 on bitstreams older than 27-AUG-2026).
+Command reference: https://nd110.hackercorp.no/Terminal; the boot commands
+are in `NorskData-Doc/OPCOM-Boot-Reference.md`. Highlights measured working
 on this board:
 
 - Examine/deposit memory (`addr/`, value CR), range dump `start<end` (the
@@ -121,3 +121,36 @@ mid-hunt.
   free-run behavior with 1-2.
 - "I need to reset / control it remotely" -> 7 today, 8 as soon as one wire
   is soldered, 5+10 for the full debugger experience.
+
+## Proving a probe survived synthesis
+
+Moved here 28-SEP-2026 from the finished page-fault campaign plans. A build
+reporting success proves NOTHING about whether a diagnostic block is in it.
+Three mechanisms have removed one while the bitstream still flashed cleanly
+and streamed constants: (1) the new file is not in `nd120_tang20k.gprj`, so
+it is a black box - caught by `yosys hierarchy -check`; (2) two drivers on
+the shared debug port `XMIC_DBG_15_0` (Gowin stops with EX2000; a Verilator
+lint of one module misses it - see `gowin_build.ps1`); (3) the TX mux does not
+select `dbg_txd` for that define, so everything feeding it is dead code (see
+the comment in `src/ND120_TANG20K_TOP.v`). **The check that works:** search
+the post-synthesis netlist `build/nd120_tang20k_build/impl/gwsynthesis/*.vg`
+for the block's signals, and compare the register count against a build
+without the define (the page-fault capture added +174 registers).
+
+## Gate-level timing simulation with Gowin SDF (recipe, not yet used)
+
+Moved here 28-SEP-2026 from the answered masked-grant question sheet;
+confirmed available 18-JUL-2026 on the Gowin V1.9.10.02 install, not
+re-checked since. The one simulation that models real delays:
+
+- The PnR option "Generate SDF File" exists (`IDE/data/config/
+  rtlplacerouteoptions.xml`, id PNR01, command `-sdf`), but the scripted build
+  emits only the post-synthesis `.vg`, not a post-PnR `.vo` + `.sdf`. Enable
+  both in `gowin_build.tcl` to use this.
+- The timing primitive library is `IDE/simlib/gw2a/prim_tsim.v` in the Gowin
+  install (gw2a = the Tang's GW2AR die; 284 `specify` blocks).
+- iverilog does `$sdf_annotate` and specify delays (Verilator does not):
+  `iverilog -o gate <proj>.vo <gowin>/IDE/simlib/gw2a/prim_tsim.v tb.v` with
+  `initial $sdf_annotate("<proj>.sdf", dut);` in the testbench.
+- Keep it unit-level (e.g. one `CGA_INTR` wrapper through PnR): a full-chip
+  gate sim is heavy, and the SDRAM main memory is not in the FPGA netlist.

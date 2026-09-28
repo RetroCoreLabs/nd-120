@@ -20,7 +20,7 @@
 ** decodes phys banks in the order BANK0,BANK2,BANK1 - so the CONTIGUOUS  **
 ** second 2 MB is BANK2, and BANK0+BANK2 is the real 4 MB; see line 373.) **
 **                                                                       **
-** ND_SDRAM_PACK16 (docs/nd120-parity-refactor-order.md, semantics       **
+** ND_SDRAM_PACK16 (docs/build-defines.md section 1, semantics           **
 ** pinned by docs/nd120-parity-analysis.md): only the 16 DATA bits are   **
 ** stored, two adjacent ND words per 32-bit SDRAM location, so           **
 ** BANK0+BANK2 (still the full 4 MB, boot sizing unchanged) fold into    **

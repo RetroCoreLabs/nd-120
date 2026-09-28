@@ -110,6 +110,11 @@ docker run -it --rm -v "$(pwd)":/build raetro/quartus:17.0 \
   `.qpf`.
 - Output: `output_files/nd120.rbf` (plus a `.sof` used for JTAG/SignalTap).
 - Release naming convention (Template README): `nd120_YYYYMMDD.rbf`.
+- A Docker build takes about 25 minutes. Never edit a source file while
+  Quartus is reading it - two builds (v42, v43) were thrown away for exactly
+  that.
+- Run the container from WSL, not Git Bash: Git Bash rewrites the working
+  directory to a Windows path and the run dies before Quartus starts.
 
 ### CI
 
@@ -124,15 +129,6 @@ Needed for PLL IP generation and SignalTap. Install per
 [01-getting-started.md](01-getting-started.md) §5, open `nd120.qpf`, press the
 compile (play) button — that is the entire official flow
 (https://mister-devel.github.io/MkDocs_MiSTer/developer/mistercompile/).
-
-## 5. How the core was brought up (historical)
-
-The first build was deliberately NOT `ND3202D` - it was the Template with just the
-core name `"ND120;;"` in CONF_STR, `LED_USER` blinking off the PLL, a byte pattern
-on `UART_TXD`, and the example video left in place, so a black screen had one cause
-at a time. The full `ND3202D` machine followed and now boots SINTRAN on hardware
-(see [`../README.md`](../README.md)). The build check below is what a healthy
-compile still looks like.
 
 ## Build check
 

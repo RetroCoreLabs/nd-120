@@ -127,7 +127,7 @@ module sd_fat_test_top #(
     //       only DAT0 is wired. Commands/CRC-status/busy are on their
     //       single lines in BOTH modes; the FAT mount/scan path
     //       (sd_file_reader) always runs 1-bit regardless.
-    // Full story: README.md "USE_4BIT" + Verilog/docs/sd-speed-plan.md.
+    // Full story: README.md "USE_4BIT" + Verilog/docs/sd-cmd18-block-gap-research.md.
     parameter            USE_4BIT      = 1             // full speed. (11-JUL "all BAD" incident: 1-bit isolation build proved card+logic healthy; suspect was the snooped RCA, now taken from the reader's card_rca export)
 ) (
     input  sys_clk,   // 27 MHz crystal

@@ -1,10 +1,14 @@
 # GAO (Gowin Analyzer Oscilloscope) capture on the Tang Nano 20K
 
-Date: 17-JUL-2026. Purpose: the decisive S1 experiment from
-Verilog/docs/tang-masked-grant-audit.md -
-capture the CGA_INTR grant chain (int_req_q, INTRQN, PICV, mask/request
-bit 10, CSA) around the spurious PIL 0 -> 10 grant that only manifests at
-speed on silicon.
+Date: 17-JUL-2026. Written for the S1 experiment from
+Verilog/docs/tang-masked-grant-audit.md (deleted 28-SEP-2026, in git history) - capture the CGA_INTR grant chain
+(int_req_q, INTRQN, PICV, mask/request bit 10, CSA) around a spurious
+PIL 0 -> 10 grant. **That fault was solved 18-JUL-2026 (see
+`ANALYSIS-cga-intr-masked-grant-root-cause.md`).** The GAO mechanics below
+(build hook, cable handover, launching the analyzer, troubleshooting) are
+general; the signal list and trigger are what `src/nd120_tang20k_gao.rao`
+holds today - change the .rao for a different question. The campaign-only
+"what decides S1" reading guide was cut 28-SEP-2026 (git history keeps it).
 
 Every claim in this document is tagged VERIFIED (read from the named
 Gowin document / repo file / synthesized netlist) or INFERRED (labelled).
@@ -104,10 +108,11 @@ so plan trigger changes via the .rao.
 
 ## 4. Resource budget (why the window is 1024 samples, not 4096)
 
-The current GAO-free Gowin EDA build uses 43 of 46 BSRAM blocks (94%,
+On 17-JUL-2026 the GAO-free Gowin EDA build used 43 of 46 BSRAM blocks (94%,
 SP 34 + SDPB 9 - VERIFIED in
 Verilog/fpga/tang-nano-20k/build/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.rpt.txt).
-Only 3 blocks are free.
+Only 3 blocks were free. (The storage build measured 3-AUG-2026 is at
+96% - re-read the current `.rpt` before sizing a capture.)
 
 - 28 capture bits x 1024 depth fits in 2 BSRAM (1Kx18 mode x2 = 36
   bits) - leaves 1 block spare. (BSRAM mode geometry is standard GW2A;
@@ -126,9 +131,8 @@ Only 3 blocks are free.
     cd Verilog/fpga/tang-nano-20k
     .\gowin_build.ps1 -Variant full -Gao
 
-Use `-Variant full` (CPU 27 MHz) if the goal is the full-speed
-manifestation; the bug was measured on the flashed full-speed
-configuration. `-Gao` writes build\gao_enable.flag; gowin_build.tcl then
+Pick the variant the fault shows on (`-Variant full` was used for the
+17-JUL capture). `-Gao` writes build\gao_enable.flag; gowin_build.tcl then
 adds the .rao. A later build WITHOUT `-Gao` removes the flag - no sticky
 state.
 
@@ -177,11 +181,11 @@ After the session, to return to the WSL flow:
 
     usbipd attach --wsl --busid <busid>
 
-(and in WSL, the usual /mnt/e workflow -
-Verilog/fpga/tang-nano-20k/usb-attach.sh.)
+(and in WSL, the usual workflow -
+Verilog/fpga/tang-nano-20k/usb-attach.sh, or `make usb`.)
 
-Console note: while the board is on Windows, the OPCOM console (9600
-baud) is the OTHER channel of the same USB device - use a Windows
+Console note: while the board is on Windows, the OPCOM console (115200
+7E1 since 27-AUG-2026; 9600 before) is the OTHER channel of the same USB device - use a Windows
 terminal (PuTTY / TeraTerm) on the COM port that appears, NOT the WSL
 picocom. JTAG and UART are separate channels of the FT2232 emulation, so
 GAO capture and the console can run at the same time (INFERRED - the
@@ -189,9 +193,9 @@ channels are independent in a real FT2232; verify on first session).
 
 ### Launching the tools (VERIFIED 17-JUL-2026 on this board)
 
-Executables live in `C:\Utils\Gowin\Gowin_V1.9.10.02_x64\IDE\bin\`:
+Executables live in the Gowin EDA install's `IDE\bin\` folder:
 `gao_analyzer.exe` (the logic analyzer), `gvio_analyzer.exe`. The
-Programmer is separate: `C:\Utils\Gowin\Gowin_V1.9.10.02_x64\Programmer\bin\programmer.exe`.
+Programmer is separate: `Programmer\bin\programmer.exe` in the same install.
 
 Launch the analyzer with NO command-line device args - passing
 `-series/-device/-gao/-fs` on the command line produced a
@@ -199,7 +203,7 @@ Launch the analyzer with NO command-line device args - passing
 the `.rao` from the GUI (File -> Open ->
 `Verilog/fpga/tang-nano-20k/src/nd120_tang20k_gao.rao`):
 
-    Start-Process 'C:\Utils\Gowin\Gowin_V1.9.10.02_x64\IDE\bin\gao_analyzer.exe'
+    Start-Process '<Gowin install>\IDE\bin\gao_analyzer.exe'
 
 (From WSL, prefix with `powershell.exe -Command "..."`.)
 
@@ -239,11 +243,11 @@ port in the analyzer:
 2. Hand the USB device to Windows (section 6).
 3. Start the analyzer. Two equivalent ways (VERIFIED in SUG114):
    - Gowin IDE: open the project-less IDE
-     (C:\Utils\Gowin\Gowin_V1.9.10.02_x64\IDE\bin\gw_ide.exe), menu
+     (`<Gowin install>\IDE\bin\gw_ide.exe`), menu
      Tools -> Gowin Analyzer Oscilloscope, then toolbar Open and select
      Verilog/fpga/tang-nano-20k/src/nd120_tang20k_gao.rao
    - Standalone exe:
-     C:\Utils\Gowin\Gowin_V1.9.10.02_x64\IDE\bin\gao_analyzer.exe
+     <Gowin install>\IDE\bin\gao_analyzer.exe
        -series GW2AR -device GW2AR-18C
        -gao Verilog/fpga/tang-nano-20k/src/nd120_tang20k_gao.rao
        -fs Verilog/fpga/tang-nano-20k/build/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs
@@ -262,13 +266,11 @@ port in the analyzer:
    bitstream; the ID is embedded in both).
 6. ARM BEFORE REPRODUCING: click Start (F1) = one-shot capture. The
    analyzer waits for the trigger.
-7. Reproduce: on the Windows COM console, run the INSTRUCTION-B cold
-   start exactly as in the failing session (the 400$ tape boot). The
-   spurious level-10 claim trips the trigger; the waveform view fills
-   with 512 pre / 512 post samples.
-   - If nothing triggers but the hang still happens, the grant story is
-     wrong -> click Force Trigger (F3) to grab a window anyway and look
-     at the state, and try the M1 (INTRQN) expression next build.
+7. Reproduce the fault on the Windows COM console. The trigger fires and
+   the waveform view fills with 512 pre / 512 post samples.
+   - If nothing triggers, click Force Trigger (F3) to grab a window
+     anyway and look at the state, and consider the M1 (INTRQN)
+     expression for the next build.
 8. Export: toolbar Export -> format CSV (also VCD if wanted - GTKWave
    reads it with the existing tooling). Default export dir is
    impl/wave under the project, i.e.
@@ -277,29 +279,10 @@ port in the analyzer:
    Verilog/fpga/tang-nano-20k/ and note
    the bitstream it came from.
 
-### Reading the capture (what decides S1)
-
-At/around the trigger sample:
-
-- `HIRL/s_int_req_q = 1` -> the enable FF was NEVER cleared by the IOF
-  at 000261 (or was re-enabled): **S1 confirmed on silicon.** The
-  pre-trigger window shows whether it was 1 the whole time or flipped.
-- `s_int_req_q = 0` but HVE still fired -> the claim path leaked around
-  the enable FF on silicon (the RTL gates HVE with int_req_qn since the
-  15-JUL fix, so this would mean a silicon/timing artifact - check
-  s_int_req_qn consistency bits).
-- `s_picmask_15_0_n_out[10] = 1` -> the mask window (S2) is open, as the
-  audit predicts post-MCL.
-- `s_lreq_15_0[10]` shows when the level-10 pend arrived;
-  `s_ireq_15_0_n[10]` low pulses distinguish a fresh PID-write/IOXERR
-  from a stale RQBIT carried over a btn1 restart (S5).
-- `CSA_12_0` before/after the trigger identifies the microcode path that
-  performed the claim (compare against the nd120uc listing).
-
 ## 8. Automation notes
 
 - Bitstream flashing can be scripted with
-  C:\Utils\Gowin\Gowin_V1.9.10.02_x64\Programmer\bin\programmer_cli.exe
+  `<Gowin install>\Programmer\bin\programmer_cli.exe`
   (path INFERRED from the standard install layout; adjust to the local
   install). openFPGALoader from WSL works as today when the device is
   attached to WSL.

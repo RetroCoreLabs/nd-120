@@ -1,16 +1,17 @@
 # Tang Nano 20K — BSRAM budget: what uses it, how to get more, what will not fit
 
-> **Status: ANALYSIS ONLY — NOTHING HERE IS IMPLEMENTED.**
-> Written 14-JUL-2026. No RTL has been changed. Two independent pieces of future
-> work are described:
+> **Status (checked 28-SEP-2026).** Written 14-JUL-2026.
 >
-> - **Part 1** — reclaim **8 blocks** by repacking the UUA half of the WCS.
->   Optional; do it when you need the space.
-> - **Part 2** — the floppy / SMD 2 KB sector buffers **will not map to BSRAM as
->   currently written**. This is a *blocker*, not an optimisation: it must be
->   fixed before those devices can go on this board at all.
+> - **Part 1** - reclaim **8 blocks** by repacking the UUA half of the WCS.
+>   **Still open, not implemented** (`CPU_CS_WCS_21_22.v` still instantiates
+>   32 `IDT6168A_20` chips). Optional; do it when you need the space.
+> - **Part 2** - the floppy / SMD sector-buffer sync-read refactor. **DONE**
+>   (commit `cd9b94f`, 23-JUL-2026): `ND_FLOPPY_DMA.v` and `ND_SMD.v` each hold
+>   one synchronous-read buffer, and both devices are in the Tang storage build
+>   (BSRAM 96%, measured 3-AUG-2026 - see `README.md`, "Storage build").
 >
-> Each part lists its own preconditions. Do not treat either as ready to build.
+> The block counts in "The situation" are the 10-JUL-2026 build, before the
+> storage devices went in.
 
 ## The situation
 
@@ -98,9 +99,8 @@ independent routes to the same boundary, so the 1356 split is trustworthy.
 
 ### Reproducing the measurement
 
-Run from this directory (`Verilog/fpga/tang-nano-20k/`). Python on Windows lives
-at `C:\Users\ronny\AppData\Local\Programs\Python\Python311\python.exe`; under WSL
-use `/usr/bin/python3`.
+Run from this directory (`Verilog/fpga/tang-nano-20k/`) with a python.org
+Python on Windows (not the Microsoft Store one), or `/usr/bin/python3` under WSL.
 
 ```python
 # 1. Per-chip used depth: which bank has slack?
@@ -244,100 +244,23 @@ preserve posedge-clk, write-first, 1-cycle-read semantics exactly.
 
 ---
 
-# Part 2 — Device buffers (floppy / SMD): sync-read refactor REQUIRED
+# Part 2 — Device buffers (floppy / SMD): sync-read refactor (DONE)
 
-**This is not an optimisation. As written, these buffers cannot go in BSRAM, and
-they do not fit anywhere else either.**
+**Done in commit `cd9b94f` (23-JUL-2026).** BSRAM is synchronous-read only. The
+floppy-DMA and SMD 2 KB sector buffers (`reg [15:0] s_buffer[0:1023]`, one
+1Kx18 block each) used to have three asynchronous read ports at independent
+addresses; Gowin cannot map that to BSRAM, and as registers one buffer would
+exceed the device's 15552 FFs (the `ND_SMD.v` comment records 43k LUT4
+measured standalone). Both are now a simple dual-port RAM: one muxed write
+port and one registered read port whose address follows the active consumer
+(see the comments above `s_buffer` in `ND_FLOPPY_DMA.v` and `ND_SMD.v`). The
+same template is `Verilog/Shared/support/IDT6168A_20.v`, and the same fix
+serves Basys3 (RAMB18 has the same constraint).
 
-Neither device is in the Tang build today — the synthesis file list contains no
-floppy / SMD / storage sources — so nothing is broken right now. This is what
-must be dealt with *when they are added*.
-
-## The budget (the easy part)
-
-The 2 KB sector buffer that each controller needs already exists in the RTL and
-is exactly the right size:
-
-- `Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v:233` —
-  `reg [15:0] s_buffer[0:1023]`
-- `Verilog/ND-BUS-DEVICES/SMD/circuit/ND_SMD.v:149` — same
-- `Verilog/ND-BUS-DEVICES/FLOPPY/circuit/ND_FLOPPY_PIO.v:94` — same
-
-1024 x 16 bits = 16 Kbit = 2 KB. A BSRAM18 in 1Kx18 mode holds 1024 x 18, so
-**one buffer = one block**, 89% utilised. Two devices = **2 blocks of the 5
-free**, leaving 3. Control/status registers are a non-issue — registers sit at
-12% (~14,000 FFs free) and a controller register file is a couple hundred.
-
-## Why it does not work as written
-
-**BSRAM is synchronous-read only.** These buffers have **three asynchronous read
-ports at three independent addresses**, plus two write sites:
-
-```verilog
-// ND_FLOPPY_DMA.v
-233:  reg [15:0] s_buffer[0:1023];
-234:  always @(*) dbuf_rdata = s_buffer[dbuf_addr];                   // async read 1
-259:  3'd0: iox_rdata = s_boot_active ? s_buffer[s_bootptr] : 16'd1;  // async read 2
-357:  if (dbuf_we) s_buffer[dbuf_addr] <= dbuf_wdata;                 // sync write 1
-539:  dma_issue(1'b1, s_mem_ptr, s_buffer[s_sec_idx[9:0]]);           // async read 3
-590:  s_buffer[s_sec_idx[9:0]] <= dma_rdata;                          // sync write 2
-```
-
-`ND_SMD.v` has the identical shape at lines 150 / 174 / 251 / 393 / 437.
-
-Gowin cannot map that to a BSRAM. It falls back to distributed SSRAM (RAM16S4)
-with large address muxes, or to plain registers — and **1024 x 16 = 16384 bits as
-registers exceeds the 15552 logic registers on the entire device, for a single
-buffer.** The distributed-RAM path replicates storage per read port and burns a
-large share of the LUT headroom.
-
-This is invisible in Verilator, which is why it has not bitten yet.
-
-> **Unmeasured:** the exact LUT/SSRAM cost of the un-refactored version has NOT
-> been synthesized for Gowin. The direction is not in doubt (async multi-port
-> reads cannot be BSRAM), but treat any specific LUT figure as an estimate until
-> someone runs it. Synthesising the two modules standalone for GW2AR-18 would
-> give real before/after numbers cheaply.
-
-## The fix
-
-Refactor each buffer to **one synchronous read port + one write port** — the
-standard BRAM inference template. There is already a documented, working example
-of it in this repo, and its header explicitly notes both Vivado and Gowin
-recognise the pattern (`Verilog/Shared/support/IDT6168A_20.v`):
-
-```verilog
-always @(posedge clk) begin
-  if (we) mem[a] <= d;
-  dout <= mem[a];        // registered read -> 1 cycle latency
-end
-```
-
-The work is in the FSMs, not the storage:
-
-1. **Collapse the three readers onto one port.** They look mutually exclusive by
-   state — boot streaming (`s_boot_active` / `s_boot_mode`), DMA-out
-   (`dma_issue`), and the backend fill (`dbuf_rdata`) — so a mux on the address
-   is plausible. **Not verified;** confirm the exclusivity from the FSMs before
-   relying on it. Alternatively use a true dual-port block (SDPB) and collapse to
-   two ports.
-2. **Absorb the 1-cycle read latency** in each state machine. Every state that
-   consumes `s_buffer[...]` combinationally today needs an extra cycle, including
-   the `dma_issue` call site and the `iox_rdata` boot path.
-3. Keep the write-first semantics if any state writes and reads the same address
-   in one cycle.
-
-**The same fix serves Basys3** — RAMB18 has the identical synchronous-read
-constraint, so this is not Tang-specific work. Do it once.
-
-## Preconditions for Part 2
-
-- Confirm the three read ports are genuinely mutually exclusive per FSM state
-  (or budget for a dual-port block).
-- The floppy/SMD testbenches (`ND-BUS-DEVICES/*/sim/`) must still pass after the
-  latency change — these are registered in `Verilog/tests/run_all_tests.sh` and
-  the extra cycle will move timing in the tb expectations.
-- Decide whether `ND_FLOPPY_PIO.v` needs the same treatment or is Verilator-only.
+**Still open:** `Verilog/ND-BUS-DEVICES/FLOPPY/circuit/ND_FLOPPY_PIO.v:94`
+still reads its buffer asynchronously (lines 171 and 182). It is not in any
+Tang build today; decide whether it needs the same treatment or stays
+Verilator-only before it goes on a board.
 
 ---
 
@@ -372,19 +295,15 @@ unaffordable, this is where to look next.
 
 # Budget summary
 
-| | blocks now | after Part 1 | note |
+| | blocks (10-JUL build) | after Part 1 | note |
 |---|---|---|---|
 | WCS LUA (`_C`) | 16 | 16 | all 4096 words live, already optimal, do not touch |
 | WCS UUA (`_D`) | 16 | **8** | only 1356 words live; rest is a computable addr ramp |
 | `tmm_` / `am_` / `ims_` | 9 | 9 | untouched |
 | **subtotal** | **41 (90%)** | **33 (~72%)** | |
-| free | 5 | 13 | |
-| floppy buffer (Part 2) | — | −1 | **only after the sync-read refactor** |
-| SMD buffer (Part 2) | — | −1 | **only after the sync-read refactor** |
-| **free after both** | | **11** | |
 
-Part 2's two blocks fit in today's 5 free without Part 1. Part 1 is what buys
-comfort for whatever comes after.
+The storage build since added the floppy and SMD buffers and more (96% on
+3-AUG-2026). Part 1 is still the way to buy room for whatever comes next.
 
 # References
 
@@ -394,8 +313,8 @@ comfort for whatever comes after.
   for Part 2.
 - `Verilog/fpga/tang-nano-20k/wcs_*.hex` — per-chip preload images (`_C` = LUA,
   `_D` = UUA)
-- `Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v` — 2 KB buffer, line 233
-- `Verilog/ND-BUS-DEVICES/SMD/circuit/ND_SMD.v` — 2 KB buffer, line 149
+- `Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v` — 2 KB buffer (sync read)
+- `Verilog/ND-BUS-DEVICES/SMD/circuit/ND_SMD.v` — 2 KB buffer (sync read)
 - `Verilog/ND-BUS-DEVICES/FLOPPY/circuit/ND_FLOPPY_PIO.v` — 2 KB buffer, line 94
 - `build/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.rpt.txt` — PnR resource
   report quoted above

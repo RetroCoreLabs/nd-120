@@ -271,7 +271,7 @@ config as the shipped SINTRAN-booting build except the CPU divider.
 | run_clk45_1 | clk 45 + physopt + 115200 baud | +0.020 (22 ns req) | +0.020 | 0 | +0.031 | **PASS - programmed 26-AUG 10:17, SINTRAN BOOTS on silicon with the 115200 console (Ronny-verified). Deployed configuration** |
 
 All runs one seed each (Vivado is deterministic per configuration - spread
-across directives/seeds is NOT known; see section 9 next steps). WHS stayed
+across directives/seeds is NOT known; see section 9). WHS stayed
 in +0.012..+0.043 across all runs (hold is period-independent and healthy).
 WPWS +0.264 (MIG clk200 domain) at every run.
 
@@ -301,16 +301,9 @@ this campaign):
 3. `BOARD_CLK_FREQ` moves with `clk=` automatically (UART baud, RTC tick,
    watchdogs) - verified to be a single pair in `build.tcl`.
 
-Next steps, in order:
-
-1. Ronny picks a target tier; rebuild at that clock and flash (the .bit
-   currently on disk is the 50 MHz physopt experiment - REBUILD before any
-   flash).
-2. Board validation at the chosen clock: SINTRAN boot x N, console login,
-   the boardtest scripts, ideally a soak.
-3. Small sweep (3-4 directive combinations) at the chosen clock to measure
-   spread.
-4. ASYNC_REG hygiene fixes (section 7 item 2).
-5. Long term: cut the CGA IDB ring in RTL, then re-run this search - the
-   WNS becomes a guarantee instead of a floor.
-
+Still open from this campaign (checked 28-SEP-2026): the ASYNC_REG hygiene
+(section 7 item 2 - `nd120_nexys4ddr_top.v` still has no `ASYNC_REG`), a
+directive/seed sweep to measure spread at the deployed clock (section 7 item
+3), and the CGA IDB ring cut (`Verilog/docs/HANDOFF-cga-idb-ring-cut.md`). The
+tier choice is made: the board is deployed at 33.333 MHz with the cache ON
+(`../timing.md`).

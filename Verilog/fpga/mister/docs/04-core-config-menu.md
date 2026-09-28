@@ -63,33 +63,12 @@ https://github.com/MiSTer-devel/Wiki_MiSTer/wiki/Core-configuration-string
 - `V,v` + `` `BUILD_DATE `` — version string shown next to the core name.
 - `I,...` info lines; `SS<base>:<size>` savestates (future exotica).
 
-## 3. A real, complete example — PDP2011's menu (verbatim from its emu file)
+## 3. A real, complete example
 
-Source: https://raw.githubusercontent.com/MiSTer-Enhanced/PDP2011_MiSTer/main/pdp2011.sv
-
-```verilog
-localparam CONF_STR = {
-    "PDP2011;UART19200;",
-    "-;",
-    "S0,DSKIMG,Mount RK disk;",
-    "S1,DSKIMG,Mount RL disk;",
-    "S2,DSKIMG,Mount RM/RP (RH) disk;",
-    "-;",
-    "O[7:5],PDP-11 Model,20,34,44,45,70,94;",
-    "-;",
-    "O[2],Console,Virtual VT100,Serial 19200 baud;",
-    "-;",
-    "P1,Virtual VT100;",
-    "P1O[9:8],Color,Green,Blue,White,Amber;",
-    ...
-    "T[0],Reset;",
-    "R[0],Reset and close OSD;",
-    "V,v",`BUILD_DATE
-};
-```
-
-(abridged; full string in the source file). Note the pattern: S-slots for disks,
-O-bits for machine configuration, a P1 page for terminal cosmetics, T/R reset.
+PDP2011's menu (`pdp2011.sv` in
+https://github.com/MiSTer-Enhanced/PDP2011_MiSTer) shows the usual pattern:
+S-slots for disks, O-bits for machine configuration, a P1 page for terminal
+cosmetics, T/R reset. Section 4 is ours, and is the one to copy from.
 
 ## 4. The shipped ND-120 CONF_STR
 

@@ -34,6 +34,18 @@ For scripted control beyond load_core (inject key presses, generate .mgl shortcu
 https://github.com/pocomane/MiSTer_Batch_Control (e.g. `mbc raw_seq EEMDDO` to drive
 the menu, `mbc load_rom ...`).
 
+### Mounting images at core load: use an MGL
+
+For this core the framework automount (`boot<n>.vhd` in
+`/media/fat/games/ND120/`) does NOT attach anything - measured 02-SEP-2026
+with the `ND120_STORAGE_PROBE` console probe (`MNT=00000`). Use an MGL:
+`load_core /media/fat/ND120-storage-test.mgl` mounts floppy 0, floppy 1,
+WD0 and the tape (probe shows MNT 10000 -> 11000 -> 11100 -> 11101, bit
+order fd0 fd1 WD0 WD1 tape).
+
+Board loop: `Verilog/fpga/mister/tools/deploy_and_look.sh` (its header lists
+MISTER_HOST, MISTER_PASS, MISTER_SETTLE).
+
 ## 2. Making the core appear in the menu (the "release" path)
 
 - A core is one `.rbf`; loading it reprograms the FPGA (official explanation:

@@ -23,9 +23,9 @@ The CPU period in ns equals the divider (`clk_table` in `build.tcl`).
 
 | `clk` | CPU period | CPU-domain WNS | verdict |
 |-------|-----------|----------------|---------|
-| 16 | 60 ns (16.667 MHz) | +26.455 | PASS - shipped build, SINTRAN boots |
+| 16 | 60 ns (16.667 MHz) | +26.455 | PASS - the 25-AUG build, SINTRAN boots; the high-margin fallback |
 | 25 | 40 ns | +9.293 | PASS |
-| 33 | 30 ns | +1.282 | PASS |
+| 33 | 30 ns | +1.282 | PASS - with the cache ON this is the deployed clock since 31-AUG (see the 30/31-AUG sections below) |
 | 35 | 28 ns | +1.308 | PASS |
 | 38 | 26 ns | +0.316 | PASS |
 | 40 | 25 ns | +0.319 | PASS |
@@ -33,7 +33,7 @@ The CPU period in ns equals the divider (`clk_table` in `build.tcl`).
 | 45 | 22 ns | +0.085 | PASS - razor-thin |
 | 50 | 20 ns | **-2.546** | **FAIL** - default flow, 1213 failing endpoints, TNS -1600; the WNS gate refuses the bitstream |
 | 50 + `physopt` | 20 ns | **+0.007** | PASS - `phys_opt_design` recovered the full 2.55 ns; **BOOTS SINTRAN (silicon, 26-AUG)** |
-| 45 + `physopt`, 115200 console | 22 ns | +0.020 | PASS - **BOOTS SINTRAN with 115200 console (silicon, 26-AUG); deployed** |
+| 45 + `physopt`, 115200 console | 22 ns | +0.020 | PASS - **BOOTS SINTRAN with 115200 console (silicon, 26-AUG); deployed until the cache came on (31-AUG)** |
 | 50 + `physopt`, 115200 console | 20 ns | **-0.210** | **FAIL** - the baud-constant edit re-rolled placement; 50 MHz closure is single-seed fragile |
 
 Hold (WHS) stayed between +0.012 and +0.043 ns across all runs (hold does
@@ -101,11 +101,13 @@ design-wide WNS and are unaffected by the CPU divider.
 ## What STA does NOT prove (read before shipping a fast clock)
 
 1. **Functional validation.** UPDATE 26-AUG-2026, both Ronny-verified on
-   the board, one boot each, no soak yet:
+   the board, one boot each:
    - **SINTRAN III boots at 50 MHz** (the 9600-baud `physopt` build,
      WNS +0.007).
    - **SINTRAN III boots at 45.45 MHz with the console at 115200 baud**
-     (`clk 45 ilaslim physopt`, WNS +0.020) - the deployed configuration.
+     (`clk 45 ilaslim physopt`, WNS +0.020) - the deployed configuration
+     until 31-AUG-2026; since then the deployed build is 33.333 MHz with
+     the cache ON.
    SOAKED 27-AUG-2026: a booted SINTRAN at 45.45 MHz answered all 8
    console-attention probes over a 4-hour unattended run (the Tang fast20
    did the same). SD-card WRITE workloads at these clocks remain
@@ -202,3 +204,6 @@ different worst paths), and it is 75-80% ROUTING.
 **So no local register can cut this cone**, and the only real fix is a pipeline
 stage in the memory-protection path, which moves every fault a cycle later
 machine-wide. Deployed answer stays 33.333 MHz with cache (7.52 MIPS).
+
+With the cache the ceiling is 1/28.039 ns = 35.66 MHz. `clk=35` is 28.0 ns,
+a 0.039 ns miss on paper - untested on the board and not worth the margin.

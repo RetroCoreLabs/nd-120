@@ -85,23 +85,10 @@ Console: 9600 8N1 on the BL616 USB serial (/dev/ttyUSB1 under WSL);
 if the TangNano20K /> prompt of the BL616 answers instead of the menu,
 type `choose uart` once. H prints the help. S1/S2 = full reset.
 
-## 6. Coming next: the ND-120 device file set (not needed yet)
+## 6. The ND-120 device file set
 
-The ND-120 device stack (nd_storage) uses fixed root filenames, one
-per emulated device (decided 11-JUL-2026):
-
-| File | Device | Size | Notes |
-|---|---|---|---|
-| TAPE.BPUN | paper-tape reader (device 400) | any BPUN, <= 64 KB slot | boot tape |
-| FLOPPY1.IMG | floppy unit 1 | ~1.2 MB (fixed) | preloaded to SDRAM at open |
-| FLOPPY2.IMG | floppy unit 2 | ~1.2 MB (fixed) | preloaded to SDRAM at open |
-| SMD0.IMG | SMD/HDD unit 0 | tens of MB | cached, not preloaded (Phase 4) |
-| SMD1.IMG | SMD/HDD unit 1 | tens of MB | cached, not preloaded (Phase 4) |
-| SMD2.IMG | SMD/HDD unit 2 | tens of MB | cached, not preloaded (Phase 4) |
-| SMD3.IMG | SMD/HDD unit 3 | tens of MB | cached, not preloaded (Phase 4) |
-
-All in the ROOT directory, contiguous (fresh-format card + copy in one
-go gives that; menu 5 CHECK verifies). Missing files simply leave that
-device unmounted - only create the images you use. This section moves
-to the device documentation when the stack lands; nothing to prepare
-today.
+This test board needs only the files above. The full ND-120 builds use a
+fixed set of root-directory file names, one per emulated device (`TAPE.BPUN`,
+`FLOPPY1.IMG`, `WD0.IMG`, ...); the table is in
+`Verilog/docs/nd-storage-design.md` ("Card file set"), and the board
+quickstarts (`Verilog/fpga/QUICKSTART-*.md`) say which image to copy.

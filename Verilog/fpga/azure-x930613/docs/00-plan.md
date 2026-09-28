@@ -114,7 +114,7 @@ verified against multiple independent sources (see
   hobbyist sources use or mention an open-source alternative anywhere -
   OpenOCD appears only as the FT232H JTAG initializer, not a
   synthesis/PnR substitute. LiteX (mentioned only in the earlier
-  ChatGPT-written report, not the primary hobbyist sources) is a SoC
+  unsourced report, not the primary hobbyist sources) is a SoC
   build-automation framework, not a synthesis/PnR replacement - its own
   Altera backend still calls out to Quartus, so it doesn't avoid the
   licensing requirement either. **Quartus Prime Standard remains the

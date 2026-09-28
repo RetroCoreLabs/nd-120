@@ -513,7 +513,7 @@
 // compilation unit (OSS: `make VARIANT=full|crawl|slow` passes -D flags;
 // Gowin: `gowin_build.ps1 -Variant ...` emits build/tang20k_variant.v as
 // the first project file). No variant define = slow bring-up, the same
-// default as before. See docs/tang20k-build-flows.md.
+// default as before. See ../README.md "Two build flows".
 `ifdef TANG_VARIANT_FULL
   // full speed 27/54 MHz: neither SLOW nor CRAWL defined
 `elsif TANG_VARIANT_FAST20

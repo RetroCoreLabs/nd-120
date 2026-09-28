@@ -46,18 +46,14 @@ the board).
 - **Parity is stored, not recomputed** (2 extra bits per word) so the
   self-test's deliberate bad-parity writes behave exactly like real chips.
 
-## Integration (when the Tang ND-120 top-level exists)
+## Integration
 
-1. Compile-gate: `MAIN_RAM_SDRAM` (part of the planned `TARGET_TANG20K`
-   define set, `docs/build-defines.md`). Verilator and Basys3 builds never
-   see this folder.
-2. In `MEM_43`/`ND3202D`/top: under `ifdef MAIN_RAM_SDRAM`, instantiate
-   `MEM_RAM_49_SDRAM` instead of `MEM_RAM_49` and thread through: `clk2x`,
-   `clk2x_sdram` (both from the board rPLL) and the SDRAM pin bundle.
-3. Constraints: SDRAM magic ports auto-connect in Gowin EDA; the OSS flow
-   needs `../sdram-test/src/sdram_pins_oss.cst`.
-4. `CLK2X_FREQ` parameter = 2x `BOARD_CLK_FREQ`. Ceiling with current
-   controller timing parameters: OSC ~33 MHz / SDRAM ~66 MHz.
+Wired into the Tang build under `MAIN_RAM_SDRAM` (set by `src/tang20k_defines.v`);
+Verilator and the Xilinx builds never see this folder. Two things still worth
+knowing: the SDRAM ports auto-connect in Gowin EDA but the OSS flow needs
+`../sdram-test/src/sdram_pins_oss.cst`, and `CLK2X_FREQ` = 2x `BOARD_CLK_FREQ`
+(ceiling with the current controller timing parameters: OSC ~33 MHz / SDRAM
+~66 MHz).
 
 ## Run the testbench
 

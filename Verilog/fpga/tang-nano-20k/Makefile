@@ -1,4 +1,4 @@
-# ND-120 on Tang Nano 20K - DUAL-TOOLCHAIN build (see docs/tang20k-build-flows.md)
+# ND-120 on Tang Nano 20K - DUAL-TOOLCHAIN build (see README.md "Two build flows")
 #
 # PRIMARY: OSS CAD Suite (yosys + nextpnr-himbaechel + gowin_pack), Linux/WSL
 # BACKUP:  Gowin EDA (gw_sh on the Windows host via gowin_build.ps1)

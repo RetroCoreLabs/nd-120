@@ -117,6 +117,7 @@ debugged here first and the MEGA65 inherits a path that has met real silicon.
 
 The first build was the terminal console alone with no ND-120 in it, so a black
 screen had one possible cause at a time; the full machine followed. That whole
-sequence is done - SINTRAN boots on silicon (02-SEP-2026). The blow-by-blow of
-the memory-alignment and clock fixes lives in the project memory notes and
-`../RELEASE-NOTES-release2.md`.
+sequence is done - SINTRAN boots on silicon (02-SEP-2026, `HISTORY.md`). The
+WCS read-latency fix that made the CPU run is written up in
+`Verilog/docs/mister-microcode-loop.md`; the other bring-up fixes are recorded
+only in git history.

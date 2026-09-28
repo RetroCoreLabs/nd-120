@@ -8,9 +8,9 @@ keyboard, microcode uploaded from the HPS at core load. All links verified
 What actually shipped: five OSD mount slots (floppy 0/1, Winchester 0/1, paper
 tape) served over the block interface by `rtl/nd_storage_hps.v`; a clean-room
 TDV2200 terminal on the MiSTer's own screen + keyboard (shared with the MEGA65
-port); and 4 MB main memory in the DE10-Nano SDRAM add-on module. The two case
-studies below (PDP2011's disks, the DDRAM/SDRAM memory options) are the reference
-material that informed those choices.
+port); and 4 MB main memory in the DE10-Nano SDRAM add-on module. Sections 2 and
+5 keep, in short, the reference material that informed those choices (trimmed
+28-SEP-2026; the full case study is in git history).
 
 ## 1. Block devices — the hps_io protocol
 
@@ -45,55 +45,16 @@ sector buffer) → drop your request on ack. Block size defaults to 512 bytes
 (`BLKSZ` parameter). The disk image is a **flat sequence of blocks** — exactly what
 a file on the SD card provides.
 
-## 2. Case study: how PDP2011 does its disks
+## 2. Case study: how PDP2011 does its disks (short)
 
-Repo: https://github.com/MiSTer-Enhanced/PDP2011_MiSTer (current repo; original
-port: https://github.com/birdybro/PDP2011_MiSTer). Wrapper:
-https://raw.githubusercontent.com/MiSTer-Enhanced/PDP2011_MiSTer/main/pdp2011.sv
-
-The clever part: **the disk controllers were not rewritten for MiSTer.** PDP2011's
-original RK11/RL11/RH70 controllers (`rtl/rk11.vhd`, `rtl/rl11.vhd`,
-`rtl/rh11.vhd`) natively speak SPI-SD-card protocol through a shared driver
-(`rtl/sdspi.vhd`, full CMD0/CMD8/ACMD41/CMD17/CMD24 init+transfer FSM). The MiSTer
-port inserts the framework's **`sys/sd_card.sv` SD-card emulator** between each
-controller's SPI pins and hps_io — a fake SDHC card in fabric, backed by the
-Linux-mounted image:
-
-```verilog
-hps_io #(.CONF_STR(CONF_STR), .WIDE(1), .VDNUM(3), .PS2DIV(3125)) hps_io (...);
-
-sd_card #(.WIDE(1)) sd_card_rk (
-    .clk_sys(clk_100mhz), .clk_spi(clk_100mhz), .reset(reset), .sdhc(1),
-    .sd_lba(sd_lba[0]), .sd_rd(sd_rd[0]), .sd_wr(sd_wr[0]), .sd_ack(sd_ack[0]),
-    .sd_buff_addr(sd_buff_addr), .sd_buff_din(sd_buff_din[0]),
-    .sd_buff_dout(sd_buff_dout), .sd_buff_wr(sd_buff_wr),
-    .sck(rk_sclk), .ss(rk_cs | ~vsd_sel_rk), .mosi(rk_mosi), .miso(rk_miso)
-);
-
-always @(posedge clk_100mhz) begin
-    if(img_mounted[0]) vsd_sel_rk <= |img_size;   // mount -> controller enabled
-    ...
-end
-assign have_rk = vsd_sel_rk;
-```
-
-Inside `rk11.vhd`: Unibus registers (RKCS/RKWC/RKBA/RKDA...) are decoded; the GO
-bit starts a transfer; geometry (drive/cyl/head/sector) is flattened to a linear
-block address; a bus-master FSM DMAs words between memory and the sdspi 256-word
-sector buffer.
-
-**Lesson for the ND-120:** model the ND floppy/SMD controller with a simple
-sector-level handshake (block address, start, done, 256-word buffer) and drive
-`sd_lba/sd_rd/sd_wr/sd_buff_*` **directly** — the SPI layer in PDP2011 is
-historical baggage from its standalone-FPGA origin; we don't need `sd_card.sv` at
-all unless we want to reuse an SPI-speaking controller. The ND controller's job is
-the same as rk11's: translate IOX register writes + DMA into "read/write block N of
-drive D".
-
-Two extra tricks from PDP2011 worth copying:
-- mount pulse → controller present/absent at runtime (`have_rk` style enables);
-- an OSD option can redirect a controller to the **physical** secondary SD slot
-  (`SD_SCK/SD_MOSI/SD_CS/SD_MISO` emu ports) for real-media access later.
+PDP2011 (https://github.com/MiSTer-Enhanced/PDP2011_MiSTer) did not rewrite its
+disk controllers for MiSTer: its RK11/RL11/RH70 controllers speak SPI-SD
+natively, and the port puts the framework's `sys/sd_card.sv` SD-card emulator
+between each controller's SPI pins and `hps_io`. Lesson taken for the ND-120:
+drive `sd_lba/sd_rd/sd_wr/sd_buff_*` directly with a sector-level handshake -
+the SPI layer is baggage from PDP2011's standalone-FPGA origin. Two tricks worth
+copying: the mount pulse makes a controller present/absent at runtime, and an OSD
+option can redirect a controller to the physical secondary SD slot.
 
 ## 3. File upload (ioctl) — the microcode path
 
@@ -144,27 +105,13 @@ PDP2011 instantiates four KL11 serial units and muxes unit 0/1 between the VT an
 the external UART with one status bit — a good template for OPCOM + extra ND
 terminal ports.
 
-## 5. Main memory — the options (shipped: 4 MB in the SDRAM module)
+## 5. Main memory (shipped: 4 MB in the SDRAM module)
 
 The shipped core puts 4 MB (2M words) of main memory in the DE10-Nano SDRAM
-add-on module (WCS in block RAM, cache off). The two validated options below are
-the reference that led there:
-
-- **HPS DDR3 via the `DDRAM_*` emu ports** (64-bit data, `DDRAM_ADDR[28:0]` in
-  64-bit words, bursts, `DDRAM_BUSY`/`DDRAM_DOUT_READY` flow control). ao486 uses
-  it as x86 main memory — verified in its source
-  (https://raw.githubusercontent.com/MiSTer-devel/ao486_MiSTer/master/ao486.sv),
-  which pins a window with `assign DDRAM_ADDR[28:25] = 4'h3;` and leaves SDRAM
-  unused. Higher/variable latency, but at original ND bus speed that is absorbed;
-  no add-on board needed. The porting docs warn DDR3 needs careful reset handling
-  ("or hard hangs").
-- **SDRAM add-on board**: raw pins on `SDRAM_*`; there is no shared framework
-  controller — cores bring their own (PDP2011's is inside `rtl/mister_top.vhd`:
-  init/refresh FSM, 16-bit data). Our Tang Nano 20K SDRAM bridge work transfers
-  almost directly. Deterministic latency, costs an add-on board.
-
-What shipped: the SDRAM add-on module (the Tang Nano 20K SDRAM bridge experience
-transferred almost directly, as expected). DDRAM stays the documented fallback.
+add-on module (WCS in block RAM, cache off), on the Tang Nano 20K SDRAM bridge.
+The documented fallback is the HPS DDR3 through the `DDRAM_*` emu ports (as
+ao486 uses it): higher, variable latency, no add-on board, and the porting docs
+warn it needs careful reset handling.
 
 ## Device checklist
 
@@ -178,12 +125,9 @@ transferred almost directly, as expected). DDRAM stays the documented fallback.
 
 ## Addendum, 27-AUG-2026 - the built-in terminal, and why we cannot vendor PDP2011's
 
-PDP2011's VT100/VT105 (`rtl/vt.vhd`, `rtl/vga.vhd`, `rtl/vgacr.vhd`,
-`rtl/ps2.vhd`) is the exact feature we want - but those files carry a
-**non-commercial-use-only** header (Sytse van Slooten, 2008-2021), which is
-NOT the repo's GPL-2.0 `LICENSE` and cannot be mixed into this MIT repo.
-They are also a microcoded CPU running terminal firmware, i.e. far more
-terminal than a SINTRAN login needs.
+PDP2011's VT100/VT105 terminal files carry a **non-commercial-use-only**
+header (Sytse van Slooten, 2008-2021), which is NOT the repo's GPL-2.0
+`LICENSE` and cannot be mixed into this MIT repo.
 
 Decision (carried out): the terminal was re-implemented clean-room, using
 PDP2011 only as a feature checklist, and shared with the MEGA65 port. The

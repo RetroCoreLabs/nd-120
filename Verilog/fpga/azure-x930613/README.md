@@ -17,22 +17,20 @@ verified against a datasheet or the physical card**:
 | Network | 2x QSFP+ / 40GbE |
 | Host interface | PCIe Gen3 x16 |
 
-I have not verified the exact Stratix V GS variant, the board's clocking,
-or its debug access **against a datasheet or the physical card** - the
-table above is Ronny's own numbers, unverified by me independently.
+The exact Stratix V GS variant, the board's clocking and its debug access
+have not been checked against a datasheet or the physical card - the table
+above is Ronny's own numbers.
 
 A third-party blog, [devops.lol](https://www.devops.lol/) (see Links,
 below), identifies this same part number (X930613-001) as the **Microsoft
 "Storey Peak" board (Catapult v2)** and gives more specific numbers. A
-second report (pasted into this conversation 31-AUG-2026) added more
-detail but **was written by ChatGPT, not sourced from the card or a
-datasheet** - so before trusting any of it, every checkable claim in it
-was run against independent sources: a GitHub issue on the `corundum`
-project (corundum/corundum#213), the community reverse-engineering repo
-[`ruurdk/storey-peak`](https://github.com/ruurdk/storey-peak), and
-[theretroweb.com](https://theretroweb.com/expansioncards/s/microsoft-azure-x930613-001-fpga-card).
+second, unsourced report (31-AUG-2026) added more detail; every checkable
+claim in it was run against independent sources: a GitHub issue on the
+`corundum` project (corundum/corundum#213), the community
+reverse-engineering repo [`ruurdk/storey-peak`](https://github.com/ruurdk/storey-peak),
+and [theretroweb.com](https://theretroweb.com/expansioncards/s/microsoft-azure-x930613-001-fpga-card).
 Results below - **confirmed** means at least two independent sources
-agree; **unverified** means only the ChatGPT report claims it and no
+agree; **unverified** means only the unsourced report claims it and no
 other source was found:
 
 | Item | Value | Status |
@@ -44,8 +42,8 @@ other source was found:
 | Debug access | on-board **FTDI FT232H**, USB-to-JTAG, **no PCB modification or external programmer needed** - Quartus/OpenOCD can use it via community driver/library work | confirmed (devops.lol, corundum#213, ruurdk/storey-peak) |
 | Toolchain | **Quartus Prime Standard required** - Quartus Lite's free tier stops at Cyclone V/MAX 10 (which is why the `mister/` DE10-Nano board in this repo gets free tooling and this one doesn't) | confirmed - Stratix V is absent from every Lite device list checked, and Quartus's own Docker image tagged `-all` was pulled and queried directly: it ships only Cyclone V + MAX 10 device files, zero Stratix V |
 | GPIO | **none** on the standard interfaces - devops.lol's author rewired a UART through the QSFP+ module's I2C pins to get any general-purpose signal off the board | devops.lol only, unverified elsewhere |
-| Onboard flash size | ChatGPT's report claimed "~256 Mbit (32 MB) NOR flash" for persistent config | **unverified - no source found for this number**, treat as a guess until checked against the board itself or a schematic |
-| Logic capacity (~457K LE / ~172K ALM / ~40 Mbit BRAM) | ChatGPT's report gave these as "approximate capacity" | **unverified** - 457K LE appears in devops.lol too (so likely a real Stratix V GS family figure), but the ALM and BRAM numbers have no independent source and may just be ChatGPT extrapolating from the LE count |
+| Onboard flash size | the unsourced report claimed "~256 Mbit (32 MB) NOR flash" for persistent config | **unverified - no source found for this number**, treat as a guess until checked against the board itself or a schematic |
+| Logic capacity (~457K LE / ~172K ALM / ~40 Mbit BRAM) | the unsourced report gave these as "approximate capacity" | **unverified** - 457K LE appears in devops.lol too, but the ALM and BRAM numbers have no independent source |
 | Known issues (devops.lol author's) | dual-PCIe-IP selection needed DLL shimming on Windows; Nios II/Eclipse toolchain flaky; DDR3 bus deadlocks were hit building a LiteX-based SoC | devops.lol only, unverified elsewhere |
 
 This is a much harder bring-up target than any board currently in this
@@ -56,7 +54,7 @@ JTAG/UART bridge over a repurposed FTDI chip instead of a normal header.
 ## Why this board is a different shape from every other target
 
 Every other board in `Verilog/fpga/` is a hobbyist devboard: it has a
-UART or USB-JTOG console, a keyboard/VGA path, or an SD card, and it
+UART or USB-JTAG console, a keyboard/VGA path, or an SD card, and it
 powers up and runs standalone. This card is a datacenter PCIe accelerator:
 
 - **Toolchain is different.** Every other Altera/Intel target here

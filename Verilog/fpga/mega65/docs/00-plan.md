@@ -1,8 +1,9 @@
 # MEGA65 port - the living plan
 
-**Next:** send `build/delivery/` (both `.cor` files + the tester note; release names in `fpga/release-staging/`) to
-the testers and act on what comes back. Nothing of this port has run on a
-real MEGA65 yet.
+**Next:** act on what the testers send back. Both `.cor` files are attached
+to the live release `bitstreams-2026-09` (uploaded 05-SEP-2026); the tester
+instructions are `../../QUICKSTART-mega65.md`. Nothing of this port is
+recorded as having run on a real MEGA65 yet.
 
 Rebuilt 04-SEP-2026 (both cores, ~19 min each): `nd120_mega65_r6_20MHz_115200.cor`
 (SDRAM, CPU 20 MHz, WNS +0.249 / WHS +0.002 ns, stamp `bc612ad+ 04-Sep-2026
@@ -115,7 +116,7 @@ the deployed Nexys build.
 | `rtl/` | the Verilog: `nd120_mega65_machine.v`, `nd120_console_mega65.v`, `m65_keys_to_ps2.v`, `nd_storage_mega65_devices.v`, `nd_storage_vdrives.v`, `nd_avalon_port.v` |
 | `sim/` | one bench per file + `vdrives_model.v`, `lint_machine.sh`; `make all` runs them; registered in `Verilog/tests/run_all_tests.sh` |
 | `build.tcl`, `Makefile` | `make toolchain` once, `make all BOARD=r3|r4|r5|r6` -> `.bit` + `.cor` under `build/<board>/` |
-| `docs/SEND-NOTE.md` | what goes to a tester |
+| `../QUICKSTART-mega65.md` | what goes to a tester |
 | `tools/` | gitignored; `coretool` lands here |
 
 **Isolation rule (Ronny, 27-AUG):** everything for this port lives under

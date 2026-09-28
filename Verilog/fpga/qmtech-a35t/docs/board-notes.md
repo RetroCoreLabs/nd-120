@@ -82,3 +82,40 @@ Simple 1 Hz alternating blinker on `C8`/`D8`, reset on `H18`, `sys_clk` on
 `R2` - source of the pin facts in [`../board-pins.xdc`](../board-pins.xdc).
 Ships with a netlist-inserted ILA on the counter, again confirming the
 ILA-over-JTAG workflow.
+
+## Board setup and smoke tests (from the 08-JUL-2026 bring-up handoff)
+
+Merged here 28-SEP-2026 from `HANDOFF-qmtech-a35t-bringup.md` (superseded
+04-SEP-2026 by `../README.md`; git history keeps it). Hardware facts, verified
+against the manual and the schematic in this folder:
+
+- Same FPGA die as the Basys3, part **`xc7a35tcsg325-1`** (CSG325 package),
+  plus 32 MB SDRAM, which removes the Basys3's 24 KB BRAM main-memory limit.
+- Mini USB = **power only** (QMTECH omits the FTDI bridge Digilent boards
+  have). Everything else goes through a **Xilinx Platform Cable USB II** on the
+  6-pin JTAG header: programming, SPI flash, ILA, VIO. Vivado's hardware
+  manager sees it like the Basys3's onboard JTAG, so the `../basys3/ila_*.tcl`
+  workflow carries over.
+- No UART on the board. Console options considered: a BSCANE2 JTAG-UART
+  bridge, VIO character poking, or 2 header pins + an external 3.3 V
+  USB-serial dongle (the shipped build uses header JP3 - see
+  `../../QUICKSTART-qmtech-a35t.md`).
+- Confirmed pins (schematic sheet 2/4; full map in
+  [`../board-pins.xdc`](../board-pins.xdc)): 50 MHz oscillator on `R2`
+  (MRCC), keys `H18` (SW1) / `H17` (SW2) active-low, LEDs `C8`/`D8`
+  active-low, 39 SDRAM pins. On headers JP2/JP3, **pin 1 = 5 V, pin 2 = 3V3**.
+
+Smoke tests, for when the full build fails in a way that makes the board
+itself the suspect (Windows host, board powered from the Mini USB, Platform
+Cable on the JTAG header):
+
+1. `led-test/`: `vivado -mode batch -source build.tcl` (synth + impl +
+   bitstream + JTAG program in one run). PASS = `led_n[0]` blinks at 1 Hz and
+   `led_n[1]` lights while SW1 (H18) is held. A wrong blink rate means the
+   clock assumption is wrong; a failed program means cable/target (check that
+   hw_server sees the cable).
+2. `mem-test/` (port of `../basys3/mem-test/`, 50 MHz MMCM -> 16.667 MHz, UART
+   TX is an internal `mark_debug` net): LEDs fast blink = running, 1 Hz blink
+   = PASS, both solid = FAIL. Same die as the Basys3 where this passes, so a
+   FAIL points at the board (clock/MMCM), not the logic. The iverilog sim
+   (`mem-test/sim/`, `-DNO_MMCM`) passes.

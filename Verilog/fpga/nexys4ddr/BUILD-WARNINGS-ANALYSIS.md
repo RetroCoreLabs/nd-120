@@ -99,9 +99,9 @@ module, in the same build mode.
 This sits directly in the parity-error path that commits `148594d` and `6d95b09`
 were about.
 
-**Status: found, not fixed.** It is a behaviour change in the memory error path
-and should not be made blind - it needs the same treatment the `AM29833A` got
-(sysclk-sampled edge detect) plus a testbench proving latch and FF modes agree.
+**Status: FIXED (commit `202c606`, 25-AUG-2026).** In `FPGA_FF_MODE`,
+`MEM_DATA_46.v:177-201` now replaces `MEMORY_4`/`MEMORY_5` with the same
+sysclk edge capture the `AM29833A` uses; latch mode keeps the J-K chips.
 
 ---
 
@@ -210,15 +210,15 @@ that failure is silent. Worth a cleanup pass, not urgent.
 
 ---
 
-## What to do, in order
+## What to do, in order (status 28-SEP-2026)
 
 1. **Break the CGA ring in RTL.** It removes `8-295`, `LUTLP-1` and `8-326`
-   together, makes the WNS number mean something, and takes synthesis back from
-   hours to minutes. Everything else here is smaller.
-2. **`MEMORY_5` in `MEM_DATA_46.v`** - finish the FF-mode conversion its own
-   neighbouring comment describes.
-3. **`ND_FLOPPY_DMA` set/reset priority** - closes a sim-vs-silicon gap on 11
-   bits for very little work.
-4. **Read the 22 deleted registers and the `sd_writer` connections** - both are
-   currently UNVERIFIED and both could be hiding a real omission.
-5. RAM inference and the cosmetic items whenever convenient.
+   together and makes the WNS number mean something. Owned by
+   `Verilog/docs/HANDOFF-cga-idb-ring-cut.md`.
+2. `MEMORY_5` in `MEM_DATA_46.v` - DONE (section 2).
+3. **`ND_FLOPPY_DMA` set/reset priority** (section 3) and **the 22 deleted
+   registers + the `sd_writer` connections** (section 4) - NOT re-checked since
+   `ND_FLOPPY_DMA.v` was reworked; needs a fresh synthesis log read. Of the
+   examples, `s_disk_to` is read today (`ND_FLOPPY_DMA.v:660`) and `s_pend` is
+   only used when the `EARLY_REREQ` parameter is non-zero.
+4. RAM inference and the cosmetic items whenever convenient.

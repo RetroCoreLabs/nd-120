@@ -2,8 +2,8 @@
 
 Run the 1988 Norsk Data ND-120 on this board from a ready-built bitstream -
 no FPGA toolchain needed. Two deployment paths: **USB** (proven, used for
-every build in this repo) and **microSD card** (vendor-documented,
-verification on our hardware pending - see the banner in that section).
+every build in this repo) and **microSD card** (verified end to end on our
+hardware 27-AUG-2026 - see the note in that section).
 
 What you need:
 
@@ -108,15 +108,9 @@ To go back to a plain board, restore the demo or move JP1 back to JTAG.
 
 > **VERIFIED WORKING end to end (27-AUG-2026)** with bitstreams built
 > after the fix-sd-card change: the FPGA configures itself from the
-> card AND boots SINTRAN from the same card afterwards. History of the
-> bug this needed: the board's microcontroller reads the card in SPI
-> mode during configuration, and a card that entered SPI mode only
-> leaves it by a power cycle; the design used to hold slot power ON
-> constantly (`sd_reset` a constant), so every disc operation after an
-> SD-card configuration failed with FDISK error 3 while the same card
-> booted fine over USB. The design now power-cycles the slot itself at
-> every configuration, reset and master clear. Bitstreams older than
-> 27-AUG-2026 still have the bug - with those, Path 2 gives OPCOM only.
+> card AND boots SINTRAN from the same card afterwards. Bitstreams older
+> than 27-AUG-2026 give OPCOM only on this path (the fix and its history:
+> the 27-AUG row in `HISTORY.md`).
 > Reference: `nexys4ddr/docs/nexys4ddr_rm.pdf`, Figure 3 and
 > section 3.3.
 

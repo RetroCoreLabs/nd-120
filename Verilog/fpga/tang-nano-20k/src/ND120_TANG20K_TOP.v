@@ -376,7 +376,7 @@ module ND120_TANG20K_TOP (
   //   slice 3 -> frozen[55:42]  cycle[23:10]
   //
   // Full layout and the decode are in
-  //   Verilog/fpga/tang-nano-20k/PLAN-pagefault-root-cause.md
+  //   Verilog/fpga/tang-nano-20k/PLAN-pagefault-root-cause.md (retired, git 043c460)
   //
   // NOTE: while this define is set, XMIC_DBG_15_0 carries the capture readout,
   // NOT the microsequencer address-advance probe. Do not decode it as the latter.
@@ -610,7 +610,7 @@ module ND120_TANG20K_TOP (
 `elsif TANG_PTORD_CAPTURE
   // ---------------------------------------------------------------------------
   // ORDERING: PAGE-TABLE WRITES vs NO-PERMIT ACCESSES, ONE PAGE, ONE RING
-  // (23-AUG-2026, Phase 1b of PLAN-pf-campaign-prio.md)
+  // (23-AUG-2026, Phase 1b of PLAN-pf-campaign-prio.md, git 043c460)
   //
   // THE CONTRADICTION THIS SETTLES. Both were measured on silicon on the same
   // boot, and they cannot both describe the same moment:
@@ -1196,7 +1196,9 @@ module ND120_TANG20K_TOP (
   wire [19:0] s_cap_src   = {4'd0, 3'b0, CSA_12_0[12:0]};
 `elsif ND_WD_TRACE_TVEC_CSA
   // CSA, not PIL, in the low bits: the PAGING test-3 analysis
-  // (docs/HANDOFF-paging-test3-pof-dispatch-rootcause.md) pins its D2
+  // (docs/HANDOFF-paging-test3-pof-dispatch-rootcause.md, retired - git
+  // 202c606; the cause proved to be the PAL 44306A EIPL term, PAL_44306A.v)
+  // pins its D2
   // defect to the overlapped COMM,AREAD dispatch word at CSA 04420. If
   // the SINTRAN hang traps at the same microcode address, it is the same
   // defect and not merely the same symptom.
@@ -2151,7 +2153,7 @@ module ND120_TANG20K_TOP (
   // silently collapsed by yosys into an always-driving OBUF: the FPGA then
   // fights the card on DAT1-3 through every 4-bit read data phase, which
   // simulates perfectly and fails on silicon. Proven from the synthesis
-  // netlist 12-JUL-2026 - see docs/sd-speed-plan.md rung c. The pads idle
+  // netlist 12-JUL-2026 - see fpga/tang-nano-20k/sd-fat-test/README.md. The pads idle
   // released and the slot's external 10K pull-ups hold the lines high,
   // including DAT3 at CMD0 (SD-native mode select).
   assign sd_dat1 = s_sd_dat1_oe ? s_sd_dat1_o : 1'bz;

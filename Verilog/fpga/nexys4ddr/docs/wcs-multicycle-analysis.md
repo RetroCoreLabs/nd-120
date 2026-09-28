@@ -20,15 +20,15 @@ How many clk_cpu cycles does the machine really give this path?
 
 Everything below runs on one clock. OSC == sysclk == clk_cpu on the FPGA -
 stated and enforced in
-E:\Dev\Repos\Ronny\nd-120\Verilog\CPU-BOARD-3202\circuit\IO_DCD_38.v:367-373
+Verilog/CPU-BOARD-3202/circuit/IO_DCD_38.v:367-373
 ("drive OSC straight from that clean net so OSC == sysclk == clk_cpu"), and
-E:\Dev\Repos\Ronny\nd-120\Verilog\ND120_TOP.v:404 (assign clk1 = clk_cpu).
+Verilog/ND120_TOP.v:404 (assign clk1 = clk_cpu).
 
 The microcycle is sequenced by PAL_44601B (the CC0-CC3 FSM), clocked on OSC
-(E:\Dev\Repos\Ronny\nd-120\Verilog\CPU-BOARD-3202\circuit\CYC_36.v:382-408).
+(Verilog/CPU-BOARD-3202/circuit/CYC_36.v:382-408).
 Its TERM register is set for EXACTLY ONE clk_cpu cycle per microcycle and
 then self-clears
-(E:\Dev\Repos\Ronny\nd-120\Verilog\PAL\PAL_44601B.v:113-127: the whole
+(Verilog/PAL/PAL_44601B.v:113-127: the whole
 TERM equation is guarded by "if (s_term_n_int) ... else TERM_reg <= 1'b0").
 Cycle length varies ONLY in the number of states BEFORE the TERM pulse:
 
@@ -47,7 +47,7 @@ original listing comments naming each cycle length.)
 The derived clocks (all from CYC_36.v):
 
 - MCLK = ~(TERM_n & MCLK_n), and MCLK_n has ONLY RWCS product terms
-  (E:\Dev\Repos\Ronny\nd-120\Verilog\PAL\PAL_44307C.v:96-99 and the naming
+  (Verilog/PAL/PAL_44307C.v:96-99 and the naming
   comment at :46-53). So outside a RWCS cycle, MCLK == TERM: ONE rise per
   microcycle, entering the TERM pulse. During RWCS, MCLK is stretched high
   through the CC3_n/CC2 states and its single rise is at the start of the
@@ -63,22 +63,22 @@ The derived clocks (all from CYC_36.v):
 
 **(1) Launch.** LAA_REG (and its twin LBA_REG) are R41P_EN registers
 with EN = MCLK_EN
-(E:\Dev\Repos\Ronny\nd-120\Verilog\DELILAH-CPU\CGA_MIC\circuit\CGA_MIC.v:1038,1102;
+(Verilog/DELILAH-CPU/CGA_MIC/circuit/CGA_MIC.v:1038,1102;
 FF implementation
-E:\Dev\Repos\Ronny\nd-120\Verilog\Shared\ndlib\R41P_EN.v:40-49, which is
+Verilog/Shared/ndlib/R41P_EN.v:40-49, which is
 where the "gen_enable.q_r_reg" name in the timing report comes from). They
 capture ONLY on the MCLK rise. Call that posedge t. From the clock model
 above, the cycle [t, t+1) is either the TERM pulse (all non-RWCS cycles) or
 state a=0000 (the RWCS stretch, whose rise is in state a).
 
 **(2) Capture.** The WCS is 32 BRAMs
-(E:\Dev\Repos\Ronny\nd-120\Verilog\CPU-BOARD-3202\circuit\CPU_CS_WCS_21_22.v,
+(Verilog/CPU-BOARD-3202/circuit/CPU_CS_WCS_21_22.v,
 chips CHIP_16C..31D, model
-E:\Dev\Repos\Ronny\nd-120\Verilog\Shared\support\IDT6168A_20.v:104-127):
+Verilog/Shared/support/IDT6168A_20.v:104-127):
 the address pin is sampled at EVERY posedge, data out one cycle later. But
 the address only MOVES while the ACAL latches are transparent, and they are
 transparent only while MACLK is high
-(E:\Dev\Repos\Ronny\nd-120\Verilog\CPU-BOARD-3202\circuit\CPU_CS_ACAL_17.v:150-170:
+(Verilog/CPU-BOARD-3202/circuit/CPU_CS_ACAL_17.v:150-170:
 hold-FF plus pass-through mux on s_maclk). So the address captures that
 can ever carry NEW data are the posedges that close a MACLK-high cycle:
 
@@ -89,7 +89,7 @@ can ever carry NEW data are the posedges that close a MACLK-high cycle:
 **(3) Consumption.** The BRAM output register IS the microinstruction
 register - CSBITS fans out combinationally into the CGA with no register in
 between
-(E:\Dev\Repos\Ronny\nd-120\Verilog\CPU-BOARD-3202\circuit\CPU_PROC_CGA_33.v:126
+(Verilog/CPU-BOARD-3202/circuit/CPU_PROC_CGA_33.v:126
 onward is pure assigns). Whatever the address pins sample gets executed. So
 the constraint question is purely: which address captures at t+1 can depend
 on data launched at t?
@@ -97,7 +97,7 @@ on data launched at t?
 ## Why every 1-cycle capture is masked
 
 The address the BRAMs sample is MA_12_0 from the IPOS mux
-(E:\Dev\Repos\Ronny\nd-120\Verilog\DELILAH-CPU\CGA_MIC\circuit\CGA_MIC_IPOS.v:96-141),
+(Verilog/DELILAH-CPU/CGA_MIC/circuit/CGA_MIC_IPOS.v:96-141),
 a 4-way mux per bit:
 
 | sel | source   | reaches it from LAA/LBA_REG? |
@@ -117,7 +117,7 @@ capture:
   a - UNSTABLE TRAP IN THIS PERIOD CAN DESTROY MA !"). During the TERM pulse
   TERM_n=0, and in state a all CC bits are 0 - either way ETRAP_n=1.
   TRAPN = BRK_n | CBRK | ETRAP_n
-  (E:\Dev\Repos\Ronny\nd-120\Verilog\DELILAH-CPU\CGA_TRAP\circuit\CGA_TRAP_BRKDET.v:256-263,
+  (Verilog/DELILAH-CPU/CGA_TRAP/circuit/CGA_TRAP_BRKDET.v:256-263,
   GATES_16, NAND with all-inverted inputs). ETRAP_n=1 forces TRAPN=1 no
   matter what the ALU is doing: TVEC deselected, the IPOS selector pinned.
   The 1988 designers built this fence for exactly this hazard; we are
@@ -133,7 +133,7 @@ capture:
   (CPU_CS_ACAL_17.v:168-170) - so its captures are all end-of-TERM. CSCA
   is MCA from the MAC, and MCA is an L8 latch of ICA transparent only while
   MCLK is LOW
-  (E:\Dev\Repos\Ronny\nd-120\Verilog\DELILAH-CPU\CGA_MAC\circuit\CGA_MAC_APOS_CALCA.v:214
+  (Verilog/DELILAH-CPU/CGA_MAC/circuit/CGA_MAC_APOS_CALCA.v:214
   onward, .L(s_mclk_n), header comment "MCA source is ICA, and is latched on
   posedge on MCLK"). During TERM, MCLK is high, the latch holds, and the
   live route from the datapath is closed at every 31G capture.

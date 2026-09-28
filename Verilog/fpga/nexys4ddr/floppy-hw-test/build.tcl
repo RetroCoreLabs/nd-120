@@ -3,7 +3,7 @@
 #   vivado -mode batch -source build.tcl              # build + JTAG program
 #   vivado -mode batch -source build.tcl -tclargs -noburn
 # Purpose and output format: see the header of floppy_hwtest_top.v and
-# ../HANDOFF-floppy-dma-investigation.md.
+# ../HANDOFF-floppy-dma-investigation.md (retired, git c4896a4).
 
 set part xc7a100tcsg324-1
 set srcdir [file dirname [file normalize [info script]]]

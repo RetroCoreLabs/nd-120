@@ -1,7 +1,7 @@
 /****************************************************************************
 ** floppy_hwtest_top - SELF-CHECKING VERILOG TEST PROGRAM ON THE REAL      **
 ** NEXYS 4 DDR HARDWARE for the floppy DMA path (root cause + fix:        **
-** ../HANDOFF-floppy-dma-investigation.md PART 0).                         **
+** ../HANDOFF-floppy-dma-investigation.md PART 0, retired - git c4896a4).  **
 **                                                                         **
 ** WHAT IT CONTAINS - the real RTL under test, no CPU:                     **
 **   ND_FLOPPY_DMA (the floppy controller)                                 **

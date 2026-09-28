@@ -50,8 +50,7 @@ automatically; the OSS flow must pin them explicitly (see below).
 Out of the box the board's flash contains a **LiteX SoC** (VexRiscv_Min @
 48 MHz) from the `litex/` folder of
 [sipeed/TangNano-20K-example](https://github.com/sipeed/TangNano-20K-example)
-(local clone: `/home/ronny/repos/TangNano-20K-example`, prebuilt bitstream
-`litex/tang_nano_20k_litex.fs`). It talks on the BL616 USB serial at
+(prebuilt bitstream `litex/tang_nano_20k_litex.fs` in that repository). It talks on the BL616 USB serial at
 **115200** baud and its BIOS has `mem_test`, `mem_speed`, `sdram_test`
 commands - a handy independent cross-check of the SDRAM hardware.
 
@@ -67,7 +66,7 @@ Useful facts from its boot report (observed on our board, 2026-07-08):
 Loading this test into **SRAM** (`make load` / openFPGALoader without `-f`) is
 volatile and leaves the factory image alone. Writing **flash** (`make flash`)
 replaces LiteX - restore it with
-`openFPGALoader -b tangnano20k -f /home/ronny/repos/TangNano-20K-example/litex/tang_nano_20k_litex.fs`.
+`openFPGALoader -b tangnano20k -f <your clone of TangNano-20K-example>/litex/tang_nano_20k_litex.fs`.
 
 ## What the test does
 
@@ -144,37 +143,12 @@ the package-pin CST automatically.
 
 ### USB access from WSL2 (usbipd)
 
-WSL2 has no USB devices by default, so `make load` fails with
-`unable to open ftdi device` until the board is forwarded from Windows with
-[usbipd-win](https://github.com/dorssel/usbipd-win). One-time setup in an
-**elevated (Administrator) PowerShell**:
-
-```powershell
-winget install usbipd
-usbipd list          # find the board's BUSID
-usbipd bind --busid <BUSID>          # one-time: mark shareable (admin)
-usbipd attach --wsl --busid <BUSID>  # forward to WSL (repeat after replug)
-```
-
-Gotchas observed on this machine (2026-07-08):
-
-- The Tang Nano 20K's BL616 enumerates as an FTDI pair, VID:PID **`0403:6010`**
-  ("USB Serial Converter A, USB Serial Converter B"). The **Basys3 uses the
-  exact same VID:PID**, so with both boards plugged in, two identical entries
-  appear (here: `1-7` and `3-3`) and `usbipd list` cannot tell them apart.
-  Disambiguate by unplugging/replugging the Tang and seeing which BUSID
-  disappears, or attach both and identify by JTAG IDCODE
-  (`openFPGALoader --detect`: GW2AR-18 = `0x0000081b`, Basys3's Artix-7 =
-  `0x0362d093`).
-- While attached to WSL, the board's **COM port disappears from Windows**; the
-  serial console is reachable from WSL instead (e.g. `/dev/ttyUSB1` - the BL616
-  is a two-channel FTDI: channel A = JTAG, channel B = UART). Give it back
-  with `usbipd detach --busid <BUSID>`.
-- `usbipd attach` must be re-run after every replug or WSL restart
-  (`bind` persists, `attach` does not).
-- WSL2 has no udev, so the forwarded device is root-only. After every attach:
-  `sudo chmod 666 /dev/bus/usb/<bus>/<dev>` (find it with `lsusb`) before
-  openFPGALoader works without root.
+Use `make usb` in the parent folder - the attach, the raw-USB permissions and
+the serial nodes are scripted there; see `../README.md`, "Bring-up". One trap
+that script cannot solve for you: the Basys3 enumerates with the **same**
+VID:PID `0403:6010`, so with both boards plugged in, tell them apart by JTAG
+IDCODE (`openFPGALoader --detect`: GW2AR-18 = `0x0000081b`, Basys3's Artix-7 =
+`0x0362d093`) or by unplugging one.
 
 ### Serial console from WSL2 (how the hardware run was verified)
 
@@ -247,12 +221,11 @@ The testbench runs the complete sequence against a behavioral SDRAM model
 and a 64-byte block, and starts the test through the UART RX path - so both
 borrowed SC2661 state machines are exercised.
 
-## Notes for the ND-120 integration (next step)
+## Notes that carried into the ND-120 bridge
 
-- The controller is **byte-based** with 5-cycle operations and 4-cycle read
-  latency at up to 66.7 MHz - the ND-120 bridge (`MEM_RAM_49.v` interface:
-  `AA_9_0`, `BANK*`, `RAS/CAS`, `MWRITE50_n`) will need a small FSM in front
-  of it, plus refresh arbitration exactly like the one in this test.
+The ND-120 integration is done: `../sdram-bridge/` wraps this controller (5-cycle
+operations, 4-cycle read latency, up to 66.7 MHz) behind the sheet-49 protocol.
+
 - The 180-degree `clkoutp` phase relationship is load-bearing; keep the rPLL
   configuration when changing the clock frequency.
 - LiteX proves the silicon is fine at 48 MHz CL-2, so any failure seen with

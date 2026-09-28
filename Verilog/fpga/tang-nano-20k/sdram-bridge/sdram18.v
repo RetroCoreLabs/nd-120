@@ -9,7 +9,7 @@
 //   - everything else (timing parameters, state machine, refresh, init)
 //     is unchanged
 //
-// ND_SDRAM_PACK16 (docs/nd120-parity-refactor-order.md, semantics pinned by
+// ND_SDRAM_PACK16 (docs/build-defines.md section 1, semantics pinned by
 // docs/nd120-parity-analysis.md): store 16 DATA bits only, TWO ND words per
 // 32-bit SDRAM location. addr becomes a 22-bit HALF-WORD address
 // ([21:1] = location, [0] = half), din/dout become 16 bits. A 16-bit write

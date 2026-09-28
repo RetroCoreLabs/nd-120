@@ -217,7 +217,7 @@ From WSL (Vivado runs on the Windows host):
 cd Verilog/fpga/nexys4ddr
 make build              # bitstream only, no board needed
 make                    # bitstream + JTAG program
-make CLK=33             # try a 33.333 MHz CPU clock instead of 16.667 MHz
+make CLK=33             # the deployed 33.333 MHz CPU clock (the default is 16.667 MHz)
 make clean
 ```
 
@@ -262,10 +262,41 @@ means an empty microcode ROM, which looks like a dead CPU).
 | Clocking | `FPGA_FF_MODE`, one clock domain | The latch model never ships on FPGA. |
 | CPU clock | **33.333 MHz** (`clk 33` + `physopt`) with the cache ON - the deployed clock (7.52 MIPS) | Boots SINTRAN on silicon. 45.45 MHz and 50 MHz also boot (cache-off builds); 45.45 with the real cache is parked as routing-bound. The frequency search, the cache-clock analysis and the bottleneck writeup are in [`timing.md`](timing.md); `clk=16` remains the high-margin fallback. |
 | WCS load | runtime load from the PROM images | The -100T has BRAM to spare; `-skipwcs` switches to the Basys3-style bitstream preload. |
-| CPU cache | compiled in (default since 29-AUG-2026); **runtime on/off on slide switch `sw[4]`: down = on, up = off** (the console's SW1, sheet 25 CON) | All 8 cache tests pass on the board (31-AUG-2026); the earlier CACHE-120-A00 failure (used bit never set) is fixed. Root-cause: `docs/HANDOFF-cache-and-panel-29AUG.md`. `nocache` / `make CACHE=0` compiles the RAMs out. |
+| CPU cache | compiled in (default since 29-AUG-2026); **runtime on/off on slide switch `sw[4]`: down = on, up = off** (the console's SW1, sheet 25 CON) | All 8 cache tests pass on the board (31-AUG-2026); the earlier CACHE-120-A00 failure (used bit never set) is fixed. Root causes and how to test: `Verilog/docs/CACHE-STATUS.md`. `nocache` / `make CACHE=0` compiles the RAMs out. |
 | VGA console | `ND120_CONSOLE_VGA` (default since 29-AUG-2026) - console on the VGA connector + USB keyboard, serial console kept in parallel | Every deployed image since 28-AUG had it. `novgaconsole` / `make VGACONSOLE=0` leaves it out to save space; the screen is then dark and only the serial console works. |
 | Panel clock | `ND120_PANEL_CLOCK` (default since 29-AUG-2026) - the MC68705/MM58274 hardware clock emulated in `CPU-BOARD-3202/circuit/PANCAL_68705_CLOCK.v`, 1 Hz tick derived from `BOARD_CLK_FREQ` so it follows `clk=` | Proven on the Tang (SINTRAN takes the time across a master clear, TPE starts without "clock is not updated"). `-NoPanelClock` / `make PANELCLOCK=0` brings back the old stub if the space is needed for something else; then SINTRAN prints "ND-100 PANEL CLOCK INCORRECT" at every boot. Details: `Verilog/docs/panel-clock-68705.md`. |
 | Console | **115200** 7E1 on the USB-UART since 26-AUG-2026 | The physical rate is the `UART_BAUD_RATE` build constant alone: the emulated SC2661 stores the microcode's BAUDV mode value (thumbwheel 8 = 9600 - the 1988 table tops out there) but times every bit off the compile-time divider, and TX-ready is a polled flag. The machine believes 9600; the wire runs 115200. |
+
+**CPU board lamps are ACTIVE LOW.** `nd120_nexys4ddr_top.v` inverts
+`panel_cpu_red` / `panel_cpu_green` (lines 669-670). Measured on the MiSTer
+(31-AUG-2026, `fpga/mister/nd120.sv:601-607`) and confirmed here on build 24:
+GREEN lights with the inversions in place. Removing them on the strength of
+the IOC register comments made RED light while no master clear was running.
+
+**Always pass `-noburn` when you flash separately** - otherwise `build.tcl`
+programs the board itself at the end and a later `program_only.tcl`
+reconfigures it a second time.
+
+### Vivado working rules (each cost a build to learn)
+
+- Build from a separate worktree pinned to a commit, not the shared tree
+  other sessions are editing. A partial sync of the terminal files once gave
+  `byte_fifo not found`, and a shared-tree build once gave a dead console.
+- Launch Vivado detached (on Windows: WMI, `Invoke-CimMethod
+  Win32_Process Create`), not from a foreground call with a timeout: a
+  timeout returns exit 143 and takes Vivado down with it, with no error in
+  the log.
+- Clear `.Xil` after any killed run. Leftovers make Chipscope fail with
+  `Config Param 'mark_debug' is already registered`.
+- Arm and read an ILA in ONE Vivado session. `hw_ila` properties are
+  software-side and re-initialise per batch run.
+- Compare ILA status case-insensitively: Vivado returns `FULL`, and a
+  compare against `"Full"` reported "never triggered" on a run that had.
+- `CONTROL.TRIGGER_MODE` is read-only in this Vivado; setting it aborts the
+  script.
+- Program an ILA build with its `.ltx` (`ila_cache.tcl -tclargs program`),
+  not `program_only.tcl`, or the probes come back unnamed.
+- Vivado runs on Windows and needs no WSL; only Verilator/iverilog do.
 
 ### Raising the clock
 
@@ -275,28 +306,20 @@ CPU speed. Supported: **16, 20, 25, 27, 33, 35, 38, 40, 42, 45, 50, 100** MHz
 (VCO fixed at 1000 MHz; the 35-45 entries are fractional dividers added by the
 26-AUG-2026 clock-up campaign).
 
-Measured post-route STA results, one run each, Vivado 2026.1, `ilaslim`
-config (evidence: `timing-analysis/run_clk*/`, analysis:
-`timing-analysis/TIMING_CLOSURE_REPORT.md`):
-
-| clk= | period | CPU-domain WNS | verdict |
-|------|--------|----------------|---------|
-| 16 | 60 ns | +26.455 | PASS (shipped, SINTRAN boots) |
-| 25 | 40 ns | +9.293 | PASS |
-| 33 | 30 ns | +1.282 | PASS |
-| 35 | 28 ns | +1.308 | PASS |
-| 38 | 26 ns | +0.316 | PASS |
-| 40 | 25 ns | +0.319 | PASS |
-| 42 | 24 ns | +0.152 | PASS |
-| 45 | 22 ns | +0.085 | PASS (razor-thin, single seed) |
-| 50 | 20 ns | **-2.546** | **FAIL** (1213 endpoints, gate refuses bitstream) |
+The measured post-route STA result for every clock (one run each, Vivado
+2026.1, `ilaslim` config) is the table in [`timing.md`](timing.md); the
+per-domain analysis is `timing-analysis/TIMING_CLOSURE_REPORT.md` and the
+evidence is `timing-analysis/run_clk*/`. In short: 16 to 45 MHz close with the
+default flow, 50 MHz needs `physopt` and is fragile.
 
 STA passing is NOT functional validation by itself. Silicon-verified
-26-AUG-2026: SINTRAN boots at 45.45 MHz (115200 console, deployed) and at
-50 MHz (9600 build). No soak yet at either; the two auto-inserted
-loop-breaking false paths (CGA IDB ring remnants, see `build.tcl`) make
-every CPU WNS a floor, not a guarantee; and the 50 MHz closure died on a
-one-constant edit (`timing.md`), so every new build must pass its own gate.
+26-AUG-2026: SINTRAN boots at 45.45 MHz (115200 console, cache off) and at
+50 MHz (9600 build); 45.45 MHz was soaked 4 hours on 27-AUG-2026, 50 MHz
+never was. The deployed clock is 33.333 MHz with the cache ON (status above).
+The two auto-inserted loop-breaking false paths (CGA IDB ring remnants, see
+`build.tcl` and `Verilog/docs/HANDOFF-cga-idb-ring-cut.md`) make every CPU WNS
+a floor, not a guarantee; and the 50 MHz closure died on a one-constant edit
+(`timing.md`), so every new build must pass its own gate.
 
 `clk=` sets the MMCM divider **and** `BOARD_CLK_FREQ` together - they must
 always move as a pair, or the UART baud divisor, the RTC tick and every
@@ -426,9 +449,8 @@ vivado -mode batch -source build.tcl -tclargs nocache -noburn        # cache RAM
 ```
 
 The VGA console is ON BY DEFAULT since 29-AUG-2026 (`novgaconsole` drops it).
-It adds the 12 terminal sources, copies the font next to `font_rom.v`
-(Vivado resolves `$readmemh` relative to the .v, not the project), reads the
-extra XDC, and defines `ND120_CONSOLE_VGA` plus the console baud. `-noburn`
+It adds the 12 terminal sources (the font is embedded in `font_rom.v`, no
+`.hex` file is read), reads the extra XDC, and defines `ND120_CONSOLE_VGA` plus the console baud. `-noburn`
 builds without programming the board - **`build.tcl` programs over JTAG by
 default**, which would replace whatever is currently running.
 
@@ -440,50 +462,15 @@ half. The banner and the banner/machine priority are shared with the MiSTer and
 MEGA65 consoles (`Terminals/rtl/term_console_feed.v`), so the three boards
 cannot drift apart.
 
-### First build, 28-AUG-2026 - SYNTHESIZED, PROGRAMMED, AND SINTRAN STILL BOOTS
+### Verified on the board
 
-`vivado -mode batch -source build.tcl -tclargs vgaconsole`, Vivado 2026.1,
-default `clk_sel 16` and 115200 baud. Measured, not estimated:
-
-| | |
-|---|---|
-| Setup | **WNS +1.460 ns**, TNS 0.000 |
-| Hold | WHS +0.016 ns, THS 0.000 |
-| DRC | 0 errors |
-| Bitstream | `nd120_nexys4ddr.bit`, 3,825,999 bytes |
-| Programmed | yes, over JTAG |
-
-So the terminal core fits and closes timing on top of the whole ND-120, with
-+1.46 ns of setup margin left. Hold margin is thin (+0.016 ns) but positive.
-
-**SINTRAN III boots on the resulting bitstream** - confirmed by reading COM11
-while the board came up:
-
-```
- 09.45.15     16 SEPTEMBER   1994
- SINTRAN III - VSX/500 M
---- NEXYS4 FPGA ---
- CPU TYPE:      102      CPU NUMBER:    120
-SINTRAN III RUNNING -
-PAGES FOR SWAPPING:   3074B
-```
-
-That is the important negative result too: adding the console did NOT break the
-machine. The serial console still works exactly as before, which is the whole
-premise of testing the terminal on this board.
-
-**All three are now verified on the board:** the VGA connector drives the
-picture, the font ROM loaded (the real box-drawing glyphs, embedded in
-`font_rom.v`), and the keyboard table is right, including the Left-arrow fix.
-That last one was the reason this board was chosen - typing a key and comparing
-the screen against what COM11 shows the machine actually received is what
-settled the scancode table.
-
-Simulation coverage behind it: 8 testbenches (7 in `Terminals/sim` including a
-1,920,000-pixel frame comparison, 1 for the MiSTer glue), Verilator lint clean,
-zero inferred latches, and the default non-console bitstream proven unchanged by
-preprocessing the top level both ways.
-
+The first console build (28-AUG-2026, `clk 16`, WNS +1.460 ns) programmed and
+booted SINTRAN with the serial console unchanged. Since then the VGA picture,
+the embedded box-drawing font and the keyboard table (incl. the Left-arrow fix)
+are all verified on the board, by typing a key and comparing the screen with
+what the serial console shows the machine received. The record is the 1-2 SEP
+row in `HISTORY.md`. Simulation coverage: 8 testbenches (7 in `Terminals/sim`
+including a 1,920,000-pixel frame comparison, 1 for the MiSTer glue).
 
 ### Slide switches
 
@@ -548,6 +535,6 @@ would look right and be wrong:
   in *frames*, not clocks, so it stays correct when `sw[2]` changes the pixel
   clock.
 
-Design mockup and the full provenance of every field:
-<https://claude.ai/code/artifact/65f75e7c-ce77-4724-89ab-8b219d19f9a9>
+The design mockup with the provenance of every field is kept outside the
+repository (a private page, not linked here).
 

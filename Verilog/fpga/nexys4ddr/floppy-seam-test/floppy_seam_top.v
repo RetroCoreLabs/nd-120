@@ -1,6 +1,7 @@
 /****************************************************************************
 ** floppy_seam_top - autonomous silicon probe for the Nexys 4 DDR floppy   **
-** seam fault (see ../HANDOFF-floppy-dma-investigation.md).                **
+** seam fault (see ../HANDOFF-floppy-dma-investigation.md, retired -       **
+** git c4896a4).                                                           **
 **                                                                         **
 ** WHAT IT IS: the EXACT storage configuration of the ND-120 top           **
 ** (nd120_nexys4ddr_top.v) - nd_storage at the same parameters, the same   **

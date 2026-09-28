@@ -1,16 +1,15 @@
 # Nexys 4 DDR extensions: microSD, then DDR2 main memory
 
 **Full path:** `Verilog/fpga/nexys4ddr/EXTENSIONS-PLAN.md`
-**Date:** 19-AUG-2026. **Status: HISTORICAL (02-SEP-2026).** Both extensions are DONE and proven on silicon - the microSD/FAT stack and DDR2 main memory both ship in the deployed Nexys build that boots SINTRAN III. This document is kept for the DDR2 latency-budget rationale that the generated module docs cite; read it as the original plan, not current status.
+**Date:** 19-AUG-2026. **Status: HISTORICAL (02-SEP-2026).** Both extensions are DONE and proven on silicon - the microSD/FAT stack and DDR2 main memory both ship in the deployed Nexys build that boots SINTRAN III. This document is kept for the DDR2 latency-budget rationale that RTL comments cite (`ddr2/MEM_RAM_49_DDR2.v`, `ddr2/nd_ddr2_port.v`, `sd-fat-test/nd_memtest_ddr2.v`, `build.tcl`) and for the board's SD facts; the finished work lists, the 20-AUG status and the acceptance lists were cut 28-SEP-2026 (git history keeps them). Read it as the original plan, not current status.
 
 The first build in this folder is a Basys3 clone on a bigger part: BRAM main
 memory (24 KB), 16.667 MHz, UART console. This document covers the two things
 the Nexys 4 DDR has that the Basys3 does not - an on-board **microSD slot** and
 **128 MiB of DDR2** - in the order they should be done.
 
-Order matters: SD first. It is a port of a stack already proven on silicon, it
-needs no new timing analysis, and it makes the board useful (disk images) on
-its own. DDR2 is the hard one and its central question is still open.
+Order it was done in: SD first (a port of a stack already proven on silicon),
+then DDR2 (the hard one).
 
 ---
 
@@ -33,8 +32,9 @@ bidirectional `sd_dat0`, with a `*_oe` tristate pattern at the top level.
 1. **Slot power.** The reference manual (section 12) is explicit: after
    configuration the on-board microcontroller relinquishes the SD bus, and
    *"the SD_RESET signal needs to be actively driven low by the FPGA to power
-   the microSD card slot"*. `nd120_nexys4ddr_top.v` already drives `sd_reset`
-   low - without it the slot is dead and every SD command times out.
+   the microSD card slot"* - without it the slot is dead and every SD command
+   times out. (Since 27-AUG-2026 the design also power-cycles the slot at
+   configuration, reset and master clear - see `HISTORY.md`.)
 2. **Pins** (Digilent master XDC, already listed commented-out in
    `nd120_nexys4ddr.xdc`): `SD_SCK B1`, `SD_CMD C1`, `SD_DAT C2/E1/F1/D2`,
    `SD_CD A1` (card detect), `SD_RESET E2`.
@@ -51,28 +51,6 @@ bidirectional `sd_dat0`, with a `*_oe` tristate pattern at the top level.
    SD test does: 27.027 MHz -> ~137 kHz), or raise the CPU clock. **Recommended:
    a dedicated 27 MHz MMCM output for the SD/storage domain**, so SD stays at
    its proven divisors no matter what `clk=` the CPU is built with.
-
-### Work list
-
-1. Add a second MMCM output (or a second MMCM) for `clk_stor` = 27.027 MHz in
-   the board wrapper; keep it out of the CPU clock group in `nd120_timing.xdc`
-   and declare it asynchronous to both existing clocks.
-2. Bring the SD ports out of the wrapper and enable the commented XDC lines.
-3. Wire the storage stack the way `ND120_TANG20K_TOP.v` does, including the
-   `*_oe` tristate assigns **at the top level only**.
-4. Port the SD-FAT test design (`../basys3/sd-fat-test/`) to this board first
-   as a standalone `sd-fat-test/` subfolder, and prove the card on hardware
-   (LIST/DUMP over the UART) **before** wiring it into the CPU build.
-5. Respect the write-path safety policy in `Verilog/SD-FAT/README.md` -
-   `SDFAT_WRITE` is on and a boot rewrites LBA 0; prove any write path in
-   simulation first.
-
-### Acceptance
-
-- Standalone test: card mounts, `LIST` shows the FAT32 root, `DUMP` matches the
-  file contents byte for byte, over the board's own USB-UART.
-- CPU build: a tape/disc image on the card is served to the ND-120 and the
-  machine boots from it, same as the Tang.
 
 ---
 
@@ -148,57 +126,6 @@ bigger part (~607 KB BRAM = up to ~300K ND words as pack16, versus 24 KB
 today). **This is worth doing on its own** as an intermediate step: it is
 deterministic, needs no MIG, and multiplies memory by more than 10x.
 
-### Where this stands now (20-AUG-2026)
-
-The controller exists and the access path is **already factored for reuse**:
-
-```
-        ddr2-test/gen_mig.tcl          generates the MIG core from
-                 |                     Digilent's own mig.prj
-                 v
-        ddr2-test/ip/ddr/*             the generated controller
-                 |
-                 v
-        ddr2/nd_ddr2_port.v            THE shared access port
-           |                 |         (req_valid/req_we/req_addr/
-           |                 |          req_wdata -> rsp_valid/rsp_rdata)
-           v                 v
-  sd-fat-test/              MEM_RAM_49_DDR2.v
-  nd_memtest_ddr2.v         (the ND-120 sheet-49 backend, NOT YET BUILT)
-  (menu command M)
-```
-
-`nd_ddr2_port.v` owns the MIG instance and hides its two-handshake command
-interface. The memory test and the future ND-120 backend use the **same**
-module, so the test exercises the exact access path the CPU will use - which
-is the whole point of validating memory before deploying the CPU.
-
-### The deployment path
-
-1. **Validate the memory** with menu command `M` in
-   [`sd-fat-test/`](sd-fat-test/README.md). It writes an address-derived
-   pattern over all 128 MiB, reads it back, and reports PASS/FAIL plus the
-   first bad address and an error count.
-2. **Read the latency number the same run prints**:
-   `DDR2 RDLAT MAX nnnn CYC` - the worst-case ui_clk cycles from a read being
-   accepted to its data arriving, measured over 8.4 million reads including
-   whatever refresh collisions occur. One ui_clk cycle is 13.33 ns.
-3. **That number picks the backend architecture**, against a budget of three
-   CPU cycles (180 ns at 16.667 MHz, 90 ns at 33.333 MHz, so roughly 13 or 6
-   ui_clk cycles):
-   - comfortably inside the budget -> a direct sheet-49 backend on
-     `nd_ddr2_port` is possible;
-   - outside it -> option A (BRAM cache in front) with option B (stall the CPU
-     clock domain on a miss) as the fallback, both described above. Given
-     tRFC alone is 127.5 ns on a 1 Gb DDR2 device, expect to need this.
-4. **Build `MEM_RAM_49_DDR2.v`** to the sheet-49 contract on top of
-   `nd_ddr2_port`, selected by a new `MAIN_RAM_DDR2` arm in `MEM_43.v`,
-   with the protocol-replay testbench passing first.
-5. **Build the ND-120 bitstream** with `MAIN_RAM_DDR2` instead of
-   `MAIN_RAM_BLOCKRAM`.
-
-Steps 1 and 2 need no new RTL - they are a bitstream away.
-
 ### Other DDR2 facts to respect
 
 - The DDR2 pins live in a **1.8 V** HR bank; MIG generates their constraints -
@@ -212,12 +139,3 @@ Steps 1 and 2 need no new RTL - they are a bitstream away.
   DDR2 refresh internally - which is precisely why its latency is variable.
 - Capacity: 128 MiB as pack16 = 64M ND words, far more than the ND-120's
   3-bank x 1M-word address space. Memory is not the limit; latency is.
-
-### Acceptance for the DDR2 stage
-
-- Protocol testbench PASS, registered in the suite, with the N+4 deadline
-  asserted on every access including refresh collisions.
-- Vivado timing met at the selected CPU clock with the MIG core in.
-- On hardware: self-test unchanged, OPCOM deposit/examine round-trip across the
-  full advertised memory range, boot-time memory sizing reports the expected
-  banks, and a disc boot behaves the same as the BRAM build.

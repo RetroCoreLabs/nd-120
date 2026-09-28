@@ -1,6 +1,6 @@
 # ND120 Tang Nano 20K - build wrapper (Windows PowerShell) - Gowin EDA flow
 # (BACKUP toolchain; the primary flow is the OSS suite via `make` in this
-#  dir - see docs/tang20k-build-flows.md)
+#  dir - see README.md "Two build flows")
 #
 #   cd E:\Dev\Repos\Ronny\nd-120\Verilog\fpga\tang-nano-20k
 #   .\gowin_build.ps1 [-Variant slow|crawl|full] [-Gao] [-PfCapture] [-PcHistory] [-JplCapture] [-NoPanelClock] [-Cache]
@@ -31,7 +31,7 @@
 #   It captures the trap-logic inputs at the TCLK edge that latched a page-fault
 #   vector, then LOCKS, and streams the frozen word out through XMIC_DBG as four
 #   14-bit slices. Use it to answer whether the page fault that halts SINTRAN is
-#   real - see PLAN-pagefault-root-cause.md in this directory.
+#   real - see PLAN-pagefault-root-cause.md (retired, git 043c460).
 #   WARNING: while it is set, XMIC_DBG carries the capture readout and NOT the
 #   microsequencer address-advance probe, so the other TANG_*_CAPTURE decodes do
 #   not apply to that word.
