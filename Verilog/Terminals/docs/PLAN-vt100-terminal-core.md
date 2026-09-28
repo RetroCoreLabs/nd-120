@@ -66,7 +66,7 @@ Verilog** for VGA timing + a 2 KB character RAM + a font ROM + CR/LF/BS/scroll.
 
 ## The better spec source: RetroTerm (Ronny, 27-AUG-2026)
 
-`E:\Dev\Ronny\RetroTerm` is **MIT, Copyright (c) 2025-2026 Ronny Hansen** -
+The RetroTerm repository is **MIT, Copyright (c) 2025-2026 Ronny Hansen** -
 his own code - and it already implements VT100, VT52, ECMA-48, TDV and
 Tektronix. There is no licence question and no clean-room dance: it can be
 read, quoted and translated freely. It is a better specification than the

@@ -169,7 +169,7 @@ Ronny pointed out that the escape sequences are documented in RetroTerm's own
 changed the design, and two of the corrections were things a live trace would
 have shown only after a wasted build.
 
-**Source:** `E:\Dev\Ronny\RetroTerm\docs\TDV-COMPLETE-ESCAPE-SEQUENCE-REFERENCE.md`
+**Source:** `docs/TDV-COMPLETE-ESCAPE-SEQUENCE-REFERENCE.md` in the RetroTerm repository
 and `TDV-COMPREHENSIVE-REFERENCE.md`, cross-checked against each other, plus
 `TDV-DLE-CURSOR-BUG-FIX.md`.
 

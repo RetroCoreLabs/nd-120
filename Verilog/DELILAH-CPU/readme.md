@@ -1,23 +1,25 @@
 # Verilog code for DELILAH-CPU
 
-## Status for the different modules in the DELILAH CPU
+The DELILAH CPU gate array (CGA). Each folder holds one block: `circuit/` is the
+Verilog, `sim/` its testbenches, `doc/` the generated module pages.
 
-| Folder           | Status        |  Test status                   | Comment                                         |
-|------------------|---------------|--------------------------------|-------------------------------------------------|
-| CGA_WRF          | Completed     | 4 test cases                   |                                                 |
-| CGA_ALU          | In progreess  |                                | ALU functions seem to work, need more testcases |
-| CGA_DCD          | In progress   | Need to build testcases        |
-| CGA_HELPER       | In progress   | Need to build testcases        |
-| CGA_IDBCTL       | In progress   | Need to build testcases        |
-| CGA_INTR         | In progress   | 4 test cases. Looking good     |
-| CGA_MAC          | In progress   | Need to build testcases        |
-| CGA_MIC          | In progress   | Need to build testcases        |
-| CGA_TRAP         | In progress   | 4 test cases.                  | Need to validate TRAP logic and add more testcases
-| TESTMUX          | Completed     | 26 test cases                  |
-| CGA (DELILAH)    | In progress   | Need to build testcases        |
+| Folder      | Block |
+|-------------|-------|
+| CGA         | Top level of the gate array (DELILAH) |
+| CGA_ALU     | ALU |
+| CGA_DCD     | Decoder: microword COMM / IDBS / MIS fields to control signals |
+| CGA_IDBCTL  | Internal data bus (IDB) control |
+| CGA_INTR    | Interrupt controller |
+| CGA_MAC     | Memory access controller |
+| CGA_MIC     | Microcode controller (next-address logic, loop counter) - see `CGA_MIC/sim/README.md` |
+| CGA_TESTMUX | Test multiplexer |
+| CGA_TRAP    | Trap handler |
+| CGA_WRF     | Register file |
 
-## Source code stat
+## Tests
 
-The generated Verilog files contain a total of 20,372 lines.
-
-The generated C++ files from Verilator contains (for all submodules) a total of 325,447 lines.
+Every self-checking testbench for these blocks is registered in
+`Verilog/tests/run_all_tests.sh` with its pass pattern; `make test` in
+`Verilog/` runs them all. The CPU self-test and the instruction-verify
+areas run on the whole machine - see
+`Verilog/tests/instruction-verify/CAMPAIGN-STATUS.md`.

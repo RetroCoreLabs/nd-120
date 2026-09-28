@@ -1,7 +1,7 @@
 /****************************************************************************************
 ** ND120 - COMMITTED ACCESS TO A ZERO PAGE-TABLE ENTRY MUST DISPATCH A PAGE-FAULT TRAP  **
 **                                                                                     **
-** THE QUESTION (hypothesis H1, PLAN-zero-read-nonresident-page.md): when a committed   **
+** THE QUESTION (H1, PLAN-zero-read-nonresident-page.md, git 043c460): when a committed **
 ** MMU-translated access (VACC=1) reads a page-table entry whose permit bits are all    **
 ** zero (a non-resident page), does the RTL raise the page-fault trap and divert the    **
 ** microsequencer to trap vector 1 - or does the access complete and the CPU carry on?  **

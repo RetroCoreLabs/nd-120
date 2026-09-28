@@ -2,7 +2,7 @@
 
 WRITABLE CONTROL STORE
 
-## CPU Board 3202D - Sheet 19
+## CPU Board 3202D - Sheets 21 and 22
 
 ### Test program verification
 

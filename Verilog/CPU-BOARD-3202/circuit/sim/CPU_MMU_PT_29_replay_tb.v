@@ -31,11 +31,12 @@
 **     of main RAM").                                                     **
 **   * DOES NOT reproduce the 177777 store-routing bug: INSTRUCTION-B's    **
 **     MEMORY-REFERENCE area PASSES 400/400 vs ND-110 golden              **
-**     (docs/HANDOFF-instruction-verify-and-mpy.md), so this workload is   **
+**     (tests/instruction-verify/CAMPAIGN-STATUS.md), so this workload is  **
 **     NOT the failing one. The failing case is the ND-120/CX TPE-MON      **
-**     INSTCTION diagnostic - a separate capture (see                     **
-**     sim/HANDOFF-csharp-paging-capture.md). This tb encodes the CORRECT  **
-**     shadow-RAM routing so a future regression there is caught.          **
+**     INSTCTION diagnostic - a separate capture (see the retired         **
+**     sim/HANDOFF-csharp-paging-capture.md, summarised in HISTORY.md).   **
+**     This tb encodes the CORRECT shadow-RAM routing so a future         **
+**     regression there is caught.                                        **
 **                                                                       **
 ** Read model (TMM2018D_25.v line 67, SYNC): !CS_n & W_n => data_out_reg  **
 **   <= array[ADDR]; D_OUT registered. So a read needs the address        **

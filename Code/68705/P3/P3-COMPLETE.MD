@@ -1,6 +1,7 @@
 # MC68705P3 ND-5000 External Panel Controller — Complete Firmware Analysis
 
-**File:** `E:\Dev\Repos\Ronny\nd-120\Code\68705\P3\ND-5000C-MC68705P3.BIN`  
+**File:** `Code/68705/P3/ND-5000C-MC68705P3.BIN` (2048 bytes)  
+**Datasheet:** `Code/68705/6805/MC68705P3.PDF` (Motorola Technical Summary, pages 3-568 to 3-585; page numbers below are the printed ones)  
 **Chip:** Motorola MC68705P3 (28-pin DIP, 2KB ROM)  
 **Language:** 6805:BE:16:default  
 **Role:** ND-5000C external operator panel controller — HD44780 LCD display, physical buttons, bidirectional CY7C401 FIFO interface to ND-120 main CPU  
@@ -38,7 +39,7 @@ The MC68705P3 is the controller for the **ND-5000C external operator panel** —
 |---------|---------------------------|---------------------------|
 | Package | 28-pin DIP | 40-pin DIP |
 | ROM | 2KB (0x0000-0x07FF) | 4KB (0x0000-0x0FFF) |
-| RAM | 64 bytes (0x0010-0x004F) | 128 bytes |
+| RAM | 112 bytes on chip (0x0010-0x007F, datasheet p.3-571); firmware uses 0x0010-0x004C | 128 bytes |
 | Display | HD44780 LCD (2×40 chars) | 7-segment shift register chain |
 | Input | Physical buttons via Port A | None (display-only U3 side) |
 | Protocol | 192-bit serial + command poll | FIFO command only |
@@ -50,7 +51,7 @@ The MC68705P3 is the controller for the **ND-5000C external operator panel** —
 ND-120 CPU
     │
     ├──► PANC register ──► CY7C401 FIFO ──► PA[5:0] (commands)
-    │                                         PA7 = /IRQ (serial frame ready)
+    │                                         /INT pin 2 (serial frame ready, tested by BIH/BIL)
     │
     ├──► Serial transmitter ──► PA0 (CH1: time data)
     │                       ──► PA1 (CH2: display data)
@@ -79,17 +80,32 @@ ND-120 CPU
 
 | Address | Name | Init Value | Description |
 |---------|------|-----------|-------------|
-| 0x0000 | PORT_A | — | **Input**: PA[5:0]=command, PA3=lock, PA6=button, PA7=/IRQ |
+| 0x0000 | PORT_A | — | **Input**: PA[5:0]=command, PA3=lock, PA6=button, PA7=read as data (see Section 3) |
 | 0x0001 | PORT_B | — | **Output**: LCD data / ND-120 response byte |
-| 0x0002 | PORT_C | — | **Output**: PC0=ND120_STROBE, PC1=SERIAL_CLK, PC2=LCD_RS, PC3=LCD_E |
+| 0x0002 | PORT_C | — | **Output**: PC0=ND120_STROBE, PC1=SERIAL_CLK, PC2=LCD_RS, PC3=LCD_E (Port C has only 4 bits, datasheet p.3-570) |
 | 0x0004 | DDRA | 0x00 | Direction A: all inputs |
 | 0x0005 | DDRB | 0xFF | Direction B: all outputs |
 | 0x0006 | DDRC | 0xFF | Direction C: all outputs |
-| 0x0009 | TCR | 0x78 | Timer Control: prescaler /128, internal clock |
+| 0x0008 | TDR | 0x00 | Timer Data Register (8-bit down counter, datasheet p.3-575). Written 0 at 0x0100 (boot) and at 0x0264 (every WaitForData pass); read at 0x017B in ProcessData (0 → BSET STATUS_FLAGS.5, non-zero → BCLR STATUS_FLAGS.5) |
+| 0x0009 | TCR | 0x78 | Timer Control. Decoded with datasheet p.3-575: TIR=0, TIM=1 (timer interrupt masked), TIN=1 (external clock), TIE=1 (TIMER pin enabled), PSC=1 (clear prescaler), PS2-0=000 (prescaler /1). That is "timer input mode 4": the TDR counts pulses on the TIMER pin (pin 7). This applies because MOR bit TOPT=0 (see 0x0784 below) |
 
 ### RAM (0x0010-0x004F, initialized to 0xFF at power-on)
 
 See [Section 4](#4-ram-variable-map) for full variable map.
+
+Datasheet memory map (p.3-571): on-chip RAM is 112 bytes at 0x0010-0x007F. The stack sits at the top of it: the stack pointer is reset to 0x007F and may grow down to 0x0061 (31 bytes, p.3-572). The firmware's own variables stop at 0x004C.
+
+### Datasheet memory map for 0x0080-0x07FF (p.3-571)
+
+| Range | Datasheet use | What the dump holds |
+|-------|---------------|---------------------|
+| 0x0080-0x00FF | Page-zero user EPROM (128 bytes) | tables + start of code |
+| 0x0100-0x0783 | Main user EPROM (1668 bytes) | code + tables |
+| 0x0784 | Mask Option Register (MOR) | 0x20 → CLK=0 (crystal oscillator), TOPT=0 (software timer), CLS=1 (timer clock from TIMER pin), TIE=0, P2-P0=000 (prescaler /1) — decoded with p.3-576 |
+| 0x0785-0x07F7 | Bootstrap ROM (115 bytes) | 0xFF in this image |
+| 0x07F8-0x07FF | Interrupt vectors | all 0x00D6 |
+
+User EPROM total is 1804 bytes (0x0080-0x0783), not 2KB; the 2048-byte file is the whole address space.
 
 ### ROM (0x0050-0x07F7)
 
@@ -119,13 +135,52 @@ See [Section 4](#4-ram-variable-map) for full variable map.
 | 0x06B0-0x06BB | SetDisplayAddressAndWrite |
 | 0x06BC-0x06FC | TABLE_CHAR_DECODE (level-1) |
 | 0x06FD-0x0758 | TABLE_CHAR_SUBKEYS (level-2) |
-| 0x0759-0x077F | TABLE_7SEG_TO_ASCII |
-| 0x0780-0x07F7 | (unused, 0xFF) |
+| 0x0759-0x077B | TABLE_7SEG_TO_ASCII (key 0xFF at 0x077B ends the search) |
+| 0x077C-0x0783 | bytes CF 4E 09 80 00 C5 00 00 (after the table end marker; no code instruction names these addresses directly; use unknown) |
+| 0x0784 | MOR = 0x20 (see datasheet map above) |
+| 0x0785-0x07F7 | (bootstrap ROM area, 0xFF in this image) |
 | 0x07F8-0x07FF | Interrupt vectors |
 
 ---
 
 ## 3. Port Assignment
+
+### Pinout (28-pin DIP) — datasheet "Pin Assignments", p.3-585
+
+The chip has 20 I/O lines: PA0-PA7, PB0-PB7 and PC0-PC3 (datasheet p.3-570). There is no PC4-PC7.
+
+| Pin | Name | Use in this firmware |
+|-----|------|----------------------|
+| 1 | VSS | Ground |
+| 2 | /INT | External interrupt input. Tested by BIH/BIL ("branch if interrupt line high/low", p.3-578) as the serial-frame signal; the INT vector goes to RESET |
+| 3 | VCC | +5.25 V ±0.5 V (p.3-569) |
+| 4 | EXTAL | Oscillator. MOR CLK=0 selects the crystal option (p.3-569, p.3-576) |
+| 5 | XTAL | Oscillator |
+| 6 | VPP | EPROM programming voltage; tied to VCC in normal use (p.3-569) |
+| 7 | TIMER | External timer input. TCR=0x78 makes the TDR count pulses on this pin (p.3-575) |
+| 8 | PC0 | ND120_STROBE (output) |
+| 9 | PC1 | SERIAL_CLK (output) |
+| 10 | PC2 | LCD_RS (output) |
+| 11 | PC3 | LCD_E (output) |
+| 12 | PB0 | LCD D0 / response bit 0 |
+| 13 | PB1 | LCD D1 / response bit 1 |
+| 14 | PB2 | LCD D2 / response bit 2 |
+| 15 | PB3 | LCD D3 / response bit 3 |
+| 16 | PB4 | LCD D4 / response bit 4 |
+| 17 | PB5 | LCD D5 / response bit 5 |
+| 18 | PB6 | LCD D6 / response bit 6 |
+| 19 | PB7 | LCD D7 (always 0 in responses: AND #0x7F at 0x023A) |
+| 20 | PA0 | CH1 serial data / command bit 0 |
+| 21 | PA1 | CH2 serial data / command bit 1 |
+| 22 | PA2 | CH3 serial data / command bit 2 |
+| 23 | PA3 | Lock key / command bit 3 |
+| 24 | PA4 | Command bit 4 |
+| 25 | PA5 | Command bit 5 |
+| 26 | PA6 | Button change bit |
+| 27 | PA7 | Read as data (see Port A table) |
+| 28 | /RESET | Reset input, Schmitt trigger with on-chip pull-up (p.3-570) |
+
+Datasheet port notes (p.3-570): the DDRs are write-only and read back as 0xFF; reset clears all DDRs to 0 (all inputs), so the firmware's first job at 0x00D6 is writing DDRB/DDRC. Port output latches are not set by reset.
 
 ### Port A — ALL INPUTS (DDRA = 0x00)
 
@@ -138,9 +193,9 @@ See [Section 4](#4-ram-variable-map) for full variable map.
 | PA4 | (unused) | Input | — |
 | PA5 | CMD[5] | Input | Command code bit 5 (MSB of 6-bit command) |
 | PA6 | BTN_CHANGE | Input | Button state change flag |
-| PA7 | /IRQ | Input | Serial frame available (used by BIH/BIL, NOT as hardware interrupt) |
+| PA7 | (input) | Input | Read as data: cmd_display_update (0x01DB) tests PORT_A_SNAPSHOT bit 7 (BRSET 7,$12). It is NOT the interrupt line: BIH/BIL test the separate /INT pin (pin 2) |
 
-**Note:** PA[5:0] together form the 6-bit command code sent from the ND-120 via PANC register and CY7C401 FIFO. The firmware polls PA rather than using the hardware interrupt mechanism.
+**Note:** PA[5:0] together form the 6-bit command code sent from the ND-120 via PANC register and CY7C401 FIFO. The firmware polls PA rather than using the hardware interrupt mechanism. The serial-frame signal is the /INT pin, polled with BIH/BIL; the INT vector (0x07FA) points at RESET, and the I bit is never cleared (no CLI in the code), so it never causes an interrupt.
 
 ### Port B — ALL OUTPUTS (DDRB = 0xFF)
 
@@ -159,7 +214,7 @@ Port B is dual-use: the same 8 lines drive both the HD44780 LCD data bus and car
 | PC1 | SERIAL_CLK | Output | Serial bit clock — toggled to clock each data bit from PA0/PA1/PA2 |
 | PC2 | LCD_RS | Output | HD44780 RS: 0=command register, 1=data register |
 | PC3 | LCD_E | Output | HD44780 Enable strobe (data valid on falling edge) |
-| PC4-PC7 | (unused) | Output | Not connected / undefined |
+| PC4-PC7 | (do not exist) | — | Port C is 4 bits; bits 7-4 of 0x0002 and 0x0006 read as 1 (datasheet p.3-570, p.3-571) |
 
 **Important:** PC0 is for ND-120 output; PC1 is for serial input clock; PC2/PC3 are LCD control. These are mutually exclusive in timing.
 
@@ -227,6 +282,14 @@ All RAM at 0x0010-0x004F. Initialized to 0xFF at power-on; zeroed selectively du
 | 2 | BINARY_MODE — using binary digit display (not 7-seg decode) |
 | 1 | LAYOUT_SET — display layout has been initialized |
 
+### Control bits inside DISP_DATA_BUF (bit 7 of three bytes)
+
+| Address | Byte | Read at | Effect of bit 7 |
+|---------|------|---------|-----------------|
+| 0x0038 | DISP_DATA_BUF[3] | 0x04DB, 0x04FD, 0x0520 | 1 → "DAY:" label (0x00A0) and then the TIME/UTC label; 0 → "YEAR:" label (0x00C7) and "  MONTH:" label (0x00CD) |
+| 0x003A | DISP_DATA_BUF[5] | 0x0341, 0x0356, 0x039D | 1 → after the message is handled, jump to 0x04D6 (the date/time line + status bars); 0 → go to 0x03AB (ADDRESS:/P COUNT: path) |
+| 0x003C | DISP_DATA_BUF[7] | 0x0502 | 1 → "  TIME:" label (0x00A5); 0 → "   UTC:" label (0x00AD). Only used when 0x0038 bit 7 = 1 |
+
 ---
 
 ## 5. Boot Sequence
@@ -245,7 +308,7 @@ RESET (0x00D6)
 │   ├── PA3=0 → clear STATUS_FLAGS bit7 (unlocked)
 │   └── PA3=1 → set STATUS_FLAGS bit7 (locked)
 ├── WriteToDisplayPort(STATUS_FLAGS) → output status to ND-120
-├── Zero: DISPLAY_LINE2_OFFSET, PREV_DISPLAY_STATUS, PORT_A_SNAPSHOT, button_state
+├── Zero: DISPLAY_LINE2_OFFSET, PREV_DISPLAY_STATUS, PORT_A_SNAPSHOT, TDR (0x0008, timer data register; STA $08 at 0x0100)
 ├── cmd_handler_a4() → timing calibration delay
 ├── SendDisplayCommand(0x38) → LCD: Function Set (8-bit, 2-line, 5×7)
 ├── SendDisplayCommand(0x0C) → LCD: Display On, cursor off
@@ -346,6 +409,20 @@ TABLE_CMD_LOOKUP_2 (0x008B) — alternate mode (STATUS_FLAGS.4=1):
 ### CompleteCommandProcessing (0x01C0)
 
 Sends two ND-120 response strobes (OutputToDisplayDriver twice), reads STATUS_FLAGS, calls WriteToDisplayPort, then waits for PA command to clear (WaitForCmdClear at 0x01B7).
+
+The first strobe carries the handler's code in A (1, 2, 4 or 8) ORed with STATUS_FLAGS. The second carries A=0, because the delay loop in WriteToDisplayPort leaves A=0, so it sends STATUS_FLAGS & 0x7F alone. The entry at 0x01C6 skips the two strobes: it sends STATUS_FLAGS, waits for the command to clear, and JMPs to 0x011F.
+
+### Handler detail (from the ROM, 0x01B7-0x0236)
+
+| Handler | What it does |
+|---------|--------------|
+| 0x01B7 WaitForCmdClear | Loop: read PA, AND 0x3F, until 0. Returns with A=0 |
+| 0x01D1 cmd_conditional_update | STATUS_FLAGS.4=1 → A=1, CompleteCommandProcessing. STATUS_FLAGS.4=0 and PA_SAMPLE bit 3=1 → 0x01C6 (status only). Otherwise A=1, CompleteCommandProcessing |
+| 0x01DB cmd_display_update | PORT_A_SNAPSHOT bit 7=1 → 0x01C6. Otherwise: OutputToDisplayDriver(2), OutputToDisplayDriver(0), delay 0x024B, then A=4 → CompleteCommandProcessing |
+| 0x01ED cmd_multi_stage_update | OutputToDisplayDriver(2), WaitForCmdClear, OutputToDisplayDriver(0), delay 0x024B, then 0x01C6 |
+| 0x0205 cmd_handler_5e | PA_PREV_HIGH_BITS bit 6=0 → 0x01C6. Else toggle STATUS_FLAGS.5, then 0x01C6 |
+| 0x0213 cmd_handler_6c | Poll PA & 0x3F: value 0x21 → toggle STATUS_FLAGS.4, then 0x01C6. Value 0 → if PA_PREV_HIGH_BITS bit 6=1 toggle STATUS_FLAGS.6; then 0x01C6 |
+| 0x024B cmd_handler_a4 | Sets SERIAL_TIMEOUT (0x004C)=0x30, then a delay of 6 × nested DECX/DECA loops |
 
 ---
 
@@ -460,6 +537,15 @@ The panel uses an **HD44780-compatible LCD controller** in 8-bit bus mode.
 | Entry Mode | 0x06 | Cursor increment, display no shift |
 | Clear Display | 0x01 | Clear + return home (via InitDisplayClearPulse) |
 
+Other HD44780 commands the firmware sends (every JSR 0x05FC in the ROM: 0x0107, 0x010C, 0x0111, 0x037C, 0x061A, 0x06B8):
+
+| Command | Value | Where |
+|---------|-------|-------|
+| Cursor/display shift left | 0x18 | 0x037A — once per character step of the message scroll loop |
+| Set DDRAM address | 0x80 \| addr | 0x06B8 (SetDisplayAddressAndWrite / CalculateDisplayPosition) |
+
+No other command value (for example 0x02 Return Home) is ever sent.
+
 ### SendDisplayCommand (0x05FC) — RS=0 path
 
 ```
@@ -507,8 +593,10 @@ When responding to ND-120 commands (NOT writing to LCD):
 PC0 = 0  (strobe LOW)
 Port B ← response byte
 PC0 = 1  (strobe HIGH → rising edge latches data into CY7C401)
+delay: A=0x20 outer count, DECX inner loop (about 32 × 256 passes; the first inner pass starts from whatever X holds)
+return with A=0
 ```
-OutputToDisplayDriver (0x0238) first ORs the byte with STATUS_FLAGS and masks to 7 bits before calling WriteToDisplayPort.
+OutputToDisplayDriver (0x0238) first ORs the byte with STATUS_FLAGS and masks to 7 bits before falling into WriteToDisplayPort. There is no ready/busy handshake: the strobe and the fixed delay are all the firmware does.
 
 ---
 
@@ -535,8 +623,14 @@ The ND-120 sends time data as **7-segment display patterns** (the same encoding 
 | 0x13 | '7' | 7 |
 | 0x7F | '8' | 8 |
 | 0x3F | '9' | 9 |
+| 0x50 | 0xFF | "show as binary" marker |
+| 0x51 | 0xFF | "show as binary" marker |
+| 0x54 | 0xFF | "show as binary" marker |
+| 0x55 | 0xFF | "show as binary" marker |
 | 0x4F | ' ' | blank variant |
 | 0x66 | ' ' | blank variant |
+
+(Table bytes 0x0759-0x077B in ROM order; key 0xFF at 0x077B ends it.) Before the search, LookupCharacterCode clears bit 7 of the pattern (BCLR 7,$1B at 0x0628), and it steps X by one (INCX at 0x0623, saved in X_SAVE) so the caller walks its buffer. A result of 0xFF makes DisplayTimeData (0x03E4) print the byte with DisplayBinaryDigits and set DISPLAY_STATUS_FLAGS.2.
 
 If a pattern is not found, returns ' ' (0x20). This is the same 7-segment encoding as the U3 chip's TABLE_7SEG_PATTERNS, confirming the two chips use a compatible encoding system.
 
@@ -549,6 +643,7 @@ The display channel bytes encode both the **display mode** (what type of informa
 - key matched against SERIAL_TEMP_CH2 (high byte of char pair)
 - If value has bit7 set → strip bit7, return directly as character
 - If value bit7=0 → use value as offset into level-2 table
+- First entry (0x06BC-0x06BD) is [0x08, 0x80]: key 0x08 returns 0x00 directly (the status-display mode)
 
 **Level 2 — TABLE_CHAR_SUBKEYS (0x06FD):**
 - Format: subgroups of [key, result] pairs, 0xFF separates subgroups
@@ -594,7 +689,7 @@ Line 2: [TIME_DATA_BUF decoded time digits]
 - MSG_BUFFER[0] == ' ': display "P COUNT:" label (0x00BE)
 
 **Time format:**  
-Depending on DISP_DATA_BUF[0].7 (UTC flag):
+Depending on bit 7 of 0x003C = DISP_DATA_BUF[7] (tested at 0x0502; see Section 4):
 - Bit7=1: "  TIME:" prefix, then HH:MM:SS
 - Bit7=0: "   UTC:" prefix, then HH:MM:SS
 
@@ -605,7 +700,7 @@ Displays binary status bar graph when the decoded display character is 0:
 ```
 Line 1: [8 bar pairs from STAT_DATA_BUF]  ← '|' (0xDB) or '.' (0x2E) per bit
          + decimal status values (bit patterns 0-3)
-         + YEAR:/  MONTH: label based on DISP_DATA_BUF.7
+         + DAY:/YEAR: and TIME:/UTC:/MONTH: labels based on bit 7 of 0x0038 and 0x003C (Section 4)
 Line 2: [TIME_DATA_BUF decoded time]
 ```
 
@@ -614,6 +709,17 @@ Each status byte pair is displayed as a combination of bar characters:
 - Bit clear: '.' or '_' (0x5F)
 - Decimal values for 4 pairs of status bytes
 - Then "YEAR:" or "  MONTH:" label depending on display flag
+
+**Ring digits (0x048C-0x04AB).** After the bars, four characters are printed from the byte pair in SERIAL_TEMP_CH1 (0x1B) / SERIAL_TEMP_CH2 (0x1C). Each is a digit if its bit is set, else '_' (0x5F):
+
+| Position | Bit tested | Printed if set |
+|----------|-----------|----------------|
+| 1 | 0x1C bit 0 | '0' |
+| 2 | 0x1B bit 1 | '1' |
+| 3 | 0x1B bit 7 | '2' |
+| 4 | 0x1C bit 6 | '3' |
+
+Then the "ON "/"OFF" labels are printed twice (0x04BD, 0x04CC), chosen by 0x1B bit 7 and 0x1B bit 4 of the next byte pair (bit set → "ON ").
 
 ### DisplayTimeData (0x03CF)
 
@@ -659,7 +765,7 @@ Level-1 two-level character decode table. See [Section 10](#10-character-decodin
 
 Level-2 character decode subkeys. See [Section 10](#10-character-decoding).
 
-### TABLE_7SEG_TO_ASCII (0x0759-0x077F) — 39 bytes
+### TABLE_7SEG_TO_ASCII (0x0759-0x077B) — 35 bytes (17 pairs + 0xFF end key)
 
 7-segment pattern to ASCII reverse lookup. See [Section 10](#10-character-decoding).
 
@@ -677,8 +783,9 @@ Located at 0x07F8-0x07FF (end of ROM).
 | 0x07FE | VEC_RESET | 0x00D6 | Power-on reset → RESET |
 
 **All four vectors point to RESET (0x00D6).** This is a deliberate design choice:
-- The hardware timer is not used as a periodic ISR
-- The /IRQ pin is polled via BIH/BIL rather than used as an interrupt
+- The hardware timer is not used as a periodic ISR (TCR bit TIM=1 masks it; the TDR is only read as a pulse counter, see Section 2)
+- The /INT pin (pin 2) is polled via BIH/BIL rather than used as an interrupt
+- Vector order and addresses match the datasheet reset/interrupt flowchart (p.3-573): TIMER 0x07F8, INT 0x07FA, SWI 0x07FC, RESET 0x07FE
 - Any unintended interrupt causes a full re-initialization (safe fallback)
 
 This differs from the U3 chip which has a distinct Timer ISR at 0x08C8 for the software RTC.
@@ -883,8 +990,8 @@ The U3 (built-in panel) and P3 (external panel) serve different physical hardwar
 | **Display commands** | No — custom shift protocol | Yes — HD44780 command set (0x38, 0x0C, 0x06, 0x01) |
 | **Input path** | FIFO (CY7C401) via Port A/B + PB3 gate | Dual: FIFO command (PA[5:0]) + serial 3-channel (PA0-PA2) |
 | **Serial protocol** | None — PANC FIFO only | 192-bit × 3 channel serial reception |
-| **IRQ usage** | /EMP (PD7) for FIFO-empty detection | /IRQ pin (PA7) polled via BIH/BIL for serial frame |
-| **Timer ISR** | Distinct ISR at 0x08C8 (~247Hz software RTC) | All vectors → RESET (no timer ISR) |
+| **IRQ usage** | /EMP (PD7) for FIFO-empty detection | /INT pin (pin 2, not a port bit) polled via BIH/BIL for serial frame |
+| **Timer ISR** | Distinct ISR at 0x08C8 (400 Hz; drives the software RTC) | All vectors → RESET (no timer ISR) |
 | **Software RTC** | Yes — full year/month/day/hour/min/sec | No — receives time from ND-120 via serial |
 | **MM58274 RTC** | Yes — hardware RTC chip init + read | No hardware RTC |
 | **Physical buttons** | None (display-only side) | Yes — PA3=lock key, PA[5:0]=button/command |
@@ -904,7 +1011,9 @@ The P3 chip **receives** 7-segment patterns sent by the ND-120 over a dedicated 
 
 ## 17. Corrections to Existing Analysis Files
 
-### `E:\Dev\Repos\Ronny\nd-120\Code\68705\P3\C-code-p3.md`
+The documents reviewed here have been removed from the repository. Their correct facts are merged into sections 1-16; the error lists below are kept as the record of what was wrong.
+
+### `Code/68705/P3/C-code-p3.md` (and its copy `Code/68705/P3/p3_code/mc68705_readme.md`)
 
 **Correct:**
 - PA[5:0] = 6-bit command code ✓
@@ -929,11 +1038,29 @@ The P3 chip **receives** 7-segment patterns sent by the ND-120 over a dedicated 
 
 7. **"128+ dispatch codes"** — the actual dispatch has **8 function indices** via the jump table; the lookup tables contain only 5-6 entries each. The "128+" figure from the C emulation is incorrect.
 
-### `E:\Dev\Repos\Ronny\nd-120\Code\68705\P3\P3\command_analysis.md` (assumed)
+8. **Pin numbers and supply pins** (both copies) — "VBB pin 1, VSS pin 14, VDD pin 28, XTAL pin 15, PORTA pins 16-23, PORTB pins 6-13, PORTC PC0-PC7 pins 2-5, 24-27" — WRONG. The datasheet pinout (p.3-585) is in Section 3; the chip has no VBB pin and no PC4-PC7.
 
-The dual lookup table structure (TABLE_CMD_LOOKUP_1 vs TABLE_CMD_LOOKUP_2 selected by STATUS_FLAGS.4) means the same command byte (e.g., 0x02) can dispatch to **different handlers** depending on system state. This mode-switching behavior was likely not captured in earlier analysis.
+9. **"RAM 64 bytes (0x0010-0x004F)", "ROM 2KB"** — the chip has 112 bytes of RAM (0x0010-0x007F) and 1804 bytes of user EPROM (datasheet p.3-571); see Section 2.
+
+10. **Display command 0x02 "Return Home"** — never sent by the firmware. 0x18 "Shift Left" is sent (0x037A).
+
+11. **Command ranges "0x08-0x0C button polling", "0x48-0x4A direct output", "0x77-0x7F serial reception"** — not commands. They are artefacts of the decompiler's switch view; see item 7.
+
+### Former `Code/68705/P3/P3/` folder (eight files)
+
+These were an earlier pass, written as notes on a Ghidra project that is not part of this repository: `command_analysis.md`, `ghidra_hardware_docs.md`, `ghidra_updates.md`, `mc68705p3_pinout.md`, `panel_controller_analysis.md`, `port_analysis.md`, `technical_report.md`, `variable_renames.md`. What was wrong in them:
+
+1. **Pinout** (`mc68705p3_pinout.md`, `ghidra_hardware_docs.md`) — every pin number was wrong (VBB on pin 1, XTAL/EXTAL as one pin 15, PA0 on pin 23, PC0-PC7). The datasheet pinout is in Section 3. The supply currents, power and "±0.01% crystal" figures had no source.
+2. **Display hardware** — "HD44100H LCD driver", "CD4035 shift registers", "LD-H7919" and "SX 423 M4" modules, "PC0 = display strobe / CD4035 latch", "PC3-PC7 display control". The firmware drives an HD44780-type text LCD with PC2=RS and PC3=E (Section 9); PC0 is the ND-120 strobe; PC4-PC7 do not exist.
+3. **"readIRQ() not found / external"** — it is the BIH/BIL instructions testing the /INT pin (Section 3).
+4. **"PA7 status/control" and "PA4-PA7 button matrix"** — PA4/PA5 are command bits; PA7 is read only by cmd_display_update (0x01DB).
+5. **Dispatch "0x00-0xFE, 128+ cases", "0x90-0x94 direct output", "0xA2 special return", "0xEE-0xFE serial reception"** — there are 8 handlers in the jump table at 0x01A7 (Section 7). The dual tables at 0x0080/0x008B mean the same command byte (e.g., 0x02) dispatches to **different handlers** depending on STATUS_FLAGS.4.
+6. **"InitDisplayClearPulse signals the CPU" / "button events interrupt the CPU via the timer"** — InitDisplayClearPulse only sends LCD command 0x01 (0x0618). The only outputs toward the ND-120 are Port B and the PC0 strobe.
+7. **"TimeDisplayBuffer" at 0x0035-0x003C** — this holds the raw channel-2 serial bytes (STA $35,X at 0x02D3), not formatted time.
+8. **"DisplayTimeData shows 9 characters"** — the counter starts at 9 but is decremented before the first character, so 8 are shown (0x03D1-0x03DB).
+9. **PANC/PANS bit formats, clock commands, button names, key-lock positions, UTIL/HIT/RING/MODE displays** (`panel_controller_analysis.md`) — the file gives no source for them, and none of it can be seen in this firmware. Not carried over.
 
 ---
 
-*Analysis performed April 2026 via Ghidra MCP on MC68705P3.BIN.*  
+*Analysis performed April 2026 in Ghidra on MC68705P3.BIN; datasheet and ROM checks added September 2026.*  
 *All findings based on direct disassembly — no assumptions.*

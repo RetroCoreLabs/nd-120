@@ -67,7 +67,7 @@ module nd_storage #(
     // Bit clock and bus width for the DATA path (sd_writer). The 2.7 MHz
     // 1-bit default here was the bring-up setting; sd-fat-test proved
     // CLKDIV=1 (13.5 MHz) + 4-bit on this exact board with a real SDHC card -
-    // READ 5981 KB/s vs the 137 KB/s baseline (docs/sd-speed-plan.md rung c,
+    // READ 5981 KB/s vs the 137 KB/s baseline (docs/sd-cmd18-block-gap-research.md,
     // 12-JUL-2026). USE_4BIT additionally needs DAT1-3 pinned and wired at
     // the board top; it is a parameter so a board without them stays 1-bit.
     parameter [7:0]      WR_CLKDIV    = 8'd1,          // sd_writer bit clock divider
@@ -387,7 +387,7 @@ module nd_storage #(
   // board top must use the single-ternary  oe ? val : 1'bz  form for these:
   // a nested ternary is silently collapsed to an always-on driver by yosys,
   // which made the FPGA fight the card through every 4-bit read data phase -
-  // simulating perfectly and failing on silicon (docs/sd-speed-plan.md).
+  // simulating perfectly and failing on silicon (fpga/tang-nano-20k/sd-fat-test/README.md).
   assign sd_dat1_o  = wr_dat1_o;
   assign sd_dat1_oe = s_phase_write & wr_dat1_oe;
   assign sd_dat2_o  = wr_dat2_o;

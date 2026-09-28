@@ -1,15 +1,15 @@
 # SD-FAT - reusable SD card + FAT filesystem library
 
-Board-independent SD card access for the ND-120 project. This is the
-storage backend for the planned ND-100 device emulation stack (paper
-tape reader 400, floppy, SMD - see `Verilog/docs/sd-bpun-device-plan.md`)
-and for the standalone board test projects.
+Board-independent SD card access for the ND-120 project. It is the
+storage backend of the ND-100 bus devices (paper tape reader 400, floppy,
+SMD, Winchester) and of the standalone board test projects.
 
-First proven consumer: `Verilog/fpga/tang-nano-20k/sd-fat-test/`
-(interactive UART menu; proven on hardware 11-JUL-2026). Second consumer
-under construction: `nd_storage` - the multi-client storage facade for
-the ND-100 bus devices (spec, validation, design and step-by-step status
-in `Verilog/docs/nd-storage-*.md`; steps 1-5 of 10 done and gated).
+Consumers: `Verilog/fpga/tang-nano-20k/sd-fat-test/` (interactive UART
+menu; proven on hardware 11-JUL-2026), and `nd_storage` - the multi-client
+storage facade for the ND-100 bus devices (spec, validation and design in
+`Verilog/docs/nd-storage-*.md`). SINTRAN III boots on the Tang Nano 20K
+from a Winchester image on the SD card through `nd_storage`
+(24-AUG-2026, `Verilog/docs/nd-storage-design.md`).
 
 ## Contents
 
@@ -17,6 +17,10 @@ Everything in this library is ORIGINAL project code under the repository's
 MIT license. `sd_file_reader.v` and `sd_writer.v` are clean-room
 implementations written from the public SD Physical Layer Simplified
 Specification and the Microsoft FAT specification.
+
+SD/FAT code lives ONLY in `Verilog/SD-FAT/` (the generic library) and
+`fpga/<board>/` (board glue) - never in `DELILAH-CPU/`, `DECODE-GateArray/`
+or `CPU-BOARD-3202/`.
 
 | File | Origin | Function |
 |---|---|---|
@@ -27,25 +31,20 @@ Specification and the Microsoft FAT specification.
 | `sim/sd_card_model.v` | project | Behavioral SD card for iverilog testbenches: serves sector reads from a raw image file, ACCEPTS CMD24 writes and CMD25 bursts into the image (CRC16 checked, per-block busy), streams CMD18 bursts, handles ACMD23/CMD12 (counted), checks command CRC7, answers with real CRCs; ACMD6 4-bit bus mode (nibble framing, CRC16 per DAT line, per-line CRC-error injection via `corrupt_line`, status/busy on DAT0 only) |
 | `sim/sd_writer_tb.v` + `sim/Makefile` | project | sd_writer unit test incl. the CMD25/CMD18 burst cases, a mid-burst CRC-status abort, and the 4-bit phase (single + burst both ways, injected per-line CRC error, DAT1-3 discipline monitor) after the full 1-bit suite as regression (registered in the global test registry as `SD-FAT/sim :: test-writer`) |
 | `circuit/nds_sync.v` | project (MIT) | 2-flop toggle/pulse + level CDC primitives for nd_storage |
-| `circuit/nd_storage_engine.v` | project (MIT) | nd_storage block engine: round-robin arbiter (7 clients), per-client clk_cpu front-ends, CDC word bridge, SDRAM-read + card-write-through paths (spec: docs/nd-storage-interface-spec.md, design: docs/nd-storage-design.md) |
-| `circuit/nd_storage_mount.v` | project (MIT) | nd_storage open/preload FSM: per-open reader re-init, root-file scan, size-vs-slot gate, byte stream -> big-endian packer -> SDRAM slot, reader park; SMD clients answer open_err in v1 (PRELOAD_MASK) |
-| `circuit/nd_storage.v` | project (MIT) | nd_storage top: reader+writer instances, phase_write SD pin mux, mount/engine mem-port mux, fatchk writer-command mux (rd_mode=1 while chk_busy), FILEn/SLOTn parameter set, sd_status/card_type/fs_type |
-| `circuit/nd_storage_fatchk.v` | project (MIT) | Mount-time contiguity checker (SDFAT_STORAGE_CHECK): verifies FAT[c]=c+1 over the opened file's whole chain + end-of-chain via sd_writer CMD17 reads (FAT16 + FAT32, cached FAT sector); machine ok/bad verdict - a fragmented file fails the open (spec sections 6/8) |
+| `circuit/nd_storage_engine.v` | project (MIT) | nd_storage block engine: round-robin arbiter (up to 8 clients; `nd_storage` sets 8), per-client clk_cpu front-ends, CDC word bridge, cache fill, FAT-chain resolve, write-through (spec: docs/nd-storage-interface-spec.md, design: docs/nd-storage-design.md) |
+| `circuit/nd_storage_mount.v` | project (MIT) | nd_storage open FSM: per-open reader re-init, root-file scan, geometry latch, reader park (no preload since 04-AUG-2026; `M_LOAD` is dead code) |
+| `circuit/nd_storage.v` | project (MIT) | nd_storage top: reader+writer instances, phase_write SD pin mux, mount/engine mem-port mux, fatchk writer-command mux (rd_mode=1 while chk_busy), FILEn/SLOTn parameter set, CACHE_MASK / cache directory, sd_status/card_type/fs_type |
+| `circuit/nd_storage_fatchk.v` | project (MIT) | Mount-time contiguity checker (SDFAT_STORAGE_CHECK): verifies FAT[c]=c+1 over the opened file's whole chain + end-of-chain via sd_writer CMD17 reads (FAT16 + FAT32, cached FAT sector); machine ok/bad verdict. Diagnostic only since 07-AUG-2026 (`-DSDFAT_FORCE_STORAGE_CHECK`); the engine walks the FAT chain, so fragmented files work |
+| `circuit/nd_storage_cache.v` | project (MIT) | tag/LRU directory of the shared block cache (design: docs/nd-storage-design.md 2.7) |
 | `sim/nds_mem_model.v` | project | behavioral SDRAM device-port model (randomized latency) |
 | `sim/nd_storage_cdc_tb.v`, `nd_storage_engine_tb.v`, `nd_storage_write_tb.v` | project | registered gates test-nds-cdc / test-nds-engine / test-nds-write |
 | `sim/nd_storage_tb.v` + `sim/make_storage_image.sh` | project | full-stack mount gate test-nds-mount (real FAT16 image: open/preload, missing/oversize/SMD open_err, block read, reopen); the image script also builds the deliberately fragmented FRAG.IMG and REFUSES to emit it unless a python FAT re-walk proves the fragmentation |
 | `sim/nd_storage_fatchk_unit_tb.v`, `sim/nd_storage_fatchk_tb.v` | project | registered fatchk gates test-nds-fatchk-unit (checker vs scripted engine stub: FAT16/FAT32 formats, EOC thresholds, read-count/cache, guards) and test-nds-fatchk (full stack vs FRAG.IMG: open_err, contiguous neighbor opens, retry; + feature-off elaboration lint) |
 
-## History (vendoring, now resolved)
+## The reader's interface (binding feature set)
 
-The read path (card init + FAT mount + file stream) was originally
-vendored from a third-party GPL-3.0 core while the library was proven
-on hardware. On 12-JUL-2026 those files were REPLACED by the clean-room
-MIT `sd_file_reader.v` above (written from the public SD and FAT
-specifications, validated against the same registered gates and card
-models), so the whole library is now project MIT code. The historical
-modification list below describes the interface the replacement had to
-keep - it is the reader's binding feature set:
+`sd_file_reader.v` (clean-room, 12-JUL-2026; it replaced an earlier
+vendored reader and had to keep its interface) provides:
 
 1. `scan_done` output - the internal filesystem FSM reached DONE
    (file fully streamed, file not found, or unmountable filesystem).
@@ -71,17 +70,17 @@ keep - it is the reader's binding feature set:
    the `sdcmd` pin is split into `sdcmd_i/_o/_oe` (repo rule: the only
    tristate lives at the board top level).
 
-The clean-room reader is also FASTER than the vendored core: the data
-phase runs at clk/2 (13.5 MHz at 27 MHz, CLK_DIV=1) instead of the old
-architectural clk/4 ceiling, and file bytes stream through CMD18
-multi-block reads across contiguous cluster runs.
+The data phase runs at clk/2 (13.5 MHz at 27 MHz, CLK_DIV=1), and file
+bytes stream through CMD18 multi-block reads across contiguous cluster
+runs.
 
 ## WRITE-PATH SAFETY POLICY (mandatory, 11-JUL-2026)
 
-Born from a real destroyed card: a geometry-capture bug wrote FAT
-sectors from reset-zero values (sector 0 = the boot sector), and the
-happy-path test sequence masked it because an earlier command had
-already populated the registers. NO bitstream containing SD write
+Born from a real destroyed card: `sd_fat_rewrite.v` state `S_DIR_W`
+wrote the patched directory sector to the raw `dir_sector` input (0 on
+a cold-start create) instead of the internal `dsec_r`, so CMD24 went to
+sector 0 - the boot sector. The happy-path test sequence masked it
+because an earlier command had already populated the registers. NO bitstream containing SD write
 functionality is loaded or flashed onto hardware unless the simulation
 gates prove ALL of:
 
@@ -127,8 +126,8 @@ f_mkfs formatting and exFAT, ~4 KB RAM) on a small RISC-V softcore
 nand2mario's NESTang), with a one-page mailbox diskio driving THIS
 library's sector engine. FatFs's ffconf.h config model mirrors the
 feature-flag philosophy above. The pure-Verilog ops in this library
-remain the fast boot/device path; the softcore tier is Phase-planned
-in Verilog/docs/device-bus-todo.md.
+remain the fast boot/device path; the softcore tier is not built and no
+live plan schedules it (the old device plan was retired 28-SEP-2026).
 
 ## Block access (ND-120 1-kiloword blocks)
 
@@ -183,6 +182,30 @@ adapter is in hand, in `Verilog/docs/sd-bpun-device-plan.md` 6.2).
   (same protocol subset) plus the tristate-resolving wrapper
   `sd_fat_test_vtop.v` there.
 
+## Pitfalls (cost real time)
+
+- Verilator rejects a delayed assignment to an array inside a `for` loop
+  (BLKLOOPINIT). Use a walking clear and a combinationally built mask.
+- A `for`-loop reset over an array forces flip-flops, not block RAM
+  (~26k FF at 512 sets in the first cache directory).
+- An asynchronous reset anywhere in the process that writes an array also
+  stops block-RAM inference, even if the array itself is never reset. Write
+  the array in its own `always @(posedge clk)` with no reset.
+- Never split a directory's valid/rank bits into their own indexed arrays
+  read combinationally (187,283 AND gates at 512x4). Keep one word per set.
+- `file_found` in sd_file_reader.v is a LEVEL, not a pulse: an
+  `if (file_found) ... else if (scan_done)` chain never reaches the second
+  branch.
+- sd_writer.v is a sector READ/WRITE engine: `rd_mode=1` gives CMD17/CMD18
+  with an `rx_we/rx_addr/rx_data` sink. `burst_len` 0 and 1 are the same.
+- Never stop the reader in the middle of a transfer: it leaves the card inside
+  a CMD17 and the next card user fails. Wait for `scan_done`.
+- A testbench check can go blind without failing: after an architecture
+  change, re-derive what each check looks at, do not just confirm it is green.
+- The mount test image (sim/make_storage_image.sh) holds only TAPE.BPUN,
+  FLOPPY1.IMG and FRAG.IMG - no SMD0.IMG, so a client-3 open legitimately
+  fails as not-found.
+
 ## Known limitations (by construction)
 
 - The reader never writes (all writes go through the separate
@@ -198,6 +221,7 @@ adapter is in hand, in `Verilog/docs/sd-bpun-device-plan.md` 6.2).
   are skipped (e.g. read-only or hidden files).
 - LFN names up to 52 bytes ASCII; non-ASCII UTF-16 units or broken
   LFN chains fall back to the 8.3 name.
+- No card-detect pin: a missing card is only seen when a command fails.
 
 ## Write path status
 

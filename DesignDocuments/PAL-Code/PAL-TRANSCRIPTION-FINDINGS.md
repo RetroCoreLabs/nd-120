@@ -19,9 +19,12 @@ active-low pin, so an unslashed literal `X` in an equation = active-high sense =
 `wire X = ~X_n`; a slashed `/X` = the raw `X_n` port. All 8 remaining faults were re-derived under
 this rule against the scan and hold.
 
-**Scope / status.** This is a REPORT for schematic validation. **No RTL was modified.** These are
-CPU-BOARD PALs — do not change without Ronny's go. `44801A` (arbiter) was already fixed in earlier
-work and is not re-listed here.
+**Status (checked 28-SEP-2026): ALL 8 confirmed faults below are FIXED in the RTL** - each fixed
+equation carries a "PALASM ..." / "30-JUL audit" comment in its `Verilog/PAL/PAL_*.v`
+(44306A EIPL, 44302B DSTB, 45001B SPES + SPEA, 44403C DLY0, 44310D BDRY, 45008B DISB + TST). The
+"Verilog as-built (wrong)" column and line numbers below describe the code as it was at the audit.
+`Verilog/PAL/PROVENANCE.md` describes the checks that guard the PALs now. `44801A` (arbiter) was
+already fixed in earlier work and is not re-listed here.
 
 **Fault classes found:** (A) inverted literal — a `/X` negation dropped or added on one literal of
 a product term; (B) NAND-vs-NOR latch reset — two hold product-terms OR-combined as `(H1==0)|(H2==0)`

@@ -1,6 +1,6 @@
 # RetroTermWeb TDV2200 - facts read from the code, 01-SEP-2026
 
-Source: `/home/ronny/repos/RetroTermWeb/src` (WSL; `\\wsl.localhost\Ubuntu\home\ronny\repos\RetroTermWeb` from Windows).
+Source: `src/` of the RetroTermWeb repository.
 
 Ronny's instruction, 01-SEP-2026: the board's TDV2200 terminal must behave like
 the RetroCore / RetroTermWeb emulation. These three reports were produced by
@@ -176,7 +176,7 @@ Checked first (T2200:89-93), before the table above.
 
 ## Keyboard (terminal to host)
 
-Repo path that works from Windows: `\\wsl.localhost\Ubuntu\home\ronny\repos\RetroTermWeb`. All paths below are under `/home/ronny/repos/RetroTermWeb/`.
+All paths below are relative to the root of the RetroTermWeb repository.
 
 ### How a physical PC key becomes bytes
 

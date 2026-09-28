@@ -83,7 +83,7 @@
 ** registers, but the MASS STORAGE LOAD microroutine ('21540&', CSA       **
 ** o2217) starts with two +1 writes and a +7 write, and boot mode used to **
 ** discard them - so the GO that followed ran with a zero word count and  **
-** loaded nothing. See docs/ANALYSIS-smd-disc-tema-not-ready.md.          **
+** loaded nothing.                                                        **
 **                                                                       **
 ** Thumbwheels (all level 11): tw0 01540/017, tw1 01550/020,             **
 **   tw2 00540/023, tw3 00550/006 (octal). This instance = tw0 defaults.  **
@@ -651,8 +651,8 @@ module ND_SMD #(
           // A +1 write ALSO leaves boot mode. The BPUN byte-server the boot
           // mode exists for never writes +1 or +7 (it writes +3 with bit 2,
           // polls +2, reads +0), while the microcode MASS STORAGE LOAD
-          // routine at CSA o2217 (Code/Microcode/ND-120 Mikroprogramlisting-
-          // L-ocr.md, "MASS STORAGE LOAD, BECAUSE BIT 13 IS 1") starts with
+          // routine at CSA o2217 (Code/Microcode/ND-120-DELILAH-L.LISTING.txt
+          // line 5866, "MASS STORAGE LOAD, BECAUSE BIT 13 IS 1") starts with
           // TWO +1 writes (core address HI then LO) before +3 / +7 / +5.
           // Swallowing them left '21540&' loading a word count of zero, so
           // the GO completed instantly and transferred nothing.

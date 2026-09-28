@@ -109,7 +109,7 @@ module nd_storage_engine #(
     input  wire [N_CLIENTS*32-1:0] first_sector,  // file first SD sector
 
     // ---- FAT-walk geometry (clk_stor; runtime chain walking, no
-    // contiguity requirement - docs/PLAN-fatwalk-runtime.md) ----
+    // contiguity requirement - docs/nd-storage-design.md section 2.2) ----
     input  wire [N_CLIENTS*28-1:0] first_cluster, // file first FAT cluster
     input  wire [7:0]              fat_spc,       // sectors/cluster (power of 2)
     input  wire [31:0]             fat0_sector,   // first FAT sector (volume)
@@ -276,7 +276,7 @@ module nd_storage_engine #(
   reg [31:0]          s_rdata_lat;                 // mem word being pushed
   reg [15:0]          s_stage_hi;                  // even pull word (high half)
 
-  // ---- FAT-walk state (docs/PLAN-fatwalk-runtime.md) ----
+  // ---- FAT-walk state (docs/nd-storage-design.md section 2.2) ----
   reg [N_CLIENTS-1:0] s_m_val;                     // per-client memo valid
   reg [19:0]          s_m_idx [0:N_CLIENTS-1];     // memo: cluster idx in file
   reg [27:0]          s_m_clu [0:N_CLIENTS-1];     // memo: FAT cluster number
@@ -1020,7 +1020,7 @@ module nd_storage_engine #(
         end
 
         // ---- completion --------------------------------------------------
-        // ---- FAT-chain resolve (docs/PLAN-fatwalk-runtime.md) -----------
+        // ---- FAT-chain resolve (docs/nd-storage-design.md section 2.2) -----------
         F_RES: begin
           if (s_wd_hit) begin
             s_err_c    <= 1'b1;
@@ -1105,7 +1105,7 @@ module nd_storage_engine #(
           // IN-SECTOR CHAIN FOLLOWING (24-AUG-2026). The original design took
           // ONE hop per card read, on the assumption that access is sequential
           // and the per-client memo makes the steady state 0..1 hops
-          // (docs/PLAN-fatwalk-runtime.md). SINTRAN's demand paging is RANDOM,
+          // (docs/nd-storage-design.md section 2.2). SINTRAN's demand paging is RANDOM,
           // so nearly every access is a backward seek that restarts at the
           // chain head - hundreds of hops, each its own CMD17. Measured on
           // silicon: 351 ms of the 362 ms a disc operation costs is SD read

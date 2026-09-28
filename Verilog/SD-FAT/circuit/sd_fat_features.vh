@@ -73,7 +73,7 @@
 `ifdef SDFAT_STORAGE
   // RETIRED AS A DEFAULT 07-AUG-2026: the storage engine walks the FAT
   // chain at runtime (nd_storage_engine.v F_RES states,
-  // docs/PLAN-fatwalk-runtime.md), so fragmented files are simply CORRECT
+  // docs/nd-storage-design.md 2.2), so fragmented files are simply CORRECT
   // and there is nothing left for a mount-time contiguity gate to protect.
   // The checker remains available as a diagnostic build
   // (-DSDFAT_FORCE_STORAGE_CHECK - its testbenches build it that way);

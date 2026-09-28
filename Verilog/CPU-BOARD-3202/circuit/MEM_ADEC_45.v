@@ -280,7 +280,7 @@ module MEM_ADEC_45 (
   // CPU Address Decode and CPU Local Request
 `ifdef FPGA_FF_MODE
   // FF mode: sysclk-domain mirror - CK (ECREQ) becomes an edge enable, no
-  // routed-net clock (see docs/HANDOFF-basys3-memory-write.md)
+  // routed-net clock (see docs/nd120-dram-memory.md section 5)
   PAL_44445B_D PAL_UCADEC (
       .sysclk(sysclk),
       .sys_rst_n(sys_rst_n),

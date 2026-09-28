@@ -1,76 +1,55 @@
 # CGA_MIC Simulation & Testbenches
 
-**Full path:** `Verilog/DELILAH-CPU/CGA_MIC/sim/`
+Testbenches for `Verilog/DELILAH-CPU/CGA_MIC/circuit/` (the project convention:
+a `sim/` folder next to the module).
 
-## Testbench convention
+## Self-checking unit tests (iverilog)
 
-Testbenches are placed in a `sim/` subdirectory next to the module source
-code. This is the standard practice across the project:
+Each target below is registered in `Verilog/tests/run_all_tests.sh` and runs
+under `make test`. Most build the testbench more than once - in the default
+mode and with `-DFPGA_FF_MODE` and/or `-DUSE_TRANSPARENT_LATCHES` - see the
+`Makefile` for the exact builds.
 
-```
-DELILAH-CPU/CGA_MIC/
-  circuit/
-    CGA_MIC.v               ← module source
-    CGA_MIC_MASEL.v          ← submodule source
-  sim/
-    Makefile                 ← build targets for all tests
-    test_mic.cpp             ← Verilator full-module testbench
-    MASEL_cycle_tb.v         ← iverilog MASEL cycle/race testbench
-    MASEL_iw_capture_tb.v    ← iverilog MASEL IW capture timing testbench
-    mic.gtkw                 ← GTKWave config
-```
+| Target | Testbench | Module under test |
+|--------|-----------|-------------------|
+| `make test-masel-basic`   | `CGA_MIC_MASEL_tb.v`        | MASEL (address source select) |
+| `make test-mic-csel`      | `CGA_MIC_CSEL_tb.v`         | CSEL |
+| `make test-mic-incount`   | `CGA_MIC_INCOUNT_tb.v`      | INCOUNT |
+| `make test-mic-iinc`      | `CGA_MIC_IINC_tb.v`         | IINC (NEXT = IW + 1) |
+| `make test-mic-ipos`      | `CGA_MIC_IPOS_tb.v`         | IPOS (final address mux, trap-vector override) |
+| `make test-mic-stackbit`  | `CGA_MIC_STACK_BIT_tb.v`    | return stack, one bit |
+| `make test-mic-stackbit12`| `CGA_MIC_STACK_BIT12_tb.v`  | return stack, bit 12 |
+| `make test-mic-stack`     | `CGA_MIC_STACK_tb.v`        | return stack |
+| `make test-mic-wcareg`    | `CGA_MIC_WCAREG_tb.v`       | WCA register |
+| `make test-mic-repeat`    | `CGA_MIC_MASEL_REPEAT_tb.v` | MASEL repeat register |
+| `make test-mic-condreg`   | `CGA_MIC_CONDREG_tb.v`      | condition register |
+| `make test-mic-top`       | `CGA_MIC_tb.v`              | whole CGA_MIC next-address machine |
 
-## Running MASEL testbenches (iverilog)
-
-```bash
-cd Verilog/DELILAH-CPU/CGA_MIC/sim
-
-# Run both MASEL testbenches
-make test-masel
-
-# Run individually
-make test-masel-cycle    # full-cycle test (14 tests: JMP/NEXT/RET/REPEAT + race conditions)
-make test-masel-iw       # IW capture timing test (race + stability monitoring)
-```
-
-## Running full CGA_MIC test (Verilator)
+## Exploratory MASEL race testbenches (not pass/fail)
 
 ```bash
-make all    # compile + run + open GTKWave
+make test-masel-cycle    # MASEL_cycle_tb.v
+make test-masel-iw       # MASEL_iw_capture_tb.v
+make test-masel          # both, plus test-masel-basic
+```
+
+These two print EXPECTED FAIL lines on purpose: they model the FPGA race
+where SC5/SC6 and MCLK change on the same sysclk edge. They are not in the
+registry for that reason (`run_all_tests.sh`, "NOT in the registry").
+
+- `MASEL_cycle_tb.v` - the full microcode address cycle including the IINC
+  feedback loop (NEXT = IW + 1): sequential NEXT, JMP target capture (13-bit
+  address from the CSBIT fields), RETURN (from the stack), REPEAT (IW feeds
+  back to itself), SC5/SC6 races, a 1-sysclk active phase, and IW/W
+  stability while MCLK=1.
+- `MASEL_iw_capture_tb.v` - regIW capture timing, with a parallel
+  negedge-sysclk variant (V_NEG) for side-by-side comparison.
+
+Both write VCD files (`MASEL_cycle_tb.vcd`, `MASEL_iw_capture_tb.vcd`) for GTKWave.
+
+## Full CGA_MIC test (Verilator)
+
+```bash
+make all    # compile + run + open GTKWave (mic.gtkw)
 make run    # compile + run (no GTKWave)
-```
-
-## MASEL testbench details
-
-### MASEL_cycle_tb.v
-
-Tests the full microcode address cycle including the IINC feedback loop
-(NEXT = IW + 1). Validates:
-
-- Sequential NEXT progression (IW increments correctly)
-- JMP target capture (13-bit address from CSBIT fields)
-- RETURN path (from stack)
-- REPEAT path (IW feeds back to itself)
-- SC5/SC6 race conditions (SC transitions at the same edge as MCLK)
-- 1-sysclk active phase (FPGA-realistic tight timing)
-- Active-phase stability (IW and W must not glitch while MCLK=1)
-
-**Current baseline:** 11 PASS / 3 FAIL (race tests fail with original
-`posedge s_mclk` in iverilog — expected because the testbench models the
-FPGA race where SC and MCLK transition at the same sysclk edge).
-
-### MASEL_iw_capture_tb.v
-
-Focused test on the regIW capture timing. Includes a parallel
-negedge-sysclk variant (V_NEG) for side-by-side comparison. Tests
-capture correctness and stability of IW_12_0 / W_12_0 during held
-MCLK phases.
-
-## Viewing waveforms
-
-Both testbenches generate VCD files:
-
-```bash
-gtkwave MASEL_cycle_tb.vcd &
-gtkwave MASEL_iw_capture_tb.vcd &
 ```

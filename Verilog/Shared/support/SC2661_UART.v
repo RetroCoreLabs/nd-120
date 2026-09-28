@@ -593,7 +593,7 @@ module SC2661_UART (
         //     in the same window was stranded forever (measured 24-AUG in
         //     the dmaSim real-timing LFN run: txhold=3E '>' pending,
         //     insend=0, TX idle, status claiming ready - console dead).
-        // See fpga/nexys4ddr/HANDOFF-floppy-dma-investigation.md 24-AUG.
+        // See fpga/nexys4ddr/HANDOFF-floppy-dma-investigation.md 24-AUG (git c4896a4).
         if (!cmd_txEnabled && txState == TX_STATE_IDLE) begin
           txBit <= 1;          // hold MARK while disabled and idle
           txCounter <= 0;      // pending THR (if any) waits for TxEN

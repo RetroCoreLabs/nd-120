@@ -3,7 +3,7 @@
 ** Same equations; the four registers sample on sysclk with a rising-    **
 ** edge ENABLE on the original CK (DBAPR) instead of using it as a       **
 ** clock net (routed-net-as-clock breaks the write phase on FPGA -       **
-** see docs/HANDOFF-basys3-memory-write.md). PAL file itself untouched.  **
+** see docs/nd120-dram-memory.md section 5). PAL file itself untouched.  **
 ** Pattern: CYC_CC_D / CYC_TERM_D.                                       **
 ** Last reviewed: 8-JUL-2026  Ronny Hansen                               **
 ***************************************************************************/

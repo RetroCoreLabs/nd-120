@@ -75,7 +75,8 @@ def main():
     # (bits 7:0, untouched) and a LIST-FILE-NAMES failure. The fields were
     # misread, and the LFN claim was withdrawn the same day it was made:
     # the 24-AUG 14:00 A/B matrix in
-    # Verilog/fpga/nexys4ddr/HANDOFF-floppy-dma-investigation.md shows the
+    # Verilog/fpga/nexys4ddr/HANDOFF-floppy-dma-investigation.md (retired,
+    # git c4896a4) shows the
     # Nexys failing LFN with the PATCHED word too, and the rig and the Tang
     # passing with the raw one ("MICROCODE FULLY EXONERATED"). Decoded
     # against ND110Compile/ND120Tokens.cs ("A,6" = RF0 060000, "COND,F=0" =

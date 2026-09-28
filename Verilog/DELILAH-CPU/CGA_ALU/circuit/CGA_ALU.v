@@ -52,7 +52,7 @@ module CGA_ALU (
     //! GPR != 0 and both P and the opcode to change).
     //! Do NOT substitute CFETCH here: that FF feeds its own Q back to D and
     //! only reloads on the BRK scan path - measured 0 pulses in 460
-    //! instructions (see docs/HANDOFF-mips-and-clock.md).
+    //! instructions (see docs/build-defines.md, ND120_MIPS_TAP).
     output        XGPRLOAD_DBG,
 
     output        BDEST,

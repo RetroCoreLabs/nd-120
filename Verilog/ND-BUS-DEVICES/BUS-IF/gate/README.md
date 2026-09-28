@@ -34,21 +34,15 @@ Tang rig.
 make                 # normal `verilator` on PATH (WSL/Linux)
 ```
 
-The C cores come from `$(NDDEVICECORE)`, intended to be the nd-120 submodule
-`Verilog/ND-BUS-DEVICES/portable` **once it is wired** (it is not yet). Until
-then, point it at the populated NDModulE copy:
-
-```sh
-# Windows / oss-cad-suite (the perl `verilator` wrapper is broken here):
-export VERILATOR_ROOT=/c/Utils/oss-cad-suite/share/verilator
-export PATH="/c/Utils/oss-cad-suite/lib:/c/Utils/w64devkit/bin:/c/Utils/oss-cad-suite/bin:$PATH"
-make VERILATOR=verilator_bin.exe NDDEVICECORE=/e/Dev/Ronny/NDModulE/lib/NDDeviceCore
-```
+The C cores come from `$(NDDEVICECORE)`, which defaults to the nd-120
+submodule `Verilog/ND-BUS-DEVICES/portable` (`Makefile`: `NDDEVICECORE ?=
+../../portable`). Run `git submodule update --init` first if it is empty.
+On Windows the oss-cad-suite perl `verilator` wrapper does not work; set
+`VERILATOR_ROOT` and `PATH` to your oss-cad-suite install and run
+`make VERILATOR=verilator_bin.exe`.
 
 ## TODO to make this the real gate
 
-- Wire the `Verilog/ND-BUS-DEVICES/portable` submodule so `$(NDDEVICECORE)`
-  defaults resolve without an override.
-- Register in the machine-checkable test harness (it already emits
-  `TB_RESULT: PASS`).
+- Register in the machine-checkable test harness `Verilog/tests/run_all_tests.sh`
+  (it already emits `TB_RESULT: PASS`; not registered as of 28-SEP-2026).
 - Add terminal + IDENT + DMA (ND_DMA_MASTER) coverage.

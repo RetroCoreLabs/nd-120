@@ -19,7 +19,7 @@
 **                                                                       **
 ** Waveforms here replay the shapes MEASURED in the Verilator trace of   **
 ** the failing system (docs: fpga/nexys4ddr/HANDOFF-floppy-dma-          **
-** investigation.md PART 0):                                             **
+** investigation.md PART 0, retired - git c4896a4):                      **
 **   T1 zero word, 2-tick foreign transient        -> must read 0        **
 **      (THE BUG: the pre-fix RTL returns the transient here)            **
 **   T2 nonzero word, transient right before data  -> real data          **

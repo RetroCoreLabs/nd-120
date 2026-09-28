@@ -663,7 +663,7 @@ golden-cycle-timeline: CPU_CYCLE_TIMELINE_tb
 
 # ---------------------------------------------------------------------------
 # Committed access to a ZERO page-table entry must dispatch the page-fault
-# trap (hypothesis H1 of PLAN-zero-read-nonresident-page.md, unit level).
+# trap (hypothesis H1 of PLAN-zero-read-nonresident-page.md, git 043c460, unit level).
 # Wires the REAL chain: cycle PALs (44601B+44307C) + TMM2018D PT status RAM +
 # CGA_TRAP_BRKDET + CGA_TRAP_TVGEN(_P2) + CGA_MIC_IPOS, with the board's real
 # BRK/TRAP feedback. FETCH/READ/WRITE against PTe=0 must each force

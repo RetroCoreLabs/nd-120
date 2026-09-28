@@ -10,7 +10,7 @@ Reference behavior: `Verilog/simDevices/NDBus.cpp` (bus handshake) and
 models that runSim boots with today. The Verilog devices must match them;
 the runSim console golden gates the swap.
 
-Master plan: `Verilog/docs/device-bus-todo.md`.
+Storage design: `Verilog/docs/nd-storage-design.md`.
 
 ## Structure
 
@@ -22,6 +22,18 @@ TAPE-400/   ND_TAPE_400.v - papertape reader, IOX 400-403, ident 02,
             level 12. Byte source is a port (file model in sim, SD-FAT
             streamer on hardware).
 FLOPPY/     floppy PIO controller, IOX 1560-1567, ident 021, level 11.
+FLOPPY-DMA/ ND_FLOPPY_DMA.v - floppy controller 3112, DMA interface
+            (register semantics per ND-11.021.01; IOX 1560 base).
+DMA/        ND_DMA_MASTER.v - the DMA bus master (request/grant + one
+            memory reference per grant) that FLOPPY-DMA and SMD use.
+SMD/        ND_SMD.v - SMD disc controller (ND632 / PCB 3043+3044), DMA.
+WINCHESTER/ ND_WINCHESTER.v - Winchester DMA block device, IOX 500-507,
+            ident 1, level 11. oracle/ holds its reference trace.
+testdata/   README only: which disk images the testbenches read (the
+            images themselves are not in git).
+portable/   git submodule (RetroCoreLabs/NDDeviceCore): the portable C
+            device cores the RTL is proven against. Not documented here -
+            see its own README.
 ```
 
 ## Disc geometry - Winchester vs SMD
@@ -145,6 +157,40 @@ exactly 13.0 cylinders (1.27%), i.e. the bad-track and reserved-area
 allowance. A number in that shape CONFIRMS the geometry; reading it as
 decimal makes it look like a 219 MB drive and sends you chasing a
 discrepancy that does not exist.
+
+## Running the Winchester against the CPU in Verilator
+
+A device with a green unit bench and no entry in `BUSDEV_COMPONENTS`
+(`Verilog/sim/Makefile`, `Verilog/runSim/Makefile`) has never met the CPU -
+check that list before believing any "it works". The Winchester went from
+unit benches straight to the Tang until 06-AUG-2026 for that reason.
+
+    cd Verilog/sim
+    make probe-wd USE_LATCHES=0 EXTRA_WD_DEFINES=-DND120_DEV_DELAY_TICKS=216000
+    cd ../ND-BUS-DEVICES/WINCHESTER/sim
+    ND120_WD_IMG=<75 MB Winchester image> ND120_WD_TRACE_FILE=wd_trace.log \
+    python3 wd_disctema.py disctema_console.log
+
+`wd_disctema.py` boots `1560&`, then types `disc`, `DU-DI-C`, `DIS-74-1`,
+unit/cylinder/surface/sector 0, amount 1. About 50 minutes.
+
+Both build flags are needed:
+
+- `USE_LATCHES=0`: `Verilog/sim/Makefile` defaults to 1 (latch mode), which
+  never floppy-boots. Symptom: the prompt appears, `1560&` echoes, then
+  nothing.
+- `ND120_DEV_DELAY_TICKS=216000`: the disc delay in `ND120_CORE.v` is 8 ms of
+  wall-clock time, `(DEV_CLK_HZ/1000) * SMD_DELAY_MS`. `DEV_CLK_HZ` is 27 MHz on
+  the Tang but falls back to 100 MHz in Verilator, so the same 8 ms is 216,000
+  cycles on silicon and 800,000 in the sim. The CPU runs per cycle, so
+  DISC-TEMA's status-wait loop gets 3.7x more passes and its software timeout
+  fires before the transfer is programmed. The define makes the sim
+  cycle-identical to silicon; it is a diagnostic lever, left undefined by
+  default.
+
+`ND120_WD_TRACE_FILE` makes `Verilog/simDevices/NDBus.cpp` log whether the
+image opened, every IOX to 500-507, every IDENT with the level and the answer,
+and every disc-side START / REQ / READ DONE.
 
 ## Device bus (between ND_BUS_SLAVE and the device cores)
 
