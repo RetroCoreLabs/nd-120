@@ -1,6 +1,8 @@
 # ND-120 FPGA timing constraints
-# Added to the Vivado project by vivado_build.tcl (constrs_1 fileset), processed
-# AFTER the project's pin/clock XDC so the primary clock 'sys_clk' already exists.
+# Read by vivado_build.tcl AFTER synthesis and AFTER nd120_basys3.xdc (the
+# pin/clock XDC), so the primary clock 'sys_clk' already exists. (Until
+# 30-SEP-2026 the script added it to a Vivado project's constraint set,
+# implementation-only, PROCESSING_ORDER LATE - the same order.)
 #
 # Clock architecture (see ND120_TOP.v, 2026-07-06):
 #   sys_clk  = 100 MHz Basys3 pin. Clocks ONLY the POR, 7-seg display, heartbeat

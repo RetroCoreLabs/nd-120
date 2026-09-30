@@ -1,12 +1,16 @@
 # Check if microcode ROM has actual data after synthesis
 # Usage: vivado -mode batch -source check_rom.tcl -nojournal -nolog
 
-source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
-set project_dir $b3_project_dir
-open_project "${project_dir}/ND3202D.xpr"
-open_run synth_1
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + build folder paths
+# The synthesized design: <build>/post_synth.dcp, written by a full_synth run
+# of vivado_build.tcl (there is no Vivado project since 30-SEP-2026).
+if {![file exists $b3_synth_dcp]} {
+    puts "ERROR: no synthesized design at $b3_synth_dcp - run vivado_build.tcl with full_synth first"
+    exit 1
+}
+open_checkpoint $b3_synth_dcp
 
-set fp [open "${project_dir}/output/rom_content_check.txt" w]
+set fp [open "${b3_output_dir}/rom_content_check.txt" w]
 puts $fp "=== Microcode ROM Content Check ==="
 puts $fp "Date: [clock format [clock seconds]]"
 puts $fp ""
@@ -47,8 +51,7 @@ foreach c $prom_cells {
 
 close $fp
 close_design
-close_project
 
 puts ""
-puts "Results: ${project_dir}/output/rom_content_check.txt"
+puts "Results: ${b3_output_dir}/rom_content_check.txt"
 exit 0

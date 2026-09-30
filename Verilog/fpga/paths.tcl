@@ -85,7 +85,11 @@ proc nd120_setting {name} {
 proc nd120_stop {msg} {
     set batch 1
     if {[info exists ::rdi::mode] && $::rdi::mode ne "batch"} { set batch 0 }
-    if {$batch} { exit 1 }
+    # The return after exit only matters where exit does not end the run:
+    # Verilog/tests/hierarchy_harness.tcl replaces exit to carry on reading a
+    # build script's file list, and there a missing build folder must not
+    # stop it.
+    if {$batch} { exit 1; return }
     error $msg
 }
 

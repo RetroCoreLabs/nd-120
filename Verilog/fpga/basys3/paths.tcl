@@ -8,38 +8,43 @@
 # Paths INSIDE the repository are worked out from where this file sits - no
 # drive letter or checkout location is written anywhere.
 #
-# The one path OUTSIDE the repository is the Basys3 Vivado GUI project (the
-# folder holding ND3202D.xpr). It comes from ND120_BASYS3_PROJECT, taken from
-# the environment or, when it is not set there, from local.mk at the
-# repository root (written by configure.py; ../paths.tcl reads it, so the
-# Vivado console needs nothing extra). To point one console session
-# somewhere else:
-#   set ::env(ND120_BASYS3_PROJECT) {<folder holding ND3202D.xpr>}
+# The one path OUTSIDE the repository is the build folder: ND120_BUILD_DIR,
+# taken from the environment or, when it is not set there, from local.mk at
+# the repository root (written by configure.py; ../paths.tcl reads it, so the
+# Vivado console needs nothing extra). Everything the Basys3 build writes
+# goes to <ND120_BUILD_DIR>/basys3/. To point one console session somewhere
+# else:
+#   set ::env(ND120_BUILD_DIR) {<folder>}
+#
+# Since 30-SEP-2026 the Basys3 build is a non-project flow like the other
+# Vivado boards: there is no Vivado project any more, and ND120_BASYS3_PROJECT
+# (the old ND3202D.xpr folder) is read by nothing.
 #
 # Variables this file sets (all prefixed b3_ so they cannot collide with a
 # script's own names):
 #   b3_here         this folder (Verilog/fpga/basys3)
 #   b3_verilog_dir  the Verilog/ folder of this checkout
-#   b3_logdir       Verilog/fpga/basys3/logs (created if missing; gitignored)
-#   b3_project_dir  the Vivado project folder (ND120_BASYS3_PROJECT)
-#   b3_output_dir   <project>/output - bitstream, probes file, reports
-#   b3_routed_dcp   <project>/ND3202D.runs/impl_1/ND120_TOP_routed.dcp
-#   b3_bit          <project>/output/ND120_TOP.bit
-#   b3_ltx          <project>/output/ND120_TOP.ltx (ILA probes)
+#   b3_build_dir    <ND120_BUILD_DIR>/basys3 - every output of the build
+#   b3_output_dir   the same folder (the name the older scripts use)
+#   b3_logdir       <build>/logs - ILA captures and experiment reports
+#   b3_synth_dcp    <build>/post_synth.dcp - the synthesized design (the
+#                   checkpoint a build without full_synth starts from)
+#   b3_routed_dcp   <build>/ND120_TOP_routed.dcp
+#   b3_bit          <build>/ND120_TOP.bit
+#   b3_ltx          <build>/ND120_TOP.ltx (ILA probes)
 
 set b3_here        [file dirname [file normalize [info script]]]
 set b3_verilog_dir [file normalize [file join $b3_here .. ..]]
-set b3_logdir      [file join $b3_here logs]
-file mkdir $b3_logdir
 
 # Shared helpers: reads local.mk at the repository root (the environment
 # wins), and stops with the one "missing setting" message.
 source [file join $b3_here .. paths.tcl]
 
-nd120_require ND120_BASYS3_PROJECT "the Basys3 scripts"
-
-set b3_project_dir [file normalize [nd120_host_path [nd120_setting ND120_BASYS3_PROJECT]]]
-set b3_output_dir  [file join $b3_project_dir output]
-set b3_routed_dcp  [file join $b3_project_dir ND3202D.runs impl_1 ND120_TOP_routed.dcp]
-set b3_bit         [file join $b3_output_dir ND120_TOP.bit]
-set b3_ltx         [file join $b3_output_dir ND120_TOP.ltx]
+set b3_build_dir   [nd120_board_dir basys3 "the Basys3 scripts"]
+set b3_output_dir  $b3_build_dir
+set b3_logdir      [file join $b3_build_dir logs]
+file mkdir $b3_logdir
+set b3_synth_dcp   [file join $b3_build_dir post_synth.dcp]
+set b3_routed_dcp  [file join $b3_build_dir ND120_TOP_routed.dcp]
+set b3_bit         [file join $b3_build_dir ND120_TOP.bit]
+set b3_ltx         [file join $b3_build_dir ND120_TOP.ltx]

@@ -156,11 +156,11 @@ TOPS = [
          kind="vivado", script="fpga/qmtech-a35t/build.tcl", args=[],
          build="`Verilog/fpga/qmtech-a35t/build.tcl`, default arguments"),
     dict(key="basys3", title="Basys3", short="Basys3",
-         kind="project", script="fpga/basys3/vivado_build.tcl",
+         kind="vivado", script="fpga/basys3/vivado_build.tcl",
          args=["full_synth", "skip_program"],
          build="`Verilog/fpga/basys3/vivado_build.tcl` with `full_synth`. Its "
-               "file list is the Vivado project (.xpr) the script opens, which "
-               "is kept OUTSIDE the repository, plus the files the script adds"),
+               "file list is `nd120_basys3_sources.txt` next to it (a non-project "
+               "flow since 30-SEP-2026)"),
     dict(key="cmod", title="Cmod A7-35T", short="Cmod",
          kind="vivado", script="fpga/cmod-a7-35t/build.tcl", args=[],
          build="`Verilog/fpga/cmod-a7-35t/build.tcl`, default arguments"),

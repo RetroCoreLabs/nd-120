@@ -1,32 +1,12 @@
 # ND-120 Vivado Lint-Only Script
 # Usage: vivado -mode batch -source vivado_lint.tcl
-# Much faster than full build -- just runs synthesis + linter
+# Much faster than full build -- just runs synthesis with the linter.
+#
+# Since 30-SEP-2026 (non-project flow) this is vivado_build.tcl with the lint
+# flag: the same source list, include path and defines, synth_design -lint,
+# then stop. Its log and .Xil land in the build folder,
+# <ND120_BUILD_DIR>/basys3, like the build's.
 
-source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
-set project_dir $b3_project_dir
-
-puts "============================================"
-puts " ND-120 Vivado Linter"
-puts "============================================"
-
-if {[file exists "${project_dir}/ND3202D.xpr"]} {
-    open_project "${project_dir}/ND3202D.xpr"
-} else {
-    puts "ERROR: Project not found"
-    exit 1
-}
-
-# Run synthesis with linter
-reset_run synth_1
-set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-lint} -objects [get_runs synth_1]
-launch_runs synth_1 -jobs 4
-wait_on_run synth_1
-
-set synth_status [get_property STATUS [get_runs synth_1]]
-puts "\nLint status: $synth_status"
-
-# Reset the synth options back to normal
-set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {} -objects [get_runs synth_1]
-
-close_project
-exit 0
+set argv [list lint]
+set argc 1
+source [file join [file dirname [file normalize [info script]]] vivado_build.tcl]

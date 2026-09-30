@@ -131,7 +131,11 @@ proc unknown {args} {
     return ""
 }
 
-# ---- Vivado non-project flow (Nexys 4 DDR, Cmod A7, QMTECH, MEGA65) --------
+# ---- Vivado non-project flow (Nexys 4 DDR, Cmod A7, QMTECH, MEGA65, Basys3) --
+set ::H_proj_defines {}
+set ::H_proj_incdirs {}
+set ::H_proj_top ""
+
 proc read_verilog {args} {
     set sv 0
     set n [llength $args]
@@ -158,15 +162,20 @@ proc synth_design {args} {
             -include_dirs   { foreach d [lindex $args [incr i]] { H_out INCDIR [H_norm $d] } }
         }
     }
+    # Defines and include folders set on the in-memory project's fileset
+    # (set_property verilog_define / include_dirs [current_fileset]) instead
+    # of passed to synth_design - the Basys3 non-project flow does it that
+    # way, as its old project did (since 30-SEP-2026).
+    foreach d $::H_proj_defines { H_out DEFINE $d }
+    foreach d $::H_proj_incdirs { H_out INCDIR [H_norm $d] }
     H_out STOP synth_design
     set ::H_stopped 1
     error HIER_STOP
 }
 
-# ---- Vivado project flow (Basys3: the file list lives in an .xpr) ----------
-set ::H_proj_defines {}
-set ::H_proj_incdirs {}
-set ::H_proj_top ""
+# ---- Vivado project flow (the Basys3 build before 30-SEP-2026: the file
+# list lived in an .xpr). Kept for any script that still opens a project;
+# set_property below also serves the non-project fileset properties. --------
 
 proc open_project {path} {
     set hp [H_host_path $path]

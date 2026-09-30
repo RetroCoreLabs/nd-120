@@ -4,7 +4,7 @@
 #
 # Usage (from Verilog\fpga\basys3):
 #   vivado -mode batch -source timing_explore.tcl
-# Outputs land in .\logs\ (readable from WSL).
+# Outputs land in <ND120_BUILD_DIR>\basys3\logs\ (readable from WSL).
 
 source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
 set dcp $b3_routed_dcp
