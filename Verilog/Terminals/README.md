@@ -183,7 +183,7 @@ Identical on every board. Only the ends differ:
 
 ## Where the specification comes from
 
-**RetroTerm** (`E:\Dev\Ronny\RetroTerm`) is Ronny's own MIT-licensed terminal
+**RetroTerm** (its own repository, `$ND_REPOS/RetroTerm`) is Ronny's own MIT-licensed terminal
 emulator and it already implements VT100, VT52, ECMA-48, TDV and Tektronix.
 That makes it a clean, unrestricted specification source - unlike PDP2011's
 VT100, whose files are non-commercial-only and cannot be touched (details in

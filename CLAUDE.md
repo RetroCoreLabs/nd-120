@@ -183,7 +183,7 @@ Key `vivado_build.tcl` flags: `full_synth` (required for a ~1h full re-synth; ot
     STERR, unit suite 48/48, all 13 instruction-verify areas, and the sim/
     latch-vs-FF golden traces byte-identical. Ground-truth confirmed against
     the C# DELILAH-L PIC trace
-    (`/mnt/e/Dev/Repos/Ronny/ND110Compile/traces/PIC-TRACE-RUN-ND120.md`):
+    (`$ND_REPOS/ND110Compile/traces/PIC-TRACE-RUN-ND120.md`):
     vector+1 loads on the winning chip only, per-group DCDF (HIF/LOF) qualifies
     it. The follow-on `IIC: 11 - Memory Out of Range` misreport was a THIRD
     transcription bug — `CGA_INTR_CNTLR.v` swapped FIDBO bits 1<->2 on the

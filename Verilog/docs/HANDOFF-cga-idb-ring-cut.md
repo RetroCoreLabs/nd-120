@@ -406,7 +406,7 @@ CGA ring. **Only a SINTRAN boot on hardware covers this.**
    `TB_RESULT: PASS (skipped - no golden)` and exits 0** when the golden is
    missing, and `make test-instr-%` greps for `TB_RESULT: PASS`. The goldens
    live **outside the repo**, at
-   `/mnt/e/Dev/Repos/Ronny/ND110Compile/traces/`. They are present today (16
+   `$ND_REPOS/ND110Compile/traces/`. They are present today (16
    files, verified 04-SEP-2026), so the gate is live on this machine - but on
    any machine without that directory the entire instruction campaign reports
    green while doing nothing. **Verified by reading the script.**

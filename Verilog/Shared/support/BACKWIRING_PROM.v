@@ -36,8 +36,8 @@
 **   2. the CPU board drives PIL out to the B-plug and takes INR back    **
 **      in from it (the paired signals above);                           **
 **   3. SINTRAN's GCPUNR reads exactly 8 bytes by executing VERSN once   **
-**      per interrupt level 0..7 - E:\Dev\Ronny\NDInsight\SINTRAN\       **
-**      NPL-SOURCE\NPL\PH-P2-OPPSTART.NPL:3534-3570.                     **
+**      per interrupt level 0..7 - $ND_REPOS/NDInsight/SINTRAN/          **
+**      NPL-SOURCE/NPL/PH-P2-OPPSTART.NPL:3534-3570.                     **
 **                                                                       **
 ** MICROCODE TIMING NOTE (real hardware bug, both behaviours work):      **
 ** LDPIL has not settled when the very next microword samples IDBS,INR,  **

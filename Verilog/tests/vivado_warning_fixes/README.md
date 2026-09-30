@@ -52,7 +52,7 @@ brew install verilator
 
 ### Run All Tests
 ```bash
-cd /home/user/nd-120/Verilog/tests/vivado_warning_fixes
+cd Verilog/tests/vivado_warning_fixes   # from the repository root
 make all
 ```
 
