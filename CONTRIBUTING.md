@@ -1,3 +1,7 @@
+---
+title: Contributing to nd-120
+---
+
 # Contributing to nd-120
 
 Thanks for looking. This file says how to get a build running, what the code is expected to look
