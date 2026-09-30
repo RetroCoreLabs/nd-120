@@ -11,9 +11,9 @@
 ***************************************************************************/
 
 module CGA_TRAP_BRKDET (
-    input       CBRKN,
-    input       ETRAPN,
-    input       FTRAPN,
+    input       CBRKN,      //! CBRK negated (from CGA_DCD.CBRKN)
+    input       ETRAPN,     //! External Trap, active low (from CPU_PROC_CGA_33.ETRAP_n)
+    input       FTRAPN,     //! tied to 1 (in CGA_TRAP)
     input       IFETCH,
     input       IFETCHN,
     input       IINDN,
@@ -25,11 +25,11 @@ module CGA_TRAP_BRKDET (
     input       IWRITE,
     input       IWRITEN,
     input       VACC,       //! MMU-translated memory reference this cycle - qualifies every break/protect term
-    input       VTRAPN,
+    input       VTRAPN,     //! tied to 1 (in CGA_TRAP)
 
 
-    output BRKN,
-    output TRAPN
+    output BRKN,            //! CGA Break, active low (to CPU_PROC_CGA_33.CGABRK_n)
+    output TRAPN            //! Trap, active low (to CPU_PROC_CGA_33.TRAP_n)
 );
 
   /*******************************************************************************

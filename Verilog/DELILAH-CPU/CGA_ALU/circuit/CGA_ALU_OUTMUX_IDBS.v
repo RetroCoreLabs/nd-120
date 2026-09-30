@@ -13,9 +13,9 @@
 module CGA_ALU_OUTMUX_IDBS (
     input       sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
     input       ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input       ALUCLK,
-    input       ALUD2N,
-    input [4:0] CSIDBS_4_0,
+    input       ALUCLK,     //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input       ALUD2N,     //! ALU Data 2, active low signal (from CGA_CPU_ALU_CONTR.ALUD2N)
+    input [4:0] CSIDBS_4_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[41:37])
 
     output EA,
     output EAARG,

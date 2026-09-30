@@ -17,17 +17,17 @@ module CGA_MAC_LASEL (
     input        sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input        MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input        CSMREQ,
+    input        CSMREQ,   //! CSM request (from CGA_DCD.CSMREQ)
     input        DOUBLE,
     input        EXMN,
     input [7:0]  ICA_15_8,
-    input        MCLK,
-    input [2:0]  PCR_2_0,
+    input        MCLK,     //! Master CLock (from CGA_MAC.MCLK)
+    input [2:0]  PCR_2_0,  //! Program Counter Register bits 15 to 0 (same net as CGA_MAC.PCR_15_0[2:0])
     input        PEX,
-    input        PONI,
+    input        PONI,     //! Memory Protection ON, PONI=1 (from CGA_MAC.PONI)
     input        SEGZN,
     input        SELPTN,
-    input        VEX,
+    input        VEX,      //! Vector EXecute signal (same net as CGA_MAC.VEX)
 
     output A10,
     output A1617,
@@ -35,12 +35,12 @@ module CGA_MAC_LASEL (
     output A1819,
     output B1819,
     output B1821,
-    output BB10,
-    output C10,
+    output BB10,           //! no PONI + DOUBLE + SHADOW + MREQ (to CGA_MAC_LA1025.BB10)
+    output C10,            //! no PONI + DOUBLE + SHADOW + not MREQ (to CGA_MAC_LA1025.C10)
     output D1617,
     output E1617,
     output F1617,
-    output LSHADOW
+    output LSHADOW         //! Latch SHADOW signal (to CGA_MAC.LSHADOW)
 );
 
   /*******************************************************************************

@@ -14,17 +14,17 @@ module CGA_INTR_CNTLR_IRGEL_HIGEL (
     input sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input FIDB03,
+    input FIDB03,   //! FIDB (from CGA_INTR.FIDBO_15_0[3])
     input HIDET,
     input HIENABN,
     input HIGAS,
     input L,
     input LOGASN,
     input M,
-    input MCLK,
+    input MCLK,     //! Master Clock (from CGA_INTR.MCLK)
     input N,
 
-    output HIGSN
+    output HIGSN    //! High Speed signal, active low (to CGA_INTR.HIGSN)
 );
 
   /*******************************************************************************

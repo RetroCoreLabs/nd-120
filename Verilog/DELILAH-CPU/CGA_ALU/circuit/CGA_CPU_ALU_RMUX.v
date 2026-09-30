@@ -11,12 +11,12 @@
 ***************************************************************************/
 
 module CGA_CPU_ALU_RMUX (
-    input [15:0] A_15_0,
+    input [15:0] A_15_0,  //! DATA output 16 bit A, from register selected by LAA_3_0 (from CGA_WRF.A_15_0)
     input [15:0] D_15_0,
-    input        RA,
-    input        RD,
+    input        RA,  //! Register A control signal (from CGA_CPU_ALU_CONTR.RA)
+    input        RD,  //! Register D control (or Read) signal (from CGA_CPU_ALU_CONTR.RD)
 
-    output [15:0] RN_15_0
+    output [15:0] RN_15_0  //! R(15:0) negated (to CGA_CPU_ALU_RALU.RN_15_0)
 );
 
   /*******************************************************************************

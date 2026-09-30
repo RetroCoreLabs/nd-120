@@ -20,17 +20,17 @@ module CGA_INTR_CNTLR_IRGEL_HIRL (
     input       H,
     input       HIDET,
     input       HIGSN,
-    input [2:0] HIVEC_2_0,
+    input [2:0] HIVEC_2_0,  //! High vector (same net as CGA_INTR_CNTLR_IRGEL_VMUX.HIVEC_2_0)
     input       HIVGES,
-    input       MCLK,
+    input       MCLK,     //! Master Clock (from CGA_INTR.MCLK)
     input       S,
 
     output HIENABN,
     output HIGAS,
     output HIPASSALL,
     output HIRQ,
-    output HVE,
-    output PD,
+    output HVE,           //! High vector Enable (to CGA_INTR_CNTLR_IRGEL_VMUX.HVE)
+    output PD,            //! Power Down signal (to CGA_INTR.PD)
     output RDN
 );
 

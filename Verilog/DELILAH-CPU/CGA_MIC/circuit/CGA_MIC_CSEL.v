@@ -12,22 +12,22 @@
 
 module CGA_MIC_CSEL (
     input       sysclk,    //! FPGA system clock — threaded to LATCH
-    input       ALUCLK,
-    input       CFETCH,
-    input       COND,
-    input       CRY,
-    input       DZD,
-    input       F11,
-    input       F15,
-    input       IRQ,
+    input       ALUCLK,    //! ALU clock signal (from CGA_MIC.ALUCLK)
+    input       CFETCH,    //! Control signal for fetch operation (from CGA_MIC.CFETCH)
+    input       COND,      //! Condition output signal (same net as CGA_MIC.COND)
+    input       CRY,       //! Carry flag input (from CGA_MIC.CRY)
+    input       DZD,       //! Divide by zero detection (same net as CGA_MIC.DZD)
+    input       F11,       //! Bit F11 (from CGA_MIC.F11)
+    input       F15,       //! Bit F15 (from CGA_MIC.F15)
+    input       IRQ,       //! Interrupt request signal (from CGA_MIC.IRQ)
     input       LCZ,
-    input       OOD,
-    input       OVF,
+    input       OOD,       //! Out of data signal (same net as CGA_MIC.OOD)
+    input       OVF,       //! Overflow flag (from CGA_MIC.OVF)
     input       RESTR,
-    input       SPARE,
-    input       STP,
-    input [3:0] TSEL_3_0,
-    input       ZF,
+    input       SPARE,     //! Spare signal for future use (from CGA_MIC.SPARE)
+    input       STP,       //! Stop control signal (from CGA_MIC.STP)
+    input [3:0] TSEL_3_0,  //! Test Select. CSBIT 7:4 (from CGA_MIC_CONDREG.TSEL_3_0)
+    input       ZF,        //! Zero flag (from CGA_MIC.ZF)
 
     output CONDN
 );

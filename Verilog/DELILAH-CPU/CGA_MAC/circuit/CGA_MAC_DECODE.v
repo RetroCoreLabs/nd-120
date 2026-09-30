@@ -14,15 +14,15 @@ module CGA_MAC_DECODE (
     input       sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input       MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input [4:0] CSCOMM_4_0,
-    input [1:0] CSMIS_1_0,
-    input       LCSN,
-    input       MCLK,
-    input       WR3,
-    input       WR7,
+    input [4:0] CSCOMM_4_0,  //! Microcode: Commands (5 bits) (from CGA_MAC.CSCOMM_4_0)
+    input [1:0] CSMIS_1_0,  //! Microcode: Misc  (2 bits) (from CGA_MAC.CMIS_1_0)
+    input       LCSN,     //! Instruction Load Control Signal (from CGA_MAC.ILCSN)
+    input       MCLK,     //! Master CLock (from CGA_MAC.MCLK)
+    input       WR3,      //! Enable write to WR3 (B register) (from WR_15_0) (from CGA_WRF.WR3)
+    input       WR7,      //! Enable write to WR7 (X register) (from WR_15_0) (from CGA_WRF.WR7)
 
     output ADDSEL,
-    output CDS,
+    output CDS,           //! If false all 16 bits of CD is added. If true, only the low 8 bits are added. (to CGA_MAC_ADD.CDS)
     output CDSEL,
     output EXMN,
     output HOLD,
@@ -30,11 +30,11 @@ module CGA_MAC_DECODE (
     output LLDPCR,
     output LLDSEG,
     output NLCASEL,
-    output PB,
-    output PLCA,
-    output PRB,
+    output PB,            //! Select ALU register B (to CGA_MAC_ADD.PB)
+    output PLCA,          //! Select ALU Load Control Address (to CGA_MAC_ADD.PLCA)
+    output PRB,           //! Select Microcode register B (to CGA_MAC_ADD.PRB)
     output PSEL,
-    output PX,
+    output PX,            //! Select ALU register X (to CGA_MAC_ADD.PX)
     output SAPT,
     output SPTN
 );

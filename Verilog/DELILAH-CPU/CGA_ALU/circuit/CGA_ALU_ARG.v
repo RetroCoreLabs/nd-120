@@ -14,8 +14,8 @@
 module CGA_ALU_ARG (
     input        sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
-    input [15:0] CSBIT_15_0,
+    input        ALUCLK,     //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input [15:0] CSBIT_15_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[15:0])
 
     output [15:0] ARG_15_0
 );

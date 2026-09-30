@@ -21,19 +21,19 @@ module CGA_MAC_SEGPT (
 
     // Input signals
     input        EXMN,
-    input [15:0] FIDBO_15_0,
+    input [15:0] FIDBO_15_0,  //! FIDBO output from previous stage (from CGA_MAC.FIDBO_15_0)
     input        LLDEXM,
     input        LLDPCR,
     input        LLDSEG,
-    input        MCLK,
+    input        MCLK,  //! Master CLock (from CGA_MAC.MCLK)
 
     // Output signals
-    output [15:0] PCR_15_0,
+    output [15:0] PCR_15_0,  //! Program Counter Register bits 15 to 0 (to CGA_MAC.PCR_15_0)
     output [15:0] PCR_RB_15_0,  //! registered readback tap for IDBCTL/SEL6 (loop cut)
     output        PEX,
     output        SEGZN,
     output [ 7:0] SEG_7_0,
-    output        VEX,
+    output        VEX,  //! Vector EXecute signal (to CGA_MAC.VEX)
     output [ 1:0] XPT_1_0
 );
 

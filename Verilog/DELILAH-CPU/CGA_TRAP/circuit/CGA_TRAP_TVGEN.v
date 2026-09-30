@@ -14,8 +14,8 @@ module CGA_TRAP_TVGEN (
     input       sysclk,   //! FPGA system clock (P2: TCLK_EN capture)
     input       TCLK_EN,  //! TCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input       DSTOPN,
-    input       FTRAPN,
+    input       DSTOPN,   //! DSTOP negated (from CGA_DCD.DSTOPN)
+    input       FTRAPN,   //! tied to 1 (in CGA_TRAP)
     input       IFETCH,
     input       IFETCHN,
     input       IIND,
@@ -28,14 +28,14 @@ module CGA_TRAP_TVGEN (
     input       IWRITE,
     input       IWRITEN,
     input       PAN,
-    input       PONI,
-    input       TCLK,
+    input       PONI,     //! Memory Protection ON, PONI=1 (same net as CGA.XPONI)
+    input       TCLK,     //! User Clock (from CPU_PROC_CGA_33.UCLK)
     input       VACC,       //! MMU-translated memory reference this cycle - qualifies every trap-vector term below
-    input       VTRAPN,
+    input       VTRAPN,   //! tied to 1 (in CGA_TRAP)
 
     output       PVIOL,
     output       RESTR,
-    output [3:0] TVEC_3_0
+    output [3:0] TVEC_3_0  //! Trap vector bits 3 to 0 (to CGA_MIC.TVEC_3_0)
 );
 
   /*******************************************************************************

@@ -13,20 +13,20 @@ module CGA_INTR_CNTLR (
     input        sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input        MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input        EPIC,
-    input [15:0] FIDBO_15_0,
+    input        EPIC,     //! Enable PIC (Programmable Interrupt Controller) signal (from CGA_INTR.EPIC)
+    input [15:0] FIDBO_15_0,  //! FIDB , 16-bit (from CGA_INTR.FIDBO_15_0)
     input [15:0] IREQ_15_0_N,
-    input [ 3:0] LAA_3_0,
-    input        MCLK,
+    input [ 3:0] LAA_3_0,  //! Latched Address A, 4-bit (from CGA_INTR.LAA_3_0)
+    input        MCLK,     //! Master Clock (from CGA_INTR.MCLK)
 
-    output        EPICMASKN,
-    output        HIGSN,
+    output        EPICMASKN,  //! EPIC Mask, active low (to CGA_INTR.EPICMASKN)
+    output        HIGSN,   //! High Speed signal, active low (to CGA_INTR.HIGSN)
     output        IRQN,
-    output        LOGSN,
-    output        PD,
-    output [15:0] PICMASK_15_0,
-    output [ 2:0] PICS_2_0,
-    output [ 2:0] PICV_2_0,
+    output        LOGSN,   //! Logical Segment Number, active low (to CGA_INTR.LOGSN)
+    output        PD,      //! Power Down signal (to CGA_INTR.PD)
+    output [15:0] PICMASK_15_0,  //! PIC Mask, 16-bit (to CGA_INTR.PICMASK_15_0)
+    output [ 2:0] PICS_2_0,  //! PIC Select, 3-bit (to CGA_INTR.PICS_2_0)
+    output [ 2:0] PICV_2_0,  //! PIC Vector, 3-bit (to CGA_INTR.PICV_2_0)
     output [15:0] XMIREQ_15_0_N   //! DEBUG: masked interrupt-request vector (active low) that drives the grant
 );
 

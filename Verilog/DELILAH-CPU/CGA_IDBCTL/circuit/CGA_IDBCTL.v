@@ -16,24 +16,24 @@ module CGA_IDBCTL (
     input        MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
     // Input signal
-    input        EPCRN,
-    input        EPGSN,
-    input        EPICMASKN,
-    input        EPICSN,
-    input        EPICVN,
-    input        FETCHN,
-    input        HIGSN,
-    input [11:0] LA_21_10,
-    input        LOGSN,
-    input        MCLK,
-    input [15:0] PCR_15_0,
-    input        PD,
-    input [15:0] PICMASK_15_0,
-    input [ 2:0] PICS_2_0,
-    input [ 2:0] PICV_2_0,
+    input        EPCRN,    //! EPCR negated (from CGA_DCD.EPCRN)
+    input        EPGSN,    //! EPGS negated (from CGA_DCD.EPGSN)
+    input        EPICMASKN,  //! EPIC Mask, active low (from CGA_INTR.EPICMASKN)
+    input        EPICSN,   //! EPICS negated (from CGA_DCD.EPICSN)
+    input        EPICVN,   //! EPICV negated (from CGA_DCD.EPICVN)
+    input        FETCHN,   //! Fetch negated (from CGA_DCD.FETCHN)
+    input        HIGSN,    //! High Speed signal, active low (from CGA_INTR.HIGSN)
+    input [11:0] LA_21_10,  //! Latch Address bits 23 to 10 (from CGA_MAC.LA_23_10[11:0])
+    input        LOGSN,    //! Logical Segment Number, active low (from CGA_INTR.LOGSN)
+    input        MCLK,     //! Microcycle clock (= TERM outside RWCS, stretched during RWCS) (from CPU_PROC_CGA_33.MCLK)
+    input [15:0] PCR_15_0,  //! PCR registered readback tap for IDBCTL/SEL6 (IDB loop cut) (from CGA_MAC.PCR_RB_15_0)
+    input        PD,       //! Power Down signal (from CGA_INTR.PD)
+    input [15:0] PICMASK_15_0,  //! PIC Mask, 16-bit (from CGA_INTR.PICMASK_15_0)
+    input [ 2:0] PICS_2_0,  //! PIC Select, 3-bit (from CGA_INTR.PICS_2_0)
+    input [ 2:0] PICV_2_0,  //! PIC Vector, 3-bit (from CGA_INTR.PICV_2_0)
     input        PVIOL,
     input        VACCN,        //! VACC_n - passed straight down to CGA_IDBCTL_PGSREG as its load enable
-    input [15:0] XFIDBI_15_0,
+    input [15:0] XFIDBI_15_0,  //! A output  (Connect to internal XFIDBI data bus) (from BusDriver16.A_15_0_OUT)
 
     // Output signal
     output [15:0] FIDBI_15_0_OUT

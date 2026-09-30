@@ -17,18 +17,18 @@ module CGA_MAC (
 
     // Input signals
     input        MCLK_EN,     //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        CSMREQ,
+    input        CSMREQ,      //! CSM request (from CGA_DCD.CSMREQ)
     input        DOUBLE,
     input        ILCSN,       //! Instruction Load Control Signal
     input        MCLK,        //! Master CLock
     input        PONI,        //! Memory Protection ON, PONI=1
     input        PTM,
-    input        WR3,
-    input        WR7,
+    input        WR3,         //! Enable write to WR3 (B register) (from WR_15_0) (from CGA_WRF.WR3)
+    input        WR7,         //! Enable write to WR7 (X register) (from WR_15_0) (from CGA_WRF.WR7)
     input [ 1:0] CMIS_1_0,    //! Microcode: Misc  (2 bits)
     input [ 4:0] CSCOMM_4_0,  //! Microcode: Commands (5 bits)
     input [15:0] RB_15_0,     //! Microcode Register B
-    input [15:0] CD_15_0,
+    input [15:0] CD_15_0,     //! Command/Data bus (from CPU_PROC_CGA_33.CD_15_0)
     input [15:0] FIDBO_15_0,  //! FIDBO output from previous stage
     input [15:0] PR_15_0,     //! ALU P Register
     input [15:0] BR_15_0,     //! ALU B Register

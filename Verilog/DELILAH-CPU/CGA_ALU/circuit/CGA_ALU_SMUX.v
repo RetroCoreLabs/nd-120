@@ -11,11 +11,11 @@
 **************************************************************************/
 
 module CGA_ALU_SMUX (
-    input [15:0] A_15_0,
-    input [15:0] B_15_0,
+    input [15:0] A_15_0,  //! DATA output 16 bit A, from register selected by LAA_3_0 (from CGA_WRF.A_15_0)
+    input [15:0] B_15_0,  //! DATA output 16 bit B, from register selected by LBA_3_0 (from CGA_WRF.B_15_0)
     input [15:0] Q_15_0,
-    input        SA,
-    input        SB,
+    input        SA,  //! Source A selector for ALU operations (from CGA_CPU_ALU_CONTR.SA)
+    input        SB,  //! Source B selector for ALU operations (from CGA_CPU_ALU_CONTR.SB)
 
     output [15:0] S_15_0
 );

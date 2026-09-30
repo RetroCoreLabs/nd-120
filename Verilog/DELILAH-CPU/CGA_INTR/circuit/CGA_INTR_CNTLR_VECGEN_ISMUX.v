@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 module CGA_INTR_CNTLR_VECGEN_ISMUX (
-    input [2:0] FIDBO_2_0,
+    input [2:0] FIDBO_2_0,  //! FIDB (from CGA_INTR.FIDBO_15_0[2:0])
     input       HIGSN,
     input [2:0] HISTAT_2_0,
     input       LOGSN,

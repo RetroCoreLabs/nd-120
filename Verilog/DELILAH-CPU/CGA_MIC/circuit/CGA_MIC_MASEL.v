@@ -16,19 +16,19 @@ module CGA_MIC_MASEL (
 
     input        MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input        CSBIT20,
-    input [11:0] CSBIT_11_0,
+    input        CSBIT20,  //! Control signal for bit 20 (from CGA_MIC.CSBIT20)
+    input [11:0] CSBIT_11_0,  //! Control signals for bits 15 to 0 (from CGA_MIC.CSBIT_15_0[11:0])
     input [ 3:0] JMP_3_0,
-    input        MCLK,
+    input        MCLK,  //! Main clock signal (from CGA_MIC.MCLK)
     input        MCLKN,
-    input        MRN,
+    input        MRN,  //! Memory read (from CGA_MIC.MRN)
     input [12:0] NEXT_12_0,
-    input [12:0] RET_12_0,
-    input        SC5,
-    input        SC6,
+    input [12:0] RET_12_0,  //! Return Microcode Address (13 bits) (from CGA_MIC_STACK.RET_12_0)
+    input        SC5,  //! Status control bits 6 to 3 (same net as CGA_MIC.SC_6_3[2])
+    input        SC6,  //! Status control bits 6 to 3 (same net as CGA_MIC.SC_6_3[3])
 
     output [12:0] IW_12_0,
-    output [12:0] W_12_0,
+    output [12:0] W_12_0,  //! Working Address - 13-bit address used during normal operation (to CGA_MIC_IPOS.W_12_0)
     output [12:0] DBG_REP_12_0,  //! DEBUG: regREP_comb (the computed next-address the sequencer selected; for SEL_JUMP = s_jmpaddr). Tang 06000-hang root-cause.
     output [12:0] DBG_JMP_12_0   //! DEBUG: s_jmpaddr_12_0 (the raw JUMP target = {csbit20,csbit_11_0[11:4],jmp}). If wrong => WCS-read/CSBITS wrong.
 );

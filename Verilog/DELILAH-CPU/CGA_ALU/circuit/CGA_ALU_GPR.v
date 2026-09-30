@@ -12,11 +12,11 @@
 module CGA_ALU_GPR (
     input        sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
-    input [15:0] CD_15_0,
+    input        ALUCLK,     //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input [15:0] CD_15_0,    //! Command/Data bus (from CPU_PROC_CGA_33.CD_15_0)
     input [15:0] FIDBO_15_0,
-    input [ 2:0] GPRC_2_0,
-    input        GPRLI,
+    input [ 2:0] GPRC_2_0,   //! General-Purpose Register Code (3-bit) (from CGA_CPU_ALU_CONTR.GPRC_2_0)
+    input        GPRLI,      //! General-Purpose Register Load Indicator (from CGA_CPU_ALU_CONTR.GPRLI)
 
     output        DGPR0N,  //! Detect GPR0 is set. 
     output [15:0] GPR_15_0

@@ -16,28 +16,28 @@ module CGA_ALU (
     input sys_rst_n, // System reset in FPGA
 
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
-    input [15:0] A_15_0,
-    input [15:0] B_15_0,
-    input [15:0] CD_15_0,
-    input [ 8:0] CSALUI_8_0,
-    input [ 1:0] CSALUM_1_0,
-    input [15:0] CSBIT_15_0,
-    input [ 1:0] CSCINSEL_1_0,
-    input [ 4:0] CSIDBS_4_0,
-    input [ 1:0] CSMIS_1_0,
-    input [ 1:0] CSSST_1_0,
-    input [15:0] EA_15_0,
+    input        ALUCLK,  //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input [15:0] A_15_0,  //! DATA output 16 bit A, from register selected by LAA_3_0 (from CGA_WRF.A_15_0)
+    input [15:0] B_15_0,  //! DATA output 16 bit B, from register selected by LBA_3_0 (from CGA_WRF.B_15_0)
+    input [15:0] CD_15_0,  //! Command/Data bus (from CPU_PROC_CGA_33.CD_15_0)
+    input [ 8:0] CSALUI_8_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[63:55])
+    input [ 1:0] CSALUM_1_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[45:44])
+    input [15:0] CSBIT_15_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[15:0])
+    input [ 1:0] CSCINSEL_1_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[47:46])
+    input [ 4:0] CSIDBS_4_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[41:37])
+    input [ 1:0] CSMIS_1_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[43:42])
+    input [ 1:0] CSSST_1_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[54:53])
+    input [15:0] EA_15_0,  //! Enable A (source) bits for read. 16 bits to select register. (from CGA_WRF.EA_15_0)
     input [15:0] FIDBI_15_0,
     input [ 3:0] LAA_3_0,  //! A Operand. CSBITS [15:12]
     input [ 3:0] LBA_3_0,  //! B Operand. CSBITS [19:16]
-    input        LCZN,
-    input        LDDBRN,
-    input        LDGPRN,
-    input        LDIRV,
-    input        LDPILN,
-    input        UPN,
-    input        XFETCHN,
+    input        LCZN,  //! Load condition zero not (from CGA_MIC.LCZN)
+    input        LDDBRN,  //! Latch DBR negated (from CGA_DCD.LDDBRN)
+    input        LDGPRN,  //! Latch GPR negated (from CGA_DCD.LDGPRN)
+    input        LDIRV,  //! Load IRV (from CGA_DCD.LDIRV)
+    input        LDPILN,  //! Load PIL negated (from CGA_DCD.LDPILN)
+    input        UPN,  //! Update not signal (from CGA_MIC.UPN)
+    input        XFETCHN,  //! XFETCH negated (from CGA_DCD.XFETCHN)
 
     //! DEBUG: one pulse each time the instruction register takes a NEW opcode.
     //! The GPR MUX41P selects D1 = CD_15_0 when GPRC[1:0] == 01
@@ -55,21 +55,21 @@ module CGA_ALU (
     //! instructions (see docs/build-defines.md, ND120_MIPS_TAP).
     output        XGPRLOAD_DBG,
 
-    output        BDEST,
+    output        BDEST,  //! B is destination (enable write to B from 'RB_15_0' on ALUCLK) (to CGA_WRF.BDEST)
     output        CRY,
-    output        DOUBLE,
-    output        F11,
+    output        DOUBLE,  //! Double precision operation (to CPU_PROC_CGA_33.DOUBLE)
+    output        F11,  //! Bit F11 (to CGA_MIC.F11)
     output        F15,
     output [15:0] FIDBO_15_0_OUT,
-    output        IONI,
-    output        MI,
-    output        OVF,
-    output [ 3:0] PIL_3_0,
-    output        PONI,
+    output        IONI,  //! I/O Non-Maskable Interrupt (to CPU_PROC_CGA_33.IONI)
+    output        MI,  //! M bit (to CGA_MIC.MI)
+    output        OVF,  //! Overflow flag (to CGA_MIC.OVF)
+    output [ 3:0] PIL_3_0,  //! Processor Interrupt Level (to CPU_PROC_CGA_33.PIL_3_0)
+    output        PONI,  //! Memory Protection ON, PONI=1 (to CGA.XPONI)
     output        PTM,
     output [15:0] RB_15_0,
-    output        SGR,
-    output        Z,
+    output        SGR,  //! Segment register (to CGA_DCD.SGR)
+    output        Z,  //! Error flag from ALU (to CGA_INTR.Z)
     output        ZF
 );
 

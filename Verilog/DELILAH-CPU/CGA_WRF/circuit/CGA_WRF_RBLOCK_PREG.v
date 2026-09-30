@@ -14,14 +14,14 @@ module CGA_WRF_RBLOCK_PREG (
     input sys_rst_n, // System reset in FPGA
 
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
+    input        ALUCLK,  //! To clock the operation (from CGA_WRF_RBLOCK.ALUCLK)
     input        ALUCLKN,
-    input [15:0] NLCA_15_0,
-    input [15:0] RB_15_0,
-    input        WR2,
-    input        XFETCHN,
+    input [15:0] NLCA_15_0,  //! Input to P register (B=Reg2 which is P) (from CGA_WRF_RBLOCK.NLCA_15_0)
+    input [15:0] RB_15_0,  //! Register B DATA (Destination) for WRITE. 16 bits to select register(s) (from CGA_WRF_RBLOCK.RB_15_0)
+    input        WR2,  //! Register B DATA (select) for WRITE. 16 bits to select register(s) (from CGA_WRF_RBLOCK.WR_15_0[2])
+    input        XFETCHN,  //! Input to P register (from CGA_WRF_RBLOCK.XFETCHN)
 
-    output [15:0] PR_15_0,
+    output [15:0] PR_15_0,  //! Direct output from P register (register #2) (to CGA_WRF_RBLOCK.PR_15_0)
     output [15:0] P_15_0
 );
 

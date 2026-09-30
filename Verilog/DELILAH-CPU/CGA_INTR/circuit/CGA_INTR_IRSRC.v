@@ -11,18 +11,18 @@
 ***************************************************************************/
 
 module CGA_INTR_IRSRC (
-    input        BINT10N,
-    input        BINT11N,
-    input        BINT12N,
-    input        BINT13N,
-    input        BINT15N,
-    input        EMPIDN,
-    input [15:0] FIDBO_15_0,
-    input        IOXERRN,
-    input        MORN,
-    input        PARERRN,
-    input        POWFAILN,
-    input        Z,
+    input        BINT10N,  //! Bus Interrupt 10, active low (from CGA_INTR.BINT10N)
+    input        BINT11N,  //! Bus Interrupt 11, active low (from CGA_INTR.BINT11N)
+    input        BINT12N,  //! Bus Interrupt 12, active low (from CGA_INTR.BINT12N)
+    input        BINT13N,  //! Bus Interrupt 13, active low (from CGA_INTR.BINT13N)
+    input        BINT15N,  //! Bus Interrupt 15, active low (from CGA_INTR.BINT15N)
+    input        EMPIDN,  //! Interrupt Disable (EPIC.LDMPIE->set mask reg:inh all ints) (from CGA_INTR.EMPIDN)
+    input [15:0] FIDBO_15_0,  //! FIDB , 16-bit (from CGA_INTR.FIDBO_15_0)
+    input        IOXERRN,  //! IO Exception Error, active low (from CGA_INTR.IOXERRN)
+    input        MORN,  //! MOR signal, active low (Memory Error) (from CGA_INTR.MORN)
+    input        PARERRN,  //! Parity Error, active low (from CGA_INTR.PARERRN)
+    input        POWFAILN,  //! Power Failure, active low (from CGA_INTR.POWFAILN)
+    input        Z,  //! Error flag from ALU (from CGA_INTR.Z)
 
     output [15:0] IREQ_15_0_N
 );

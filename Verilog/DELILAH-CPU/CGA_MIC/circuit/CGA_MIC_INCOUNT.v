@@ -14,12 +14,12 @@ module CGA_MIC_INCOUNT (
     input sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input CD0,
-    input CD1,
+    input CD0,      //! Data bus for communication (from CGA_MIC.CD_15_0[0])
+    input CD1,      //! Data bus for communication (from CGA_MIC.CD_15_0[1])
     input EC,
-    input LWCAN,
-    input MCLK,
-    input MRN,
+    input LWCAN,    //! Latch WCA (from CGA_MIC.LWCAN)
+    input MCLK,     //! Main clock signal (from CGA_MIC.MCLK)
+    input MRN,      //! Memory read (from CGA_MIC.MRN)
 
     output CSWAN0,
     output CSWAN1

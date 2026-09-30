@@ -10,8 +10,8 @@
 
 
 module CGA_WRF_RBLOCK_SEL16 (
-    input [15:0] EA_15_0,
-    input [15:0] EB_15_0,
+    input [15:0] EA_15_0,  //! Enable A (source) for read. 16 bits to select register. (from CGA_WRF_RBLOCK.EA_15_0)
+    input [15:0] EB_15_0,  //! Enable B (dest) for read. 16 bits to select register. (from CGA_WRF_RBLOCK.EB_15_0)
     input [15:0] SI_15_0,
 
     output PA,

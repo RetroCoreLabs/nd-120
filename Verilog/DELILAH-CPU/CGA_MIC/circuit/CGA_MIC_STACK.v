@@ -17,10 +17,10 @@ module CGA_MIC_STACK (
     input        MCLK_EN,       //! MCLK rise clock-enable pulse (FPGA_FF_MODE, else 0)
     input        MCLK_FALL_EN,  //! MCLK fall clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input        MCLK,
+    input        MCLK,          //! Main clock signal (from CGA_MIC.MCLK)
     input        SCLKN,
     input        SC3,            //! SC[4:3] values - 00:HOLD, 01:POP, 10:LOAD, 11:PUSH
-    input        SC4,
+    input        SC4,           //! Status control bits 6 to 3 (same net as CGA_MIC.SC_6_3[1])
     input [12:0] NEXT_12_0,
 
     output        DEEP,

@@ -14,13 +14,13 @@ module CGA_MIC_WCAREG (
     input        sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input        MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input [15:0] CD_15_0,
-    input        LCSN,
-    input        LWCAN,
-    input        MCLK,
+    input [15:0] CD_15_0,  //! Data bus for communication (from CGA_MIC.CD_15_0)
+    input        LCSN,     //! Internal Load Control Store (negated) (from CGA_MIC.ILCSN)
+    input        LWCAN,    //! Latch WCA (from CGA_MIC.LWCAN)
+    input        MCLK,     //! Main clock signal (from CGA_MIC.MCLK)
 
-    output [12:0] WCA_12_0,
-    output        WCSN
+    output [12:0] WCA_12_0,  //! Write Control Store Address - 13-bit address for writing to control store (to CGA_MIC_IPOS.WCA_12_0)
+    output        WCSN     //! Write control signal not (to CGA_MIC.WCSN)
 );
 
   /*******************************************************************************

@@ -14,15 +14,15 @@ module CGA_INTR_CNTLR_VECGEN (
     input        sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input        MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input        FIDBO3,
-    input        FIDBO4,
-    input [ 2:0] FIDBO_2_0,
+    input        FIDBO3,   //! FIDB (from CGA_INTR.FIDBO_15_0[3])
+    input        FIDBO4,   //! FIDB (from CGA_INTR.FIDBO_15_0[4])
+    input [ 2:0] FIDBO_2_0,  //! FIDB (from CGA_INTR.FIDBO_15_0[2:0])
     input        G,
     input        HIF,
     input        HIGSN,
     input        LOF,
     input        LOGSN,
-    input        MCLK,
+    input        MCLK,     //! Master Clock (from CGA_INTR.MCLK)
     input [15:0] MIREQ_15_0_N,
     input        N,
     input        OESN,
@@ -37,7 +37,7 @@ module CGA_INTR_CNTLR_VECGEN (
     output       LOVGES,
     output [2:0] LX_2_0,
     output [2:0] LX_2_0_N,
-    output [2:0] PICS_2_0
+    output [2:0] PICS_2_0  //! PIC Select, 3-bit (to CGA_INTR.PICS_2_0)
 );
 
   /*******************************************************************************

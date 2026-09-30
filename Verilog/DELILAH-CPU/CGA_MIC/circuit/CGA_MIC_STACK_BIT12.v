@@ -17,8 +17,8 @@ module CGA_MIC_STACK_BIT12 (
     input MCLK_FALL_EN,  //! MCLK fall clock-enable pulse (FPGA_FF_MODE, else 0)
 
     input LOAD,
-    input MCLK,
-    input S3,
+    input MCLK,          //! Main clock signal (from CGA_MIC.MCLK)
+    input S3,            //! SC[4:3] values - 00:HOLD, 01:POP, 10:LOAD, 11:PUSH (from CGA_MIC_STACK.SC3)
     input S3N,
     input S4NS3N,
     input S4S3N,
@@ -26,7 +26,7 @@ module CGA_MIC_STACK_BIT12 (
     input STIN,
 
     output DEEP,
-    output STOUT
+    output STOUT         //! Return Microcode Address (to CGA_MIC_STACK.RET_12_0[12])
 );
 
   /*******************************************************************************

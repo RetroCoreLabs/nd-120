@@ -10,11 +10,11 @@
 ***************************************************************************/
 
 module CGA_ALU_SHIFT (
-    input        ALUI7,
-    input        ALUI8N,
-    input [15:0] F_15_0,
-    input        RLI,
-    input        RRI,
+    input        ALUI7,  //! ALU Instruction bit 7 output (from CGA_CPU_ALU_CONTR.ALUI7)
+    input        ALUI8N,  //! ALU Instruction bit 8, active low output (from CGA_CPU_ALU_CONTR.ALUI8N)
+    input [15:0] F_15_0,  //! Function Result (15:0) (from CGA_CPU_ALU_RALU.F_15_0)
+    input        RLI,  //! Register Load Indicator signal (from CGA_CPU_ALU_CONTR.RLI)
+    input        RRI,  //! Register Right Immediate control signal (from CGA_CPU_ALU_CONTR.RRI)
 
     output [15:0] RB_15_0
 );

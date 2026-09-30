@@ -14,13 +14,13 @@
 module CGA_ALU_STS (
     input        sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
-    input        CRY,
-    input [ 1:0] CSTS_1_0,
+    input        ALUCLK,     //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input        CRY,        //! Carry Out (from CGA_CPU_ALU_RALU.CRY)
+    input [ 1:0] CSTS_1_0,   //! Control Store status outputs (2-bit) (from CGA_CPU_ALU_CONTR.CSTS_1_0)
     input [15:0] FIDBO_15_0,
-    input        LDPILN,
-    input        MI,
-    input        OVF,
+    input        LDPILN,     //! Load PIL negated (from CGA_DCD.LDPILN)
+    input        MI,         //! Microinstruction/Memory interface indicator (from CGA_CPU_ALU_CONTR.MI)
+    input        OVF,        //! Overflow Flag (from CGA_CPU_ALU_RALU.OVF)
 
     output [15:0] STS_15_0
 );

@@ -14,7 +14,7 @@
 module CGA_ALU_SWAP (
     input        sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
+    input        ALUCLK,     //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
     input [15:0] FIDBO_15_0,
 
     output [15:0] SW_15_0

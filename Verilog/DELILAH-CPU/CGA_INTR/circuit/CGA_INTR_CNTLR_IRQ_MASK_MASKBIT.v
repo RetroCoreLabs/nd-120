@@ -14,7 +14,7 @@ module CGA_INTR_CNTLR_IRQ_MASK_MASKBIT (
     input sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input CLOCK,
+    input CLOCK,    //! Master Clock (from CGA_INTR.MCLK)
     input DATAIN,
     input DCDA,
     input DCDB,

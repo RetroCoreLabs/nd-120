@@ -13,10 +13,10 @@
 module CGA_ALU_QREG (
     input        sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
-    input [15:0] F_15_0,
-    input        QLI,
-    input [ 1:0] QSEL_1_0,
+    input        ALUCLK,     //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input [15:0] F_15_0,     //! Function Result (15:0) (from CGA_CPU_ALU_RALU.F_15_0)
+    input        QLI,        //! Q Register Load Indicator (from CGA_CPU_ALU_CONTR.QLI)
+    input [ 1:0] QSEL_1_0,   //! Q Register Select control signals (2-bit) (from CGA_CPU_ALU_CONTR.QSEL_1_0)
 
     output [15:0] Q_15_0
 );

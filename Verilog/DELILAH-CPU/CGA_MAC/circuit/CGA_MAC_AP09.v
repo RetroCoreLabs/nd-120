@@ -17,23 +17,23 @@ module CGA_MAC_AP09 (
 
     // Input signals
     input        ADDSEL,
-    input [15:0] ADD_15_0,
+    input [15:0] ADD_15_0,  //! Addition result output (from CGA_MAC_ADD.ADD_15_0)
     input        CDSEL,
-    input [15:0] CD_15_0,
+    input [15:0] CD_15_0,  //! Command/Data bus (from CPU_PROC_CGA_33.CD_15_0)
     input        ECCRHIN,
     input        HOLD,
-    input        MCLK,
+    input        MCLK,  //! Master CLock (from CGA_MAC.MCLK)
     input        MCLK_EN,     //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
     input        NLCASEL,
-    input [15:0] PR_15_0,
+    input [15:0] PR_15_0,  //! ALU P Register (from CGA_MAC.PR_15_0)
     input        PSEL,
 
     // Output signals
-    output        ECCR,
+    output        ECCR,  //! Error Correction Code Register (to CGA_MAC.ECCR)
     output [15:0] ICA_15_0,
-    output [15:0] LCA_15_0,
-    output [ 9:0] MCA_9_0,
-    output [15:0] NLCA_15_0
+    output [15:0] LCA_15_0,  //! ALU Load Control Address (to CGA_MAC_ADD.LCA_15_0)
+    output [ 9:0] MCA_9_0,  //! Microcode Address bits 9 to 0 (to CGA_MAC.MCA_9_0)
+    output [15:0] NLCA_15_0  //! Next Latch Address bits 15 to 0 (to CGA_MAC.NLCA_15_0)
 );
 
   /*******************************************************************************

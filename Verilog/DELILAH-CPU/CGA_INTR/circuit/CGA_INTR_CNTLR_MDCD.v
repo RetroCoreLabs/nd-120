@@ -14,18 +14,18 @@ module CGA_INTR_CNTLR_MDCD (
     input       sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input       MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input       EPIC,
+    input       EPIC,     //! Enable PIC (Programmable Interrupt Controller) signal (from CGA_INTR.EPIC)
     input       HIPASSALL,
-    input [3:0] LAA_3_0,
+    input [3:0] LAA_3_0,  //! Latched Address A, 4-bit (from CGA_INTR.LAA_3_0)
     input       LOPASSALL,
-    input       MCLK,
+    input       MCLK,     //! Master Clock (from CGA_INTR.MCLK)
 
     output A,
     output B,
     output C,
     output D,
     output E,
-    output EPICMASKN,
+    output EPICMASKN,     //! EPIC Mask, active low (to CGA_INTR.EPICMASKN)
     output G,
     output H,
     output HIF,

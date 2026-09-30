@@ -16,8 +16,8 @@ module CGA_INTR_CNTLR_IRGEL (
 
     input       D,
     input       E,
-    input       FIDB03,
-    input       FIDB04,
+    input       FIDB03,   //! FIDB (from CGA_INTR.FIDBO_15_0[3])
+    input       FIDB04,   //! FIDB (from CGA_INTR.FIDBO_15_0[4])
     input       H,
     input       HIDET,
     input       HIVGES,
@@ -25,19 +25,19 @@ module CGA_INTR_CNTLR_IRGEL (
     input       LODET,
     input       LOVGES,
     input       M,
-    input       MCLK,
+    input       MCLK,     //! Master Clock (from CGA_INTR.MCLK)
     input       N,
     input       S,
     input [2:0] HIVEC_2_0,
     input [2:0] LOVEC_2_0,
 
-    output       HIGSN,
+    output       HIGSN,   //! High Speed signal, active low (to CGA_INTR.HIGSN)
     output       HIPASSALL,
     output       IRQN,
-    output       LOGSN,
+    output       LOGSN,   //! Logical Segment Number, active low (to CGA_INTR.LOGSN)
     output       LOPASSALL,
-    output       PD,
-    output [2:0] PICV_2_0
+    output       PD,      //! Power Down signal (to CGA_INTR.PD)
+    output [2:0] PICV_2_0  //! PIC Vector, 3-bit (to CGA_INTR.PICV_2_0)
 );
 
   /*******************************************************************************

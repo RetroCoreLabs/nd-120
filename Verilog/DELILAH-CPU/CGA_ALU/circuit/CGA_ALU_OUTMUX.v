@@ -17,18 +17,18 @@ module CGA_ALU_OUTMUX (
 
     input        AARG0,
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
-    input        ALUD2N,
+    input        ALUCLK,  //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input        ALUD2N,  //! ALU Data 2, active low signal (from CGA_CPU_ALU_CONTR.ALUD2N)
     input [15:0] ARG_15_0,
-    input [15:0] A_15_0,
-    input [ 4:0] CSIDBS_4_0,
+    input [15:0] A_15_0,  //! DATA output 16 bit A, from register selected by LAA_3_0 (from CGA_WRF.A_15_0)
+    input [ 4:0] CSIDBS_4_0,  //! Control Store Bits (from CPU_PROC_CGA_33.CSBITS[41:37])
     input [15:0] DBR_15_0,
-    input [15:0] EA_15_0,
+    input [15:0] EA_15_0,  //! Enable A (source) bits for read. 16 bits to select register. (from CGA_WRF.EA_15_0)
     input [15:0] FIDBI_15_0,
-    input [15:0] F_15_0,
+    input [15:0] F_15_0,  //! Function Result (15:0) (from CGA_CPU_ALU_RALU.F_15_0)
     input [15:0] GPR_15_0,
-    input [ 2:0] LAA_3_1,
-    input [ 2:0] LBA_2_0,
+    input [ 2:0] LAA_3_1,  //! A Operand. CSBITS [15:12] (from CGA_ALU.LAA_3_0[3:1])
+    input [ 2:0] LBA_2_0,  //! B Operand. CSBITS [19:16] (from CGA_ALU.LBA_3_0[2:0])
     input [15:0] STS_15_0,
     input [15:0] SW_15_0,
 

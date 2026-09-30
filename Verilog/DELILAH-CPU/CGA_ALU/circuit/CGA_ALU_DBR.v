@@ -15,9 +15,9 @@
 module CGA_ALU_DBR (
     input        sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
-    input [15:0] CD_15_0,
-    input        LDDBRN,
+    input        ALUCLK,     //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input [15:0] CD_15_0,    //! Command/Data bus (from CPU_PROC_CGA_33.CD_15_0)
+    input        LDDBRN,     //! Latch DBR negated (from CGA_DCD.LDDBRN)
 
     output [15:0] DBR_15_0
 );

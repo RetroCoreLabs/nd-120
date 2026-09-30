@@ -21,19 +21,19 @@ module CGA_MAC_SEGPT_PCR (
     input sys_rst_n, // System reset in FPGA
 
     // Input signals
-    input [15:0] FIDBO_15_0,
+    input [15:0] FIDBO_15_0,  //! FIDBO output from previous stage (from CGA_MAC.FIDBO_15_0)
     input        LLDPCR,
     input        MCLKN,
 
     // Output signals
-    output [15:0] PCR_15_0,
+    output [15:0] PCR_15_0,  //! Program Counter Register bits 15 to 0 (to CGA_MAC.PCR_15_0)
 
     // Registered readback tap (21-AUG-2026): same stored value as PCR_15_0
     // but taken from the L8/L4 register (QA_R taps), WITHOUT the FF-mode
     // transparent bypass. Feeds ONLY the IDBCTL/SEL6 IDB readback - this
     // cuts the combinational IDB ring FIDBO -> PCR -> SEL6 -> FIDBI ->
     // OUTMUX(EFIDB) -> FIDBO. All other consumers keep PCR_15_0.
-    output [15:0] PCR_RB_15_0
+    output [15:0] PCR_RB_15_0  //! registered readback tap for IDBCTL/SEL6 (loop cut) (to CGA_MAC_SEGPT.PCR_RB_15_0)
 );
 
   /*******************************************************************************

@@ -14,7 +14,7 @@ module CGA_MAC_PTSEL (
     input sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input MCLK,
+    input MCLK,     //! Master CLock (from CGA_MAC.MCLK)
     input PONI, //! Memory Protection ON, PONI=1
     input PTM,
     input SAPT,

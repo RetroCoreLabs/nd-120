@@ -14,7 +14,7 @@ module CGA_INTR_CNTLR_VECGEN_STAT_SBIT (
     input sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input CK,
+    input CK,       //! Master Clock (from CGA_INTR.MCLK)
     input DCDF,
     input DCDFN,
     input DCDG,

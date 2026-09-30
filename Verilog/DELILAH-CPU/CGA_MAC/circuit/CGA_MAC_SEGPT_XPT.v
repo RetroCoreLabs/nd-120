@@ -17,13 +17,13 @@ module CGA_MAC_SEGPT_XPT (
 
     // Input signals
     input       EXMN,
-    input [2:0] FIDBO_2_0,
+    input [2:0] FIDBO_2_0,  //! FIDBO output from previous stage (from CGA_MAC.FIDBO_15_0[2:0])
     input       LLDEXM,
     input       MCLKN,
 
     // Output signals
     output       PEX,
-    output       VEX,
+    output       VEX,  //! Vector EXecute signal (to CGA_MAC.VEX)
     output [1:0] XPT_1_0
 );
 

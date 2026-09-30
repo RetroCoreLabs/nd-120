@@ -15,15 +15,15 @@ module CGA_INTR_CNTLR_IRGEL_LOGEL (
     input sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input FIDB04,
+    input FIDB04,   //! FIDB (from CGA_INTR.FIDBO_15_0[4])
     input L,
     input LIENABN,
     input LOGAS,
     input M,
-    input MCLK,
+    input MCLK,     //! Master Clock (from CGA_INTR.MCLK)
     input N,
 
-    output LOGSN
+    output LOGSN    //! Logical Segment Number, active low (to CGA_INTR.LOGSN)
 );
 
   /*******************************************************************************

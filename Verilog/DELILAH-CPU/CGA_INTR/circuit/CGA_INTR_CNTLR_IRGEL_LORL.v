@@ -20,9 +20,9 @@ module CGA_INTR_CNTLR_IRGEL_LORL (
     input       D,
     input       E,
     input       LODET,
-    input [2:0] LOVEC_2_0,
+    input [2:0] LOVEC_2_0,  //! Lo vector (same net as CGA_INTR_CNTLR_IRGEL_VMUX.LOVEC_2_0)
     input       LOVGES,
-    input       MCLK,
+    input       MCLK,     //! Master Clock (from CGA_INTR.MCLK)
     input       RDN,
     input       S,
 
@@ -31,7 +31,7 @@ module CGA_INTR_CNTLR_IRGEL_LORL (
     output LOGAS,
     output LOGASN,
     output LOPASSALL,
-    output LVE
+    output LVE            //! Lo vector Enable (to CGA_INTR_CNTLR_IRGEL_VMUX.LVE)
 );
 
   /*******************************************************************************

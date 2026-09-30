@@ -15,30 +15,30 @@ module CGA_TRAP (
     input sysclk,   //! FPGA system clock (P2: TCLK_EN capture)
     input TCLK_EN,  //! TCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input CBRKN,
-    input DSTOPN,
-    input ETRAPN,
-    input FETCHN,
-    input FTRAPN,
-    input INDN,
-    input INTRQN,
-    input PANN,
-    input [1:0] PCR_1_0,
-    input PONI,
-    input [6:0] PT_15_9,
-    input TCLK,
+    input CBRKN,    //! CBRK negated (from CGA_DCD.CBRKN)
+    input DSTOPN,   //! DSTOP negated (from CGA_DCD.DSTOPN)
+    input ETRAPN,   //! External Trap, active low (from CPU_PROC_CGA_33.ETRAP_n)
+    input FETCHN,   //! Fetch negated (from CGA_DCD.FETCHN)
+    input FTRAPN,   //! tied to 1 (in CGA)
+    input INDN,     //! IND negated (from CGA_DCD.INDN)
+    input INTRQN,   //! Interrupt Request, active low (from CGA_INTR.INTRQN)
+    input PANN,     //! Parity Error, active low (from CPU_PROC_CGA_33.PAN_n)
+    input [1:0] PCR_1_0,  //! Program Counter Register bits 15 to 0 (from CGA_MAC.PCR_15_0[1:0])
+    input PONI,     //! Memory Protection ON, PONI=1 (same net as CGA.XPONI)
+    input [6:0] PT_15_9,  //! Page Table bits (from CPU_PROC_CGA_33.PT_15_9)
+    input TCLK,     //! User Clock (from CPU_PROC_CGA_33.UCLK)
     // VACC_n from CGA_DCD. Inverted here and handed to TBUF/TVGEN/BRKDET, where
     // it qualifies EVERY memory-protect trap term - page fault, ring violation,
     // WIP and PGU are all AND'ed with VACC. No VACC, no memory-protect trap.
-    input VACCN,
-    input VTRAPN,
-    input WRITEN,
+    input VACCN,    //! Valid access negated (see block comment, sheet 10/10) (from CGA_DCD.VACCN)
+    input VTRAPN,   //! tied to 1 (in CGA)
+    input WRITEN,   //! Write enable negated (from CGA_DCD.WRITEN)
 
-    output BRKN,
+    output BRKN,    //! CGA Break, active low (to CPU_PROC_CGA_33.CGABRK_n)
     output PVIOL,
     output RESTR,
-    output TRAPN,
-    output [3:0] TVEC_3_0
+    output TRAPN,   //! Trap, active low (to CPU_PROC_CGA_33.TRAP_n)
+    output [3:0] TVEC_3_0  //! Trap vector bits 3 to 0 (to CGA_MIC.TVEC_3_0)
 );
 
   /*******************************************************************************

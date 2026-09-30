@@ -17,7 +17,7 @@ module CGA_INTR_CNTLR_VECGEN_OSMUX (
     input [2:0] LOSTAT_2_0,
     input       OESN,
 
-    output [2:0] PICS_2_0
+    output [2:0] PICS_2_0  //! PIC Select, 3-bit (to CGA_INTR.PICS_2_0)
 );
 
   /*******************************************************************************

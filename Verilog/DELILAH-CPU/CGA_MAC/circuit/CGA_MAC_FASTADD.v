@@ -12,10 +12,10 @@
 
 module CGA_MAC_FASTADD (
     input [ 7:0] CDE_15_8,
-    input [ 7:0] CD_7_0,
+    input [ 7:0] CD_7_0,  //! CPU data (Added to the selected register) (from CGA_MAC_ADD.CD_15_0[7:0])
     input [15:0] PRP_15_0,
 
-    output [15:0] ADD_15_0
+    output [15:0] ADD_15_0  //! Addition result output (to CGA_MAC_ADD.ADD_15_0)
 );
 
   /*******************************************************************************

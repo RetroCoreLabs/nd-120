@@ -15,8 +15,8 @@ module CGA_WRF_RBLOCK_LR16 (
     input sys_rst_n, // System reset in FPGA
 
     input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
-    input        ALUCLK,
-    input [15:0] RB_15_0,
+    input        ALUCLK,  //! To clock the operation (from CGA_WRF_RBLOCK.ALUCLK)
+    input [15:0] RB_15_0,  //! Register B DATA (Destination) for WRITE. 16 bits to select register(s) (from CGA_WRF_RBLOCK.RB_15_0)
     input        WR,
 
     output [15:0] LR_15_0,

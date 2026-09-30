@@ -14,8 +14,8 @@ module CGA_TRAP_TVGEN_P2 (
     input sysclk,   //! FPGA system clock (P2: TCLK_EN capture)
     input TCLK_EN,  //! TCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input DSTOPN,
-    input FTRAPN,
+    input DSTOPN,   //! DSTOP negated (from CGA_DCD.DSTOPN)
+    input FTRAPN,   //! tied to 1 (in CGA_TRAP_TVGEN)
     input IFETCH,
     input INTRQ,
     input LEV1,
@@ -29,7 +29,7 @@ module CGA_TRAP_TVGEN_P2 (
     input RV,
     input TCLK,  //! TRAP CLOCK
     input VACC,  //! MMU-translated memory reference this cycle - qualifies the level-2 vector terms
-    input VTRAPN,
+    input VTRAPN,   //! tied to 1 (in CGA_TRAP_TVGEN)
     input WIP,
     input WIPN,
 

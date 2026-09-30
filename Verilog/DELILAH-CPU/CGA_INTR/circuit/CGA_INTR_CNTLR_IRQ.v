@@ -24,10 +24,10 @@ module CGA_INTR_CNTLR_IRQ (
     input        CPN,
     input [15:0] DIN_15_0,
     input [15:0] IREQ_15_0_N,
-    input        MCLK,
+    input        MCLK,     //! Master Clock (from CGA_INTR.MCLK)
 
     output [15:0] MIREQ_15_0_N,
-    output [15:0] PICMASK_15_0
+    output [15:0] PICMASK_15_0  //! PIC Mask, 16-bit (to CGA_INTR.PICMASK_15_0)
 );
 
   /*******************************************************************************

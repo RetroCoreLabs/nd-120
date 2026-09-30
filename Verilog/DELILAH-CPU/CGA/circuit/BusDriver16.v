@@ -20,7 +20,7 @@ module BusDriver16 (
     output wire [15:0] A_15_0_OUT, // A output  (Connect to internal XFIDBI data bus)
 
     input wire[15:0]   IO_15_0_IN,    // IN and OUT to XFIDB data bus (Connect to EXTERNAL _XFIDB_ data bus)
-    output wire [15:0] IO_15_0_OUT  //
+    output wire [15:0] IO_15_0_OUT  //! FIDB output bus (to CPU_PROC_CGA_33.FIDB_15_0_OUT)
 );
 
   reg [15:0] IO_reg;  // Internal data register

@@ -50,7 +50,7 @@ module CGA_INTR_CNTLR_IRQ_REG_RQBIT_V2 (
     input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
     input CLR,
-    input CP,
+    input CP,       //! Master Clock (from CGA_INTR.MCLK)
     input CPN,
     input PN,
 

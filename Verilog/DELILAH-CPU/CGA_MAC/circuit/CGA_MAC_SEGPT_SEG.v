@@ -15,7 +15,7 @@ module CGA_MAC_SEGPT_SEG (
     input sys_rst_n, // System reset in FPGA
 
     // Input signals
-    input [7:0] FIDBO_7_0,
+    input [7:0] FIDBO_7_0,  //! FIDBO output from previous stage (from CGA_MAC.FIDBO_15_0[7:0])
     input       LLDSEG,
     input       MCLKN,
 

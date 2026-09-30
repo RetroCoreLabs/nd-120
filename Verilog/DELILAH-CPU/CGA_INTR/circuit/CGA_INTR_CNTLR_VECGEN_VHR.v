@@ -16,7 +16,7 @@ module CGA_INTR_CNTLR_VECGEN_VHR (
 
     input [2:0] HIVEC_2_0,
     input [2:0] LOVEC_2_0,
-    input       MCLK,
+    input       MCLK,     //! Master Clock (from CGA_INTR.MCLK)
     input       N,
 
     output [2:0] HX_2_0,

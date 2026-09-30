@@ -15,9 +15,9 @@ module CGA_IDBCTL_PGSREG (
     input sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
     input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input FETCHN,
-    input [11:0] LA_21_10,
-    input MCLK,
+    input FETCHN,   //! Fetch negated (from CGA_DCD.FETCHN)
+    input [11:0] LA_21_10,  //! Latch Address bits 23 to 10 (from CGA_MAC.LA_23_10[11:0])
+    input MCLK,     //! Microcycle clock (= TERM outside RWCS, stretched during RWCS) (from CPU_PROC_CGA_33.MCLK)
     input PVIOL,
     // VACCN is the LOAD ENABLE of this register (inverted to s_vacc and wired
     // to TE on every SCAN_FF_EN cell below; D is tied back to Q, so TE=0 holds).
@@ -26,7 +26,7 @@ module CGA_IDBCTL_PGSREG (
     // stops rising, and VACC cannot rise while paging is off (CGA_DCD.v sheet
     // 10/10, GATES_75). That is how PGS survives long enough for the trap
     // handler to read it back through EPGS.
-    input VACCN,
+    input VACCN,    //! VACC_n - passed straight down to CGA_IDBCTL_PGSREG as its load enable (from CGA_IDBCTL.VACCN)
 
     output [11:0] PGS_11_0,
     output [ 1:0] PGS_15_14

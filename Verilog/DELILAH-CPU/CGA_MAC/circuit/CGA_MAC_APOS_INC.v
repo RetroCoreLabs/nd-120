@@ -11,9 +11,9 @@
 ***************************************************************************/
 
 module CGA_MAC_APOS_INC (
-    input [15:0] LCA_15_0,
+    input [15:0] LCA_15_0,  //! Local Address Output (16 bits) (from CGA_MAC_APOS_CALCA.LCA_15_0)
 
-    output [15:0] NLCA_15_0
+    output [15:0] NLCA_15_0  //! Next Latch Address bits 15 to 0 (to CGA_MAC.NLCA_15_0)
 );
 
   // New implementation using Verilog arithmetic

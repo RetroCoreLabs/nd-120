@@ -11,40 +11,40 @@
 ***************************************************************************/
 
 module CGA_TESTMUX (
-    input       CBRKN,
-    input       CFETCH,
-    input       COND,
-    input       CRY,
-    input       CSMREQ,
+    input       CBRKN,       //! CBRK negated (from CGA_DCD.CBRKN)
+    input       CFETCH,      //! Command fetch (from CGA_DCD.CFETCH)
+    input       COND,        //! Condition output signal (from CGA_MIC.COND)
+    input       CRY,         //! Carry Out (from CGA_CPU_ALU_RALU.CRY)
+    input       CSMREQ,      //! CSM request (from CGA_DCD.CSMREQ)
     input       DEEP,
-    input       DSTOPN,
-    input       DZD,
-    input       F15,
-    input       INDN,
-    input       LCZN,
-    input       LDIRV,
-    input       MI,
-    input       OOD,
-    input       OVF,
-    input       PN,
+    input       DSTOPN,      //! DSTOP negated (from CGA_DCD.DSTOPN)
+    input       DZD,         //! Divide by zero detection (from CGA_MIC.DZD)
+    input       F15,         //! Function Result (15:0) (from CGA_CPU_ALU_RALU.F_15_0[15])
+    input       INDN,        //! IND negated (from CGA_DCD.INDN)
+    input       LCZN,        //! Load condition zero not (from CGA_MIC.LCZN)
+    input       LDIRV,       //! Load IRV (from CGA_DCD.LDIRV)
+    input       MI,          //! Microinstruction/Memory interface indicator (from CGA_CPU_ALU_CONTR.MI)
+    input       OOD,         //! Out of data signal (from CGA_MIC.OOD)
+    input       OVF,         //! Overflow Flag (from CGA_CPU_ALU_RALU.OVF)
+    input       PN,          //! Parity not signal (from CGA_MIC.PN)
     input       PTM,
-    input       PTREEOUT,
-    input       PTSTN,
+    input       PTREEOUT,    //! tied to 1 (in CGA)
+    input       PTSTN,       //! tied to 1 (in CGA)
     input       RESTR,
-    input [3:0] SC_6_3,
-    input       SGR,
-    input       TN,
-    input [2:0] TSEL_2_0,
-    input [3:0] TVEC_3_0,
-    input       UPN,
+    input [3:0] SC_6_3,      //! Status control bits 6 to 3 (from CGA_MIC.SC_6_3)
+    input       SGR,         //! Sign Greater Than (from CGA_CPU_ALU_RALU.SGR)
+    input       TN,          //! Trap not signal (from CGA_MIC.TN)
+    input [2:0] TSEL_2_0,    //! Selects testmux signals to output on TEST_4_0 (from CPU_PROC_CGA_33.SEL_TESTMUX)
+    input [3:0] TVEC_3_0,    //! Trap vector bits 3 to 0 (same net as CGA_MIC.TVEC_3_0)
+    input       UPN,         //! Update not signal (from CGA_MIC.UPN)
     input       VACCN,       //! VACC_n - readable on the test multiplexer, D1 input
-    input       VEX,
-    input       WPN,
-    input       WRITEN,
-    input       XFETCHN,
-    input       ZF,
+    input       VEX,         //! Vector EXecute signal (from CGA_MAC.VEX)
+    input       WPN,         //! Enable write to WR2 Negated (P register) (from WR_15_0) (from CGA_WRF.WPN)
+    input       WRITEN,      //! Write enable negated (from CGA_DCD.WRITEN)
+    input       XFETCHN,     //! XFETCH negated (from CGA_DCD.XFETCHN)
+    input       ZF,          //! Zero Flag (from CGA_CPU_ALU_RALU.ZF)
 
-    output [4:0] TEST_4_0
+    output [4:0] TEST_4_0    //! Test output (to CPU_PROC_CGA_33.TEST_4_0)
 );
 
   /*******************************************************************************

@@ -11,9 +11,9 @@
 **************************************************************************/
 
 module CGA_ALU_RALU_LOGOP (
-    input        ALU14,
+    input        ALU14,  //! ALU Instruction - bit 4 (from CGA_CPU_ALU_RALU.ALUI4)
     input [15:0] A_15_0,
-    input        FSEL,
+    input        FSEL,  //! Function Select (1=Logic function (XOR), 0=OR/AND/NOT) (from CGA_CPU_ALU_RALU.FSEL)
     input [15:0] S_15_0,
 
     output [15:0] LF_15_0

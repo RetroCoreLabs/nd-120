@@ -23,7 +23,7 @@ module CGA_INTR_CNTLR_IRQ_REG (
     input [15:0] CLRQ_15_0,
     input        CPN,
     input [15:0] IRQ_15_0_N,
-    input        MCLK,
+    input        MCLK,     //! Master Clock (from CGA_INTR.MCLK)
 
     output [15:0] LREQ_15_0
 

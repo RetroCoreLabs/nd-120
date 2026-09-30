@@ -30,14 +30,14 @@ module CGA_MAC_LA1025 (
     input        E1617,
     input        F1617,
     input [15:0] ICA_15_0,
-    input        MCLK,
-    input [15:0] PCR_15_0,
+    input        MCLK,     //! Master CLock (from CGA_MAC.MCLK)
+    input [15:0] PCR_15_0,  //! Program Counter Register bits 15 to 0 (same net as CGA_MAC.PCR_15_0)
     input [ 7:0] SEG_7_0,
     input [ 1:0] XPT_1_0,
 
 
     output        ECCRHIN,
-    output [13:0] LA_23_10
+    output [13:0] LA_23_10  //! Latch Address bits 23 to 10 (to CGA_MAC.LA_23_10)
 );
 
   /*******************************************************************************
