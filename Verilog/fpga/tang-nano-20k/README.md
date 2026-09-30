@@ -227,7 +227,7 @@ The complete ND-120 CPU has a Tang top-level and Gowin project here:
 | `src/gowin_rpll_27_54.v` | One rPLL: 54 MHz (SDRAM ctrl) + 54 MHz shifted (SDRAM chip) + 27 MHz (CPU/bus/OSC) |
 | `src/nd120_tang20k.cst` / `.sdc` | Pins (verified 20K pinout); the 27 MHz input clock plus three reasoned `set_false_path` exceptions (see [Clock variants](#clock-variants-and-measured-boot-timings-24-aug-2026), 31-AUG and 01-SEP notes) |
 | `nd120_tang20k.gprj` | Gowin GUI project - 247 files, generated from the Verilator dependency list (single source of truth for the tcl too) |
-| `gowin_build.tcl` / `gowin_build.ps1` | Scripted build on the Windows host: `.\gowin_build.ps1` copies the 32 WCS preload hex files (`Code/Microcode/wcs/`), runs `gw_sh` from the Gowin EDA install (`ND120_GOWIN` in `../local.mk`, else `gw_sh.exe` on PATH - see [Local paths](#local-paths)) -> `build\impl\pnr\nd120_tang20k_build.fs` |
+| `gowin_build.tcl` / `gowin_build.ps1` | Scripted build on the Windows host: `.\gowin_build.ps1` copies the 32 WCS preload hex files (`Code/Microcode/wcs/`), runs `gw_sh` from the Gowin EDA install (`ND120_GOWIN` in `local.mk` at the repository root - see [Local settings](#local-settings)) -> `<build>\nd120_tang20k_build\impl\pnr\nd120_tang20k_build.fs`, `<build>` = `$ND120_BUILD_DIR\tang-nano-20k` |
 | `lint/rpll_stub.v` | Lint-only rPLL stub (Verilator elaboration check; not in the Gowin build) |
 
 Build config: microcode is **bitstream-preloaded** (`SKIP_WCS_LOAD`, PROM never
