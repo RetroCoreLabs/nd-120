@@ -29,9 +29,14 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 HOST="${MISTER_HOST:-MisterPi.HackerCorp.no}"
 USER_AT="root@${HOST}"
 SETTLE="${MISTER_SETTLE:-12}"
-RBF="${HERE}/../output_files/nd120.rbf"
+# The core and the screenshots live in the build folder,
+# $ND120_BUILD_DIR/mister (local.mk at the repository root, written by
+# configure.py; the environment wins) - `make build` copies the core there.
+BUILD_MISTER="$(python3 "${HERE}/../../../../configure.py" --get ND120_BUILD_DIR)/mister" || {
+    echo "nd-120: ND120_BUILD_DIR is not set - run python3 configure.py from the repository root"; exit 1; }
+RBF="${BUILD_MISTER}/nd120.rbf"
 CORE_PATH="/media/fat/_Computer/ND120.rbf"
-OUTDIR="${MISTER_SHOTDIR:-${HERE}/../shots}"
+OUTDIR="${MISTER_SHOTDIR:-${BUILD_MISTER}/shots}"
 
 # Auth: SSH KEY by default (the board has this host's public key). MISTER_PASS
 # is only the fallback for a board without the key installed - it is a

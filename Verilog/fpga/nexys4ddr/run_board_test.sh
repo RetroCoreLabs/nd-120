@@ -11,7 +11,7 @@
 #   3. On a HANG or FAIL verdict: BEFORE resetting, take an ILA capnow
 #      capture of the live machine (only if the programmed bitstream has
 #      an ILA - pass -ila to say so), then save the transcript + capture
-#      into boardtest-results/<name>-<timestamp>/.
+#      into $ND120_BUILD_DIR/nexys4ddr/boardtest-results/<name>-<timestamp>/.
 #   4. Exit 0 with "BOARD_TEST: PASS" or nonzero with "BOARD_TEST: FAIL".
 #
 # Usage (from fpga/nexys4ddr/, WSL side):
@@ -35,19 +35,26 @@ HAS_ILA="${2:-}"
 BT="boardtests/${NAME}.bt"
 [ -f "$BT" ] || { echo "BOARD_TEST: FAIL no such script $BT"; exit 2; }
 
-STAMP=$(date +%Y%m%d-%H%M%S)
-OUT="boardtest-results/${NAME}-${STAMP}"
-mkdir -p "$OUT"
-
 # Local settings: the environment first, then local.mk at the repository
 # root - configure.py does the reading (and checks before any work), so the
 # rule and the message are the same as make's.
-ROOT="$(cd ../../../.. && pwd)"
-python3 "$ROOT/configure.py" --require ND120_VIVADO --for "run_board_test.sh" || exit 2
+ROOT="$(cd ../../.. && pwd)"
+python3 "$ROOT/configure.py" --require ND120_VIVADO ND120_BUILD_DIR --for "run_board_test.sh" || exit 2
 ND120_VIVADO="${ND120_VIVADO:-$(python3 "$ROOT/configure.py" --get ND120_VIVADO)}"
 ND120_VIVADO_LICENSE="${ND120_VIVADO_LICENSE:-$(python3 "$ROOT/configure.py" --get ND120_VIVADO_LICENSE)}"
 VIVADO_EXE="$ND120_VIVADO"
+
+# Results, the ILA capture and Vivado's own files go to the build folder,
+# never into this source folder. Vivado is started there (Set-Location), and
+# the Tcl scripts are named by their full Windows path.
+BOARD_DIR="$(python3 "$ROOT/configure.py" --get ND120_BUILD_DIR)/nexys4ddr"
+mkdir -p "$BOARD_DIR"
+STAMP=$(date +%Y%m%d-%H%M%S)
+OUT="$BOARD_DIR/boardtest-results/${NAME}-${STAMP}"
+mkdir -p "$OUT"
 HERE_WIN=$(wslpath -w "$(pwd)")
+BOARD_WIN=$(wslpath -w "$BOARD_DIR")
+OUT_WIN=$(wslpath -w "$OUT")
 if [ -n "${ND120_VIVADO_LICENSE:-}" ]; then
     LIC_PS="\$env:XILINXD_LICENSE_FILE='${ND120_VIVADO_LICENSE}'"
 else
@@ -58,15 +65,15 @@ fi
 
 VIVADO_PS="
 $LIC_PS
-Set-Location '$HERE_WIN'
+Set-Location '$BOARD_WIN'
 & '$VIVADO_EXE' -mode batch -nolog -nojournal"
 
 echo "[boardtest] reset: programming nd120_nexys4ddr.bit"
 if [ "$HAS_ILA" = "-ila" ]; then
-    powershell.exe -NoProfile -Command "$VIVADO_PS -source ila_capture.tcl -tclargs program" \
+    powershell.exe -NoProfile -Command "$VIVADO_PS -source '$HERE_WIN\\ila_capture.tcl' -tclargs program" \
         > "$OUT/program.log" 2>&1
 else
-    powershell.exe -NoProfile -Command "$VIVADO_PS -source program_only.tcl" \
+    powershell.exe -NoProfile -Command "$VIVADO_PS -source '$HERE_WIN\\program_only.tcl'" \
         > "$OUT/program.log" 2>&1
 fi
 grep -aq "PROGRAMMED" "$OUT/program.log" || {
@@ -74,7 +81,7 @@ grep -aq "PROGRAMMED" "$OUT/program.log" || {
 
 echo "[boardtest] running $BT"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File board_expect.ps1 \
-    -Script "boardtests\\${NAME}.bt" -Log "boardtest-results\\${NAME}-${STAMP}\\console.log" \
+    -Script "boardtests\\${NAME}.bt" -Log "${OUT_WIN}\\console.log" \
     | tee "$OUT/verdict.txt"
 RC=${PIPESTATUS[0]}
 
@@ -82,10 +89,10 @@ if [ "$RC" -ne 0 ]; then
     echo "[boardtest] FAIL (rc=$RC) - preserving live state"
     if [ "$HAS_ILA" = "-ila" ]; then
         echo "[boardtest] taking ILA capnow of the live machine"
-        rm -f ila_data.csv
-        powershell.exe -NoProfile -Command "$VIVADO_PS -source ila_capture.tcl -tclargs capnow" \
+        rm -f "$BOARD_DIR/ila_data.csv"
+        powershell.exe -NoProfile -Command "$VIVADO_PS -source '$HERE_WIN\\ila_capture.tcl' -tclargs capnow" \
             > "$OUT/capnow.log" 2>&1
-        [ -f ila_data.csv ] && cp ila_data.csv "$OUT/ila_hang.csv"
+        [ -f "$BOARD_DIR/ila_data.csv" ] && cp "$BOARD_DIR/ila_data.csv" "$OUT/ila_hang.csv"
     fi
     echo "BOARD_TEST: FAIL $NAME (artifacts: $OUT)"
     exit "$RC"

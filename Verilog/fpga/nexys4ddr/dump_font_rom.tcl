@@ -1,8 +1,11 @@
 # Dump the font ROM BRAM INIT strings from a placed checkpoint so the actual
 # silicon page->data mapping can be reconstructed and compared to the hex.
-open_checkpoint timing-analysis/run_clk33_5/post_route.dcp
+# The timing-analysis runs live in the build folder, $ND120_BUILD_DIR/nexys4ddr.
+source [file join [file dirname [file normalize [info script]]] .. paths.tcl]
+set outdir [nd120_board_dir nexys4ddr]
+open_checkpoint [file join $outdir timing-analysis run_clk33_5 post_route.dcp]
 
-set fh [open dump_font_rom.txt w]
+set fh [open [file join $outdir dump_font_rom.txt] w]
 
 # Every BRAM cell. Report name + type; we grep the font ones out in python.
 set cells [get_cells -hier -filter {PRIMITIVE_GROUP == BLOCKRAM || REF_NAME =~ RAMB*}]

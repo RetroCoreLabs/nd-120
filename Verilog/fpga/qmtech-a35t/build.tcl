@@ -32,6 +32,11 @@
 set part   xc7a35tcsg325-1
 set srcdir [file dirname [file normalize [info script]]]
 set vroot  [file normalize [file join $srcdir .. ..]]        ;# Verilog/
+# Everything this build writes - copied microcode, reports, routed checkpoint,
+# bitstream, and Vivado's own .Xil - goes to $ND120_BUILD_DIR/qmtech-a35t
+# (local.mk at the repository root, written by configure.py). Never here.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir qmtech-a35t "QMTECH build.tcl"]
 
 proc has_flag {name} {
     global argv
@@ -58,7 +63,7 @@ if {$skip_wcs} {
         puts "ERROR: expected 33 WCS images in $wcs_src, found [llength $wcs_files]"
         exit 1
     }
-    foreach f $wcs_files { file copy -force $f [file join $srcdir [file tail $f]] }
+    foreach f $wcs_files { file copy -force $f [file join $outdir [file tail $f]] }
     puts "WCS preload: [llength $wcs_files] images copied (SKIP_WCS_LOAD)."
 } else {
     set uc [file join $vroot .. Code Microcode]
@@ -67,11 +72,11 @@ if {$skip_wcs} {
             puts "ERROR: microcode image missing: [file join $uc $hex]"
             exit 1
         }
-        file copy -force [file join $uc $hex] [file join $srcdir $hex]
+        file copy -force [file join $uc $hex] [file join $outdir $hex]
     }
     puts "-promload: microcode PROM images copied (2 files)."
 }
-cd $srcdir
+cd $outdir
 
 create_project -in_memory -part $part
 
@@ -210,7 +215,7 @@ puts "Clock relationships applied: cpu<->2x TIMED, stor bounded datapath-only."
 # Utilization straight after synthesis. On this part that number decides
 # whether the build is possible at all, so it is reported before the hour of
 # place-and-route rather than after it.
-report_utilization -file [file join $srcdir util_synth.rpt]
+report_utilization -file [file join $outdir util_synth.rpt]
 puts "Post-synthesis utilization written to util_synth.rpt"
 
 opt_design
@@ -218,8 +223,8 @@ place_design
 phys_opt_design
 route_design
 
-report_utilization    -file [file join $srcdir util.rpt]
-report_timing_summary -file [file join $srcdir timing.rpt]
+report_utilization    -file [file join $outdir util.rpt]
+report_timing_summary -file [file join $outdir timing.rpt]
 
 # Save the routed checkpoint BEFORE the timing gate. A build that misses
 # timing exits below, and without this there is nothing left to interrogate:
@@ -228,7 +233,7 @@ report_timing_summary -file [file join $srcdir timing.rpt]
 # run. Open it with:
 #   open_checkpoint nd120_qmtech_routed.dcp
 #   report_timing -max_paths 50 -slack_lesser_than 0 -file paths.rpt
-write_checkpoint -force [file join $srcdir nd120_qmtech_routed.dcp]
+write_checkpoint -force [file join $outdir nd120_qmtech_routed.dcp]
 
 # Fail loudly on negative slack. A build that misses timing must never be
 # programmed silently: the Basys3 spent months being "built" while failing
@@ -274,11 +279,11 @@ if {$wns < 0} {
 # downgrade the day the ring is cut in RTL.
 # The report is written BEFORE the downgrade so it records the loops at full
 # severity. Count them with: grep -c "LUTLP-1#" drc_loops.rpt
-report_drc -checks {LUTLP-1} -file [file join $srcdir drc_loops.rpt]
+report_drc -checks {LUTLP-1} -file [file join $outdir drc_loops.rpt]
 set_property SEVERITY {Warning} [get_drc_checks LUTLP-1]
 puts "LUTLP-1 downgraded to Warning (parked debt). Loop report: drc_loops.rpt"
 
-set bit [file join $srcdir nd120_qmtech.bit]
+set bit [file join $outdir nd120_qmtech.bit]
 write_bitstream -force $bit
 puts "BITSTREAM: $bit"
 

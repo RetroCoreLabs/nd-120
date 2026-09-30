@@ -18,17 +18,26 @@
 #                     without it SINTRAN says "ND-100 PANEL CLOCK INCORRECT" at
 #                     every boot and cannot keep time, see docs/panel-clock-68705.md)
 #   make clean        remove build outputs
+#   make check-config show the local settings and what is missing
 #
-# Vivado path: ND120_VIVADO from local.mk at the repository root (python3
-# configure.py writes it); override for one run with
+# Everything the build writes goes to $(ND120_BUILD_DIR)/nexys4ddr/ -
+# bitstream, util/timing reports, the timing-analysis/run_clk<N>/ folders,
+# the copied microcode images, the generated banner ROM, and Vivado's own
+# vivado.log, vivado.jou and .Xil (Vivado is started there). load and flash
+# take the bitstream from there too.
+#
+# Vivado path: ND120_VIVADO, and the build folder: ND120_BUILD_DIR, both from
+# local.mk at the repository root (python3 configure.py writes it); override
+# Vivado for one run with
 #   make VIVADO="<your Vivado install>\bin\vivado.bat"
-# Each target checks the settings it needs first; make check-config shows them.
-# From a Windows shell, run the tcl directly instead:
-#   vivado -mode batch -source build.tcl [-tclargs -noburn clk=33 -skipwcs]
+# Each target checks the settings it needs first and stops with a message
+# naming the missing one.
+# From a Windows shell, run the tcl directly instead (it reads local.mk too):
+#   vivado -mode batch -source <checkout>\Verilog\fpga\nexys4ddr\build.tcl [-tclargs -noburn clk=33 -skipwcs]
 
+ND120_BOARD := nexys4ddr
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 
-CMD     = cmd.exe /c
 CLK    ?= 16
 PANELCLOCK ?= 1
 VGACONSOLE ?= 1
@@ -45,25 +54,28 @@ ARGS   += -NoPanelClock
 endif
 
 all:
-	@$(call nd120_require,$(ND120_NEED_VIVADO),make all)
-	$(CMD) "$(VIVADO)" -mode batch -source build.tcl -tclargs $(ARGS)
+	@$(call nd120_require,$(ND120_VIVADO_NEEDS),make all)
+	$(call nd120_vivado,build.tcl,$(ARGS))
 
 build:
-	@$(call nd120_require,$(ND120_NEED_VIVADO),make build)
-	$(CMD) "$(VIVADO)" -mode batch -source build.tcl -tclargs $(ARGS) -noburn
+	@$(call nd120_require,$(ND120_VIVADO_NEEDS),make build)
+	$(call nd120_vivado,build.tcl,$(ARGS) -noburn)
 
 # Volatile: JTAG into configuration RAM, seconds. program.tcl refuses politely
 # if there is no bitstream - it never triggers a rebuild.
 load:
-	@$(call nd120_require,$(ND120_NEED_VIVADO),make load)
-	$(CMD) "$(VIVADO)" -mode batch -source program.tcl
+	@$(call nd120_require,$(ND120_VIVADO_NEEDS),make load)
+	$(call nd120_vivado,program.tcl)
 
 # Permanent: QSPI config flash, survives power cycles. See flash.tcl.
 flash:
-	@$(call nd120_require,$(ND120_NEED_VIVADO),make flash)
-	$(CMD) "$(VIVADO)" -mode batch -source flash.tcl
+	@$(call nd120_require,$(ND120_VIVADO_NEEDS),make flash)
+	$(call nd120_vivado,flash.tcl)
 
+# The build folder, plus what builds from before 30-SEP-2026 left in this
+# folder (they wrote here).
 clean:
+	$(nd120_clean_board)
 	rm -f nd120_nexys4ddr.bit util.rpt timing.rpt \
 	      AM27256_45132L.hex AM27256_45133L.hex wcs_*.hex \
 	      vivado*.jou vivado*.log

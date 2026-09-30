@@ -101,9 +101,13 @@ foreach {what path how} [list \
     }
 }
 
-# ---- outputs go to build/<board>/, never into the submodule ---------------
-set outdir [file join $srcdir build $board]
-file mkdir $outdir
+# ---- outputs go to $ND120_BUILD_DIR/mega65/<board>/ ------------------------
+# Never into the submodule, and never into this checkout: the build folder
+# comes from ND120_BUILD_DIR (local.mk at the repository root, written by
+# configure.py; the environment wins). Vivado works in it (cd), so .Xil and
+# anything else it writes next to itself lands there too.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir mega65/$board "MEGA65 build.tcl"]
 cd $outdir
 
 # ---- microcode: the WCS preloaded from the 33 nibble images ---------------
@@ -112,18 +116,21 @@ cd $outdir
 # PROM->WCS load phase is bypassed (no PROM emulation compiled at all).
 # $readmemh("wcs_NN.hex") in Shared/support/IDT6168A_20.v resolves against
 # Vivado's WORKING directory (measured on the Nexys flow, 02-SEP-2026) - the
-# build directory here - and the older note said next to the .v source, so
-# the images are copied to BOTH places, exactly as fpga/nexys4ddr/build.tcl
-# does. The master copies live in Code/Microcode/wcs/ (gen_wcs_image.py).
+# build directory here - and the older note said next to the .v source.
+# The images are copied into the build directory only: the second place,
+# Shared/support, already holds TRACKED copies of the same raw board variant
+# (test-microcode-sync keeps them equal), so copying there only risked
+# dirtying the checkout. The master copies are made in Code/Microcode/wcs/ by
+# gen_wcs_image.py, which configure.py runs.
 set wcs_src [file normalize [file join $vroot .. Code Microcode wcs]]
 set wcs_files [glob -nocomplain [file join $wcs_src wcs_*.hex]]
 if {[llength $wcs_files] != 33} {
     puts "ERROR: expected 33 WCS images in $wcs_src, found [llength $wcs_files]"
+    puts "       Run python3 configure.py from the repository root - it makes them."
     exit 1
 }
 foreach f $wcs_files {
     file copy -force $f [file join $outdir [file tail $f]]
-    file copy -force $f [file join $vroot Shared support [file tail $f]]
 }
 puts "WCS preload: [llength $wcs_files] images copied (SKIP_WCS_LOAD)."
 
@@ -244,7 +251,7 @@ foreach f {nd120_mega65_machine.v nd120_console_mega65.v m65_keys_to_ps2.v
 
 # ---- build stamp in the power-on banner (standing rule on every terminal
 # board): git short hash (+ if the tree was dirty), date/time, and the
-# board/config line. Regenerated per build into build/<board>/ so the
+# board/config line. Regenerated per build into the build folder so the
 # committed ROM is never dirtied; falls back to the committed ROM if the
 # generator cannot run. Nobody can tell two MEGA65 bitstreams apart from a
 # photograph otherwise - and a photograph is all we get back.

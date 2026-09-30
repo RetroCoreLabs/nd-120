@@ -1,7 +1,7 @@
 # Canonical release artifacts for the ND-120 FPGA bitstreams.
 #
 # One line per downloadable file:
-#     <release-name>                          <build output, relative to Verilog/fpga/>
+#     <release-name>                          <build output, relative to ND120_BUILD_DIR>
 #
 # The release name is board + CPU clock + console baud. The console is 115200
 # 7E1 on every board, so the baud is always 115200. This file is the ONE place
@@ -16,12 +16,13 @@
 # build the clock you want, THEN stage that clock's name. The MEGA65 r3/r6 and
 # the MiSTer outputs sit in their own directories and do not collide.
 #
-# release name                              build output (under Verilog/fpga/)
+# release name                              build output (under ND120_BUILD_DIR, the
+#                                           build folder from local.mk)
 nd120_nexys4ddr_45MHz_115200.bit           nexys4ddr/nd120_nexys4ddr.bit
 nd120_nexys4ddr_16MHz_115200.bit           nexys4ddr/nd120_nexys4ddr.bit
-nd120_tang20k_fast20_20MHz_115200.fs       tang-nano-20k/build/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs
-nd120_tang20k_slow_6.75MHz_115200.fs       tang-nano-20k/build/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs
-nd120_mister_20MHz_115200.rbf              mister/output_files/nd120.rbf
-nd120_mega65_rev3_13MHz_115200.cor         mega65/build/r3/nd120_mega65_r3.cor
-nd120_mega65_r6_20MHz_115200.cor           mega65/build/r6/nd120_mega65_r6.cor
+nd120_tang20k_fast20_20MHz_115200.fs       tang-nano-20k/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs
+nd120_tang20k_slow_6.75MHz_115200.fs       tang-nano-20k/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs
+nd120_mister_20MHz_115200.rbf              mister/nd120.rbf
+nd120_mega65_rev3_13MHz_115200.cor         mega65/r3/nd120_mega65_r3.cor
+nd120_mega65_r6_20MHz_115200.cor           mega65/r6/nd120_mega65_r6.cor
 nd120_qmtech_a35t_20MHz_115200.bit         qmtech-a35t/nd120_qmtech.bit

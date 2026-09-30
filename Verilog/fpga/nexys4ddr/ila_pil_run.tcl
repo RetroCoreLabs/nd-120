@@ -31,6 +31,11 @@
 # ---------------------------------------------------------------------------
 
 set srcdir [file dirname [file normalize [info script]]]
+# The bitstream, probes file and captures live in the build folder,
+# $ND120_BUILD_DIR/nexys4ddr (local.mk at the repository root, written by
+# configure.py) - never in this source folder.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir nexys4ddr]
 set secs   [lindex $argv 0]
 if {$secs eq ""} { set secs 120 }
 
@@ -40,7 +45,7 @@ open_hw_target
 set_property PARAM.FREQUENCY 5000000 [current_hw_target]
 set dev [lindex [get_hw_devices xc7a100t*] 0]
 current_hw_device $dev
-set_property PROBES.FILE [file join $srcdir nd120_nexys4ddr.ltx] $dev
+set_property PROBES.FILE [file join $outdir nd120_nexys4ddr.ltx] $dev
 refresh_hw_device -quiet $dev
 
 set ila [lindex [get_hw_ilas] 0]
@@ -69,7 +74,7 @@ set st [get_property STATUS.CORE_STATUS $ila]
 puts "FINAL_STATUS: $st"
 if {[string equal -nocase $st "FULL"]} {
     display_hw_ila_data [upload_hw_ila_data $ila]
-    write_hw_ila_data -csv_file -force [file join $srcdir ila_pil.csv] [current_hw_ila_data]
+    write_hw_ila_data -csv_file -force [file join $outdir ila_pil.csv] [current_hw_ila_data]
     puts "PIL_CAPTURED - wrote ila_pil.csv"
 } else {
     puts "PIL_NEVER_LEFT_ZERO - the machine stayed on level 0 for ${secs}s"

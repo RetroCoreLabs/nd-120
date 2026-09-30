@@ -15,6 +15,13 @@
 # The WCS preload hexes (Verilog needs 33 wcs_*.hex) are gitignored;
 # Code/Microcode/gen_wcs_image.py regenerates them from the tracked PROM
 # images - every job runs it first.
+#
+# Local settings (local.mk, written by configure.py): the test job needs
+# none - `make -C Verilog test` runs on a clean clone with the tools on PATH,
+# and that is kept that way on purpose. The Tang netlist gates write into
+# the build folder like every board target, so that job runs configure.py
+# non-interactively first, with a build folder inside the workspace (which
+# also makes the microcode images).
 name: Verilog CI
 
 # Triggers (Ronny, 28-AUG-2026): NOT on every push - the full registry is
@@ -52,7 +59,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends yosys python3
           yosys -V
-      - name: Regenerate WCS preload images
-        run: cd Code/Microcode && python3 gen_wcs_image.py
+      - name: Configure (build folder, microcode images)
+        run: python3 configure.py --non-interactive --skip-submodules --set "ND120_BUILD_DIR=$GITHUB_WORKSPACE/build"
       - name: Tang netlist gates (tristate + latch census)
         run: make -C Verilog/fpga/tang-nano-20k check

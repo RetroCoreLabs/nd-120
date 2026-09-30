@@ -17,7 +17,7 @@
 #   crawl = CPU 3.375 MHz / SDRAM 6.75 MHz
 #   mid   = CPU 13.5 MHz / SDRAM 27 MHz
 #   full  = CPU 27 MHz / SDRAM 54 MHz  (BREAKS: s3 hangs, 1667 setup violations)
-# It is applied by generating build\tang20k_variant.v (a TANG_VARIANT_*
+# It is applied by generating <build>\tang20k_variant.v (a TANG_VARIANT_*
 # pre-define consumed by src/tang20k_defines.v) which gowin_build.tcl adds
 # as the FIRST project file - the same mechanism the OSS Makefile uses via
 # -D flags, so both toolchains share one source of truth.
@@ -25,7 +25,11 @@
 # Copies the WCS preload images (SKIP_WCS_LOAD - the $readmemh files must be
 # reachable from the synthesis working dir), then runs gw_sh on
 # gowin_build.tcl.
-# Bitstream: build\nd120_tang20k_build\impl\pnr\nd120_tang20k_build.fs
+# <build> is $ND120_BUILD_DIR\tang-nano-20k (local.mk at the repository root,
+# written by configure.py). EVERYTHING the build writes goes there - the
+# generated variant file, the GAO flag, the WCS copies, the Gowin project and
+# its impl\ reports - and gw_sh is started there. Nothing lands in this folder.
+# Bitstream: <build>\nd120_tang20k_build\impl\pnr\nd120_tang20k_build.fs
 
 # -PfCapture builds in the FIRST PAGE-FAULT FREEZE REGISTER (TANG_PF_CAPTURE).
 #   It captures the trap-logic inputs at the TCLK edge that latched a page-fault
@@ -65,18 +69,21 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 . (Join-Path $here "..\paths.ps1")
 $gwsh = Resolve-ND120Tool -Var "ND120_GOWIN" -Target "gowin_build.ps1"
 
+# The build folder, checked (with gw_sh above) before any work.
+$buildDir = Get-ND120BuildDir -Board "tang-nano-20k" -Target "gowin_build.ps1"
+Write-Host "Build folder: $buildDir"
+
 $wcs  = Join-Path $here "..\..\..\Code\Microcode\wcs"
 if (-not (Test-Path (Join-Path $wcs "wcs_16C.hex"))) {
-    Write-Error "WCS preload images not found in $wcs - run Code/Microcode/gen_wcs_image.py first."
+    Write-Error "WCS preload images not found in $wcs - run python3 configure.py (py configure.py) from the repository root; it runs Code/Microcode/gen_wcs_image.py."
 }
 
-# $readmemh path resolution differs between tool versions: put the hex files
-# in every plausible working directory.
-$buildDir = Join-Path $here "build"
-New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
-foreach ($dest in @($here, $buildDir)) {
-    Copy-Item (Join-Path $wcs "wcs_*.hex") -Destination $dest -Force
-}
+# $readmemh path resolution differs between tool versions: gowin_build.tcl
+# puts the hex files in every plausible working directory UNDER the build
+# folder. This folder is no longer one of them - the tracked copies in
+# Shared/support (next to IDT6168A_20.v, the file with the $readmemh) cover
+# the "next to the source" rule.
+Copy-Item (Join-Path $wcs "wcs_*.hex") -Destination $buildDir -Force
 Write-Host "WCS preload images copied (32 files)."
 
 # Variant selection file - ALWAYS (re)written so builds are stateless.
@@ -237,13 +244,13 @@ Set-Content -Path $variantFile -Value $variantContent -Encoding Ascii
 # A literal backtick needs TWO. Verify rather than trust.
 $vc = Get-Content -Path $variantFile -Raw
 if ($vc -match '(?m)^\s*define\s') {
-    Write-Error "build\tang20k_variant.v contains 'define' without a backtick - the PowerShell escape ate it. Use `` `` in the string."
+    Write-Error "$variantFile contains 'define' without a backtick - the PowerShell escape ate it. Use `` `` in the string."
     exit 1
 }
-Write-Host "Variant: $Variant (build\tang20k_variant.v)"
+Write-Host "Variant: $Variant ($variantFile)"
 
 # GAO (on-chip logic analyzer) - opt-in, stateless like the variant file:
-# -Gao writes build\gao_enable.flag, which makes gowin_build.tcl add
+# -Gao writes <build>\gao_enable.flag, which makes gowin_build.tcl add
 # src\nd120_tang20k_gao.rao (RTL-mode AO core, CGA_INTR grant chain).
 # Without -Gao the flag is REMOVED, so a plain build is always GAO-free.
 # Capture workflow: see GAO-HOWTO.md in this directory.
@@ -255,14 +262,23 @@ if ($Gao) {
     Remove-Item $gaoFlag -ErrorAction SilentlyContinue
 }
 
-& $gwsh (Join-Path $here "gowin_build.tcl")
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "gw_sh failed with exit code $LASTEXITCODE"
+# gw_sh works in the build folder, so anything it writes next to itself
+# lands there. gowin_build.tcl finds the folder itself (ND120_BUILD_DIR is in
+# this process's environment, from paths.ps1).
+Push-Location $buildDir
+try {
+    & $gwsh (Join-Path $here "gowin_build.tcl")
+    $gwExit = $LASTEXITCODE
+} finally {
+    Pop-Location
+}
+if ($gwExit -ne 0) {
+    Write-Error "gw_sh failed with exit code $gwExit"
 }
 
 # A build with an empty WCS is a dead CPU - fail loudly if the preload
 # images were not found during synthesis (EX3988).
-$synLog = Join-Path $here "build\nd120_tang20k_build\impl\gwsynthesis\nd120_tang20k_build.log"
+$synLog = Join-Path $buildDir "nd120_tang20k_build\impl\gwsynthesis\nd120_tang20k_build.log"
 if (Test-Path $synLog) {
     $miss = Select-String -Path $synLog -Pattern "EX3988" | Measure-Object
     if ($miss.Count -gt 0) {
@@ -272,11 +288,11 @@ if (Test-Path $synLog) {
     }
 }
 
-$fs = Join-Path $here "build\nd120_tang20k_build\impl\pnr\nd120_tang20k_build.fs"
+$fs = Join-Path $buildDir "nd120_tang20k_build\impl\pnr\nd120_tang20k_build.fs"
 if (Test-Path $fs) {
     Write-Host "Bitstream: $fs"
     Write-Host "Program (volatile SRAM):  openFPGALoader -b tangnano20k <fs>   (WSL, usbipd)"
     Write-Host "  or use the Gowin Programmer GUI on Windows."
 } else {
-    Write-Warning "Bitstream not found - check the synthesis/PnR logs under build\"
+    Write-Warning "Bitstream not found - check the synthesis/PnR logs under $buildDir"
 }

@@ -7,6 +7,11 @@
 #         writes ila_hang.csv next to this script
 #   hold  arm on MEM_HOLD==1 level, wait up to 3 min, then upload
 set srcdir [file dirname [file normalize [info script]]]
+# The bitstream, probes file and captures live in the build folder,
+# $ND120_BUILD_DIR/nexys4ddr (local.mk at the repository root, written by
+# configure.py) - never in this source folder.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir nexys4ddr]
 set mode   [lindex $argv 0]
 open_hw_manager
 connect_hw_server
@@ -14,7 +19,7 @@ open_hw_target
 set_property PARAM.FREQUENCY 5000000 [current_hw_target]
 set dev [lindex [get_hw_devices xc7a100t*] 0]
 current_hw_device $dev
-set_property PROBES.FILE [file join $srcdir nd120_nexys4ddr.ltx] $dev
+set_property PROBES.FILE [file join $outdir nd120_nexys4ddr.ltx] $dev
 refresh_hw_device $dev
 set ila [lindex [get_hw_ilas] 0]
 if {$ila eq ""} { puts "ERROR: no hw_ila found"; exit 1 }
@@ -198,8 +203,8 @@ if {$mode eq "at"} {
 # fire and a timed-out run used to print CAPTURE WRITTEN over an EMPTY csv
 # (header + radix rows only). Detect the empty upload and say so.
 upload_hw_ila_data $ila
-write_hw_ila_data -csv_file -force [file join $srcdir ila_hang.csv] [current_hw_ila_data]
-set _fh [open [file join $srcdir ila_hang.csv] r]
+write_hw_ila_data -csv_file -force [file join $outdir ila_hang.csv] [current_hw_ila_data]
+set _fh [open [file join $outdir ila_hang.csv] r]
 set _nl 0
 while {[gets $_fh _line] >= 0} { incr _nl }
 close $_fh

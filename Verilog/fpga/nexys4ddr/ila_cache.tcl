@@ -36,6 +36,11 @@
 # ---------------------------------------------------------------------------
 
 set srcdir [file dirname [file normalize [info script]]]
+# The bitstream, probes file and captures live in the build folder,
+# $ND120_BUILD_DIR/nexys4ddr (local.mk at the repository root, written by
+# configure.py) - never in this source folder.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir nexys4ddr]
 set mode   [lindex $argv 0]
 
 open_hw_manager
@@ -48,15 +53,15 @@ set dev [lindex [get_hw_devices xc7a100t*] 0]
 current_hw_device $dev
 
 if {$mode eq "program"} {
-    set_property PROGRAM.FILE [file join $srcdir nd120_nexys4ddr.bit] $dev
-    set_property PROBES.FILE  [file join $srcdir nd120_nexys4ddr.ltx] $dev
+    set_property PROGRAM.FILE [file join $outdir nd120_nexys4ddr.bit] $dev
+    set_property PROBES.FILE  [file join $outdir nd120_nexys4ddr.ltx] $dev
     program_hw_devices $dev
     refresh_hw_device $dev
     puts "PROGRAMMED (JTAG, with probes)"
     exit 0
 }
 
-set_property PROBES.FILE [file join $srcdir nd120_nexys4ddr.ltx] $dev
+set_property PROBES.FILE [file join $outdir nd120_nexys4ddr.ltx] $dev
 refresh_hw_device $dev
 
 set ila [lindex [get_hw_ilas] 0]
@@ -101,7 +106,7 @@ if {$mode eq "read"} {
     set st [get_property CORE.STATUS $ila]
     puts "TRIGGER_STATUS: $st"
     display_hw_ila_data [upload_hw_ila_data $ila]
-    set out [file join $srcdir ila_cache.csv]
+    set out [file join $outdir ila_cache.csv]
     write_hw_ila_data -csv_file -force $out [current_hw_ila_data]
     puts "WROTE: $out"
     exit 0

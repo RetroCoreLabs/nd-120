@@ -1,5 +1,7 @@
 set_param tcl.collectionResultDisplayLimit 0
-open_checkpoint timing-analysis/run_clk16_6/post_route.dcp
+# The timing-analysis runs live in the build folder, $ND120_BUILD_DIR/nexys4ddr.
+source [file join [file dirname [file normalize [info script]]] .. .. paths.tcl]
+open_checkpoint [file join [nd120_board_dir nexys4ddr] timing-analysis run_clk16_6 post_route.dcp]
 set pi [get_pins -hier -filter {NAME =~ *DELILAH/ALU/FIDBI_15_0[*]}]
 set pf [get_pins -hier -filter {NAME =~ *DELILAH/ALU/ALU_OUTMUX/OUTMUX_IDBS/IDBS_R*/F_15_0[*]} -quiet]
 set nf [get_nets -hier -filter {NAME =~ *DELILAH/ALU/ALU_OUTMUX/OUTMUX_IDBS/IDBS_R*/F_15_0[*]} -quiet]

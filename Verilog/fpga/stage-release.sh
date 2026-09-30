@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# stage-release.sh - copy a board's build output into fpga/release-staging/ under
-# the canonical release name (board_clock_baud), then regenerate SHA256SUMS.
+# stage-release.sh - copy a board's build output into <build>/release-staging/
+# under the canonical release name (board_clock_baud), then regenerate
+# SHA256SUMS. <build> is ND120_BUILD_DIR (local.mk at the repository root,
+# written by configure.py) - the build outputs are there, and so is the
+# staging folder; nothing is written into the checkout.
 #
 # WHY THIS EXISTS. Every board's build tool emits a generic name
 # (nd120_nexys4ddr.bit, nd120_mega65_r6.cor, ...). The download name that carries
@@ -19,7 +22,10 @@ set -eu
 
 here="$(cd "$(dirname "$0")" && pwd)"
 manifest="$here/release-manifest.txt"
-staging="$here/release-staging"
+case "${1:-}" in --list) sed 's/^/  /' "$manifest"; exit 0 ;; esac
+python3 "$here/../../configure.py" --require ND120_BUILD_DIR --for "stage-release.sh" || exit 2
+build="$(python3 "$here/../../configure.py" --get ND120_BUILD_DIR)"
+staging="$build/release-staging"
 sums="$staging/SHA256SUMS"
 mkdir -p "$staging"
 
@@ -35,7 +41,7 @@ lookup_source() { awk -v n="$1" '!/^#/ && NF>=2 {sub(/\r$/,"",$1); sub(/\r$/,"",
 regen_sums() {
   ( cd "$staging" && : > "$sums"
     for n in $(all_names); do [ -f "$n" ] && sha256sum "$n" >> "$sums"; done )
-  echo "SHA256SUMS regenerated ($(grep -c . "$sums" 2>/dev/null || echo 0) files) -> fpga/release-staging/SHA256SUMS"
+  echo "SHA256SUMS regenerated ($(grep -c . "$sums" 2>/dev/null || echo 0) files) -> $sums"
 }
 
 stage_one() { # $1 = release name
@@ -45,15 +51,15 @@ stage_one() { # $1 = release name
     all_names | sed 's/^/  /' >&2
     exit 1
   fi
-  if [ ! -f "$here/$src" ]; then
-    echo "ERROR: build output not found: fpga/$src" >&2
+  if [ ! -f "$build/$src" ]; then
+    echo "ERROR: build output not found: $build/$src" >&2
     echo "       Build that config first, then stage its name." >&2
     exit 1
   fi
-  cp -f "$here/$src" "$staging/$1"
+  cp -f "$build/$src" "$staging/$1"
   sz=$(wc -c < "$staging/$1")
   sh=$(sha256sum "$staging/$1" | cut -d' ' -f1)
-  echo "staged  $1  ($sz bytes)  sha256 $sh   <- fpga/$src"
+  echo "staged  $1  ($sz bytes)  sha256 $sh   <- $build/$src"
 }
 
 case "${1:-}" in

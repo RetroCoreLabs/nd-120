@@ -120,8 +120,24 @@ _nd120_require_check = $(if $(ND120_PYTHON),,$(error nd-120: Python 3 is needed 
 VIVADO ?= $(ND120_VIVADO)
 ND120_NEED_VIVADO = $(if $(filter command line,$(origin VIVADO)),,ND120_VIVADO)
 
+# ---- the build folder ------------------------------------------------------------
+# Every board writes EVERYTHING - bitstream, reports, timing-analysis runs,
+# checkpoints, copied microcode, and the tool's own log, journal and .Xil -
+# to $(ND120_BUILD_DIR)/<board>/. There is no default: a board target names
+# ND120_BUILD_DIR in its nd120_require line and stops when it is not set.
 ND120_BUILD_HOST = $(call nd120_hostpath,$(ND120_BUILD_DIR))
 ND120_BOARD_DIR  = $(ND120_BUILD_HOST)/$(ND120_BOARD)
+
+# What every Vivado board target needs.
+ND120_VIVADO_NEEDS = $(ND120_NEED_VIVADO) ND120_BUILD_DIR
+
+# $(call nd120_vivado,TCL,TCLARGS): Vivado in batch mode on TCL (a file in the
+# board folder), started IN the board's build folder, so vivado.log,
+# vivado.jou and .Xil land there too.
+nd120_vivado = $(call nd120_run,$(VIVADO),$(ND120_BOARD_DIR),-mode batch -source '$(call nd120_toolpath,$(VIVADO),$(abspath $(1)))' -log vivado.log -journal vivado.jou$(if $(strip $(2)), -tclargs $(2)))
+
+# make clean: the board's build folder, when ND120_BUILD_DIR is set.
+nd120_clean_board = $(if $(strip $(ND120_BUILD_DIR)),rm -rf '$(ND120_BOARD_DIR)',@echo "ND120_BUILD_DIR is not set - no build folder to remove")
 
 # ---- make check-config ---------------------------------------------------------
 # Keep the including Makefile's default target: rules defined here must not

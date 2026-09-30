@@ -10,6 +10,11 @@
 #   status    print the ILA capture status and exit.
 
 set srcdir [file dirname [file normalize [info script]]]
+# The bitstream, probes file and captures live in the build folder,
+# $ND120_BUILD_DIR/nexys4ddr (local.mk at the repository root, written by
+# configure.py) - never in this source folder.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir nexys4ddr]
 set mode   [lindex $argv 0]
 
 open_hw_manager
@@ -22,13 +27,13 @@ set dev [lindex [get_hw_devices xc7a100t*] 0]
 current_hw_device $dev
 
 if {$mode eq "program"} {
-    set_property PROGRAM.FILE [file join $srcdir nd120_nexys4ddr.bit] $dev
-    set_property PROBES.FILE  [file join $srcdir nd120_nexys4ddr.ltx] $dev
+    set_property PROGRAM.FILE [file join $outdir nd120_nexys4ddr.bit] $dev
+    set_property PROBES.FILE  [file join $outdir nd120_nexys4ddr.ltx] $dev
     program_hw_devices $dev
     refresh_hw_device $dev
     puts "PROGRAMMED (JTAG, with probes)"
 } else {
-    set_property PROBES.FILE [file join $srcdir nd120_nexys4ddr.ltx] $dev
+    set_property PROBES.FILE [file join $outdir nd120_nexys4ddr.ltx] $dev
     refresh_hw_device $dev
 }
 
@@ -60,7 +65,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capnow"} {
     # capture whatever is happening RIGHT NOW (steady-state runaway): no
@@ -73,7 +78,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "captrans"} {
     # trigger on the FIRST arrival at the runaway code (CSA == 0o16035,
@@ -93,7 +98,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capjpl"} {
     # LIST-FILE-NAMES wrong-indirect-jump hunt (v3 probes): trigger on the
@@ -117,7 +122,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capbad"} {
     # Catch the FAILING pass of the LIST-FILE-NAMES indirect jump: trigger
@@ -139,7 +144,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "caperr"} {
     # First entry into FILSYS's DEVICE NEVER READY error printer (0o060224
@@ -157,7 +162,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capda"} {
     # Phantom-input hunt (24-AUG): trigger when a microcode IOR read
@@ -177,7 +182,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capmenu"} {
     # LFN-runaway decision hunt (24-AUG morning): the reprint reads the
@@ -196,7 +201,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capioq"} {
     # Global console-IO trace (24-AUG): store ONLY samples where EIOR_n is
@@ -214,7 +219,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capgap"} {
     # Inter-line-gap code capture (24-AUG): trigger on the per-line
@@ -234,7 +239,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capinp"} {
     # Input-path discriminator (24-AUG): trigger when the INPUT poll's own
@@ -258,7 +263,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capqual"} {
     # Qualified write-trace (24-AUG): store ONLY samples where the main-RAM
@@ -276,7 +281,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capready"} {
     # Inter-character-gap hunt (24-AUG): trigger on the LIVE TBMT_n
@@ -295,7 +300,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capr6"} {
     # Scratch-R6 hunt (ILA v8, 24-AUG): trigger on a WRITE to WRF register
@@ -314,7 +319,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capcr"} {
     # Flow capture FORWARD from the LFN answer (24-AUG): trigger on the
@@ -336,7 +341,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capwr"} {
     # THE decisive trigger (ILA v7): a main-RAM WRITE into the constant
@@ -358,7 +363,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capfix2"} {
     # Catch the FIRST write of character junk into the constant pointer
@@ -380,7 +385,7 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "capfix"} {
     # Corruption-writer hunt (24-AUG morning): the runaway's decision path
@@ -402,12 +407,12 @@ if {$mode eq "arm"} {
     }
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "read"} {
     upload_hw_ila_data $ila
     set d [current_hw_ila_data]
-    write_hw_ila_data -force -csv_file [file join $srcdir ila_data.csv] $d
+    write_hw_ila_data -force -csv_file [file join $outdir ila_data.csv] $d
     puts "ILA DATA WRITTEN"
 } elseif {$mode eq "status"} {
     puts "CAPTURE STATUS: [get_property CONTROL.CAPTURE_STATUS $ila]"

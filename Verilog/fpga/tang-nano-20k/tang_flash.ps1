@@ -31,10 +31,14 @@ param(
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
 
-$fsRel  = "build\nd120_tang20k_build\impl\pnr\nd120_tang20k_build.fs"
-$fs     = Join-Path $here $fsRel
-$rpt    = Join-Path $here "build\nd120_tang20k_build\impl\pnr\nd120_tang20k_build.rpt.txt"
-$synLog = Join-Path $here "build\nd120_tang20k_build\impl\gwsynthesis\nd120_tang20k_build.log"
+# The Gowin build output lives in the build folder, $ND120_BUILD_DIR\tang-nano-20k
+# (local.mk at the repository root, written by configure.py).
+. (Join-Path $here "..\paths.ps1")
+$bdir   = Get-ND120BuildDir -Board "tang-nano-20k" -Target "tang_flash.ps1"
+$fsRel  = "nd120_tang20k_build\impl\pnr\nd120_tang20k_build.fs"
+$fs     = Join-Path $bdir $fsRel
+$rpt    = Join-Path $bdir "nd120_tang20k_build\impl\pnr\nd120_tang20k_build.rpt.txt"
+$synLog = Join-Path $bdir "nd120_tang20k_build\impl\gwsynthesis\nd120_tang20k_build.log"
 $gprj   = Join-Path $here "nd120_tang20k.gprj"
 $defs   = Join-Path $here "src\tang20k_defines.v"
 $vroot  = Resolve-Path (Join-Path $here "..\..")   # the Verilog tree

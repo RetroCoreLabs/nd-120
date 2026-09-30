@@ -32,7 +32,12 @@
 # ---------------------------------------------------------------------------
 
 set srcdir [file dirname [file normalize [info script]]]
-set bit [file join $srcdir nd120_nexys4ddr.bit]
+# The bitstream, probes file and captures live in the build folder,
+# $ND120_BUILD_DIR/nexys4ddr (local.mk at the repository root, written by
+# configure.py) - never in this source folder.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir nexys4ddr]
+set bit [file join $outdir nd120_nexys4ddr.bit]
 if {[llength $argv] > 0} {
     set bit [lindex $argv 0]
 }

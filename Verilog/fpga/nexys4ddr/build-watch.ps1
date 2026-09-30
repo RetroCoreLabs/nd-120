@@ -94,7 +94,12 @@ $ScriptDir = $PSScriptRoot
 # this process's environment when the environment does not hold them already.
 . (Join-Path $ScriptDir "..\paths.ps1")
 $TclScript = Join-Path $ScriptDir "build.tcl"
-$LogFile   = Join-Path $ScriptDir "build-watch.log"
+# Everything this run writes goes to the build folder, $ND120_BUILD_DIR/nexys4ddr
+# (local.mk at the repository root), and Vivado is started there - so its log,
+# journal and .Xil never land in the checkout. Stops with the one message
+# when ND120_BUILD_DIR is not set.
+$OutDir    = Get-ND120BuildDir -Board "nexys4ddr" -Target "build-watch.ps1"
+$LogFile   = Join-Path $OutDir "build-watch.log"
 
 # ---------------------------------------------------------------------------
 # Console helpers - colour is a reinforcement, the tag is the real signal, so
@@ -348,15 +353,15 @@ Write-Host ("-" * 78) -ForegroundColor DarkGray
 
 # Vivado's own -log is the one that flushes as it goes; follow that, and keep
 # stdout separately so nothing is lost if Vivado dies before writing its log.
-$vivadoLog = Join-Path $ScriptDir "vivado.log"
-$stdoutLog = Join-Path $ScriptDir "build-watch.stdout.log"
+$vivadoLog = Join-Path $OutDir "vivado.log"
+$stdoutLog = Join-Path $OutDir "build-watch.stdout.log"
 Remove-Item $vivadoLog, $stdoutLog -ErrorAction SilentlyContinue
 
 $allArgs = @("-mode", "batch", "-source", $TclScript, "-log", $vivadoLog,
              "-nojournal", "-tclargs") + $tclArgs
 
 $proc = Start-Process -FilePath $vivado -ArgumentList $allArgs `
-                      -WorkingDirectory $ScriptDir -NoNewWindow -PassThru `
+                      -WorkingDirectory $OutDir -NoNewWindow -PassThru `
                       -RedirectStandardOutput $stdoutLog `
                       -RedirectStandardError  ($stdoutLog + ".err")
 

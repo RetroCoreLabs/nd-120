@@ -12,7 +12,7 @@
 # Both flows compile the SAME ordered file list (nd120_tang20k.gprj) with the
 # SAME defines file first (src/tang20k_defines.v) - one source of truth.
 #
-#   make [VARIANT=slow|crawl|full]   OSS bitstream -> build/nd120_tang20k_oss-<variant>.fs
+#   make [VARIANT=slow|crawl|full]   OSS bitstream -> <build>/nd120_tang20k_oss-<variant>.fs
 #   make check [VARIANT=...]         netlist gates: IO_sdram_dq tristate + latch census
 #   make load / flash [VARIANT=...]  program the OSS bitstream (SRAM / config flash)
 #
@@ -20,7 +20,16 @@
 #   make load-gowin / flash-gowin    program the Gowin bitstream
 #
 #   make sim                         iverilog unit tbs (sdram-bridge + sdram-test)
-#   make clean                       remove build/
+#   make clean                       remove the build folder
+#   make check-config                show the local settings and what is missing
+#
+# <build> is $(ND120_BUILD_DIR)/tang-nano-20k: EVERYTHING both flows write -
+# the copied WCS images, yosys/nextpnr logs and netlists, the tristate gate's
+# json/log, the Gowin project with its impl/ reports and .fs - goes there,
+# never into this folder. yosys and gw_sh run with it as their working folder
+# ($readmemh resolves the wcs_*.hex names against it). Every target that
+# builds names ND120_BUILD_DIR in its settings check, `make check` (the CI
+# netlist gate) included - the CI job runs configure.py first.
 #
 # VARIANT selects the clocking (default slow, same as always):
 #   slow  = CPU 6.75 MHz / SDRAM 13.5 MHz  (TANG_SLOW_BRINGUP)
@@ -33,6 +42,7 @@
 # OSS flow) come from local.mk at the repository root - python3 configure.py
 # writes it. paths.mk loads it and passes it on to gowin_build.ps1 (through
 # WSLENV from WSL). `make check-config` shows every setting.
+ND120_BOARD := tang-nano-20k
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 
 # auto-add the oss-cad-suite tools to PATH when present: ND120_OSS_CAD_SUITE
@@ -54,7 +64,7 @@ TOP    = ND120_TANG20K_TOP
 DEVICE = GW2AR-LV18QN88C8/I7
 FAMILY = GW2A-18C
 BOARD  = tangnano20k
-BUILD  = build
+BUILD  = $(ND120_BOARD_DIR)
 GPRJ   = nd120_tang20k.gprj
 
 VARIANT ?= slow
@@ -84,14 +94,15 @@ endif
 # One source of truth: the ordered .v list from the Gowin project file
 # (src/tang20k_defines.v is first; yosys keeps `defines across a single
 # read_verilog file list, same as the Gowin ordered compilation unit).
-SRCS := $(shell grep -o '<File path="[^"]*"' $(GPRJ) | sed 's/<File path="//;s/"//' | grep '\.v$$')
+# Absolute, because yosys runs in the build folder.
+SRCS := $(abspath $(shell grep -o '<File path="[^"]*"' $(GPRJ) | sed 's/<File path="//;s/"//' | grep '\.v$$'))
 
 # The SD-FAT sources `include "sd_fat_features.vh" - give yosys the path.
 # (Gowin EDA resolves includes from the file list's own directories.)
 # Shared/support holds nd120_backwiring_defaults.vh, included by BOTH
 # BACKWIRING_PROM.v (same dir) and ND120_CORE.v (Verilog root) - the latter is
 # why the path has to be explicit here.
-INCS = -I../../SD-FAT/circuit -I../../Shared/support
+INCS = -I$(abspath ../../SD-FAT/circuit) -I$(abspath ../../Shared/support)
 
 OSS_BASE  = $(BUILD)/nd120_tang20k_oss-$(VARIANT)
 FS_OSS    = $(OSS_BASE).fs
@@ -99,17 +110,23 @@ FS_GOWIN  = $(BUILD)/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs
 
 PS = powershell.exe -NoProfile -ExecutionPolicy Bypass -File
 
-all: $(FS_OSS)
+all: check-settings $(FS_OSS)
+
+# Every target that writes into the build folder lists this FIRST, so a
+# missing ND120_BUILD_DIR stops the run before any work, with one message.
+check-settings:
+	@$(call nd120_require,ND120_BUILD_DIR,make $(or $(MAKECMDGOALS),all))
 
 $(BUILD):
-	mkdir -p $(BUILD)
+	mkdir -p '$(BUILD)'
 
-# WCS preload: $readmemh("wcs_XXC.hex") resolves against the yosys cwd (this
-# dir). The canonical source is Code/Microcode/wcs; refresh local copies.
-wcs-hex:
+# WCS preload: $readmemh("wcs_XXC.hex") resolves against the yosys cwd (the
+# build folder). The canonical source is Code/Microcode/wcs, made by
+# gen_wcs_image.py (configure.py runs it); refresh the build folder's copies.
+wcs-hex: check-settings | $(BUILD)
 	@test -f ../../../Code/Microcode/wcs/wcs_16C.hex || { \
-	  echo "WCS preload images missing - run Code/Microcode/gen_wcs_image.py"; exit 1; }
-	@cp -u ../../../Code/Microcode/wcs/wcs_*.hex .
+	  echo "WCS preload images missing - run python3 configure.py from the repository root (it runs Code/Microcode/gen_wcs_image.py)"; exit 1; }
+	@cp -u ../../../Code/Microcode/wcs/wcs_*.hex '$(BUILD)/'
 
 # ---- OSS flow: yosys -> nextpnr-himbaechel -> gowin_pack -------------------
 # attrmap -remove init: GW2A FFs power up per their SET/RESET type; Gowin
@@ -120,7 +137,7 @@ wcs-hex:
 # matches the GW2A default FF state, so nothing depends on the inits.
 $(OSS_BASE).json: $(SRCS) $(GPRJ) | $(BUILD)
 	$(MAKE) wcs-hex
-	yosys -l $(OSS_BASE)-synth.log -p "read_verilog $(INCS) $(VDEFS) $(SRCS); hierarchy -top $(TOP); proc; attrmap -remove init; synth_gowin -top $(TOP) -json $@"
+	cd '$(BUILD)' && yosys -l $(OSS_BASE)-synth.log -p "read_verilog $(INCS) $(VDEFS) $(SRCS); hierarchy -top $(TOP); proc; attrmap -remove init; synth_gowin -top $(TOP) -json $@"
 
 # package pins + SDRAM pseudo-pins (nextpnr does not auto-connect the
 # embedded SDRAM the way Gowin EDA does - same trick as sdram-test)
@@ -149,32 +166,32 @@ $(FS_OSS): $(OSS_BASE)_pnr.json
 # 1. tristate integrity: IO_sdram_dq must stay a real inout driven only by
 #    $tribuf cells (the yosys silent-collapse class that burned the SD pads)
 # 2. latch census: FPGA_FF_MODE builds must contain no inferred latches
-check: | $(BUILD)
+check: check-settings | $(BUILD)
 	$(MAKE) wcs-hex
-	yosys -q -p "read_verilog $(INCS) $(VDEFS) $(SRCS); hierarchy -top $(TOP); proc; opt -fast; tribuf; write_json $(BUILD)/tristate-$(VARIANT).json"
+	cd '$(BUILD)' && yosys -q -p "read_verilog $(INCS) $(VDEFS) $(SRCS); hierarchy -top $(TOP); proc; opt -fast; tribuf; write_json $(BUILD)/tristate-$(VARIANT).json"
 	python3 sd-fat-test/sim/check_tristate.py $(BUILD)/tristate-$(VARIANT).json $(TOP) IO_sdram_dq | tee $(BUILD)/tristate-$(VARIANT).log
 	@grep -q "TB_RESULT: PASS" $(BUILD)/tristate-$(VARIANT).log
-	yosys -q -p "read_verilog $(INCS) $(VDEFS) $(SRCS); hierarchy -top $(TOP); proc; opt -fast; select -assert-none t:\$$dlatch t:\$$dlatchsr; select -clear" \
+	cd '$(BUILD)' && yosys -q -p "read_verilog $(INCS) $(VDEFS) $(SRCS); hierarchy -top $(TOP); proc; opt -fast; select -assert-none t:\$$dlatch t:\$$dlatchsr; select -clear" \
 	  && echo "LATCH GATE: PASS (no inferred latches)" \
 	  || { echo "LATCH GATE: FAIL - inferred latches present"; exit 1; }
 
 # ---- Gowin EDA flow (backup; Windows host) ---------------------------------
 gowin:
-	@$(call nd120_require,ND120_GOWIN,make gowin)
+	@$(call nd120_require,ND120_GOWIN ND120_BUILD_DIR,make gowin)
 	$(PS) gowin_build.ps1 -Variant $(VARIANT)
 
 # ---- programming ------------------------------------------------------------
-load: $(FS_OSS)
+load: check-settings $(FS_OSS)
 	openFPGALoader -b $(BOARD) $(FS_OSS)
 
-flash: $(FS_OSS)
+flash: check-settings $(FS_OSS)
 	openFPGALoader -b $(BOARD) -f $(FS_OSS)
 
-load-gowin:
+load-gowin: check-settings
 	@test -f $(FS_GOWIN) || { echo "No Gowin bitstream at $(FS_GOWIN) - run 'make gowin' first"; exit 1; }
 	openFPGALoader -b $(BOARD) $(FS_GOWIN)
 
-flash-gowin:
+flash-gowin: check-settings
 	@test -f $(FS_GOWIN) || { echo "No Gowin bitstream at $(FS_GOWIN) - run 'make gowin' first"; exit 1; }
 	openFPGALoader -b $(BOARD) -f $(FS_GOWIN)
 
@@ -189,9 +206,12 @@ sim:
 	$(MAKE) -C sdram-bridge/sim test
 	$(MAKE) -C sdram-test/sim test
 
+# The build folder, plus build/ and the WCS copies that builds from before
+# 30-SEP-2026 left in this folder.
 clean:
-	rm -rf $(BUILD)
+	$(nd120_clean_board)
+	rm -rf build wcs_*.hex
 	$(MAKE) -C sdram-bridge/sim clean
 	$(MAKE) -C sdram-test/sim clean
 
-.PHONY: all check gowin load flash load-gowin flash-gowin sim clean wcs-hex
+.PHONY: all check gowin load flash load-gowin flash-gowin sim clean wcs-hex check-settings

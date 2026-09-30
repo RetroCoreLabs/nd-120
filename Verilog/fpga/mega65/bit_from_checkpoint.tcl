@@ -8,7 +8,11 @@
 set srcdir [file dirname [file normalize [info script]]]
 set board [lindex $argv 1]
 set run   [expr {[llength $argv] > 2 ? [lindex $argv 2] : ""}]
-set outdir [file join $srcdir build $board]
+# The build folder: $ND120_BUILD_DIR/mega65/<board> (local.mk at the
+# repository root, written by configure.py), where build.tcl left the runs.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir mega65/$board "bit_from_checkpoint.tcl"]
+cd $outdir
 if {$run eq ""} {
     set runs [lsort -dictionary [glob -directory [file join $outdir timing-analysis] -type d run*]]
     set run [file tail [lindex $runs end]]

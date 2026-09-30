@@ -93,7 +93,12 @@ else
 fi
 
 # --- 3. RTL newer than the last bitstream, without a green testbench ---------
-FS=$(ls -t "$BOARDDIR"/build/*/impl/pnr/*.fs 2>/dev/null | head -1)
+# The bitstream is in the build folder, $ND120_BUILD_DIR/<board> (local.mk at
+# the repository root; configure.py reads it). No build folder set = no
+# bitstream to compare against, and this check is skipped.
+BUILD_ROOT="$(python3 "$VERILOG_ROOT/../configure.py" --get ND120_BUILD_DIR 2>/dev/null)"
+FS=""
+[ -n "$BUILD_ROOT" ] && FS=$(ls -t "$BUILD_ROOT/$BOARD"/*/impl/pnr/*.fs 2>/dev/null | head -1)
 if [ -n "$FS" ]; then
   newer=$(find "$VERILOG_ROOT" -name '*.v' -newer "$FS" \
             -not -path '*/build/*' -not -path '*/.Xil/*' -not -path '*/sim/*' \

@@ -6,6 +6,11 @@
 
 set part xc7a35tcsg325-1
 set srcdir [file dirname [file normalize [info script]]]
+# Outputs go to $ND120_BUILD_DIR/qmtech-a35t/mem-test (local.mk at the
+# repository root, written by configure.py), and Vivado works there.
+source [file join $srcdir .. .. paths.tcl]
+set outdir [nd120_board_dir qmtech-a35t/mem-test]
+cd $outdir
 set b3dir  [file join $srcdir .. .. basys3 mem-test]
 
 create_project -in_memory -part $part
@@ -25,10 +30,10 @@ opt_design
 place_design
 route_design
 
-report_utilization      -file [file join $srcdir util.rpt]
-report_timing_summary   -file [file join $srcdir timing.rpt]
+report_utilization      -file [file join $outdir util.rpt]
+report_timing_summary   -file [file join $outdir timing.rpt]
 
-set bit [file join $srcdir qmtech_mem_test.bit]
+set bit [file join $outdir qmtech_mem_test.bit]
 write_bitstream -force $bit
 puts "BITSTREAM: $bit"
 

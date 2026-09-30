@@ -18,14 +18,17 @@
 # Run ./usb-attach.sh --detach first if the console has been in use from Linux.
 # ---------------------------------------------------------------------------
 
-set bit [file join [file dirname [info script]] nd120_nexys4ddr.bit]
+# The bitstream lives in the build folder, $ND120_BUILD_DIR/nexys4ddr (local.mk
+# at the repository root, written by configure.py).
+source [file join [file dirname [file normalize [info script]]] .. paths.tcl]
+set bit [file join [nd120_board_dir nexys4ddr] nd120_nexys4ddr.bit]
 if {[llength $argv] > 0} {
     set bit [lindex $argv 0]
 }
 
 if {![file exists $bit]} {
     puts "ERROR: no bitstream at $bit"
-    puts "       build one first: vivado -mode batch -source build.tcl -tclargs vgaconsole -noburn"
+    puts "       build one first: make build   (or: vivado -mode batch -source build.tcl -tclargs -noburn)"
     exit 1
 }
 
