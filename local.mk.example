@@ -1,0 +1,83 @@
+# ND-120 - local settings. You normally do NOT copy this file by hand:
+#
+#     python3 configure.py            (Windows: py configure.py)
+#
+# finds the tools, asks for what it cannot find, and writes local.mk next to
+# this file. local.mk is machine-local and gitignored; nothing in it is ever
+# committed. This example lists every name configure.py knows, so a person
+# setting up by hand (or reading what a value means) has one place to look.
+#
+# Syntax: plain "NAME := value" lines - no make functions or $(...) in a
+# value. In make syntax a '$' is written '$$' and a '#' is written '\#'.
+#
+# Who reads local.mk:
+#   * every board Makefile, the Verilog/ Makefiles that need a setting, and
+#     the sim/test Makefiles, through paths.mk at the repository root;
+#   * the PowerShell scripts, through Verilog/fpga/paths.ps1;
+#   * the Vivado and Gowin Tcl scripts, through Verilog/fpga/paths.tcl;
+#   * the Python and shell helpers, through configure.py (configure.setting).
+#
+# One rule everywhere: a value set in the ENVIRONMENT wins over local.mk.
+# Under make, a value on the command line (make NAME=value) wins over both.
+#
+# A target checks the settings IT needs before doing any work, and stops with
+# one message naming the variable and the command that fixes it. See
+# CONTRIBUTING.md "Local settings" for the table of names.
+#
+# Path forms: a Windows program (vivado.bat, gw_sh.exe) is always written as a
+# Windows path, even when configure.py ran in WSL, because it is started
+# through powershell.exe. Folders are written the way the shell that ran
+# configure.py sees them; every reader converts X:\... <-> /mnt/x/... itself.
+
+# Where builds go. REQUIRED for every board build: each board writes
+# everything - bitstream, reports, timing-analysis runs, Vivado's .Xil,
+# journal and log - to <this folder>/<board>/. A Windows program started from
+# WSL needs it on a Windows drive (/mnt/<drive>/...).
+# ND120_BUILD_DIR := <folder>
+
+# The Vivado program: vivado.bat on Windows, vivado on Linux. Needed by the
+# Basys3, Cmod A7, Nexys 4 DDR, QMTECH and MEGA65 builds. make VIVADO=<program>
+# overrides it for one run.
+# ND120_VIVADO := <Vivado install>\bin\vivado.bat
+
+# Vivado licence file list, handed to Vivado as XILINXD_LICENSE_FILE when that
+# is not already set. Several files are separated by ';'. Unset = the Windows
+# user (then machine) XILINXD_LICENSE_FILE.
+# ND120_VIVADO_LICENSE := <licence file>;<another licence file>
+
+# Gowin EDA gw_sh (Tang Nano 20K: make gowin, gowin_build.ps1).
+# ND120_GOWIN := <Gowin install>\IDE\bin\gw_sh.exe
+
+# Quartus bin folder. Nothing reads it today (the MiSTer build runs Quartus in
+# Docker); the name is fixed so a future script uses this one.
+# ND120_QUARTUS := <Quartus install>\bin64
+
+# oss-cad-suite folder - the install the shell you build from uses. The Tang
+# Makefile (OSS flow) puts its bin/ on PATH; Verilog/ND-120-Yosys/synh.bat
+# calls its environment.bat; the BUS-IF gate Windows example names it.
+# ND120_OSS_CAD_SUITE := <oss-cad-suite folder>
+
+# w64devkit folder (only for the BUS-IF gate Windows example).
+# ND120_W64DEVKIT := <w64devkit folder>
+
+# Folder holding the other ND repositories side by side (ND110Compile,
+# nd120uc, NDDeviceCore, RetroTerm, ...). Optional: the instruction-verify
+# golden traces and Verilog/sim/compare_boot.py need it.
+# ND_REPOS := <folder holding the ND repositories>
+
+# An ILA capture exported from Vivado as CSV (Verilog/sim/analyze_ila.py,
+# Verilog/sim/compare_boot.py).
+# ND120_ILA_CSV := <file>
+
+# Where long trace captures are kept (too big to commit).
+# ND120_ORACLE_DIR := <folder>
+
+# The Verilog/sim folder as WSL sees it (Verilog/sim/nd120_probe.py). Optional:
+# by default it is worked out from the script's own location.
+# ND120_SIM_WSLDIR := <folder>
+
+# An EMPTY folder for `make fresh-build` (any board folder): the current
+# commit is cloned into it, configured with a build folder inside the clone,
+# and built there - to prove the build needs nothing outside the repository.
+# Usually given on the command line: make fresh-build ND120_FRESH_DIR=<folder>
+# ND120_FRESH_DIR := <empty folder>

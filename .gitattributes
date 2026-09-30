@@ -17,3 +17,9 @@ Verilog/runSim/golden/** -text
 *.sh    text eol=lf
 Makefile text eol=lf
 *.mk    text eol=lf
+
+# configure.py is run as ./configure.py from WSL too; a CRLF shebang line would
+# make that fail with "/usr/bin/env: 'python3\r'".
+configure.py text eol=lf
+# local.mk.example is read by make-syntax readers; keep it like the .mk files.
+local.mk.example text eol=lf
