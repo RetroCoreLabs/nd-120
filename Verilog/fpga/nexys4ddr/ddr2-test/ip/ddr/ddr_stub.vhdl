@@ -5,7 +5,7 @@
 -- Date        : Thu Aug 20 12:45:00 2026
 -- Host        : Ronny-12700 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub
---               e:/Dev/Repos/Ronny/nd-120/Verilog/fpga/nexys4ddr/ddr2-test/ip/ddr/ddr_stub.vhdl
+--               Verilog/fpga/nexys4ddr/ddr2-test/ip/ddr/ddr_stub.vhdl
 -- Design      : ddr
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7a100tcsg324-1

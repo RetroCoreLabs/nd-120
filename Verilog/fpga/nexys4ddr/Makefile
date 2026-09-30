@@ -19,12 +19,15 @@
 #                     every boot and cannot keep time, see docs/panel-clock-68705.md)
 #   make clean        remove build outputs
 #
-# Vivado path: the same install the Basys3 flow uses; override with
-#   make VIVADO="D:\Xilinx\...\vivado.bat"
+# Vivado path: ND120_VIVADO from ../local.mk (copy ../local.mk.example), else
+# vivado on the Windows PATH; override for one run with
+#   make VIVADO="<your Vivado install>\bin\vivado.bat"
 # From a Windows shell, run the tcl directly instead:
 #   vivado -mode batch -source build.tcl [-tclargs -noburn clk=33 -skipwcs]
 
-VIVADO ?= F:\\AMDDesignTools\\2026.1\\Vivado\\bin\\vivado.bat
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+
+VIVADO ?= $(or $(ND120_VIVADO),vivado)
 CMD     = cmd.exe /c
 CLK    ?= 16
 PANELCLOCK ?= 1

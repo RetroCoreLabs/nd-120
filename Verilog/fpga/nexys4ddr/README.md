@@ -221,6 +221,12 @@ make CLK=33             # the deployed 33.333 MHz CPU clock (the default is 16.6
 make clean
 ```
 
+Vivado path and licence: `ND120_VIVADO` and `ND120_VIVADO_LICENSE` in
+`../local.mk` (copy `../local.mk.example`; see
+[Local paths](../README.md#local-paths-copy-localmkexample-to-localmk)).
+Unset, `vivado` on the Windows PATH and the Windows user licence setting are
+used. `run_board_test.sh` and `build-watch.ps1` read the same file.
+
 **Getting a built bitstream onto the board - two different things:**
 
 ```bash

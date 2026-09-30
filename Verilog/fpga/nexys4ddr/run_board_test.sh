@@ -19,7 +19,11 @@
 #   ./run_board_test.sh lfn -ila       # same, bitstream has ILA -> capture on hang
 #   ./run_board_test.sh sintran_boot
 #
-# Requirements: the Windows host runs Vivado (path below), COM11 free.
+# Requirements: the Windows host runs Vivado, COM11 free.
+# Vivado path and licence: ND120_VIVADO and ND120_VIVADO_LICENSE, from the
+# environment or ../local.mk (copy ../local.mk.example). ND120_VIVADO unset =
+# vivado on the Windows PATH; ND120_VIVADO_LICENSE unset = the Windows user
+# (then machine) XILINXD_LICENSE_FILE.
 # The runner NEVER fights for the port: if COM11 is held (a human at the
 # console), it reports port-busy and exits without touching anything.
 ###############################################################################
@@ -35,10 +39,28 @@ STAMP=$(date +%Y%m%d-%H%M%S)
 OUT="boardtest-results/${NAME}-${STAMP}"
 mkdir -p "$OUT"
 
-VIVADO_PS='
-$env:XILINXD_LICENSE_FILE="F:\AMDDesignTools\2026.1\Xilinx-2026-enterprise-eval.lic;D:\Data\Xilinix\2026-Xilinx.lic"
-Set-Location "E:\Dev\Repos\Ronny\nd-120\Verilog\fpga\nexys4ddr"
-& "F:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat" -mode batch -nolog -nojournal'
+# Local paths: take ND120_* / ND_REPOS from ../local.mk unless the
+# environment already holds them. Plain "NAME := value" lines only.
+if [ -f ../local.mk ]; then
+    while IFS= read -r kv; do
+        name=${kv%%=*}; val=${kv#*=}
+        [ -z "${!name:-}" ] && export "$name=$val"
+    done < <(sed -n -E 's/\r$//; s/^[[:space:]]*(ND120_[A-Za-z0-9_]+|ND_REPOS)[[:space:]]*[:?]?=[[:space:]]*(.*[^[:space:]])[[:space:]]*$/\1=\2/p' ../local.mk)
+fi
+VIVADO_EXE="${ND120_VIVADO:-vivado}"
+HERE_WIN=$(wslpath -w "$(pwd)")
+if [ -n "${ND120_VIVADO_LICENSE:-}" ]; then
+    LIC_PS="\$env:XILINXD_LICENSE_FILE='${ND120_VIVADO_LICENSE}'"
+else
+    # A Windows process started from WSL does not get the user's registry
+    # environment, so read the licence list from there explicitly.
+    LIC_PS="if (-not \$env:XILINXD_LICENSE_FILE) { \$env:XILINXD_LICENSE_FILE = [Environment]::GetEnvironmentVariable('XILINXD_LICENSE_FILE','User'); if (-not \$env:XILINXD_LICENSE_FILE) { \$env:XILINXD_LICENSE_FILE = [Environment]::GetEnvironmentVariable('XILINXD_LICENSE_FILE','Machine') } }"
+fi
+
+VIVADO_PS="
+$LIC_PS
+Set-Location '$HERE_WIN'
+& '$VIVADO_EXE' -mode batch -nolog -nojournal"
 
 echo "[boardtest] reset: programming nd120_nexys4ddr.bit"
 if [ "$HAS_ILA" = "-ila" ]; then

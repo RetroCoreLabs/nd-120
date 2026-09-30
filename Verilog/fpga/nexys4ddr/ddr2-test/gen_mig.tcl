@@ -49,6 +49,25 @@ set_property -dict [list \
 generate_target all [get_ips ddr]
 synth_ip [get_ips ddr]
 
+# The generated files below are committed, and Vivado writes into them the
+# absolute folders they were made in (this checkout and the Vivado install).
+# A machine path must not be committed, so rewrite those to repo-relative
+# text. Only header comments and the MIG batch record (xil_txt.in) carry them;
+# nothing in this repo's flow reads xil_txt.in back.
+set _repo_rel "Verilog/fpga/nexys4ddr/ddr2-test"
+set _map [list "$srcdir/" "$_repo_rel/"]
+if {[info exists ::env(XILINX_VIVADO)] && $::env(XILINX_VIVADO) ne ""} {
+    lappend _map "[file normalize $::env(XILINX_VIVADO)]/" "<Vivado install>/"
+}
+foreach _f {ddr_stub.v ddr_stub.vhdl ddr_sim_netlist.v ddr_sim_netlist.vhdl xil_txt.in} {
+    set _p [file join $ipdir ddr $_f]
+    if {![file exists $_p]} continue
+    set _h [open $_p r]; fconfigure $_h -translation binary; set _t [read $_h]; close $_h
+    set _h [open $_p w]; fconfigure $_h -translation binary
+    puts -nonewline $_h [string map -nocase $_map $_t]
+    close $_h
+}
+
 # Report the real port list - the tester must be written against THIS, not
 # against what the documentation is assumed to say.
 set stub [file join $ipdir ddr ddr_stub.v]

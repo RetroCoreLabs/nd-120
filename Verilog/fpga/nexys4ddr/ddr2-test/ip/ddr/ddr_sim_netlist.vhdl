@@ -5,7 +5,7 @@
 -- Date        : Thu Aug 20 12:45:00 2026
 -- Host        : Ronny-12700 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
---               e:/Dev/Repos/Ronny/nd-120/Verilog/fpga/nexys4ddr/ddr2-test/ip/ddr/ddr_sim_netlist.vhdl
+--               Verilog/fpga/nexys4ddr/ddr2-test/ip/ddr/ddr_sim_netlist.vhdl
 -- Design      : ddr
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.

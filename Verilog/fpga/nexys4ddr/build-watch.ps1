@@ -48,7 +48,8 @@
     follow it, with the same stall detection.
 
 .PARAMETER VivadoPath
-    Full path to vivado.bat. If omitted, the script looks at $env:VIVADO_BAT,
+    Full path to vivado.bat. If omitted, the script looks at $env:ND120_VIVADO
+    (also read from Verilog/fpga/local.mk), then $env:VIVADO_BAT,
     then $env:XILINX_VIVADO\bin\vivado.bat, then vivado.bat on PATH. No install
     path is hard-coded here - this file lives in the repo and a machine-
     specific path must not.
@@ -89,6 +90,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = $PSScriptRoot
+# Shared path helpers: copies ND120_* settings from Verilog/fpga/local.mk into
+# this process's environment when the environment does not hold them already.
+. (Join-Path $ScriptDir "..\paths.ps1")
 $TclScript = Join-Path $ScriptDir "build.tcl"
 $LogFile   = Join-Path $ScriptDir "build-watch.log"
 
@@ -151,6 +155,7 @@ function Resolve-Vivado {
         if (Test-Path $Explicit) { return $Explicit }
         throw "-VivadoPath '$Explicit' does not exist."
     }
+    if ($env:ND120_VIVADO -and (Test-Path $env:ND120_VIVADO)) { return $env:ND120_VIVADO }
     if ($env:VIVADO_BAT -and (Test-Path $env:VIVADO_BAT)) { return $env:VIVADO_BAT }
     if ($env:XILINX_VIVADO) {
         $c = Join-Path $env:XILINX_VIVADO "bin\vivado.bat"
@@ -162,7 +167,8 @@ function Resolve-Vivado {
     throw @"
 Cannot find vivado.bat.
 
-Set it once for this shell:
+Set ND120_VIVADO in Verilog/fpga/local.mk (copy local.mk.example), or
+set it once for this shell:
     `$env:VIVADO_BAT = '<your Vivado install>\bin\vivado.bat'
 or permanently:
     [Environment]::SetEnvironmentVariable('VIVADO_BAT','<path>','User')

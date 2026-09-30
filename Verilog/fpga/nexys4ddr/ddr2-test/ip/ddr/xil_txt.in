@@ -9,16 +9,16 @@ SET_PREFERENCE package csg324
 SET_PREFERENCE verilogsim true
 SET_PREFERENCE vhdlsim false
 SET_PREFERENCE designentry Verilog
-SET_PREFERENCE outputdirectory e:/Dev/Repos/Ronny/nd-120/Verilog/fpga/nexys4ddr/ddr2-test/ip/ddr/_tmp/
-SET_PREFERENCE subworkingdirectory e:/Dev/Repos/Ronny/nd-120/Verilog/fpga/nexys4ddr/ddr2-test/ip/ddr/_tmp/
+SET_PREFERENCE outputdirectory Verilog/fpga/nexys4ddr/ddr2-test/ip/ddr/_tmp/
+SET_PREFERENCE subworkingdirectory Verilog/fpga/nexys4ddr/ddr2-test/ip/ddr/_tmp/
 SET_PREFERENCE flowvendor Other
 SET_PREFERENCE tool vivado
 SET_PREFERENCE compnamestatus 0
 SET_PARAMETER component_name ddr
-SET_PARAMETER xml_input_file E:/Dev/Repos/Ronny/nd-120/Verilog/fpga/nexys4ddr/ddr2-test/ip/mig.prj
-SET_PARAMETER data_dir_path f:/AMDDesignTools/2025.2.1/Vivado/data/ip/xilinx/mig_7series_v4_2
+SET_PARAMETER xml_input_file Verilog/fpga/nexys4ddr/ddr2-test/ip/mig.prj
+SET_PARAMETER data_dir_path <Vivado install>/data/ip/xilinx/mig_7series_v4_2
 SET_CORE_NAME Memory Interface Generator (MIG 7 Series)
 SET_CORE_VERSION 4.2
 SET_CORE_VLNV xilinx.com:ip:mig_7series:4.2
-SET_CORE_PATH f:/AMDDesignTools/2025.2.1/Vivado/data/ip/xilinx/mig_7series_v4_2
-SET_CORE_DATASHEET f:/AMDDesignTools/2025.2.1/Vivado/data/ip/xilinx/mig_7series_v4_2/data/docs/ds176_7series_MIS.pdf
+SET_CORE_PATH <Vivado install>/data/ip/xilinx/mig_7series_v4_2
+SET_CORE_DATASHEET <Vivado install>/data/ip/xilinx/mig_7series_v4_2/data/docs/ds176_7series_MIS.pdf
