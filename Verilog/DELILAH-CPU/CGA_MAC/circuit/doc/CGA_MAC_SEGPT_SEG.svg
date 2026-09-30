@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="881.0" height="727.0" viewBox="-80.0 -80.0 881.0 727.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="881.0" height="727.0" fill="#ffffff" /><a href="../../../../Shared/logisim/doc/NAND_GATE_8_INPUTS.md"><title>GATES_1 (NAND_GATE_8_INPUTS) - open its page</title><g transform="translate(564,249.5)" id="cell_GATES_1"><text x="15" y="-4" class="nodelabel cell_GATES_1">NAND_GATE_8_INPUTS</text><rect width="30" height="160" class="cell_GATES_1" /><g transform="translate(0,10)" id="port_GATES_1~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input1</text></g><g transform="translate(0,30)" id="port_GATES_1~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input2</text></g><g transform="translate(0,50)" id="port_GATES_1~input3"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input3</text></g><g transform="translate(0,70)" id="port_GATES_1~input4"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input4</text></g><g transform="translate(0,90)" id="port_GATES_1~input5"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input5</text></g><g transform="translate(0,110)" id="port_GATES_1~input6"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input6</text></g><g transform="translate(0,130)" id="port_GATES_1~input7"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input7</text></g><g transform="translate(0,150)" id="port_GATES_1~input8"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input8</text></g><g transform="translate(30,10)" id="port_GATES_1~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_1">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_2 (AND_GATE) - open its page</title><g transform="translate(138,262)" id="cell_GATES_2"><text x="15" y="-4" class="nodelabel cell_GATES_2">AND_GATE</text><rect width="30" height="40" class="cell_GATES_2" /><g transform="translate(0,10)" id="port_GATES_2~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input1</text></g><g transform="translate(0,30)" id="port_GATES_2~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input2</text></g><g transform="translate(30,10)" id="port_GATES_2~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_2">result</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/L8.md"><title>SEG_L (L8) - open its page</title><g transform="translate(311,72)" id="cell_SEG_L"><text x="15" y="-4" class="nodelabel cell_SEG_L">L8</text><rect width="30" height="480" class="cell_SEG_L" /><g transform="translate(0,10)" id="port_SEG_L~A"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">A</text></g><g transform="translate(0,30)" id="port_SEG_L~B"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">B</text></g><g transform="translate(0,50)" id="port_SEG_L~C"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">C</text></g><g transform="translate(0,70)" id="port_SEG_L~D"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">D</text></g><g transform="translate(0,90)" id="port_SEG_L~E"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">E</text></g><g transform="translate(0,110)" id="port_SEG_L~F"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">F</text></g><g transform="translate(0,130)" id="port_SEG_L~G"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">G</text></g><g transform="translate(0,150)" id="port_SEG_L~H"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">H</text></g><g transform="translate(0,170)" id="port_SEG_L~L"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">L</text></g><g transform="translate(0,190)" id="port_SEG_L~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">sys_rst_n</text></g><g transform="translate(0,210)" id="port_SEG_L~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_SEG_L">sysclk</text></g><g transform="translate(30,10)" id="port_SEG_L~QA"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QA</text></g><g transform="translate(30,30)" id="port_SEG_L~QAN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QAN</text></g><g transform="translate(30,50)" id="port_SEG_L~QA_R"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QA_R</text></g><g transform="translate(30,70)" id="port_SEG_L~QB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QB</text></g><g transform="translate(30,90)" id="port_SEG_L~QBN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QBN</text></g><g transform="translate(30,110)" id="port_SEG_L~QB_R"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QB_R</text></g><g transform="translate(30,130)" id="port_SEG_L~QC"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QC</text></g><g transform="translate(30,150)" id="port_SEG_L~QCN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QCN</text></g><g transform="translate(30,170)" id="port_SEG_L~QC_R"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QC_R</text></g><g transform="translate(30,190)" id="port_SEG_L~QD"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QD</text></g><g transform="translate(30,210)" id="port_SEG_L~QDN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QDN</text></g><g transform="translate(30,230)" id="port_SEG_L~QD_R"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QD_R</text></g><g transform="translate(30,250)" id="port_SEG_L~QE"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QE</text></g><g transform="translate(30,270)" id="port_SEG_L~QEN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QEN</text></g><g transform="translate(30,290)" id="port_SEG_L~QE_R"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QE_R</text></g><g transform="translate(30,310)" id="port_SEG_L~QF"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QF</text></g><g transform="translate(30,330)" id="port_SEG_L~QFN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QFN</text></g><g transform="translate(30,350)" id="port_SEG_L~QF_R"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QF_R</text></g><g transform="translate(30,370)" id="port_SEG_L~QG"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QG</text></g><g transform="translate(30,390)" id="port_SEG_L~QGN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QGN</text></g><g transform="translate(30,410)" id="port_SEG_L~QG_R"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QG_R</text></g><g transform="translate(30,430)" id="port_SEG_L~QH"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QH</text></g><g transform="translate(30,450)" id="port_SEG_L~QHN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QHN</text></g><g transform="translate(30,470)" id="port_SEG_L~QH_R"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG_L">QH_R</text></g></g></a>
+<g transform="translate(138,415)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(138,350)" id="cell_sys_rst_n"><text x="15" y="-4" class="nodelabel cell_sys_rst_n">sys_rst_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sys_rst_n" /><g /></g>
+<g transform="translate(12,82.5)" id="cell_FIDBO_7_0"><text x="15" y="-4" class="nodelabel cell_FIDBO_7_0">FIDBO_7_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FIDBO_7_0" /><g /></g>
+<g transform="translate(12,282.5)" id="cell_LLDSEG"><text x="15" y="-4" class="nodelabel cell_LLDSEG">LLDSEG</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LLDSEG" /><g /></g>
+<g transform="translate(12,217.5)" id="cell_MCLKN"><text x="15" y="-4" class="nodelabel cell_MCLKN">MCLKN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MCLKN" /><g /></g>
+<g transform="translate(667,250)" id="cell_SEGZN"><text x="15" y="-4" class="nodelabel cell_SEGZN">SEGZN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SEGZN" /><g /></g>
+<g transform="translate(667,45.5)" id="cell_SEG_7_0"><text x="15" y="-4" class="nodelabel cell_SEG_7_0">SEG_7_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SEG_7_0" /><g /></g>
+<g transform="translate(567.8571428571429,35)" id="cell_$join$,15,16,17,18,19,20,21,22,"><rect width="5" height="160" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g><g transform="translate(0,90)"><text x="-3" y="-4" class="inputPortLabel">4</text></g><g transform="translate(0,110)"><text x="-3" y="-4" class="inputPortLabel">5</text></g><g transform="translate(0,130)"><text x="-3" y="-4" class="inputPortLabel">6</text></g><g transform="translate(0,150)"><text x="-3" y="-4" class="inputPortLabel">7</text></g></g>
+<g transform="translate(159.57142857142856,72)" id="cell_$split$,4,5,6,7,8,9,10,11,"><rect width="5" height="160" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g><g transform="translate(4,30)"><text x="5" y="-4">1</text></g><g transform="translate(4,50)"><text x="5" y="-4">2</text></g><g transform="translate(4,70)"><text x="5" y="-4">3</text></g><g transform="translate(4,90)"><text x="5" y="-4">4</text></g><g transform="translate(4,110)"><text x="5" y="-4">5</text></g><g transform="translate(4,130)"><text x="5" y="-4">6</text></g><g transform="translate(4,150)"><text x="5" y="-4">7</text></g></g>
+<line x1="342" x2="507" y1="102.5" y2="102.5" class="net_23"><title>s_seg_7_0_n_out[0]</title></line>
+<line x1="507" x2="507" y1="102.5" y2="260" class="net_23"><title>s_seg_7_0_n_out[0]</title></line>
+<line x1="507" x2="564" y1="260" y2="260" class="net_23"><title>s_seg_7_0_n_out[0]</title></line>
+<line x1="342" x2="497" y1="162.5" y2="162.5" class="net_24"><title>s_seg_7_0_n_out[1]</title></line>
+<line x1="497" x2="497" y1="162.5" y2="280" class="net_24"><title>s_seg_7_0_n_out[1]</title></line>
+<line x1="497" x2="564" y1="280" y2="280" class="net_24"><title>s_seg_7_0_n_out[1]</title></line>
+<line x1="342" x2="477" y1="222.5" y2="222.5" class="net_25"><title>s_seg_7_0_n_out[2]</title></line>
+<line x1="477" x2="477" y1="222.5" y2="300" class="net_25"><title>s_seg_7_0_n_out[2]</title></line>
+<line x1="477" x2="564" y1="300" y2="300" class="net_25"><title>s_seg_7_0_n_out[2]</title></line>
+<line x1="342" x2="457" y1="282.5" y2="282.5" class="net_26"><title>s_seg_7_0_n_out[3]</title></line>
+<line x1="457" x2="457" y1="282.5" y2="320" class="net_26"><title>s_seg_7_0_n_out[3]</title></line>
+<line x1="457" x2="564" y1="320" y2="320" class="net_26"><title>s_seg_7_0_n_out[3]</title></line>
+<line x1="342" x2="497" y1="342.5" y2="342.5" class="net_27"><title>s_seg_7_0_n_out[4]</title></line>
+<line x1="497" x2="497" y1="342.5" y2="340" class="net_27"><title>s_seg_7_0_n_out[4]</title></line>
+<line x1="497" x2="564" y1="340" y2="340" class="net_27"><title>s_seg_7_0_n_out[4]</title></line>
+<line x1="342" x2="477" y1="402.5" y2="402.5" class="net_28"><title>s_seg_7_0_n_out[5]</title></line>
+<line x1="477" x2="477" y1="402.5" y2="360" class="net_28"><title>s_seg_7_0_n_out[5]</title></line>
+<line x1="477" x2="564" y1="360" y2="360" class="net_28"><title>s_seg_7_0_n_out[5]</title></line>
+<line x1="342" x2="497" y1="462.5" y2="462.5" class="net_29"><title>s_seg_7_0_n_out[6]</title></line>
+<line x1="497" x2="497" y1="462.5" y2="380" class="net_29"><title>s_seg_7_0_n_out[6]</title></line>
+<line x1="497" x2="564" y1="380" y2="380" class="net_29"><title>s_seg_7_0_n_out[6]</title></line>
+<line x1="342" x2="507" y1="522.5" y2="522.5" class="net_30"><title>s_seg_7_0_n_out[7]</title></line>
+<line x1="507" x2="507" y1="522.5" y2="400" class="net_30"><title>s_seg_7_0_n_out[7]</title></line>
+<line x1="507" x2="564" y1="400" y2="400" class="net_30"><title>s_seg_7_0_n_out[7]</title></line>
+<line x1="40" x2="76" y1="227.5" y2="227.5" class="net_13"><title>MCLKN</title></line>
+<line x1="76" x2="76" y1="227.5" y2="272.5" class="net_13"><title>MCLKN</title></line>
+<line x1="76" x2="138" y1="272.5" y2="272.5" class="net_13"><title>MCLKN</title></line>
+<line x1="40" x2="138" y1="292.5" y2="292.5" class="net_12"><title>LLDSEG</title></line>
+<line x1="164.07142857142856" x2="164.07142857142856" y1="82" y2="60" class="net_4"><title>FIDBO_7_0[0]</title></line>
+<line x1="164.07142857142856" x2="216" y1="60" y2="60" class="net_4"><title>FIDBO_7_0[0]</title></line>
+<line x1="216" x2="216" y1="60" y2="82.5" class="net_4"><title>FIDBO_7_0[0]</title></line>
+<line x1="216" x2="311" y1="82.5" y2="82.5" class="net_4"><title>FIDBO_7_0[0]</title></line>
+<line x1="164.57142857142856" x2="311" y1="102.5" y2="102.5" class="net_5"><title>FIDBO_7_0[1]</title></line>
+<line x1="164.57142857142856" x2="311" y1="122.5" y2="122.5" class="net_6"><title>FIDBO_7_0[2]</title></line>
+<line x1="164.57142857142856" x2="311" y1="142.5" y2="142.5" class="net_7"><title>FIDBO_7_0[3]</title></line>
+<line x1="164.57142857142856" x2="311" y1="162.5" y2="162.5" class="net_8"><title>FIDBO_7_0[4]</title></line>
+<line x1="164.57142857142856" x2="311" y1="182.5" y2="182.5" class="net_9"><title>FIDBO_7_0[5]</title></line>
+<line x1="164.57142857142856" x2="311" y1="202.5" y2="202.5" class="net_10"><title>FIDBO_7_0[6]</title></line>
+<line x1="164.07142857142856" x2="164.07142857142856" y1="223" y2="242" class="net_11"><title>FIDBO_7_0[7]</title></line>
+<line x1="164.07142857142856" x2="216" y1="242" y2="242" class="net_11"><title>FIDBO_7_0[7]</title></line>
+<line x1="216" x2="216" y1="242" y2="222.5" class="net_11"><title>FIDBO_7_0[7]</title></line>
+<line x1="216" x2="311" y1="222.5" y2="222.5" class="net_11"><title>FIDBO_7_0[7]</title></line>
+<line x1="169" x2="226" y1="272.5" y2="272.5" class="net_31"><title>s_gates2_out</title></line>
+<line x1="226" x2="226" y1="272.5" y2="242.5" class="net_31"><title>s_gates2_out</title></line>
+<line x1="226" x2="311" y1="242.5" y2="242.5" class="net_31"><title>s_gates2_out</title></line>
+<line x1="166" x2="236" y1="360" y2="360" class="net_3"><title>sys_rst_n</title></line>
+<line x1="236" x2="236" y1="360" y2="262.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="236" x2="311" y1="262.5" y2="262.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="166" x2="246" y1="425" y2="425" class="net_2"><title>sysclk</title></line>
+<line x1="246" x2="246" y1="425" y2="282.5" class="net_2"><title>sysclk</title></line>
+<line x1="246" x2="311" y1="282.5" y2="282.5" class="net_2"><title>sysclk</title></line>
+<line x1="595" x2="667" y1="260" y2="260" class="net_14"><title>SEGZN</title></line>
+<line x1="573.8571428571429" x2="667" y1="55.5" y2="55.5" class="net_15,16,17,18,19,20,21,22"><title>SEG_7_0</title></line>
+<line x1="342" x2="377" y1="82.5" y2="82.5" class="net_15"><title>SEG_7_0[0]</title></line>
+<line x1="377" x2="377" y1="82.5" y2="12" class="net_15"><title>SEG_7_0[0]</title></line>
+<line x1="377" x2="568.3571428571429" y1="12" y2="12" class="net_15"><title>SEG_7_0[0]</title></line>
+<line x1="568.3571428571429" x2="568.3571428571429" y1="12" y2="45" class="net_15"><title>SEG_7_0[0]</title></line>
+<line x1="342" x2="397" y1="142.5" y2="142.5" class="net_16"><title>SEG_7_0[1]</title></line>
+<line x1="397" x2="397" y1="142.5" y2="65.5" class="net_16"><title>SEG_7_0[1]</title></line>
+<line x1="397" x2="567.8571428571429" y1="65.5" y2="65.5" class="net_16"><title>SEG_7_0[1]</title></line>
+<line x1="342" x2="407" y1="202.5" y2="202.5" class="net_17"><title>SEG_7_0[2]</title></line>
+<line x1="407" x2="407" y1="202.5" y2="85.5" class="net_17"><title>SEG_7_0[2]</title></line>
+<line x1="407" x2="567.8571428571429" y1="85.5" y2="85.5" class="net_17"><title>SEG_7_0[2]</title></line>
+<line x1="342" x2="417" y1="262.5" y2="262.5" class="net_18"><title>SEG_7_0[3]</title></line>
+<line x1="417" x2="417" y1="262.5" y2="105.5" class="net_18"><title>SEG_7_0[3]</title></line>
+<line x1="417" x2="567.8571428571429" y1="105.5" y2="105.5" class="net_18"><title>SEG_7_0[3]</title></line>
+<line x1="342" x2="427" y1="322.5" y2="322.5" class="net_19"><title>SEG_7_0[4]</title></line>
+<line x1="427" x2="427" y1="322.5" y2="125.5" class="net_19"><title>SEG_7_0[4]</title></line>
+<line x1="427" x2="567.8571428571429" y1="125.5" y2="125.5" class="net_19"><title>SEG_7_0[4]</title></line>
+<line x1="342" x2="447" y1="382.5" y2="382.5" class="net_20"><title>SEG_7_0[5]</title></line>
+<line x1="447" x2="447" y1="382.5" y2="145.5" class="net_20"><title>SEG_7_0[5]</title></line>
+<line x1="447" x2="567.8571428571429" y1="145.5" y2="145.5" class="net_20"><title>SEG_7_0[5]</title></line>
+<line x1="342" x2="467" y1="442.5" y2="442.5" class="net_21"><title>SEG_7_0[6]</title></line>
+<line x1="467" x2="467" y1="442.5" y2="165.5" class="net_21"><title>SEG_7_0[6]</title></line>
+<line x1="467" x2="567.8571428571429" y1="165.5" y2="165.5" class="net_21"><title>SEG_7_0[6]</title></line>
+<line x1="342" x2="487" y1="502.5" y2="502.5" class="net_22"><title>SEG_7_0[7]</title></line>
+<line x1="487" x2="487" y1="502.5" y2="229.5" class="net_22"><title>SEG_7_0[7]</title></line>
+<line x1="487" x2="568.3571428571429" y1="229.5" y2="229.5" class="net_22"><title>SEG_7_0[7]</title></line>
+<line x1="568.3571428571429" x2="568.3571428571429" y1="229.5" y2="186" class="net_22"><title>SEG_7_0[7]</title></line>
+<line x1="40" x2="159.57142857142856" y1="92.5" y2="92.5" class="net_4,5,6,7,8,9,10,11"><title>FIDBO_7_0</title></line>
+<line x1="342" x2="387" y1="122.5" y2="122.5" class="net_" />
+<line x1="387" x2="387" y1="122.5" y2="22" class="net_" />
+<line x1="387" x2="642" y1="22" y2="22" class="net_" />
+<circle cx="387" cy="122.5" r="2" style="fill:#000" class="net_" />
+<circle cx="642" cy="205" r="2" style="fill:#000" class="net_" />
+<line x1="642" x2="642" y1="22" y2="205" class="net_" />
+<line x1="342" x2="387" y1="182.5" y2="182.5" class="net_" />
+<line x1="387" x2="387" y1="182.5" y2="22" class="net_" />
+<line x1="387" x2="642" y1="22" y2="22" class="net_" />
+<circle cx="387" cy="182.5" r="2" style="fill:#000" class="net_" />
+<line x1="642" x2="642" y1="22" y2="205" class="net_" />
+<line x1="342" x2="387" y1="242.5" y2="242.5" class="net_" />
+<line x1="387" x2="387" y1="242.5" y2="22" class="net_" />
+<line x1="387" x2="642" y1="22" y2="22" class="net_" />
+<line x1="642" x2="642" y1="22" y2="205" class="net_" />
+<line x1="342" x2="437" y1="302.5" y2="302.5" class="net_" />
+<circle cx="437" cy="302.5" r="2" style="fill:#000" class="net_" />
+<line x1="437" x2="642" y1="302.5" y2="205" class="net_" />
+<line x1="342" x2="437" y1="362.5" y2="362.5" class="net_" />
+<line x1="437" x2="642" y1="362.5" y2="205" class="net_" />
+<line x1="342" x2="642" y1="422.5" y2="422.5" class="net_" />
+<line x1="642" x2="642" y1="422.5" y2="205" class="net_" />
+<line x1="342" x2="517" y1="482.5" y2="482.5" class="net_" />
+<line x1="517" x2="517" y1="482.5" y2="422.5" class="net_" />
+<line x1="517" x2="642" y1="422.5" y2="422.5" class="net_" />
+<circle cx="517" cy="482.5" r="2" style="fill:#000" class="net_" />
+<circle cx="517" cy="422.5" r="2" style="fill:#000" class="net_" />
+<line x1="642" x2="642" y1="422.5" y2="205" class="net_" />
+<line x1="342" x2="517" y1="542.5" y2="542.5" class="net_" />
+<line x1="517" x2="517" y1="542.5" y2="422.5" class="net_" />
+<line x1="517" x2="642" y1="422.5" y2="422.5" class="net_" />
+<line x1="642" x2="642" y1="422.5" y2="205" class="net_" />
+<text x="167.6" y="199.5" class="netlabel">FIDBO_7_0[6]</text>
+<text x="219.0" y="219.5" class="netlabel">FIDBO_7_0[7]</text>
+<text x="43.0" y="289.5" class="netlabel">LLDSEG</text>
+<text x="79.0" y="269.5" class="netlabel">MCLKN</text>
+<text x="598.0" y="257.0" class="netlabel">SEGZN</text>
+<text x="380.0" y="9.0" class="netlabel">SEG_7_0[0]</text>
+<text x="576.9" y="52.5" class="netlabel">SEG_7_0</text>
+<text x="400.0" y="62.5" class="netlabel">SEG_7_0[1]</text>
+<text x="410.0" y="82.5" class="netlabel">SEG_7_0[2]</text>
+<text x="420.0" y="102.5" class="netlabel">SEG_7_0[3]</text>
+<text x="430.0" y="122.5" class="netlabel">SEG_7_0[4]</text>
+<text x="169.0" y="422.0" class="netlabel">sysclk</text>
+<text x="450.0" y="142.5" class="netlabel">SEG_7_0[5]</text>
+<text x="345.0" y="439.5" class="netlabel">SEG_7_0[6]</text>
+<text x="345.0" y="499.5" class="netlabel">SEG_7_0[7]</text>
+<text x="345.0" y="99.5" class="netlabel">s_seg_7_0_n_out[0]</text>
+<text x="345.0" y="159.5" class="netlabel">s_seg_7_0_n_out[1]</text>
+<text x="345.0" y="219.5" class="netlabel">s_seg_7_0_n_out[2]</text>
+<text x="345.0" y="279.5" class="netlabel">s_seg_7_0_n_out[3]</text>
+<text x="345.0" y="339.5" class="netlabel">s_seg_7_0_n_out[4]</text>
+<text x="345.0" y="399.5" class="netlabel">s_seg_7_0_n_out[5]</text>
+<text x="345.0" y="459.5" class="netlabel">s_seg_7_0_n_out[6]</text>
+<text x="239.0" y="259.5" class="netlabel">sys_rst_n</text>
+<text x="345.0" y="519.5" class="netlabel">s_seg_7_0_n_out[7]</text>
+<text x="229.0" y="239.5" class="netlabel">s_gates2_out</text>
+<text x="219.0" y="79.5" class="netlabel">FIDBO_7_0[0]</text>
+<text x="43.0" y="89.5" class="netlabel">FIDBO_7_0</text>
+<text x="167.6" y="99.5" class="netlabel">FIDBO_7_0[1]</text>
+<text x="167.6" y="119.5" class="netlabel">FIDBO_7_0[2]</text>
+<text x="167.6" y="139.5" class="netlabel">FIDBO_7_0[3]</text>
+<text x="167.6" y="159.5" class="netlabel">FIDBO_7_0[4]</text>
+<text x="167.6" y="179.5" class="netlabel">FIDBO_7_0[5]</text>
+</svg>

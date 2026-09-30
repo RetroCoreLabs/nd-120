@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="674.0" height="1189.0" viewBox="-80.0 -80.0 674.0 1189.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="674.0" height="1189.0" fill="#ffffff" /><g transform="translate(407,22)" id="cell_$not$R81_EN.v:63$10553"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$R81_EN.v:63$10553" /><circle cx="23" cy="10" r="3" class="cell_$not$R81_EN.v:63$10553" /><g /><g /></g>
+<g transform="translate(407,217)" id="cell_$not$R81_EN.v:63$10554"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$R81_EN.v:63$10554" /><circle cx="23" cy="10" r="3" class="cell_$not$R81_EN.v:63$10554" /><g /><g /></g>
+<g transform="translate(407,282)" id="cell_$not$R81_EN.v:63$10555"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$R81_EN.v:63$10555" /><circle cx="23" cy="10" r="3" class="cell_$not$R81_EN.v:63$10555" /><g /><g /></g>
+<g transform="translate(407,412)" id="cell_$not$R81_EN.v:63$10556"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$R81_EN.v:63$10556" /><circle cx="23" cy="10" r="3" class="cell_$not$R81_EN.v:63$10556" /><g /><g /></g>
+<g transform="translate(407,607)" id="cell_$not$R81_EN.v:63$10557"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$R81_EN.v:63$10557" /><circle cx="23" cy="10" r="3" class="cell_$not$R81_EN.v:63$10557" /><g /><g /></g>
+<g transform="translate(407,737)" id="cell_$not$R81_EN.v:63$10558"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$R81_EN.v:63$10558" /><circle cx="23" cy="10" r="3" class="cell_$not$R81_EN.v:63$10558" /><g /><g /></g>
+<g transform="translate(407,867)" id="cell_$not$R81_EN.v:63$10559"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$R81_EN.v:63$10559" /><circle cx="23" cy="10" r="3" class="cell_$not$R81_EN.v:63$10559" /><g /><g /></g>
+<g transform="translate(407,997)" id="cell_$not$R81_EN.v:63$10560"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$R81_EN.v:63$10560" /><circle cx="23" cy="10" r="3" class="cell_$not$R81_EN.v:63$10560" /><g /><g /></g>
+<g transform="translate(260,757)" id="cell_$procdff$37112"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37112" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37112" /><g /><g /><g /><g /></g>
+<g transform="translate(197.66666666666666,432)" id="cell_$procmux$10879"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$10879" /><g /><g /><g /><g /></g>
+<g transform="translate(189,777)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(124,747)" id="cell_EN"><text x="15" y="-4" class="nodelabel cell_EN">EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EN" /><g /></g>
+<g transform="translate(12,22)" id="cell_CP"><text x="15" y="-4" class="nodelabel cell_CP">CP</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CP" /><g /></g>
+<g transform="translate(54,262)" id="cell_A"><text x="15" y="-4" class="nodelabel cell_A">A</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A" /><g /></g>
+<g transform="translate(54,327)" id="cell_B"><text x="15" y="-4" class="nodelabel cell_B">B</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B" /><g /></g>
+<g transform="translate(54,392)" id="cell_C"><text x="15" y="-4" class="nodelabel cell_C">C</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_C" /><g /></g>
+<g transform="translate(54,457)" id="cell_D"><text x="15" y="-4" class="nodelabel cell_D">D</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D" /><g /></g>
+<g transform="translate(54,522)" id="cell_E"><text x="15" y="-4" class="nodelabel cell_E">E</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_E" /><g /></g>
+<g transform="translate(54,587)" id="cell_F"><text x="15" y="-4" class="nodelabel cell_F">F</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_F" /><g /></g>
+<g transform="translate(54,652)" id="cell_G"><text x="15" y="-4" class="nodelabel cell_G">G</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_G" /><g /></g>
+<g transform="translate(54,717)" id="cell_H"><text x="15" y="-4" class="nodelabel cell_H">H</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_H" /><g /></g>
+<g transform="translate(472,932)" id="cell_QA"><text x="15" y="-4" class="nodelabel cell_QA">QA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QA" /><g /></g>
+<g transform="translate(472,997)" id="cell_QAN"><text x="15" y="-4" class="nodelabel cell_QAN">QAN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QAN" /><g /></g>
+<g transform="translate(472,802)" id="cell_QB"><text x="15" y="-4" class="nodelabel cell_QB">QB</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QB" /><g /></g>
+<g transform="translate(472,867)" id="cell_QBN"><text x="15" y="-4" class="nodelabel cell_QBN">QBN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QBN" /><g /></g>
+<g transform="translate(472,672)" id="cell_QC"><text x="15" y="-4" class="nodelabel cell_QC">QC</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QC" /><g /></g>
+<g transform="translate(472,737)" id="cell_QCN"><text x="15" y="-4" class="nodelabel cell_QCN">QCN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QCN" /><g /></g>
+<g transform="translate(472,542)" id="cell_QD"><text x="15" y="-4" class="nodelabel cell_QD">QD</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QD" /><g /></g>
+<g transform="translate(472,607)" id="cell_QDN"><text x="15" y="-4" class="nodelabel cell_QDN">QDN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QDN" /><g /></g>
+<g transform="translate(472,477)" id="cell_QE"><text x="15" y="-4" class="nodelabel cell_QE">QE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QE" /><g /></g>
+<g transform="translate(472,412)" id="cell_QEN"><text x="15" y="-4" class="nodelabel cell_QEN">QEN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QEN" /><g /></g>
+<g transform="translate(472,347)" id="cell_QF"><text x="15" y="-4" class="nodelabel cell_QF">QF</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QF" /><g /></g>
+<g transform="translate(472,282)" id="cell_QFN"><text x="15" y="-4" class="nodelabel cell_QFN">QFN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QFN" /><g /></g>
+<g transform="translate(472,152)" id="cell_QG"><text x="15" y="-4" class="nodelabel cell_QG">QG</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QG" /><g /></g>
+<g transform="translate(472,217)" id="cell_QGN"><text x="15" y="-4" class="nodelabel cell_QGN">QGN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QGN" /><g /></g>
+<g transform="translate(472,87)" id="cell_QH"><text x="15" y="-4" class="nodelabel cell_QH">QH</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QH" /><g /></g>
+<g transform="translate(472,22)" id="cell_QHN"><text x="15" y="-4" class="nodelabel cell_QHN">QHN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QHN" /><g /></g>
+<g transform="translate(127.71428571428571,441.5)" id="cell_$join$,5,6,7,8,9,10,11,12,"><rect width="5" height="160" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g><g transform="translate(0,90)"><text x="-3" y="-4" class="inputPortLabel">4</text></g><g transform="translate(0,110)"><text x="-3" y="-4" class="inputPortLabel">5</text></g><g transform="translate(0,130)"><text x="-3" y="-4" class="inputPortLabel">6</text></g><g transform="translate(0,150)"><text x="-3" y="-4" class="inputPortLabel">7</text></g></g>
+<g transform="translate(325,746.5)" id="cell_$split$,13,15,17,19,21,23,25,27,"><rect width="5" height="160" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">7</text></g><g transform="translate(4,30)"><text x="5" y="-4">6</text></g><g transform="translate(4,50)"><text x="5" y="-4">5</text></g><g transform="translate(4,70)"><text x="5" y="-4">4</text></g><g transform="translate(4,90)"><text x="5" y="-4">3</text></g><g transform="translate(4,110)"><text x="5" y="-4">2</text></g><g transform="translate(4,130)"><text x="5" y="-4">1</text></g><g transform="translate(4,150)"><text x="5" y="-4">0</text></g></g>
+<line x1="329.5" x2="329.5" y1="756.5" y2="97" class="net_27"><title>QH</title></line>
+<line x1="329.5" x2="347" y1="97" y2="97" class="net_27"><title>QH</title></line>
+<line x1="347" x2="347" y1="97" y2="32" class="net_27"><title>QH</title></line>
+<circle cx="347" cy="97" r="2" style="fill:#000" class="net_27" />
+<line x1="347" x2="407" y1="32" y2="32" class="net_27"><title>QH</title></line>
+<line x1="329.5" x2="329.5" y1="756.5" y2="97" class="net_27"><title>QH</title></line>
+<line x1="329.5" x2="472" y1="97" y2="97" class="net_27"><title>QH</title></line>
+<line x1="330" x2="347" y1="777" y2="777" class="net_25"><title>QG</title></line>
+<line x1="347" x2="347" y1="777" y2="227" class="net_25"><title>QG</title></line>
+<circle cx="347" cy="227" r="2" style="fill:#000" class="net_25" />
+<line x1="347" x2="407" y1="227" y2="227" class="net_25"><title>QG</title></line>
+<line x1="330" x2="347" y1="777" y2="777" class="net_25"><title>QG</title></line>
+<line x1="347" x2="347" y1="777" y2="162" class="net_25"><title>QG</title></line>
+<line x1="347" x2="472" y1="162" y2="162" class="net_25"><title>QG</title></line>
+<line x1="330" x2="357" y1="797" y2="797" class="net_23"><title>QF</title></line>
+<line x1="357" x2="357" y1="797" y2="292" class="net_23"><title>QF</title></line>
+<line x1="357" x2="407" y1="292" y2="292" class="net_23"><title>QF</title></line>
+<line x1="330" x2="357" y1="797" y2="797" class="net_23"><title>QF</title></line>
+<line x1="357" x2="357" y1="797" y2="357" class="net_23"><title>QF</title></line>
+<circle cx="357" cy="357" r="2" style="fill:#000" class="net_23" />
+<line x1="357" x2="472" y1="357" y2="357" class="net_23"><title>QF</title></line>
+<line x1="330" x2="367" y1="817" y2="817" class="net_21"><title>QE</title></line>
+<line x1="367" x2="367" y1="817" y2="422" class="net_21"><title>QE</title></line>
+<line x1="367" x2="407" y1="422" y2="422" class="net_21"><title>QE</title></line>
+<line x1="330" x2="367" y1="817" y2="817" class="net_21"><title>QE</title></line>
+<line x1="367" x2="367" y1="817" y2="487" class="net_21"><title>QE</title></line>
+<circle cx="367" cy="487" r="2" style="fill:#000" class="net_21" />
+<line x1="367" x2="472" y1="487" y2="487" class="net_21"><title>QE</title></line>
+<line x1="330" x2="377" y1="837" y2="837" class="net_19"><title>QD</title></line>
+<line x1="377" x2="377" y1="837" y2="617" class="net_19"><title>QD</title></line>
+<circle cx="377" cy="617" r="2" style="fill:#000" class="net_19" />
+<line x1="377" x2="407" y1="617" y2="617" class="net_19"><title>QD</title></line>
+<line x1="330" x2="377" y1="837" y2="837" class="net_19"><title>QD</title></line>
+<line x1="377" x2="377" y1="837" y2="552" class="net_19"><title>QD</title></line>
+<line x1="377" x2="472" y1="552" y2="552" class="net_19"><title>QD</title></line>
+<line x1="330" x2="387" y1="857" y2="857" class="net_17"><title>QC</title></line>
+<line x1="387" x2="387" y1="857" y2="747" class="net_17"><title>QC</title></line>
+<circle cx="387" cy="747" r="2" style="fill:#000" class="net_17" />
+<line x1="387" x2="407" y1="747" y2="747" class="net_17"><title>QC</title></line>
+<line x1="330" x2="387" y1="857" y2="857" class="net_17"><title>QC</title></line>
+<line x1="387" x2="387" y1="857" y2="682" class="net_17"><title>QC</title></line>
+<line x1="387" x2="472" y1="682" y2="682" class="net_17"><title>QC</title></line>
+<line x1="330" x2="407" y1="877" y2="877" class="net_15"><title>QB</title></line>
+<line x1="330" x2="397" y1="877" y2="877" class="net_15"><title>QB</title></line>
+<line x1="397" x2="397" y1="877" y2="812" class="net_15"><title>QB</title></line>
+<circle cx="397" cy="877" r="2" style="fill:#000" class="net_15" />
+<line x1="397" x2="472" y1="812" y2="812" class="net_15"><title>QB</title></line>
+<line x1="329.5" x2="329.5" y1="897.5" y2="1007" class="net_13"><title>QA</title></line>
+<line x1="329.5" x2="407" y1="1007" y2="1007" class="net_13"><title>QA</title></line>
+<line x1="329.5" x2="329.5" y1="897.5" y2="1007" class="net_13"><title>QA</title></line>
+<line x1="329.5" x2="347" y1="1007" y2="1007" class="net_13"><title>QA</title></line>
+<line x1="347" x2="347" y1="1007" y2="942" class="net_13"><title>QA</title></line>
+<circle cx="347" cy="1007" r="2" style="fill:#000" class="net_13" />
+<line x1="347" x2="472" y1="942" y2="942" class="net_13"><title>QA</title></line>
+<line x1="217" x2="260" y1="787" y2="787" class="net_2"><title>sysclk</title></line>
+<line x1="217.66666666666666" x2="235" y1="452" y2="452" class="net_29,30,31,32,33,34,35,36" />
+<line x1="235" x2="235" y1="452" y2="767" class="net_29,30,31,32,33,34,35,36" />
+<line x1="235" x2="260" y1="767" y2="767" class="net_29,30,31,32,33,34,35,36" />
+<line x1="290" x2="300" y1="767" y2="767" class="net_13,15,17,19,21,23,25,27"><title>gen_enable.q_r</title></line>
+<line x1="300" x2="300" y1="767" y2="422" class="net_13,15,17,19,21,23,25,27"><title>gen_enable.q_r</title></line>
+<line x1="300" x2="164" y1="422" y2="422" class="net_13,15,17,19,21,23,25,27"><title>gen_enable.q_r</title></line>
+<line x1="164" x2="164" y1="422" y2="442" class="net_13,15,17,19,21,23,25,27"><title>gen_enable.q_r</title></line>
+<circle cx="300" cy="767" r="2" style="fill:#000" class="net_13,15,17,19,21,23,25,27" />
+<line x1="164" x2="197.66666666666666" y1="442" y2="442" class="net_13,15,17,19,21,23,25,27"><title>gen_enable.q_r</title></line>
+<line x1="290" x2="325" y1="767" y2="767" class="net_13,15,17,19,21,23,25,27"><title>gen_enable.q_r</title></line>
+<line x1="133.71428571428572" x2="197.66666666666666" y1="462" y2="462" class="net_5,6,7,8,9,10,11,12" />
+<line x1="152" x2="207.66666666666666" y1="757" y2="757" class="net_3"><title>EN</title></line>
+<line x1="207.66666666666666" x2="207.66666666666666" y1="757" y2="467" class="net_3"><title>EN</title></line>
+<line x1="432" x2="472" y1="1007" y2="1007" class="net_14"><title>QAN</title></line>
+<line x1="432" x2="472" y1="877" y2="877" class="net_16"><title>QBN</title></line>
+<line x1="432" x2="472" y1="747" y2="747" class="net_18"><title>QCN</title></line>
+<line x1="432" x2="472" y1="617" y2="617" class="net_20"><title>QDN</title></line>
+<line x1="432" x2="472" y1="422" y2="422" class="net_22"><title>QEN</title></line>
+<line x1="432" x2="472" y1="292" y2="292" class="net_24"><title>QFN</title></line>
+<line x1="432" x2="472" y1="227" y2="227" class="net_26"><title>QGN</title></line>
+<line x1="432" x2="472" y1="32" y2="32" class="net_28"><title>QHN</title></line>
+<line x1="82" x2="128.21428571428572" y1="272" y2="272" class="net_5"><title>A</title></line>
+<line x1="128.21428571428572" x2="128.21428571428572" y1="272" y2="451.5" class="net_5"><title>A</title></line>
+<line x1="82" x2="114" y1="337" y2="337" class="net_6"><title>B</title></line>
+<line x1="114" x2="114" y1="337" y2="472" class="net_6"><title>B</title></line>
+<line x1="114" x2="127.71428571428571" y1="472" y2="472" class="net_6"><title>B</title></line>
+<line x1="82" x2="104" y1="402" y2="402" class="net_7"><title>C</title></line>
+<line x1="104" x2="104" y1="402" y2="492" class="net_7"><title>C</title></line>
+<line x1="104" x2="127.71428571428571" y1="492" y2="492" class="net_7"><title>C</title></line>
+<line x1="82" x2="94" y1="467" y2="467" class="net_8"><title>D</title></line>
+<line x1="94" x2="94" y1="467" y2="512" class="net_8"><title>D</title></line>
+<line x1="94" x2="127.71428571428571" y1="512" y2="512" class="net_8"><title>D</title></line>
+<line x1="82" x2="127.71428571428571" y1="532" y2="532" class="net_9"><title>E</title></line>
+<line x1="82" x2="94" y1="597" y2="597" class="net_10"><title>F</title></line>
+<line x1="94" x2="94" y1="597" y2="552" class="net_10"><title>F</title></line>
+<line x1="94" x2="127.71428571428571" y1="552" y2="552" class="net_10"><title>F</title></line>
+<line x1="82" x2="104" y1="662" y2="662" class="net_11"><title>G</title></line>
+<line x1="104" x2="104" y1="662" y2="572" class="net_11"><title>G</title></line>
+<line x1="104" x2="127.71428571428571" y1="572" y2="572" class="net_11"><title>G</title></line>
+<line x1="82" x2="128.21428571428572" y1="727" y2="727" class="net_12"><title>H</title></line>
+<line x1="128.21428571428572" x2="128.21428571428572" y1="727" y2="592.5" class="net_12"><title>H</title></line>
+<text x="97.0" y="549.0" class="netlabel">F</text>
+<text x="107.0" y="569.0" class="netlabel">G</text>
+<text x="85.0" y="724.0" class="netlabel">H</text>
+<text x="350.0" y="939.0" class="netlabel">QA</text>
+<text x="167.0" y="419.0" class="netlabel">gen_enable.q_r</text>
+<text x="435.0" y="1004.0" class="netlabel">QAN</text>
+<text x="333.0" y="874.0" class="netlabel">QB</text>
+<text x="435.0" y="874.0" class="netlabel">QBN</text>
+<text x="390.0" y="679.0" class="netlabel">QC</text>
+<text x="435.0" y="744.0" class="netlabel">QCN</text>
+<text x="380.0" y="549.0" class="netlabel">QD</text>
+<text x="220.0" y="784.0" class="netlabel">sysclk</text>
+<text x="435.0" y="614.0" class="netlabel">QDN</text>
+<text x="370.0" y="484.0" class="netlabel">QE</text>
+<text x="435.0" y="419.0" class="netlabel">QEN</text>
+<text x="360.0" y="354.0" class="netlabel">QF</text>
+<text x="435.0" y="289.0" class="netlabel">QFN</text>
+<text x="350.0" y="159.0" class="netlabel">QG</text>
+<text x="435.0" y="224.0" class="netlabel">QGN</text>
+<text x="332.5" y="94.0" class="netlabel">QH</text>
+<text x="435.0" y="29.0" class="netlabel">QHN</text>
+<text x="155.0" y="754.0" class="netlabel">EN</text>
+<text x="85.0" y="269.0" class="netlabel">A</text>
+<text x="85.0" y="334.0" class="netlabel">B</text>
+<text x="107.0" y="489.0" class="netlabel">C</text>
+<text x="97.0" y="509.0" class="netlabel">D</text>
+<text x="85.0" y="529.0" class="netlabel">E</text>
+</svg>

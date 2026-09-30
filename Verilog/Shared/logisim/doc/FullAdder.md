@@ -14,6 +14,16 @@ Source: `Verilog/Shared/logisim/FullAdder.v`
 
 ![FullAdder symbol](FullAdder.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![FullAdder schematic](FullAdder.svg)](FullAdder.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Logisim-evolution goes FPGA automatic generated Verilog code
@@ -29,3 +39,60 @@ Component : FullAdder
 | input | `1` | `dataA` |  |
 | input | `1` | `dataB` |  |
 | output | `1` | `result` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/FullAdder.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/FullAdder.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of FullAdder (45 lines)</summary>
+
+```verilog
+/******************************************************************************
+ ** Logisim-evolution goes FPGA automatic generated Verilog code             **
+ ** https://github.com/logisim-evolution/                                    **
+ **                                                                          **
+ ** Component : FullAdder                                                    **
+ **                                                                          **
+ *****************************************************************************/
+
+module FullAdder( carryIn,
+                  carryOut,
+                  dataA,
+                  dataB,
+                  result );
+
+   /*******************************************************************************
+   ** Here all module parameters are defined with a dummy value                  **
+   *******************************************************************************/
+   parameter extendedBits = 1;
+
+   /*******************************************************************************
+   ** The inputs are defined here                                                **
+   *******************************************************************************/
+   input carryIn;
+   input dataA;
+   input dataB;
+
+   /*******************************************************************************
+   ** The outputs are defined here                                               **
+   *******************************************************************************/
+   output carryOut;
+   output result;
+
+   /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+   wire [extendedBits-1:0] s_extendedDataA;
+   wire [extendedBits-1:0] s_extendedDataB;
+   wire [extendedBits-1:0] s_sumResult;
+
+   /*******************************************************************************
+   ** The module functionality is described here                                 **
+   *******************************************************************************/
+   assign   {carryOut, result} = dataA + dataB + carryIn;
+
+endmodule
+```
+
+</details>

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="575.0" height="355.5" viewBox="-80.0 -80.0 575.0 355.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="575.0" height="355.5" fill="#ffffff" /><g transform="translate(253,22.5)" id="cell_$not$TTL_74521.v:52$2"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$TTL_74521.v:52$2" /><circle cx="23" cy="10" r="3" class="cell_$not$TTL_74521.v:52$2" /><g /><g /></g>
+<g transform="translate(318,22.5)" id="cell_$ternary$TTL_74521.v:52$3"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$TTL_74521.v:52$3" /><g /><g /><g /><g /></g>
+<a href="../../logisim/doc/Comparator.md"><title>ARITH_1 (Comparator) - open its page</title><g transform="translate(108,22)" id="cell_ARITH_1"><text x="15" y="-4" class="nodelabel cell_ARITH_1">Comparator</text><rect width="30" height="60" class="cell_ARITH_1" /><g transform="translate(0,10)" id="port_ARITH_1~dataA"><text x="-3" y="-4" class="inputPortLabel cell_ARITH_1">dataA</text></g><g transform="translate(0,30)" id="port_ARITH_1~dataB"><text x="-3" y="-4" class="inputPortLabel cell_ARITH_1">dataB</text></g><g transform="translate(30,10)" id="port_ARITH_1~aEqualsB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_ARITH_1">aEqualsB</text></g><g transform="translate(30,30)" id="port_ARITH_1~aGreaterThanB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_ARITH_1">aGreaterThanB</text></g><g transform="translate(30,50)" id="port_ARITH_1~aLessThanB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_ARITH_1">aLessThanB</text></g></g></a>
+<g transform="translate(12,22.5)" id="cell_A_7_0"><text x="15" y="-4" class="nodelabel cell_A_7_0">A_7_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A_7_0" /><g /></g>
+<g transform="translate(12,87.5)" id="cell_B_7_0"><text x="15" y="-4" class="nodelabel cell_B_7_0">B_7_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B_7_0" /><g /></g>
+<g transform="translate(253,152.5)" id="cell_E_n"><text x="15" y="-4" class="nodelabel cell_E_n">E_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_E_n" /><g /></g>
+<g transform="translate(373,32.5)" id="cell_AB_n"><text x="15" y="-4" class="nodelabel cell_AB_n">AB_n</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_AB_n" /><g /></g>
+<g transform="translate(253,87.5)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<line x1="139" x2="253" y1="32.5" y2="32.5" class="net_20"><title>s_a_equals_b</title></line>
+<line x1="278" x2="318" y1="32.5" y2="32.5" class="net_21" />
+<line x1="283" x2="293" y1="97.5" y2="97.5" class="net_22" />
+<line x1="293" x2="293" y1="97.5" y2="52.5" class="net_22" />
+<line x1="293" x2="318" y1="52.5" y2="52.5" class="net_22" />
+<line x1="281" x2="328" y1="162.5" y2="162.5" class="net_18"><title>E_n</title></line>
+<line x1="328" x2="328" y1="162.5" y2="57.5" class="net_18"><title>E_n</title></line>
+<line x1="40" x2="108" y1="32.5" y2="32.5" class="net_2,3,4,5,6,7,8,9"><title>A_7_0</title></line>
+<line x1="40" x2="52" y1="97.5" y2="97.5" class="net_10,11,12,13,14,15,16,17"><title>B_7_0</title></line>
+<line x1="52" x2="52" y1="97.5" y2="52.5" class="net_10,11,12,13,14,15,16,17"><title>B_7_0</title></line>
+<line x1="52" x2="108" y1="52.5" y2="52.5" class="net_10,11,12,13,14,15,16,17"><title>B_7_0</title></line>
+<line x1="338" x2="373" y1="42.5" y2="42.5" class="net_19"><title>AB_n</title></line>
+<line x1="139" x2="228" y1="52.5" y2="52.5" class="net_" />
+<line x1="228" x2="228" y1="52.5" y2="182.5" class="net_" />
+<line x1="139" x2="228" y1="72.5" y2="72.5" class="net_" />
+<circle cx="228" cy="72.5" r="2" style="fill:#000" class="net_" />
+<line x1="228" x2="228" y1="72.5" y2="182.5" class="net_" />
+<text x="55.0" y="49.5" class="netlabel">B_7_0</text>
+<text x="284.0" y="159.5" class="netlabel">E_n</text>
+<text x="341.0" y="39.5" class="netlabel">AB_n</text>
+<text x="43.0" y="29.5" class="netlabel">A_7_0</text>
+<text x="142.0" y="29.5" class="netlabel">s_a_equals_b</text>
+</svg>

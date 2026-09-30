@@ -19,6 +19,16 @@ Source: `Verilog/fpga/mega65/rtl/nd_avalon_port.v`
 
 ![nd_avalon_port symbol](nd_avalon_port.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the MEGA65 R3 build, instance `MEMPORT`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd_avalon_port schematic](nd_avalon_port.svg)](nd_avalon_port.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 nd_avalon_port - the nd_ddr2_port contract on an Avalon-MM 16-bit master
@@ -93,3 +103,253 @@ slave model with random waitrequest and read latency.
 | input | `[15:0]` | `avm_readdata` |  |
 | input | `1` | `avm_readdatavalid` |  |
 | input | `1` | `avm_waitrequest` |  |
+
+## Verilog source
+
+[`Verilog/fpga/mega65/rtl/nd_avalon_port.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/mega65/rtl/nd_avalon_port.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd_avalon_port (238 lines)</summary>
+
+```verilog
+/****************************************************************************
+** nd_avalon_port - the nd_ddr2_port contract on an Avalon-MM 16-bit master **
+**                  (the MiSTer2MEGA65 HyperRAM port, MEGA65 R3)            **
+**                                                                         **
+** Full path: Verilog/fpga/mega65/rtl/nd_avalon_port.v                      **
+**                                                                         **
+** WHAT THIS IS. The Nexys 4 DDR's main-memory backend is a BRAM cache      **
+** (fpga/nexys4ddr/ddr2/MEM_RAM_49_DDR2.v) in front of a plain request/     **
+** response port whose contract is written in nd_ddr2_port.v:              **
+**   req_valid held until req_ready; req_we; req_addr in 16-BIT UNITS, a    **
+**   multiple of 8 (one transfer = one 128-bit line = 8 units); req_wdata   **
+**   128 bits; req_wmask ACTIVE-LOW byte mask (0 = write that byte);        **
+**   rsp_valid one cycle with rsp_rdata (read) or as "done" (write). One    **
+**   operation outstanding at a time.                                        **
+** That cache + the MEM_HOLD freeze absorb ANY latency, which is why the    **
+** contract is the right seam for a memory whose latency varies: the        **
+** MEGA65's HyperRAM, reached through the framework's Avalon-MM port        **
+** (CORE/vhdl/mega65.vhd hr_core_*: 16-bit data, WORD address, 8-bit        **
+** burstcount, waitrequest, readdatavalid; 100 MHz hr_clk). This module is  **
+** the port for it: the same contract on the client side, Avalon on the     **
+** other. Nothing above the seam knows the difference.                       **
+**                                                                         **
+** HOW EACH OPERATION MAPS                                                  **
+**   READ : one burst of 8 words (burstcount 8) from BASE + req_addr; the   **
+**          8 readdatavalid beats fill rsp_rdata word 0 first (unit 0 =     **
+**          bits [15:0], as nd_ddr2_port lays a line out). G_BURST = 0      **
+**          turns that into 8 single-beat reads for a slave that cannot     **
+**          burst - a build-time fallback, not the default.                 **
+**   WRITE: the cache only ever writes ONE 16-bit word into a line (its     **
+**          wmask leaves 14 of 16 bytes masked), so a masked 8-beat burst   **
+**          would move 7 useless beats. Instead every word whose mask       **
+**          enables at least one byte gets its OWN single-beat write with   **
+**          byteenable = ~mask (Avalon byteenable is ACTIVE-HIGH - the one  **
+**          inversion this seam needs); fully masked words are skipped.     **
+**          Usually that is exactly one beat.                                **
+**                                                                         **
+** AVALON RULES OBEYED: write/read/address/data/byteenable/burstcount are   **
+** held unchanged while waitrequest is high; read and write are never       **
+** asserted together; the address never leaves the window                   **
+** [BASE_WORDS, BASE_WORDS + 2M words), the 4 MB the ND-120 map holds.      **
+** BASE_WORDS defaults to the framework's own boundary: globals.vhd         **
+** C_HMAP_DEMO = 0x0200 in units of 4 kW = word 0x200000; the first 4 MiB   **
+** of the 8 MiB part belong to the framework (video buffer for the HDMI     **
+** scaler).                                                                  **
+**                                                                         **
+** Written 02-SEP-2026. Bench: sim/nd_avalon_port_tb.v against an Avalon    **
+** slave model with random waitrequest and read latency.                    **
+*****************************************************************************/
+
+`default_nettype none
+
+module nd_avalon_port #(
+    parameter [31:0]  BASE_WORDS = 32'h0020_0000,  // first HyperRAM word of the core's window
+    parameter integer G_BURST    = 1               // 1: 8-beat burst reads; 0: eight single-beat reads
+) (
+    input wire clk,   //! the Avalon clock (hr_clk, 100 MHz)
+    input wire rst,   //! synchronous, active HIGH (hr_rst)
+
+    // ---- nd_ddr2_port contract (client side) ----
+    input  wire          req_valid,
+    input  wire          req_we,
+    input  wire [ 26:0]  req_addr,    //! 16-bit units, multiple of 8
+    input  wire [127:0]  req_wdata,
+    input  wire [ 15:0]  req_wmask,   //! active LOW: 0 = write that byte
+    output wire          req_ready,
+    output reg           rsp_valid,
+    output reg  [127:0]  rsp_rdata,
+
+    // ---- Avalon-MM master ----
+    output reg         avm_write,
+    output reg         avm_read,
+    output reg  [31:0] avm_address,
+    output reg  [15:0] avm_writedata,
+    output reg  [ 1:0] avm_byteenable,
+    output reg  [ 7:0] avm_burstcount,
+    input  wire [15:0] avm_readdata,
+    input  wire        avm_readdatavalid,
+    input  wire        avm_waitrequest
+);
+
+  localparam [2:0] S_IDLE   = 3'd0,
+                   S_WR     = 3'd1,  // a single-beat write is on the bus
+                   S_WR_NXT = 3'd2,  // pick the next enabled word, or finish
+                   S_RD_CMD = 3'd3,  // the read command is on the bus
+                   S_RD_DAT = 3'd4,  // collecting readdatavalid beats
+                   S_DONE   = 3'd5;  // rsp_valid pulse
+
+  reg [2:0]   state;
+  reg [127:0] wdata_q;
+  reg [15:0]  wmask_q;
+  reg [26:0]  addr_q;     // line address, 16-bit units
+  reg [2:0]   beat;       // word within the line
+  reg [3:0]   rd_left;    // readdatavalid beats still to come (burst) / reads still to issue (single)
+
+  assign req_ready = (state == S_IDLE);
+
+  //! Index of the first enabled word at or after `from`, 8 = none
+  function [3:0] next_enabled;
+    input [3:0]  from;
+    input [15:0] mask;   // active low
+    integer k;
+    begin
+      next_enabled = 4'd8;
+      for (k = 7; k >= 0; k = k - 1)
+        if ((k >= from) && (mask[k*2 +: 2] != 2'b11)) next_enabled = k[3:0];
+    end
+  endfunction
+
+  wire [3:0] first_word = next_enabled(4'd0, req_wmask);
+  wire [3:0] next_word  = next_enabled({1'b0, beat} + 4'd1, wmask_q);
+
+  always @(posedge clk) begin
+    if (rst) begin
+      state          <= S_IDLE;
+      rsp_valid      <= 1'b0;
+      rsp_rdata      <= 128'd0;
+      avm_write      <= 1'b0;
+      avm_read       <= 1'b0;
+      avm_address    <= 32'd0;
+      avm_writedata  <= 16'd0;
+      avm_byteenable <= 2'b00;
+      avm_burstcount <= 8'd0;
+      wdata_q        <= 128'd0;
+      wmask_q        <= 16'hFFFF;
+      addr_q         <= 27'd0;
+      beat           <= 3'd0;
+      rd_left        <= 4'd0;
+    end else begin
+      rsp_valid <= 1'b0;
+
+      case (state)
+        S_IDLE: begin
+          if (req_valid) begin
+            addr_q  <= {req_addr[26:3], 3'b000};
+            wdata_q <= req_wdata;
+            wmask_q <= req_wmask;
+            if (req_we) begin
+              if (first_word == 4'd8) begin
+                // nothing enabled: a write of no bytes is simply done
+                state <= S_DONE;
+              end else begin
+                beat           <= first_word[2:0];
+                avm_write      <= 1'b1;
+                avm_address    <= BASE_WORDS + {5'd0, req_addr[26:3], 3'b000} + {28'd0, first_word};
+                avm_writedata  <= req_wdata[first_word*16 +: 16];
+                avm_byteenable <= ~req_wmask[first_word*2 +: 2];
+                avm_burstcount <= 8'd1;
+                state          <= S_WR;
+              end
+            end else begin
+              beat           <= 3'd0;
+              avm_read       <= 1'b1;
+              avm_address    <= BASE_WORDS + {5'd0, req_addr[26:3], 3'b000};
+              avm_byteenable <= 2'b11;
+              avm_burstcount <= (G_BURST != 0) ? 8'd8 : 8'd1;
+              rd_left        <= 4'd8;
+              state          <= S_RD_CMD;
+            end
+          end
+        end
+
+        // ---- writes: one single-beat transaction per enabled word --------
+        S_WR: begin
+          if (!avm_waitrequest) begin
+            avm_write <= 1'b0;
+            state     <= S_WR_NXT;
+          end
+        end
+
+        S_WR_NXT: begin
+          if (next_word == 4'd8) begin
+            state <= S_DONE;
+          end else begin
+            beat           <= next_word[2:0];
+            avm_write      <= 1'b1;
+            avm_address    <= BASE_WORDS + {5'd0, addr_q} + {28'd0, next_word};
+            avm_writedata  <= wdata_q[next_word*16 +: 16];
+            avm_byteenable <= ~wmask_q[next_word*2 +: 2];
+            state          <= S_WR;
+          end
+        end
+
+        // ---- reads: one 8-beat burst, or eight single beats ---------------
+        // Both states store a beat the moment readdatavalid is seen; a
+        // pipelined slave may return the first word in the very cycle it
+        // accepts the command, and in single-beat mode that word may also be
+        // the only one - so "accepted" and "data" are handled together.
+        S_RD_CMD: begin
+          if (!avm_waitrequest) begin
+            if (avm_readdatavalid) begin
+              rsp_rdata[beat*16 +: 16] <= avm_readdata;
+              beat    <= beat + 3'd1;
+              rd_left <= rd_left - 4'd1;
+              if (rd_left == 4'd1) begin
+                avm_read <= 1'b0;
+                state    <= S_DONE;
+              end else if (G_BURST == 0) begin
+                // next single-beat read, command stays asserted
+                avm_address <= BASE_WORDS + {5'd0, addr_q} + {29'd0, beat} + 32'd1;
+              end else begin
+                avm_read <= 1'b0;
+                state    <= S_RD_DAT;
+              end
+            end else begin
+              avm_read <= 1'b0;
+              state    <= S_RD_DAT;
+            end
+          end
+        end
+
+        S_RD_DAT: begin
+          if (avm_readdatavalid) begin
+            rsp_rdata[beat*16 +: 16] <= avm_readdata;
+            beat    <= beat + 3'd1;
+            rd_left <= rd_left - 4'd1;
+            if (rd_left == 4'd1) begin
+              state <= S_DONE;
+            end else if (G_BURST == 0) begin
+              avm_read    <= 1'b1;
+              avm_address <= BASE_WORDS + {5'd0, addr_q} + {29'd0, beat} + 32'd1;
+              state       <= S_RD_CMD;
+            end
+          end
+        end
+
+        S_DONE: begin
+          rsp_valid <= 1'b1;
+          state     <= S_IDLE;
+        end
+
+        default: state <= S_IDLE;
+      endcase
+    end
+  end
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

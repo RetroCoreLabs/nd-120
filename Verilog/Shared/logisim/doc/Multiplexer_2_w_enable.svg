@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="423.0" height="384.0" viewBox="-80.0 -80.0 423.0 384.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="423.0" height="384.0" fill="#ffffff" /><g transform="translate(94.33333333333333,77)" id="cell_$ternary$Multiplexer_2_w_enable.v:15$10522"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$Multiplexer_2_w_enable.v:15$10522" /><g /><g /><g /><g /></g>
+<g transform="translate(160,67)" id="cell_$ternary$Multiplexer_2_w_enable.v:15$10523"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$Multiplexer_2_w_enable.v:15$10523" /><g /><g /><g /><g /></g>
+<g transform="translate(89,192)" id="cell_enable"><text x="15" y="-4" class="nodelabel cell_enable">enable</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_enable" /><g /></g>
+<g transform="translate(12,32)" id="cell_muxIn_0"><text x="15" y="-4" class="nodelabel cell_muxIn_0">muxIn_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_muxIn_0" /><g /></g>
+<g transform="translate(12,97)" id="cell_muxIn_1"><text x="15" y="-4" class="nodelabel cell_muxIn_1">muxIn_1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_muxIn_1" /><g /></g>
+<g transform="translate(12,162)" id="cell_sel"><text x="15" y="-4" class="nodelabel cell_sel">sel</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sel" /><g /></g>
+<g transform="translate(215,77)" id="cell_muxOut"><text x="15" y="-4" class="nodelabel cell_muxOut">muxOut</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_muxOut" /><g /></g>
+<g transform="translate(89,22)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<line x1="40" x2="64" y1="42" y2="42" class="net_3"><title>muxIn_0</title></line>
+<line x1="64" x2="64" y1="42" y2="87" class="net_3"><title>muxIn_0</title></line>
+<line x1="64" x2="94.33333333333333" y1="87" y2="87" class="net_3"><title>muxIn_0</title></line>
+<line x1="40" x2="94.33333333333333" y1="107" y2="107" class="net_4"><title>muxIn_1</title></line>
+<line x1="40" x2="104.33333333333333" y1="172" y2="172" class="net_5"><title>sel</title></line>
+<line x1="104.33333333333333" x2="104.33333333333333" y1="172" y2="112" class="net_5"><title>sel</title></line>
+<line x1="119" x2="135" y1="32" y2="32" class="net_8" />
+<line x1="135" x2="135" y1="32" y2="77" class="net_8" />
+<line x1="135" x2="160" y1="77" y2="77" class="net_8" />
+<line x1="114.33333333333333" x2="160" y1="97" y2="97" class="net_7" />
+<line x1="117" x2="170" y1="202" y2="202" class="net_2"><title>enable</title></line>
+<line x1="170" x2="170" y1="202" y2="102" class="net_2"><title>enable</title></line>
+<line x1="180" x2="215" y1="87" y2="87" class="net_6"><title>muxOut</title></line>
+<text x="120.0" y="199.0" class="netlabel">enable</text>
+<text x="67.0" y="84.0" class="netlabel">muxIn_0</text>
+<text x="43.0" y="104.0" class="netlabel">muxIn_1</text>
+<text x="43.0" y="169.0" class="netlabel">sel</text>
+<text x="183.0" y="84.0" class="netlabel">muxOut</text>
+</svg>

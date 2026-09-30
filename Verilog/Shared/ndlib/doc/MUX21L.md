@@ -19,6 +19,16 @@ Source: `Verilog/Shared/ndlib/MUX21L.v`
 
 ![MUX21L symbol](MUX21L.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.MIC.M_RF1`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![MUX21L schematic](MUX21L.svg)](MUX21L.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 Shared
@@ -34,3 +44,76 @@ Ronny Hansen
 | input | `1` | `B` |  |
 | input | `1` | `S` |  |
 | output | `1` | `ZN` |  |
+
+## Verilog source
+
+[`Verilog/Shared/ndlib/MUX21L.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/ndlib/MUX21L.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of MUX21L (61 lines)</summary>
+
+```verilog
+/**************************************************************************
+** ND120 Shared                                                          **
+**                                                                       **
+** Component : MUX21L                                                    **
+**                                                                       **
+** Last reviewed: 11-NOV-2024                                            **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module MUX21L (
+    input A,
+    input B,
+    input S,
+
+    output ZN
+);
+
+  /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+  wire s_z;
+  wire s_s;
+  wire s_zn_out;
+  wire s_a;
+  wire s_b;
+
+  /*******************************************************************************
+   ** The module functionality is described here                                 **
+   *******************************************************************************/
+
+  /*******************************************************************************
+   ** Here all input connections are defined                                     **
+   *******************************************************************************/
+  assign s_s = S;
+  assign s_a = A;
+  assign s_b = B;
+
+  /*******************************************************************************
+   ** Here all output connections are defined                                    **
+   *******************************************************************************/
+  assign ZN = s_zn_out;
+
+  /*******************************************************************************
+   ** Here all in-lined components are defined                                   **
+   *******************************************************************************/
+
+  // NOT Gate
+  assign s_zn_out = ~s_z;
+
+  /*******************************************************************************
+   ** Here all normal components are defined                                     **
+   *******************************************************************************/
+  Multiplexer_2 PLEXERS_1 (
+      .muxIn_0(s_a),
+      .muxIn_1(s_b),
+      .muxOut(s_z),
+      .sel(s_s)
+  );
+
+
+endmodule
+```
+
+</details>

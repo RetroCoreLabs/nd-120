@@ -14,6 +14,16 @@ Source: `Verilog/fpga/tang-nano-20k/sdram-test/src/msg_printer.v`
 
 ![msg_printer symbol](msg_printer.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![msg_printer schematic](msg_printer.svg)](msg_printer.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 UART message printer for the SDRAM test
@@ -42,3 +52,202 @@ Ronny Hansen
 | input | `[7:0]` | `data` | data field for W/R messages |
 | output | `1` | `busy` | high until the whole message has left the UART |
 | output | `1` | `txd` |  |
+
+## Verilog source
+
+[`Verilog/fpga/tang-nano-20k/sdram-test/src/msg_printer.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/tang-nano-20k/sdram-test/src/msg_printer.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of msg_printer (187 lines)</summary>
+
+```verilog
+/****************************************************************************
+** UART message printer for the SDRAM test                                 **
+**                                                                         **
+** Formats fixed messages and read/write trace lines like                  **
+**   "W 200000=3E"   (write:  address=data, hex)                           **
+**   "R 200000=3E OK" / "R 200000=7F ERR"                                  **
+** and streams them out through uart_tx, one byte at a time.               **
+**                                                                         **
+** Last reviewed: 8-JUL-2026                                               **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module msg_printer #(
+    parameter DELAY_FRAMES = 234  // passed on to uart_tx (27 MHz / 115200)
+) (
+    input clk,
+    input rst_n,
+
+    input        start,  // 1-cycle pulse; only when busy=0
+    input  [3:0] msg,    // MSG_* selector, latched at start
+    input [22:0] addr,   // address field for W/R messages
+    input  [7:0] data,   // data field for W/R messages
+
+    output busy,  // high until the whole message has left the UART
+    output txd
+);
+
+  // Message selectors
+  localparam MSG_BANNER   = 4'd0;
+  localparam MSG_PROMPT   = 4'd1;
+  localparam MSG_WRITE    = 4'd2;
+  localparam MSG_READ_OK  = 4'd3;
+  localparam MSG_READ_ERR = 4'd4;
+  localparam MSG_BLOCK    = 4'd5;
+  localparam MSG_VERIFY   = 4'd6;
+  localparam MSG_DOT      = 4'd7;
+  localparam MSG_PASS     = 4'd8;
+  localparam MSG_FAIL     = 4'd9;
+
+  localparam CR = 8'h0D;
+  localparam LF = 8'h0A;
+
+  // Fixed strings (widths derived from the literals via $bits).
+  // NOTE: \r is not a legal Verilog string escape - CR must be octal \015.
+  localparam S_BANNER = "\015\012ND120 TN20K SDRAM TEST 115200-8N1\015\012";
+  localparam S_PROMPT = "PRESS S1 OR ANY KEY\015\012";
+  localparam S_BLOCK  = "WRITE BLOCK\015\012";
+  localparam S_VERIFY = "VERIFY BLOCK\015\012";
+  localparam S_PASS   = "\015\012PASS\015\012";
+  localparam S_FAIL   = "\015\012FAIL\015\012";
+
+  function [7:0] hexd(input [3:0] n);
+    hexd = (n < 4'd10) ? (8'h30 + {4'b0, n}) : (8'h37 + {4'b0, n});  // '0'-'9','A'-'F'
+  endfunction
+
+  // pick character idx (0-based) out of a string literal; 0 terminates
+  function [7:0] strchar(input [8*40-1:0] s, input integer len, input integer i);
+    strchar = (i < len) ? s[8*(len-1-i)+:8] : 8'h00;
+  endfunction
+
+  reg [ 3:0] msg_r;
+  reg [22:0] addr_r;
+  reg [ 7:0] data_r;
+  reg [ 5:0] idx;
+
+  wire [23:0] a = {1'b0, addr_r};
+
+  // Character at position idx of the latched message; 8'h00 = end of message
+  reg [7:0] ch;
+  always @(*) begin
+    case (msg_r)
+      MSG_BANNER: ch = strchar({8'b0, S_BANNER}, $bits(S_BANNER) / 8, idx);
+      MSG_PROMPT: ch = strchar({8'b0, S_PROMPT}, $bits(S_PROMPT) / 8, idx);
+      MSG_BLOCK:  ch = strchar({8'b0, S_BLOCK}, $bits(S_BLOCK) / 8, idx);
+      MSG_VERIFY: ch = strchar({8'b0, S_VERIFY}, $bits(S_VERIFY) / 8, idx);
+      MSG_PASS:   ch = strchar({8'b0, S_PASS}, $bits(S_PASS) / 8, idx);
+      MSG_FAIL:   ch = strchar({8'b0, S_FAIL}, $bits(S_FAIL) / 8, idx);
+      MSG_DOT:    ch = (idx == 0) ? "." : 8'h00;
+
+      MSG_WRITE, MSG_READ_OK, MSG_READ_ERR: begin
+        case (idx)
+          6'd0:  ch = (msg_r == MSG_WRITE) ? "W" : "R";
+          6'd1:  ch = " ";
+          6'd2:  ch = hexd(a[23:20]);
+          6'd3:  ch = hexd(a[19:16]);
+          6'd4:  ch = hexd(a[15:12]);
+          6'd5:  ch = hexd(a[11:8]);
+          6'd6:  ch = hexd(a[7:4]);
+          6'd7:  ch = hexd(a[3:0]);
+          6'd8:  ch = "=";
+          6'd9:  ch = hexd(data_r[7:4]);
+          6'd10: ch = hexd(data_r[3:0]);
+          default: begin
+            case (msg_r)
+              MSG_WRITE:
+                case (idx)
+                  6'd11: ch = CR;
+                  6'd12: ch = LF;
+                  default: ch = 8'h00;
+                endcase
+              MSG_READ_OK:
+                case (idx)
+                  6'd11: ch = " ";
+                  6'd12: ch = "O";
+                  6'd13: ch = "K";
+                  6'd14: ch = CR;
+                  6'd15: ch = LF;
+                  default: ch = 8'h00;
+                endcase
+              default:  // MSG_READ_ERR
+                case (idx)
+                  6'd11: ch = " ";
+                  6'd12: ch = "E";
+                  6'd13: ch = "R";
+                  6'd14: ch = "R";
+                  6'd15: ch = CR;
+                  6'd16: ch = LF;
+                  default: ch = 8'h00;
+                endcase
+            endcase
+          end
+        endcase
+      end
+
+      default: ch = 8'h00;
+    endcase
+  end
+
+  // Byte pump: hand ch to uart_tx, one handshake per character
+  localparam P_IDLE = 2'd0;
+  localparam P_SEND = 2'd1;
+  localparam P_GAP  = 2'd2;  // one cycle for tx_busy to assert
+
+  reg [1:0] pstate;
+  reg       tx_valid;
+  reg [7:0] tx_byte;
+  wire      tx_busy;
+
+  assign busy = (pstate != P_IDLE);
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      pstate   <= P_IDLE;
+      tx_valid <= 1'b0;
+      idx      <= 0;
+      msg_r    <= MSG_BANNER;
+      addr_r   <= 0;
+      data_r   <= 0;
+      tx_byte  <= 0;
+    end else begin
+      tx_valid <= 1'b0;
+      case (pstate)
+        P_IDLE:
+          if (start) begin
+            msg_r  <= msg;
+            addr_r <= addr;
+            data_r <= data;
+            idx    <= 0;
+            pstate <= P_SEND;
+          end
+        P_SEND:
+          if (ch == 8'h00) begin
+            pstate <= P_IDLE;
+          end else if (!tx_busy) begin
+            tx_valid <= 1'b1;
+            tx_byte  <= ch;
+            idx      <= idx + 1;
+            pstate   <= P_GAP;
+          end
+        P_GAP: pstate <= P_SEND;
+        default: pstate <= P_IDLE;
+      endcase
+    end
+  end
+
+  uart_tx #(
+      .DELAY_FRAMES(DELAY_FRAMES)
+  ) u_tx (
+      .clk(clk),
+      .rst_n(rst_n),
+      .tx_data(tx_byte),
+      .tx_valid(tx_valid),
+      .tx_busy(tx_busy),
+      .txd(txd)
+  );
+
+endmodule
+```
+
+</details>

@@ -14,6 +14,16 @@ Source: `Verilog/fpga/tang-nano-20k/sd-fat-test/src/hex_dumper.v`
 
 ![hex_dumper symbol](hex_dumper.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![hex_dumper schematic](hex_dumper.svg)](hex_dumper.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Hex/octal dumper for the SD-FAT test
@@ -54,3 +64,416 @@ Ronny Hansen
 | output | `[7:0]` | `tx_data` |  |
 | output | `1` | `tx_valid` |  |
 | input | `1` | `tx_busy` |  |
+
+## Verilog source
+
+[`Verilog/fpga/tang-nano-20k/sd-fat-test/src/hex_dumper.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/tang-nano-20k/sd-fat-test/src/hex_dumper.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of hex_dumper (401 lines)</summary>
+
+```verilog
+/****************************************************************************
+** Hex/octal dumper for the SD-FAT test                                    **
+**                                                                         **
+** Streams the contents of a byte buffer (BRAM read port, 1-cycle read    **
+** latency) as an ASCII dump through the shared uart_tx:                   **
+**                                                                         **
+**   000000: 8D 0A 30 30 36 30 30 30  30 8D 0A B1 36 B4 33 B1             **
+**   ...                       (16 bytes/line, extra space after byte 8,   **
+**                              a space after EVERY byte incl. the last)   **
+**   OCTAL WORDS AFTER LEADER: 105015 030060 ...  (first 8 words from    **
+**                                the first NONZERO byte - BPUN tapes     **
+**                                begin with a zero leader)                **
+**   LENGTH: 000000002342 BYTES                                            **
+**   DONE                                                                  **
+**                                                                         **
+** The octal line prints the first min(8, length/2) 16-bit words,          **
+** MSB-first byte order (BPUN fields are 16-bit MSB-first words).          **
+** All line ends are CR LF. Plain ASCII only.                              **
+**                                                                         **
+** NOTE: \r is not a legal Verilog string escape - CR must be octal \015.  **
+**                                                                         **
+** Last reviewed: 10-JUL-2026                                              **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module hex_dumper #(
+    parameter ADDR_W = 16  // buffer address width; length is ADDR_W+1 bits
+) (
+    input clk,
+    input rst_n,
+
+    input                 start,   // 1-cycle pulse; only when busy=0
+    input  [ADDR_W:0]     length,  // number of bytes to dump (may be 0)
+    output                busy,
+
+    // buffer read port (registered BRAM: data valid 1 clk after addr)
+    output reg [ADDR_W-1:0] mem_addr,
+    input      [7:0]        mem_data,
+
+    // handshake to the shared uart_tx (top level muxes this with status_printer)
+    output reg [7:0] tx_data,
+    output reg       tx_valid,
+    input            tx_busy
+);
+
+  localparam S_OCT  = "OCTAL WORDS AFTER LEADER: ";
+  localparam S_LEN  = "LENGTH: ";
+  localparam S_BYT  = " BYTES\015\012";
+  localparam S_DONE = "DONE\015\012";
+  localparam S_CRLF = "\015\012";
+  localparam S_COL  = ": ";
+
+  function [7:0] hexd(input [3:0] n);
+    hexd = (n < 4'd10) ? (8'h30 + {4'b0, n}) : (8'h37 + {4'b0, n});  // '0'-'9','A'-'F'
+  endfunction
+
+  // pick character idx (0-based) out of a string literal; 0 terminates
+  function [7:0] strchar(input [8*32-1:0] s, input integer len, input integer i);
+    strchar = (i < len) ? s[8*(len-1-i)+:8] : 8'h00;
+  endfunction
+
+  // powers of ten for the 12-digit decimal LENGTH field (needs 40 bits)
+  function [39:0] pow10(input [3:0] i);
+    case (i)
+      4'd0:  pow10 = 40'd1;
+      4'd1:  pow10 = 40'd10;
+      4'd2:  pow10 = 40'd100;
+      4'd3:  pow10 = 40'd1000;
+      4'd4:  pow10 = 40'd10000;
+      4'd5:  pow10 = 40'd100000;
+      4'd6:  pow10 = 40'd1000000;
+      4'd7:  pow10 = 40'd10000000;
+      4'd8:  pow10 = 40'd100000000;
+      4'd9:  pow10 = 40'd1000000000;
+      4'd10: pow10 = 40'd10000000000;
+      default: pow10 = 40'd100000000000;
+    endcase
+  endfunction
+
+  // ------------------------------------------------------------------ FSM
+  localparam ST_IDLE       = 5'd0;
+  localparam ST_LINE       = 5'd1;   // decide: next dump line or octal section
+  localparam ST_ADDR_DIG   = 5'd2;   // 6 hex digits of the line offset
+  localparam ST_COLON      = 5'd3;   // ": "
+  localparam ST_BYTE_SET   = 5'd4;   // present buffer address
+  localparam ST_BYTE_WAIT  = 5'd5;   // BRAM read latency
+  localparam ST_BYTE_HI    = 5'd6;
+  localparam ST_BYTE_LO    = 5'd7;
+  localparam ST_BYTE_SP    = 5'd8;   // space after the byte
+  localparam ST_BYTE_SP2   = 5'd9;   // extra space after byte 8
+  localparam ST_OCT_HDR    = 5'd10;
+  localparam ST_OCT_SET_HI = 5'd11;
+  localparam ST_OCT_WAIT_HI= 5'd12;
+  localparam ST_OCT_LAT_HI = 5'd13;
+  localparam ST_OCT_SET_LO = 5'd14;
+  localparam ST_OCT_WAIT_LO= 5'd15;
+  localparam ST_OCT_LAT_LO = 5'd16;
+  localparam ST_OCT_DIG    = 5'd17;  // 6 octal digits of the word
+  localparam ST_OCT_SP     = 5'd18;
+  localparam ST_LINE_CRLF   = 5'd19;
+  localparam ST_LEN_HDR    = 5'd20;
+  localparam ST_LEN_DIG    = 5'd21;  // 12 decimal digits, repeated subtraction
+  localparam ST_LEN_TAIL   = 5'd22;  // " BYTES\r\n"
+  localparam ST_DONE_STR   = 5'd23;
+  localparam ST_STR        = 5'd24;  // generic string emitter (str_sel)
+  localparam ST_SEND       = 5'd25;  // char handshake to uart_tx
+  localparam ST_GAP        = 5'd26;  // one cycle for tx_busy to assert
+  localparam ST_OSCAN_SET  = 5'd27;  // find the first nonzero byte (BPUN
+  localparam ST_OSCAN_WAIT = 5'd28;  // tapes start with a zero leader -
+  localparam ST_OSCAN_CHK  = 5'd29;  // octal words start after it)
+
+  // string selector for ST_STR
+  localparam SEL_OCT  = 3'd0;
+  localparam SEL_LEN  = 3'd1;
+  localparam SEL_BYT  = 3'd2;
+  localparam SEL_DONE = 3'd3;
+  localparam SEL_CRLF = 3'd4;
+  localparam SEL_COL  = 3'd5;
+
+  reg [4:0] state, ret_state, str_ret;
+  reg [2:0] str_sel;
+  reg [5:0] sidx;      // index into the selected string
+
+  reg [ADDR_W:0] len_r;    // latched length
+  reg [ADDR_W:0] offs;     // current line offset
+  reg [ADDR_W:0] obase;    // octal section: first byte after the zero leader
+  reg [4:0]      bidx;     // byte index within the line (0..15)
+  reg [2:0]      digidx;   // hex/octal digit counter
+  reg [15:0]     word;     // octal section: current 16-bit word
+  reg [3:0]      widx;     // octal section: word index (0..7)
+  reg [3:0]      wcnt;     // octal section: number of words to print
+  reg [39:0]     decval;   // decimal conversion remainder
+  reg [3:0]      decdig;   // current decimal digit value
+  reg [3:0]      decpow;   // current power-of-ten index (11..0)
+
+  wire [23:0] offs24 = {{(24-ADDR_W-1){1'b0}}, offs};
+  wire [ADDR_W:0] orem = len_r - obase;  // bytes after the zero leader
+
+  assign busy = (state != ST_IDLE);
+
+  // character of the selected string at sidx
+  reg [7:0] str_ch;
+  always @(*) begin
+    case (str_sel)
+      SEL_OCT:  str_ch = strchar({8'b0, S_OCT}, $bits(S_OCT)/8, sidx);
+      SEL_LEN:  str_ch = strchar({8'b0, S_LEN}, $bits(S_LEN)/8, sidx);
+      SEL_BYT:  str_ch = strchar({8'b0, S_BYT}, $bits(S_BYT)/8, sidx);
+      SEL_DONE: str_ch = strchar({8'b0, S_DONE}, $bits(S_DONE)/8, sidx);
+      SEL_CRLF: str_ch = strchar({8'b0, S_CRLF}, $bits(S_CRLF)/8, sidx);
+      default:  str_ch = strchar({8'b0, S_COL}, $bits(S_COL)/8, sidx);
+    endcase
+  end
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      state     <= ST_IDLE;
+      ret_state <= ST_IDLE;
+      str_ret   <= ST_IDLE;
+      str_sel   <= SEL_CRLF;
+      sidx      <= 0;
+      tx_valid  <= 1'b0;
+      tx_data   <= 0;
+      mem_addr  <= 0;
+      len_r     <= 0;
+      offs      <= 0;
+      obase     <= 0;
+      bidx      <= 0;
+      digidx    <= 0;
+      word      <= 0;
+      widx      <= 0;
+      wcnt      <= 0;
+      decval    <= 0;
+      decdig    <= 0;
+      decpow    <= 0;
+    end else begin
+      tx_valid <= 1'b0;
+      case (state)
+        ST_IDLE:
+        if (start) begin
+          len_r  <= length;
+          offs   <= 0;
+          digidx <= 0;
+          state  <= ST_LINE;
+        end
+
+        // ---- hex dump lines -------------------------------------------
+        ST_LINE:
+        if (offs >= len_r) begin
+          obase <= 0;
+          state <= (len_r == 0) ? ST_OCT_HDR : ST_OSCAN_SET;
+          if (len_r == 0) begin
+            str_sel <= SEL_OCT;
+            sidx    <= 0;
+            str_ret <= ST_OCT_HDR;
+            state   <= ST_STR;
+          end
+        end else begin
+          digidx <= 0;
+          state  <= ST_ADDR_DIG;
+        end
+
+        ST_ADDR_DIG: begin
+          tx_data   <= hexd(offs24[23-4*digidx-:4]);
+          ret_state <= (digidx == 3'd5) ? ST_COLON : ST_ADDR_DIG;
+          digidx    <= digidx + 3'd1;
+          state     <= ST_SEND;
+        end
+
+        ST_COLON: begin
+          str_sel <= SEL_COL;
+          sidx    <= 0;
+          str_ret <= ST_BYTE_SET;
+          bidx    <= 0;
+          state   <= ST_STR;
+        end
+
+        ST_BYTE_SET: begin
+          mem_addr <= offs[ADDR_W-1:0] + {{(ADDR_W-5){1'b0}}, bidx};
+          state    <= ST_BYTE_WAIT;
+        end
+
+        ST_BYTE_WAIT: state <= ST_BYTE_HI;
+
+        ST_BYTE_HI: begin
+          tx_data   <= hexd(mem_data[7:4]);
+          ret_state <= ST_BYTE_LO;
+          state     <= ST_SEND;
+        end
+
+        ST_BYTE_LO: begin
+          tx_data   <= hexd(mem_data[3:0]);
+          ret_state <= ST_BYTE_SP;
+          state     <= ST_SEND;
+        end
+
+        ST_BYTE_SP: begin
+          // space after byte bidx; then: end of line (16 bytes or end of
+          // data) -> CRLF; after byte 8 -> one extra space; else next byte
+          tx_data <= " ";
+          if ((bidx == 5'd15) || (offs + {{(ADDR_W-4){1'b0}}, bidx} + 1 >= len_r))
+            ret_state <= ST_LINE_CRLF;
+          else if (bidx == 5'd7)
+            ret_state <= ST_BYTE_SP2;
+          else
+            ret_state <= ST_BYTE_SET;
+          bidx  <= bidx + 5'd1;
+          state <= ST_SEND;
+        end
+
+        ST_BYTE_SP2: begin
+          tx_data   <= " ";
+          ret_state <= ST_BYTE_SET;
+          state     <= ST_SEND;
+        end
+
+        // ---- find the end of the zero leader ----------------------------
+        ST_OSCAN_SET: begin
+          mem_addr <= obase[ADDR_W-1:0];
+          state    <= ST_OSCAN_WAIT;
+        end
+
+        ST_OSCAN_WAIT: state <= ST_OSCAN_CHK;
+
+        ST_OSCAN_CHK:
+        if (mem_data != 8'h00 || obase + 1 >= len_r) begin
+          str_sel <= SEL_OCT;
+          sidx    <= 0;
+          str_ret <= ST_OCT_HDR;
+          state   <= ST_STR;
+        end else begin
+          obase <= obase + 1;
+          state <= ST_OSCAN_SET;
+        end
+
+        // ---- octal words section --------------------------------------
+        ST_OCT_HDR: begin
+          // words available after the leader: min(8, remaining/2)
+          wcnt <= (orem >= 16) ? 4'd8 : orem[3:1];
+          widx <= 0;
+          state <= ST_OCT_SET_HI;
+        end
+
+        ST_OCT_SET_HI:
+        if (widx >= wcnt) begin
+          str_sel <= SEL_CRLF;
+          sidx    <= 0;
+          str_ret <= ST_LEN_HDR;
+          state   <= ST_STR;
+        end else begin
+          mem_addr <= obase[ADDR_W-1:0] + {{(ADDR_W-5){1'b0}}, widx, 1'b0};
+          state    <= ST_OCT_WAIT_HI;
+        end
+
+        ST_OCT_WAIT_HI: state <= ST_OCT_LAT_HI;
+
+        ST_OCT_LAT_HI: begin
+          word[15:8] <= mem_data;
+          mem_addr   <= obase[ADDR_W-1:0] + {{(ADDR_W-5){1'b0}}, widx, 1'b1};
+          state      <= ST_OCT_WAIT_LO;
+        end
+
+        ST_OCT_WAIT_LO: state <= ST_OCT_LAT_LO;
+
+        ST_OCT_LAT_LO: begin
+          word[7:0] <= mem_data;
+          digidx    <= 0;
+          state     <= ST_OCT_DIG;
+        end
+
+        ST_OCT_DIG: begin
+          case (digidx)
+            3'd0: tx_data <= 8'h30 + {7'b0, word[15]};
+            3'd1: tx_data <= 8'h30 + {5'b0, word[14:12]};
+            3'd2: tx_data <= 8'h30 + {5'b0, word[11:9]};
+            3'd3: tx_data <= 8'h30 + {5'b0, word[8:6]};
+            3'd4: tx_data <= 8'h30 + {5'b0, word[5:3]};
+            default: tx_data <= 8'h30 + {5'b0, word[2:0]};
+          endcase
+          ret_state <= (digidx == 3'd5) ? ST_OCT_SP : ST_OCT_DIG;
+          digidx    <= digidx + 3'd1;
+          state     <= ST_SEND;
+        end
+
+        ST_OCT_SP: begin
+          tx_data   <= " ";
+          widx      <= widx + 4'd1;
+          ret_state <= ST_OCT_SET_HI;
+          state     <= ST_SEND;
+        end
+
+        ST_LINE_CRLF: begin  // end of a dump line
+          str_sel <= SEL_CRLF;
+          sidx    <= 0;
+          str_ret <= ST_LINE;
+          offs    <= offs + 16;
+          state   <= ST_STR;
+        end
+
+        // ---- LENGTH line ----------------------------------------------
+        ST_LEN_HDR: begin
+          str_sel <= SEL_LEN;
+          sidx    <= 0;
+          str_ret <= ST_LEN_DIG;
+          decval  <= {{(40-ADDR_W-1){1'b0}}, len_r};
+          decpow  <= 4'd11;
+          decdig  <= 4'd0;
+          state   <= ST_STR;
+        end
+
+        ST_LEN_DIG:
+        if (decval >= pow10(decpow)) begin
+          decval <= decval - pow10(decpow);
+          decdig <= decdig + 4'd1;
+        end else begin
+          tx_data <= 8'h30 + {4'b0, decdig};
+          decdig  <= 4'd0;
+          if (decpow == 4'd0) begin
+            str_sel   <= SEL_BYT;
+            sidx      <= 0;
+            str_ret   <= ST_DONE_STR;
+            ret_state <= ST_STR;
+          end else begin
+            decpow    <= decpow - 4'd1;
+            ret_state <= ST_LEN_DIG;
+          end
+          state <= ST_SEND;
+        end
+
+        ST_DONE_STR: begin
+          str_sel <= SEL_DONE;
+          sidx    <= 0;
+          str_ret <= ST_IDLE;
+          state   <= ST_STR;
+        end
+
+        // ---- generic string emitter ------------------------------------
+        ST_STR:
+        if (str_ch == 8'h00) begin
+          state <= str_ret;
+        end else begin
+          tx_data   <= str_ch;
+          sidx      <= sidx + 6'd1;
+          ret_state <= ST_STR;
+          state     <= ST_SEND;
+        end
+
+        // ---- single-character handshake to uart_tx ----------------------
+        ST_SEND:
+        if (!tx_busy) begin
+          tx_valid <= 1'b1;
+          state    <= ST_GAP;
+        end
+
+        ST_GAP: state <= ret_state;
+
+        default: state <= ST_IDLE;
+      endcase
+    end
+  end
+
+endmodule
+```
+
+</details>

@@ -19,6 +19,16 @@ Source: `Verilog/PAL/PAL_44511A_EN.v`
 
 ![PAL_44511A_EN symbol](PAL_44511A_EN.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CMDDEC.PAL_44511_ULEV0`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![PAL_44511A_EN schematic](PAL_44511A_EN.svg)](PAL_44511A_EN.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 PALASM CODE CONVERTED TO VERILOG
@@ -59,3 +69,204 @@ Ronny Hansen
 | output | `1` | `CUP` | Q0_n - (not connected) |
 | output | `1` | `CWR_n` *(active low)* | B0_n - CWR_n |
 | output | `1` | `LEV0` | B3_n - LEV0 |
+
+## Verilog source
+
+[`Verilog/PAL/PAL_44511A_EN.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/PAL/PAL_44511A_EN.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of PAL_44511A_EN (189 lines)</summary>
+
+```verilog
+/**********************************************************************************************************
+** ND120 PALASM CODE CONVERTED TO VERILOG                                                                **
+**                                                                                                       **
+** Component PAL 44511A (LEV0) - clock-enable wrapper                                                    **
+**                                                                                                       **
+** USE_ENABLE=0 (default): instantiates the original PAL_44511A untouched                                **
+**   (posedge CK registered outputs).                                                                    **
+** USE_ENABLE=1: structural copy of PAL_44511A with the registered                                       **
+**   equations captured on `posedge sysclk + if (EN)` (P2 clock-domain                                   **
+**   conversion, docs/plan-fix-unconstrained-clocks.md - EN is CYC_36's                                  **
+**   CLK_EN pulse aligned with the CLK rise). Equations are line-for-line                                **
+**   identical to PAL_44511A.v; only the flop trigger changes.                                           **
+**                                                                                                       **
+** The original PAL_44511A.v is generated from PALASM and is never                                       **
+** modified - keep the equations here in sync with it.                                                   **
+**                                                                                                       **
+** Last reviewed: 10-JUL-2026                                                                            **
+** Ronny Hansen                                                                                          **
+***********************************************************************************************************/
+
+module PAL_44511A_EN #(
+    parameter integer USE_ENABLE = 0
+) (
+    input sysclk,  //! FPGA system clock (used only when USE_ENABLE=1)
+    input EN,      //! Clock enable    (used only when USE_ENABLE=1)
+
+    input CK,   //! Clock signal (used only when USE_ENABLE=0)
+    input OE_n, //! OUTPUT ENABLE (active-low) for Q0-Q3
+
+    input PIL0,    //! I0 - PIL0
+    input PIL1,    //! I1 - PIL1
+    input PIL2,    //! I2 - PIL2
+    input PIL3,    //! I3 - PIL3
+    input CLK,     //! I4 - CLK (same signal as CK)
+    input MREQ_n,  //! I5 - MREQ_n
+    input WCA_n,   //! I6 - WCA_n
+    //input I7,       //! I7 - (not connected)
+
+    output CUP,  //! Q0_n - (not connected)
+    //output Q1_n,   //! Q1_n - (not connected)
+    //output Q2_n,   //! Q2_n - (not connected)
+    //output Q2_n,   //! Q3_n - (not connected)
+
+
+    output CWR_n,  //! B0_n - CWR_n
+    //output B1_n,   //! B1_n - (not connected)
+    //output B2_n,   //! B2_n - (not connected)
+    output LEV0    //! B3_n - LEV0
+
+);
+
+  generate
+    if (USE_ENABLE == 1) begin : gen_enable
+      /* verilator lint_off UNUSEDSIGNAL */
+      wire unused_clk = CK;
+      /* verilator lint_on UNUSEDSIGNAL */
+
+      // Register declarations for state-holding variables
+      reg  CWR_hold = 1'b0;
+      reg  CUP_n_reg = 1'b0;
+
+
+      // negated wires
+      wire MREQ = ~MREQ_n;
+      wire WCA = ~WCA_n;
+      wire CLK_n = ~CLK;
+
+      // CWR IS COMBINATIONAL, NOT REGISTERED. From the original PALASM,
+      // DesignDocuments/PAL-Code/SRC/44511A.txt:
+      //
+      //   IF (VCC) CWR  = MREQ * WCA + CWR * /CLK    <-- '='  combinational
+      //           /CUP := /CWR * MREQ + /CUP * /MREQ <-- ':=' registered
+      //
+      // In PALASM '=' is a combinational output and ':=' a registered one, and
+      // on a PAL16R4 only Q0-Q3 have flip-flops - CWR is pin B0, which has
+      // none. LEV0 (B3) in this same file was already modelled combinationally;
+      // CWR was not, and that was the bug.
+      //
+      // WHY IT MATTERED. A registered CWR is not visible until the NEXT clock
+      // edge, by which time MREQ has gone. The CUP term /CWR * MREQ needs both
+      // in the SAME cycle, so CUP never asserted at all. Everything followed
+      // from that: the used-bit PAL never wrote, CHIP_21F stayed zero, and
+      // s_hit - which requires !s_used_n - could never assert. The machine's
+      // own diagnostic (CACHE-120-A00 under TPE) reported exactly that chain:
+      // "CUP does not work", "DATA is NOT COPIED to DATA CACHE", used bit
+      // "Expected 1 Found 0", while the cache DATA memory test passed.
+      //
+      // HOW IT IS MODELLED HERE (FF mode, chosen 28-AUG-2026). The set term is
+      // combinational, so CWR is visible in the very cycle MREQ * WCA happens -
+      // that is what CUP needs. The hold term is a register qualified by /CLK,
+      // matching "HOLD UNTIL START OF NEXT CYCLE": the hold dies at the CLK rise,
+      // so CWR does not survive into the high phase.
+      //
+      // THE HOLD TERM IS A LEVEL LATCH, SAMPLED AT SYSCLK RATE (29-AUG-2026).
+      // The real pin is a feedback latch: CWR sets the instant MREQ * WCA
+      // appears and stays set for the rest of the CLK-low phase, and /CUP
+      // samples it at the CLK rise. The previous model loaded CWR_hold only
+      // on the CLK rise itself (the EN pulse), so the only WCA it could ever
+      // remember was one still present AT the rise. On this board WCA lives
+      // in cycle state d (PAL 44402D: ... * CYD ...) and CLK rises at TERM,
+      // four states later - by then WCA is long gone. Measured in Verilator
+      // FF mode (runSim ND120_CACHE_TRACE, 29-AUG-2026): WCA=1, CWR=1, MREQ=1
+      // for 4 sysclk, CWR_hold stayed 0, CUP_n stayed 1. Every cache write
+      // was lost that way and CACHE-1X0-A00 test 2 reported "CUP does not
+      // work", the same verdict as the Nexys board.
+      //
+      // Now CWR_hold is updated on EVERY sysclk: it sets on MREQ * WCA and
+      // holds while CLK is low, exactly the listing's CWR * /CLK term at
+      // sysclk resolution. At the EN sample CLK is still low (CLK_EN is the
+      // cycle BEFORE the rise, see CYC_36.v), so CUP sees the held CWR.
+      // This is the USE_LATCHES=0 path the FPGA builds; PAL_44511A.v (the
+      // latch-mode twin) models the same latch level-sensitively.
+      wire CWR = (MREQ & WCA) | (CWR_hold & CLK_n);
+
+      // LEVEL ZERO
+      assign LEV0 = ~(PIL3 | PIL2 | PIL1 | PIL0);
+
+
+      // Sequential logic - equations identical to PAL_44511A.v,
+      // captured on the enable instead of posedge CK.
+      always @(posedge sysclk) begin
+        // CWR hold latch at sysclk rate - NOT gated by EN (see above): set on
+        // MREQ * WCA, kept while CLK is low, dies once CLK is high.
+        CWR_hold <= (MREQ & WCA) | (CWR_hold & CLK_n);
+
+        if (EN) begin
+
+          // Logic for CUP (ADDED CACHE UPDATE BIT). 44511A OCR/PNG (registered):
+          //   /CUP := /CWR * MREQ + /CUP * /MREQ
+          //   (intent: CUP := CWR*MREQ + CUP*/MREQ - SET on write-to-cache, hold until next MREQ).
+          // Fix 26-JUL: the prior if/else had the MREQ polarity flipped (CWR_n & MREQ_n),
+          // so CUP was never set on a cache write and spuriously set when idle -> the
+          // CACHE-1X0 diagnostic reported "Cache updated bit: Not working".
+          CUP_n_reg <= (~CWR & MREQ) | (CUP_n_reg & MREQ_n);
+        end
+      end
+
+      // PIN 19 POLARITY (29-AUG-2026, 23:30) - THE CACHE'S FAULT 2.
+      //
+      // MEASURED (runSim, CACHE-1X0-A00 test 2, per-clock log of the test's
+      // read of the word it had just written): both tag comparators match,
+      // the used bit is set and valid, RT and DT are asserted, no write is
+      // in progress - and sheet 25's HIT stays 0 on every clock of the
+      // cycle. The only HIT input left is this pin. Same six test-2 lines on
+      // the Nexys with everything else fixed, so it is not a model artefact.
+      //
+      // THE HARDWARE. Sheet 25: HIT is the output of a 74S260 5-input NOR
+      // (21H) whose inputs are USED~, HIT~1, HIT~0, the net CWR and ground -
+      // HIT is high only when ALL of them are LOW. Sheet 34: net CWR is pin
+      // 19 of this PAL, wired straight to the connector, no inverter. So on
+      // the real board pin 19 must be LOW on a normal read and go HIGH only
+      // across a cache write (MREQ * WCA, held until CLK) - that is the pin
+      // FOLLOWING the listing's CWR expression, not its complement.
+      //
+      // This file used to drive the complement ("/CWR is active low, pin =
+      // ~CWR", the convention the 44402D's /USED and /WCA pins follow and
+      // which is right for them). For this pin that makes HIT possible only
+      // WHILE the cache is being written, i.e. never on a read: every read
+      // ran the full memory cycle and took the memory word, exactly the
+      // "DATA is taken FROM MEMORY when present in DATA CACHE" family of
+      // errors. The listing's naming and the schematic's naming disagree on
+      // this net (the listing calls the pin /CWR, both sheets call the net
+      // CWR with no ~), and the measurement decides: the pin follows CWR.
+      // The CUP equation below uses the internal CWR and is unaffected.
+      // outputs
+      assign CWR_n = OE_n ? 1'b0 : CWR;   // pin 19 follows CWR - see the note above
+      assign CUP   = OE_n ? 1'b0 : ~CUP_n_reg;
+    end else begin : gen_orig
+      /* verilator lint_off UNUSEDSIGNAL */
+      wire unused_sys = sysclk & EN;
+      /* verilator lint_on UNUSEDSIGNAL */
+      PAL_44511A PAL (
+          .CK(CK),
+          .OE_n(OE_n),
+          .PIL0(PIL0),
+          .PIL1(PIL1),
+          .PIL2(PIL2),
+          .PIL3(PIL3),
+          .CLK(CLK),
+          .MREQ_n(MREQ_n),
+          .WCA_n(WCA_n),
+          .CUP(CUP),
+          .CWR_n(CWR_n),
+          .LEV0(LEV0)
+      );
+    end
+  endgenerate
+
+endmodule
+```
+
+</details>

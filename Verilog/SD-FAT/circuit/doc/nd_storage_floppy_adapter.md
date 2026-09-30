@@ -19,6 +19,16 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_floppy_adapter.v`
 
 ![nd_storage_floppy_adapter symbol](nd_storage_floppy_adapter.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Tang Nano 20K build, instance `TAPE_SDFAT_SOURCE.gen_floppy.u_floppy_adapter`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd_storage_floppy_adapter schematic](nd_storage_floppy_adapter.svg)](nd_storage_floppy_adapter.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Parameters
 
 | Parameter | Default |
@@ -30,7 +40,7 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_floppy_adapter.v`
 | Direction | Width | Name | Description |
 |---|---|---|---|
 | input | `1` | `clk_cpu` |  |
-| input | `1` | `rst_n` *(active low)* |  |
+| input | `1` | `rst_n` *(active low)* | Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n) |
 | input | `1` | `disk_req` | 1-cycle pulse: move one sector |
 | input | `1` | `disk_wr` | 0 = image -> buffer, 1 = buffer -> image |
 | input | `[15:0]` | `disk_lsect` | logical sector |
@@ -60,3 +70,363 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_floppy_adapter.v`
 | input | `[15:0]` | `c_buf_wdata` |  |
 | input | `1` | `c_buf_we` |  |
 | output | `[15:0]` | `c_buf_rdata` | registered read (engine gives 2 cycles) |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/nd_storage_floppy_adapter.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/nd_storage_floppy_adapter.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd_storage_floppy_adapter (348 lines)</summary>
+
+```verilog
+`include "nd_storage_status.vh"
+/****************************************************************************
+** nd_storage_floppy_adapter - block adapter for the DMA floppy backend    **
+**                                                                         **
+** Design doc: Verilog/docs/nd-storage-design.md section 2.6 (step 8,      **
+** retargeted 11-JUL: the DMA controller's disk_* backend port, NOT the    **
+** PIO sector port); spec Verilog/docs/nd-storage-interface-spec.md        **
+** section 4 (client contract) and section 9 acceptance test 6.            **
+**                                                                         **
+** Sits between ND_FLOPPY_DMA's disk-image backend port (pin-for-pin, see  **
+** Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v) and ONE      **
+** nd_storage client port. Single clock: clk_cpu (the client-port domain   **
+** - the CDC lives inside nd_storage).                                     **
+**                                                                         **
+** THE ACTUAL DEVICE CONTRACT (read from the source, 11-JUL): one          **
+** LOGICAL SECTOR per request, not 1K-word chunks:                         **
+**   disk_req        in   1-cycle pulse: move one sector                   **
+**   disk_wr         in   0 = image -> device buffer, 1 = buffer -> image  **
+**   disk_lsect      in   [15:0] logical sector number                     **
+**   disk_format     in   [1:0]  0=256w 1=128w 2=64w 3=512w per sector     **
+**   disk_drive      in   [1:0]  drive select (command word bits 7:6)      **
+**   disk_wordcount  in   [10:0] words to move (= words per sector)        **
+**   disk_done       out  1-cycle pulse (device waits on it as a level)    **
+**   disk_err        out  valid with disk_done (device disk_err_in)        **
+**   dbuf_addr/wdata/we out: fill the device's 1024x16 sector buffer       **
+**                          (read direction)                               **
+**   dbuf_rdata      in   device buffer readout (combinational in the      **
+**                        device; sampled here with a settle cycle)        **
+** All request fields are registered in the device and stable from the     **
+** disk_req pulse until disk_done.                                         **
+**                                                                         **
+** DRIVE SELECT (parameter DRIVE): one adapter instance serves ONE drive   **
+** (FLOPPY1.IMG = client 1 = DRIVE 0, FLOPPY2.IMG = client 2 = DRIVE 1).   **
+** A request with disk_drive != DRIVE is ignored COMPLETELY (all outputs   **
+** stay 0), so two instances can share the controller's disk_* outputs     **
+** with their disk_done/disk_err/dbuf_* outputs OR-combined. The '1560&'   **
+** boot path always uses drive 0 (the boot command word is 16'h0300).      **
+**                                                                         **
+** Block math: linear word offset = disk_lsect << log2(words/sector);      **
+** client block = offset[24:10], word-in-block = offset[9:0]. Every        **
+** sector size divides 1024, so a sector NEVER crosses a block boundary.   **
+**                                                                         **
+** READ:  block hit (s_have_blk, s_cur_blk match) -> serve from the local  **
+**        1024x16 buffer; miss -> one c_req block read, then serve         **
+**        disk_wordcount words to the device buffer via dbuf_*.            **
+** WRITE: read-modify-write - fetch the containing block (unless cached    **
+**        or the request is a full aligned block), overlay the device's    **
+**        words (dbuf_addr walk with a settle cycle), then one c_req       **
+**        write. The local buffer stays valid as the block cache after a   **
+**        successful commit.                                               **
+** Word order: client words ARE ND words - no byte swizzling here          **
+** (design doc 4.1: the big-endian byte packing happens below the client   **
+** port).                                                                  **
+**                                                                         **
+** Errors (disk_done WITH disk_err, never a wedge, always retryable):      **
+**   - file not open (c_open_ok low)                                       **
+**   - out of range: read end past c_size_bytes; for WRITES the whole      **
+**     containing block must lie inside the file ((block+1)*2048 <=        **
+**     c_size_bytes) - the step-6 HARD RULE: never write the partial tail  **
+**     block of a file whose size is not a 2048-byte multiple (the CMD24s  **
+**     would spill past the cluster chain). Floppy images are block        **
+**     multiples, so in-range requests are never refused.                  **
+**   - c_err from nd_storage (SD failure): block cache dropped, the        **
+**     request errors out cleanly; the next disk_req simply retries.       **
+**                                                                         **
+** open_start is a pulse from the board/boot logic; it is passed through   **
+** as a c_open_req pulse (nd_storage ignores it while the port is busy).   **
+**                                                                         **
+** Last reviewed: 11-JUL-2026                                              **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module nd_storage_floppy_adapter #(
+    parameter [1:0] DRIVE = 2'd0  // disk_drive value this instance serves
+) (
+    input wire clk_cpu,
+    input wire rst_n,                   //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
+
+    // Disk-image backend port (to ND_FLOPPY_DMA, pin-for-pin)
+    input  wire        disk_req,        // 1-cycle pulse: move one sector
+    input  wire        disk_wr,         // 0 = image -> buffer, 1 = buffer -> image
+    input  wire [15:0] disk_lsect,      // logical sector
+    input  wire [ 1:0] disk_format,     // 0=256w 1=128w 2=64w 3=512w
+    input  wire [ 1:0] disk_drive,      // drive select
+    input  wire [10:0] disk_wordcount,  // words to move
+    output reg         disk_done,       // 1-cycle pulse
+    output reg         disk_err,        // valid with disk_done
+    // WHY it failed, valid with disk_done (nd_storage_status.vh). The
+    // controller maps this onto a status bit ITS OWN MANUAL defines - it
+    // never invents one - so the guest can tell a missing card from a
+    // missing file from a sector past the end of the image.
+    output reg  [ 3:0] disk_err_code,
+    output reg  [ 9:0] dbuf_addr,       // device sector buffer fill (reads)
+    output reg  [15:0] dbuf_wdata,
+    output reg         dbuf_we,
+    input  wire [15:0] dbuf_rdata,      // device sector buffer readout (writes)
+
+    // Board/boot control
+    input wire open_start,  // 1-cycle pulse: (re)open the image file
+
+    // nd_storage client port (one client, clk_cpu domain)
+    output reg         c_open_req,
+    input  wire        c_open_ok,
+    input  wire        c_open_err,
+    input  wire [31:0] c_size_bytes,
+    output reg         c_req,
+    output reg         c_wr,
+    output reg  [15:0] c_block,
+    input  wire        c_busy,
+    input  wire        c_done,          // 1-cycle pulse
+    input  wire        c_err,           // valid with c_done
+    input  wire [ 3:0] c_err_code,      // valid with c_done when c_err
+    input  wire [ 9:0] c_buf_addr,
+    input  wire [15:0] c_buf_wdata,
+    input  wire        c_buf_we,
+    output reg  [15:0] c_buf_rdata      // registered read (engine gives 2 cycles)
+);
+
+  // Local copy of the current block (BRAM): written by the client port
+  // during a fetch AND by the write-overlay walk (ONE write port, the two
+  // sources are mutually exclusive by FSM construction); read back to
+  // serve the device (reads) and to feed c_buf_rdata (write commit).
+  reg [15:0] s_blkbuf[0:1023];
+
+  // ---- request decode (combinational on the disk_req cycle) -------------
+  wire [3:0] s_shift = (disk_format == 2'd0) ? 4'd8 :
+                       (disk_format == 2'd1) ? 4'd7 :
+                       (disk_format == 2'd2) ? 4'd6 : 4'd9;
+  wire [24:0] s_lin_words = {9'd0, disk_lsect} << s_shift;  // word offset in file
+  wire [15:0] s_req_blk   = {1'b0, s_lin_words[24:10]};     // containing block
+  wire [ 9:0] s_req_woff  = s_lin_words[9:0];               // word offset in block
+
+  // read: the transfer must end inside the file (bytes)
+  wire [31:0] s_rd_end_bytes = ({7'd0, s_lin_words} + {21'd0, disk_wordcount}) << 1;
+  // write: the WHOLE containing block must lie inside the file (step-6 rule)
+  wire [31:0] s_wr_end_bytes = ({16'd0, s_req_blk} + 32'd1) << 11;
+  // local buffer overflow guard (a consistent device never trips this)
+  wire [11:0] s_span = {2'd0, s_req_woff} + {1'd0, disk_wordcount};
+
+  // The three refusals kept apart, so the reason survives to the guest
+  // instead of collapsing into one anonymous error bit.
+  wire s_notopen = !c_open_ok;
+  wire s_straddle = (s_span > 12'd1024);   // sector crosses a block boundary
+  wire s_oor = disk_wr ? (s_wr_end_bytes > c_size_bytes)
+                       : (s_rd_end_bytes > c_size_bytes);
+
+  wire s_bad = s_notopen | s_straddle | s_oor;
+
+  // full aligned block write: no read-modify-write pre-read needed
+  wire s_direct = (s_req_woff == 10'd0) && (disk_wordcount == 11'd1024);
+
+  // ---- FSM ---------------------------------------------------------------
+  localparam [3:0] F_IDLE  = 4'd0,  // wait for a matching disk_req
+                   F_CREQ  = 4'd1,  // wait !c_busy, pulse c_req
+                   F_CWAIT = 4'd2,  // client op in flight, wait c_done
+                   F_SRV1  = 4'd3,  // read serve: registered buffer read
+                   F_SRV2  = 4'd4,  // read serve: dbuf write strobe
+                   F_PULL1 = 4'd5,  // write overlay: present dbuf_addr
+                   F_PULL2 = 4'd6,  // write overlay: settle cycle
+                   F_PULL3 = 4'd7,  // write overlay: sample dbuf_rdata
+                   F_DONE  = 4'd8;  // pulse disk_done (+disk_err)
+
+  reg [ 3:0] s_state;
+  reg        s_op_wr;     // latched disk_wr
+  reg [10:0] s_wc;        // latched disk_wordcount
+  reg [ 9:0] s_woff;      // latched word offset in block
+  reg [15:0] s_blk;       // latched target block
+  reg [10:0] s_idx;       // word index within the transfer
+  reg [15:0] s_word;      // registered local-buffer read data
+  reg [15:0] s_cur_blk;   // block number held in s_blkbuf
+  reg        s_have_blk;  // s_blkbuf/s_cur_blk are valid
+  reg        s_commit;    // write phase: 0 = RMW pre-read, 1 = commit write
+  reg        s_err_q;     // error verdict for the F_DONE pulse
+  reg [ 3:0] s_code_q;    // and WHY, for the same pulse
+
+  // block buffer: single write port (client fetch stream has priority;
+  // the overlay walk only runs while the client port is idle), plus a
+  // registered read for the commit path (the engine gives 2 cycles)
+  always @(posedge clk_cpu) begin
+    if (c_buf_we) s_blkbuf[c_buf_addr] <= c_buf_wdata;
+    else if (s_state == F_PULL3) s_blkbuf[s_woff + s_idx[9:0]] <= dbuf_rdata;
+    c_buf_rdata <= s_blkbuf[c_buf_addr];
+  end
+
+  always @(posedge clk_cpu or negedge rst_n) begin
+    if (!rst_n) begin
+      disk_done  <= 1'b0;
+      disk_err   <= 1'b0;
+      dbuf_addr  <= 10'd0;
+      dbuf_wdata <= 16'd0;
+      dbuf_we    <= 1'b0;
+      c_open_req <= 1'b0;
+      c_req      <= 1'b0;
+      c_wr       <= 1'b0;
+      c_block    <= 16'd0;
+      s_state    <= F_IDLE;
+      s_op_wr    <= 1'b0;
+      s_wc       <= 11'd0;
+      s_woff     <= 10'd0;
+      s_blk      <= 16'd0;
+      s_idx      <= 11'd0;
+      s_word     <= 16'd0;
+      s_cur_blk  <= 16'd0;
+      s_have_blk <= 1'b0;
+      s_commit   <= 1'b0;
+      s_err_q    <= 1'b0;
+      s_code_q      <= `NDS_ERR_NONE;
+      disk_err_code <= `NDS_ERR_NONE;
+    end else begin
+      disk_done  <= 1'b0;
+      disk_err   <= 1'b0;
+      dbuf_we    <= 1'b0;
+      c_req      <= 1'b0;
+      c_open_req <= 1'b0;
+
+      if (open_start) c_open_req <= 1'b1;
+
+      case (s_state)
+        F_IDLE: begin
+          // idle outputs parked at 0 so two instances can OR their pins
+          dbuf_addr  <= 10'd0;
+          dbuf_wdata <= 16'd0;
+          if (disk_req && (disk_drive == DRIVE)) begin
+            s_op_wr <= disk_wr;
+            s_wc    <= disk_wordcount;
+            s_woff  <= s_req_woff;
+            s_blk   <= s_req_blk;
+            s_idx   <= 11'd0;
+            if (s_bad) begin
+              s_err_q  <= 1'b1;
+              s_code_q <= s_notopen  ? `NDS_ERR_NOTOPEN
+                        : s_oor      ? `NDS_ERR_RANGE
+                                     : `NDS_ERR_WRALIGN;  // straddle
+              s_state <= F_DONE;
+            end else if (disk_wordcount == 11'd0) begin
+              s_err_q  <= 1'b0;         // nothing to move: clean completion
+              s_code_q <= `NDS_ERR_NONE;
+              s_state <= F_DONE;
+            end else if (disk_wr) begin
+              // the buffer is about to mutate: the cache is invalid until
+              // the commit lands (re-established at c_done without error)
+              s_have_blk <= 1'b0;
+              s_commit   <= 1'b0;
+              if (s_direct || (s_have_blk && (s_cur_blk == s_req_blk))) begin
+                s_state <= F_PULL1;     // cache (or full block): overlay now
+              end else begin
+                s_state <= F_CREQ;      // RMW pre-read first
+              end
+            end else begin
+              if (s_have_blk && (s_cur_blk == s_req_blk)) begin
+                s_state <= F_SRV1;      // cache hit: serve directly
+              end else begin
+                s_state <= F_CREQ;      // fetch, then serve
+              end
+            end
+          end
+        end
+
+        // pulse c_req as soon as the port is free (req while busy is lost)
+        F_CREQ: begin
+          if (!c_busy) begin
+            c_req   <= 1'b1;
+            c_wr    <= s_op_wr && s_commit;
+            c_block <= s_blk;
+            s_state <= F_CWAIT;
+          end
+        end
+
+        F_CWAIT: begin
+          if (c_done) begin
+            if (c_err) begin
+              s_have_blk <= 1'b0;       // cache is suspect: drop it
+              s_err_q    <= 1'b1;
+              s_code_q   <= c_err_code; // pass the storage stack's reason on
+              s_state    <= F_DONE;
+            end else if (s_op_wr && s_commit) begin
+              s_have_blk <= 1'b1;       // committed: buffer == block content
+              s_cur_blk  <= s_blk;
+              s_err_q    <= 1'b0;
+              s_code_q   <= `NDS_ERR_NONE;
+              s_state    <= F_DONE;
+            end else if (s_op_wr) begin
+              s_state <= F_PULL1;       // RMW pre-read landed: overlay next
+            end else begin
+              s_have_blk <= 1'b1;       // read fetch landed
+              s_cur_blk  <= s_blk;
+              s_state    <= F_SRV1;
+            end
+          end
+        end
+
+        // ---- read serve: local buffer -> device buffer, 2 cycles/word ----
+        F_SRV1: begin
+          s_word  <= s_blkbuf[s_woff + s_idx[9:0]];
+          s_state <= F_SRV2;
+        end
+
+        F_SRV2: begin
+          dbuf_addr  <= s_idx[9:0];
+          dbuf_wdata <= s_word;
+          dbuf_we    <= 1'b1;
+          if (s_idx + 11'd1 >= s_wc) begin
+            s_err_q  <= 1'b0;
+            s_code_q <= `NDS_ERR_NONE;
+            s_state <= F_DONE;
+          end else begin
+            s_idx   <= s_idx + 11'd1;
+            s_state <= F_SRV1;
+          end
+        end
+
+        // ---- write overlay: device buffer -> local buffer, 3 cycles/word --
+        // (address, settle, sample - the device's dbuf_rdata is
+        // combinational, a registered backend would answer one cycle later;
+        // the held address makes both correct)
+        F_PULL1: begin
+          dbuf_addr <= s_idx[9:0];
+          s_state   <= F_PULL2;
+        end
+
+        F_PULL2: s_state <= F_PULL3;
+
+        F_PULL3: begin
+          // the buffer write itself happens in the memory block above
+          if (s_idx + 11'd1 >= s_wc) begin
+            s_commit <= 1'b1;           // overlay complete: commit the block
+            s_state  <= F_CREQ;
+          end else begin
+            s_idx   <= s_idx + 11'd1;
+            s_state <= F_PULL1;
+          end
+        end
+
+        F_DONE: begin
+          disk_done  <= 1'b1;
+          disk_err   <= s_err_q;
+          disk_err_code <= s_code_q;
+          dbuf_addr  <= 10'd0;
+          dbuf_wdata <= 16'd0;
+          s_state    <= F_IDLE;
+        end
+
+        default: s_state <= F_IDLE;
+      endcase
+    end
+  end
+
+endmodule
+```
+
+</details>

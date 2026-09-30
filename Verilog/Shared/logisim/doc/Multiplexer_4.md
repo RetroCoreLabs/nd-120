@@ -19,6 +19,16 @@ Source: `Verilog/Shared/logisim/Multiplexer_4.v`
 
 ![Multiplexer_4 symbol](Multiplexer_4.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.MIC.ILC_MUX.PLEXERS_1`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![Multiplexer_4 schematic](Multiplexer_4.svg)](Multiplexer_4.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Component : Multiplexer_4
@@ -35,3 +45,42 @@ Refactored 03.12.2023 Ronny Hansen
 | input | `1` | `muxIn_3` |  |
 | input | `[1:0]` | `sel` |  |
 | output | `1` | `muxOut` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/Multiplexer_4.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/Multiplexer_4.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of Multiplexer_4 (27 lines)</summary>
+
+```verilog
+/******************************************************************************
+ **                                                                          **
+ ** Component : Multiplexer_4                                                **
+ ** Functionality: 4-to-1 multiplexer                                        **
+ ** Refactored 03.12.2023 Ronny Hansen                                       **
+ *****************************************************************************/
+
+module Multiplexer_4(
+    input wire muxIn_0,
+    input wire muxIn_1,
+    input wire muxIn_2,
+    input wire muxIn_3,
+    input wire [1:0] sel,
+    output reg muxOut
+);
+
+    // Combinational logic to select the output based on 'sel'
+    always @(*) begin
+        case(sel)
+            2'b00: muxOut = muxIn_0; // Select input 0
+            2'b01: muxOut = muxIn_1; // Select input 1
+            2'b10: muxOut = muxIn_2; // Select input 2
+            2'b11: muxOut = muxIn_3; // Select input 3
+            default: muxOut = 1'bx;  // Undefined state
+        endcase
+    end
+endmodule
+```
+
+</details>

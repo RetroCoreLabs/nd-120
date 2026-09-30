@@ -1,0 +1,617 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4053.0" height="4126.0" viewBox="-80.0 -80.0 4053.0 4126.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="4053.0" height="4126.0" fill="#ffffff" /><g transform="translate(2420,181.5)" id="cell_$procdff$39491"><text x="15" y="-4" class="nodelabel cell_$procdff$39491">$adff</text><rect width="30" height="60" class="cell_$procdff$39491" /><g transform="translate(0,10)" id="port_$procdff$39491~ARST"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$39491">ARST</text></g><g transform="translate(0,30)" id="port_$procdff$39491~CLK"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$39491">CLK</text></g><g transform="translate(0,50)" id="port_$procdff$39491~D"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$39491">D</text></g><g transform="translate(30,10)" id="port_$procdff$39491~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_$procdff$39491">Q</text></g></g>
+<g transform="translate(3256,2311)" id="cell_$procdff$39496"><text x="15" y="-4" class="nodelabel cell_$procdff$39496">$adff</text><rect width="30" height="60" class="cell_$procdff$39496" /><g transform="translate(0,10)" id="port_$procdff$39496~ARST"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$39496">ARST</text></g><g transform="translate(0,30)" id="port_$procdff$39496~CLK"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$39496">CLK</text></g><g transform="translate(0,50)" id="port_$procdff$39496~D"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$39496">D</text></g><g transform="translate(30,10)" id="port_$procdff$39496~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_$procdff$39496">Q</text></g></g>
+<g transform="translate(2686.6666666666665,1267)" id="cell_$procmux$37094"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$37094" /><g /><g /><g /><g /></g>
+<g transform="translate(3772,12)" id="cell_$procmux$37096"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$37096" /><g /><g /><g /><g /></g>
+<a href="nd_storage_tape_adapter.md"><title>gen_tape.u_tape_adapter (nd_storage_tape_adapter) - open its page</title><g transform="translate(3499,1573.5)" id="cell_gen_tape.u_tape_adapter"><text x="15" y="-4" class="nodelabel cell_gen_tape.u_tape_adapter">nd_storage_tape_adapter</text><rect width="30" height="300" class="cell_gen_tape.u_tape_adapter" /><g transform="translate(0,10)" id="port_gen_tape.u_tape_adapter~byte_req"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">byte_req</text></g><g transform="translate(0,30)" id="port_gen_tape.u_tape_adapter~c_buf_addr"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_buf_addr</text></g><g transform="translate(0,50)" id="port_gen_tape.u_tape_adapter~c_buf_wdata"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_buf_wdata</text></g><g transform="translate(0,70)" id="port_gen_tape.u_tape_adapter~c_buf_we"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_buf_we</text></g><g transform="translate(0,90)" id="port_gen_tape.u_tape_adapter~c_busy"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_busy</text></g><g transform="translate(0,110)" id="port_gen_tape.u_tape_adapter~c_done"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_done</text></g><g transform="translate(0,130)" id="port_gen_tape.u_tape_adapter~c_err"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_err</text></g><g transform="translate(0,150)" id="port_gen_tape.u_tape_adapter~c_err_code"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_err_code</text></g><g transform="translate(0,170)" id="port_gen_tape.u_tape_adapter~c_open_err"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_open_err</text></g><g transform="translate(0,190)" id="port_gen_tape.u_tape_adapter~c_open_ok"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_open_ok</text></g><g transform="translate(0,210)" id="port_gen_tape.u_tape_adapter~c_size_bytes"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">c_size_bytes</text></g><g transform="translate(0,230)" id="port_gen_tape.u_tape_adapter~clk_cpu"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">clk_cpu</text></g><g transform="translate(0,250)" id="port_gen_tape.u_tape_adapter~open_start"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">open_start</text></g><g transform="translate(0,270)" id="port_gen_tape.u_tape_adapter~rst_n"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">rst_n</text></g><g transform="translate(0,290)" id="port_gen_tape.u_tape_adapter~source_rewind"><text x="-3" y="-4" class="inputPortLabel cell_gen_tape.u_tape_adapter">source_rewind</text></g><g transform="translate(30,10)" id="port_gen_tape.u_tape_adapter~byte_data"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">byte_data</text></g><g transform="translate(30,30)" id="port_gen_tape.u_tape_adapter~byte_valid"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">byte_valid</text></g><g transform="translate(30,50)" id="port_gen_tape.u_tape_adapter~c_block"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">c_block</text></g><g transform="translate(30,70)" id="port_gen_tape.u_tape_adapter~c_buf_rdata"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">c_buf_rdata</text></g><g transform="translate(30,90)" id="port_gen_tape.u_tape_adapter~c_open_req"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">c_open_req</text></g><g transform="translate(30,110)" id="port_gen_tape.u_tape_adapter~c_req"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">c_req</text></g><g transform="translate(30,130)" id="port_gen_tape.u_tape_adapter~c_wr"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">c_wr</text></g><g transform="translate(30,150)" id="port_gen_tape.u_tape_adapter~fault"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">fault</text></g><g transform="translate(30,170)" id="port_gen_tape.u_tape_adapter~fault_code"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_tape.u_tape_adapter">fault_code</text></g></g></a>
+<a href="nd_storage.md"><title>u_nd_storage (nd_storage) - open its page</title><g transform="translate(2675,389)" id="cell_u_nd_storage"><text x="15" y="-4" class="nodelabel cell_u_nd_storage">nd_storage</text><rect width="30" height="840" class="cell_u_nd_storage" /><g transform="translate(0,10)" id="port_u_nd_storage~block"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">block</text></g><g transform="translate(0,30)" id="port_u_nd_storage~buf_rdata"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">buf_rdata</text></g><g transform="translate(0,50)" id="port_u_nd_storage~clk_cpu"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">clk_cpu</text></g><g transform="translate(0,70)" id="port_u_nd_storage~clk_stor"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">clk_stor</text></g><g transform="translate(0,90)" id="port_u_nd_storage~mem_busy"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">mem_busy</text></g><g transform="translate(0,110)" id="port_u_nd_storage~mem_done"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">mem_done</text></g><g transform="translate(0,130)" id="port_u_nd_storage~mem_rdata"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">mem_rdata</text></g><g transform="translate(0,150)" id="port_u_nd_storage~open_req"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">open_req</text></g><g transform="translate(0,170)" id="port_u_nd_storage~req"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">req</text></g><g transform="translate(0,190)" id="port_u_nd_storage~rst_cpu_n"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">rst_cpu_n</text></g><g transform="translate(0,210)" id="port_u_nd_storage~rst_stor_n"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">rst_stor_n</text></g><g transform="translate(0,230)" id="port_u_nd_storage~sd_cmd_i"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">sd_cmd_i</text></g><g transform="translate(0,250)" id="port_u_nd_storage~sd_dat0_i"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">sd_dat0_i</text></g><g transform="translate(0,270)" id="port_u_nd_storage~sd_dat1_i"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">sd_dat1_i</text></g><g transform="translate(0,290)" id="port_u_nd_storage~sd_dat2_i"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">sd_dat2_i</text></g><g transform="translate(0,310)" id="port_u_nd_storage~sd_dat3_i"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">sd_dat3_i</text></g><g transform="translate(0,330)" id="port_u_nd_storage~wr"><text x="-3" y="-4" class="inputPortLabel cell_u_nd_storage">wr</text></g><g transform="translate(30,10)" id="port_u_nd_storage~buf_addr"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">buf_addr</text></g><g transform="translate(30,30)" id="port_u_nd_storage~buf_wdata"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">buf_wdata</text></g><g transform="translate(30,50)" id="port_u_nd_storage~buf_we"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">buf_we</text></g><g transform="translate(30,70)" id="port_u_nd_storage~busy"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">busy</text></g><g transform="translate(30,90)" id="port_u_nd_storage~card_type"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">card_type</text></g><g transform="translate(30,110)" id="port_u_nd_storage~dbg_bufw"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_bufw</text></g><g transform="translate(30,130)" id="port_u_nd_storage~dbg_bufwe"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_bufwe</text></g><g transform="translate(30,150)" id="port_u_nd_storage~dbg_cache_pend"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_cache_pend</text></g><g transform="translate(30,170)" id="port_u_nd_storage~dbg_fsec"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_fsec</text></g><g transform="translate(30,190)" id="port_u_nd_storage~dbg_grant"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_grant</text></g><g transform="translate(30,210)" id="port_u_nd_storage~dbg_lba"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_lba</text></g><g transform="translate(30,230)" id="port_u_nd_storage~dbg_past_eof"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_past_eof</text></g><g transform="translate(30,250)" id="port_u_nd_storage~dbg_rdata"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_rdata</text></g><g transform="translate(30,270)" id="port_u_nd_storage~dbg_rx_byte"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_rx_byte</text></g><g transform="translate(30,290)" id="port_u_nd_storage~dbg_rx_raw"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_rx_raw</text></g><g transform="translate(30,310)" id="port_u_nd_storage~dbg_rx_stb"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_rx_stb</text></g><g transform="translate(30,330)" id="port_u_nd_storage~dbg_sd_busy"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_sd_busy</text></g><g transform="translate(30,350)" id="port_u_nd_storage~dbg_state"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_state</text></g><g transform="translate(30,370)" id="port_u_nd_storage~dbg_wdata"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">dbg_wdata</text></g><g transform="translate(30,390)" id="port_u_nd_storage~done"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">done</text></g><g transform="translate(30,410)" id="port_u_nd_storage~err"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">err</text></g><g transform="translate(30,430)" id="port_u_nd_storage~err_code"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">err_code</text></g><g transform="translate(30,450)" id="port_u_nd_storage~fs_type"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">fs_type</text></g><g transform="translate(30,470)" id="port_u_nd_storage~mem_addr"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">mem_addr</text></g><g transform="translate(30,490)" id="port_u_nd_storage~mem_start"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">mem_start</text></g><g transform="translate(30,510)" id="port_u_nd_storage~mem_wdata"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">mem_wdata</text></g><g transform="translate(30,530)" id="port_u_nd_storage~mem_we"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">mem_we</text></g><g transform="translate(30,550)" id="port_u_nd_storage~open_err"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">open_err</text></g><g transform="translate(30,570)" id="port_u_nd_storage~open_ok"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">open_ok</text></g><g transform="translate(30,590)" id="port_u_nd_storage~sd_clk_o"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_clk_o</text></g><g transform="translate(30,610)" id="port_u_nd_storage~sd_cmd_o"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_cmd_o</text></g><g transform="translate(30,630)" id="port_u_nd_storage~sd_cmd_oe"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_cmd_oe</text></g><g transform="translate(30,650)" id="port_u_nd_storage~sd_dat0_o"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_dat0_o</text></g><g transform="translate(30,670)" id="port_u_nd_storage~sd_dat0_oe"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_dat0_oe</text></g><g transform="translate(30,690)" id="port_u_nd_storage~sd_dat1_o"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_dat1_o</text></g><g transform="translate(30,710)" id="port_u_nd_storage~sd_dat1_oe"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_dat1_oe</text></g><g transform="translate(30,730)" id="port_u_nd_storage~sd_dat2_o"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_dat2_o</text></g><g transform="translate(30,750)" id="port_u_nd_storage~sd_dat2_oe"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_dat2_oe</text></g><g transform="translate(30,770)" id="port_u_nd_storage~sd_dat3_o"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_dat3_o</text></g><g transform="translate(30,790)" id="port_u_nd_storage~sd_dat3_oe"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_dat3_oe</text></g><g transform="translate(30,810)" id="port_u_nd_storage~sd_status"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">sd_status</text></g><g transform="translate(30,830)" id="port_u_nd_storage~size_bytes"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_u_nd_storage">size_bytes</text></g></g></a>
+<g transform="translate(2420,289.5)" id="cell_clk_stor"><text x="15" y="-4" class="nodelabel cell_clk_stor">clk_stor</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_clk_stor" /><g /></g>
+<g transform="translate(2420,600.5)" id="cell_rst_stor_n"><text x="15" y="-4" class="nodelabel cell_rst_stor_n">rst_stor_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_rst_stor_n" /><g /></g>
+<g transform="translate(2301,117)" id="cell_clk_cpu"><text x="15" y="-4" class="nodelabel cell_clk_cpu">clk_cpu</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_clk_cpu" /><g /></g>
+<g transform="translate(2301,182)" id="cell_rst_cpu_n"><text x="15" y="-4" class="nodelabel cell_rst_cpu_n">rst_cpu_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_rst_cpu_n" /><g /></g>
+<g transform="translate(3256,1400.5)" id="cell_byte_req"><text x="15" y="-4" class="nodelabel cell_byte_req">byte_req</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_byte_req" /><g /></g>
+<g transform="translate(3771,1639)" id="cell_byte_valid"><text x="15" y="-4" class="nodelabel cell_byte_valid">byte_valid</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_byte_valid" /><g /></g>
+<g transform="translate(3772,1574)" id="cell_byte_data"><text x="15" y="-4" class="nodelabel cell_byte_data">byte_data</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_byte_data" /><g /></g>
+<g transform="translate(3256,2419)" id="cell_source_rewind"><text x="15" y="-4" class="nodelabel cell_source_rewind">source_rewind</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_source_rewind" /><g /></g>
+<g transform="translate(3765,2140)" id="cell_TDISK_FAULT"><text x="15" y="-4" class="nodelabel cell_TDISK_FAULT">TDISK_FAULT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_TDISK_FAULT" /><g /></g>
+<g transform="translate(3747,2205)" id="cell_TDISK_ERR_CODE"><text x="15" y="-4" class="nodelabel cell_TDISK_ERR_CODE">TDISK_ERR_CODE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_TDISK_ERR_CODE" /><g /></g>
+<g transform="translate(192,22)" id="cell_FDISK_REQ"><text x="15" y="-4" class="nodelabel cell_FDISK_REQ">FDISK_REQ</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FDISK_REQ" /><g /></g>
+<g transform="translate(12,22)" id="cell_FDISK_WR"><text x="15" y="-4" class="nodelabel cell_FDISK_WR">FDISK_WR</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FDISK_WR" /><g /></g>
+<g transform="translate(534,22)" id="cell_FDISK_LSECT"><text x="15" y="-4" class="nodelabel cell_FDISK_LSECT">FDISK_LSECT</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FDISK_LSECT" /><g /></g>
+<g transform="translate(1080,22)" id="cell_FDISK_FORMAT"><text x="15" y="-4" class="nodelabel cell_FDISK_FORMAT">FDISK_FORMAT</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FDISK_FORMAT" /><g /></g>
+<g transform="translate(612,22)" id="cell_FDISK_DRIVE"><text x="15" y="-4" class="nodelabel cell_FDISK_DRIVE">FDISK_DRIVE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FDISK_DRIVE" /><g /></g>
+<g transform="translate(1548,22)" id="cell_FDISK_WORDCOUNT"><text x="15" y="-4" class="nodelabel cell_FDISK_WORDCOUNT">FDISK_WORDCOUNT</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FDISK_WORDCOUNT" /><g /></g>
+<g transform="translate(3771,3934)" id="cell_FDISK_DONE"><text x="15" y="-4" class="nodelabel cell_FDISK_DONE">FDISK_DONE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FDISK_DONE" /><g /></g>
+<g transform="translate(3772,3804)" id="cell_FDISK_ERR"><text x="15" y="-4" class="nodelabel cell_FDISK_ERR">FDISK_ERR</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FDISK_ERR" /><g /></g>
+<g transform="translate(2199,87)" id="cell_FDISK_ERR_CODE"><text x="15" y="-4" class="nodelabel cell_FDISK_ERR_CODE">FDISK_ERR_CODE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FDISK_ERR_CODE" /><g /></g>
+<g transform="translate(2199,152)" id="cell_FDISK_MEDIA_FMT"><text x="15" y="-4" class="nodelabel cell_FDISK_MEDIA_FMT">FDISK_MEDIA_FMT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FDISK_MEDIA_FMT" /><g /></g>
+<g transform="translate(1919,152)" id="cell_FDBUF_ADDR"><text x="15" y="-4" class="nodelabel cell_FDBUF_ADDR">FDBUF_ADDR</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FDBUF_ADDR" /><g /></g>
+<g transform="translate(2056,152)" id="cell_FDBUF_WDATA"><text x="15" y="-4" class="nodelabel cell_FDBUF_WDATA">FDBUF_WDATA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FDBUF_WDATA" /><g /></g>
+<g transform="translate(3772,3869)" id="cell_FDBUF_WE"><text x="15" y="-4" class="nodelabel cell_FDBUF_WE">FDBUF_WE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FDBUF_WE" /><g /></g>
+<g transform="translate(690,22)" id="cell_FDBUF_RDATA"><text x="15" y="-4" class="nodelabel cell_FDBUF_RDATA">FDBUF_RDATA</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FDBUF_RDATA" /><g /></g>
+<g transform="translate(768,22)" id="cell_SDISK_START"><text x="15" y="-4" class="nodelabel cell_SDISK_START">SDISK_START</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SDISK_START" /><g /></g>
+<g transform="translate(258,22)" id="cell_SDISK_REQ"><text x="15" y="-4" class="nodelabel cell_SDISK_REQ">SDISK_REQ</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SDISK_REQ" /><g /></g>
+<g transform="translate(72,22)" id="cell_SDISK_WR"><text x="15" y="-4" class="nodelabel cell_SDISK_WR">SDISK_WR</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SDISK_WR" /><g /></g>
+<g transform="translate(1164,22)" id="cell_SDISK_BLKADDR1"><text x="15" y="-4" class="nodelabel cell_SDISK_BLKADDR1">SDISK_BLKADDR1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SDISK_BLKADDR1" /><g /></g>
+<g transform="translate(1260,22)" id="cell_SDISK_BLKADDR2"><text x="15" y="-4" class="nodelabel cell_SDISK_BLKADDR2">SDISK_BLKADDR2</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SDISK_BLKADDR2" /><g /></g>
+<g transform="translate(390,22)" id="cell_SDISK_UNIT"><text x="15" y="-4" class="nodelabel cell_SDISK_UNIT">SDISK_UNIT</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SDISK_UNIT" /><g /></g>
+<g transform="translate(1650,22)" id="cell_SDISK_WORDCOUNT"><text x="15" y="-4" class="nodelabel cell_SDISK_WORDCOUNT">SDISK_WORDCOUNT</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SDISK_WORDCOUNT" /><g /></g>
+<g transform="translate(3771,3479)" id="cell_SDISK_DONE"><text x="15" y="-4" class="nodelabel cell_SDISK_DONE">SDISK_DONE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SDISK_DONE" /><g /></g>
+<g transform="translate(3772,3609)" id="cell_SDISK_ERR"><text x="15" y="-4" class="nodelabel cell_SDISK_ERR">SDISK_ERR</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SDISK_ERR" /><g /></g>
+<g transform="translate(2199,217)" id="cell_SDISK_ERR_CODE"><text x="15" y="-4" class="nodelabel cell_SDISK_ERR_CODE">SDISK_ERR_CODE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SDISK_ERR_CODE" /><g /></g>
+<g transform="translate(1919,87)" id="cell_SDBUF_ADDR"><text x="15" y="-4" class="nodelabel cell_SDBUF_ADDR">SDBUF_ADDR</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SDBUF_ADDR" /><g /></g>
+<g transform="translate(2056,22)" id="cell_SDBUF_WDATA"><text x="15" y="-4" class="nodelabel cell_SDBUF_WDATA">SDBUF_WDATA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SDBUF_WDATA" /><g /></g>
+<g transform="translate(3772,3674)" id="cell_SDBUF_WE"><text x="15" y="-4" class="nodelabel cell_SDBUF_WE">SDBUF_WE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SDBUF_WE" /><g /></g>
+<g transform="translate(846,22)" id="cell_SDBUF_RDATA"><text x="15" y="-4" class="nodelabel cell_SDBUF_RDATA">SDBUF_RDATA</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SDBUF_RDATA" /><g /></g>
+<g transform="translate(924,22)" id="cell_WDISK_START"><text x="15" y="-4" class="nodelabel cell_WDISK_START">WDISK_START</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WDISK_START" /><g /></g>
+<g transform="translate(324,22)" id="cell_WDISK_REQ"><text x="15" y="-4" class="nodelabel cell_WDISK_REQ">WDISK_REQ</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WDISK_REQ" /><g /></g>
+<g transform="translate(132,22)" id="cell_WDISK_WR"><text x="15" y="-4" class="nodelabel cell_WDISK_WR">WDISK_WR</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WDISK_WR" /><g /></g>
+<g transform="translate(1356,22)" id="cell_WDISK_BLKADDR1"><text x="15" y="-4" class="nodelabel cell_WDISK_BLKADDR1">WDISK_BLKADDR1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WDISK_BLKADDR1" /><g /></g>
+<g transform="translate(1452,22)" id="cell_WDISK_BLKADDR2"><text x="15" y="-4" class="nodelabel cell_WDISK_BLKADDR2">WDISK_BLKADDR2</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WDISK_BLKADDR2" /><g /></g>
+<g transform="translate(462,22)" id="cell_WDISK_UNIT"><text x="15" y="-4" class="nodelabel cell_WDISK_UNIT">WDISK_UNIT</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WDISK_UNIT" /><g /></g>
+<g transform="translate(1752,22)" id="cell_WDISK_WORDCOUNT"><text x="15" y="-4" class="nodelabel cell_WDISK_WORDCOUNT">WDISK_WORDCOUNT</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WDISK_WORDCOUNT" /><g /></g>
+<g transform="translate(3771,3739)" id="cell_WDISK_DONE"><text x="15" y="-4" class="nodelabel cell_WDISK_DONE">WDISK_DONE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_WDISK_DONE" /><g /></g>
+<g transform="translate(3772,3544)" id="cell_WDISK_ERR"><text x="15" y="-4" class="nodelabel cell_WDISK_ERR">WDISK_ERR</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_WDISK_ERR" /><g /></g>
+<g transform="translate(2199,22)" id="cell_WDISK_ERR_CODE"><text x="15" y="-4" class="nodelabel cell_WDISK_ERR_CODE">WDISK_ERR_CODE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_WDISK_ERR_CODE" /><g /></g>
+<g transform="translate(1919,22)" id="cell_WDBUF_ADDR"><text x="15" y="-4" class="nodelabel cell_WDBUF_ADDR">WDBUF_ADDR</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_WDBUF_ADDR" /><g /></g>
+<g transform="translate(2056,87)" id="cell_WDBUF_WDATA"><text x="15" y="-4" class="nodelabel cell_WDBUF_WDATA">WDBUF_WDATA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_WDBUF_WDATA" /><g /></g>
+<g transform="translate(3772,3414)" id="cell_WDBUF_WE"><text x="15" y="-4" class="nodelabel cell_WDBUF_WE">WDBUF_WE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_WDBUF_WE" /><g /></g>
+<g transform="translate(1002,22)" id="cell_WDBUF_RDATA"><text x="15" y="-4" class="nodelabel cell_WDBUF_RDATA">WDBUF_RDATA</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WDBUF_RDATA" /><g /></g>
+<g transform="translate(3772,2634)" id="cell_sd_clk_o"><text x="15" y="-4" class="nodelabel cell_sd_clk_o">sd_clk_o</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_clk_o" /><g /></g>
+<g transform="translate(2420,665.5)" id="cell_sd_cmd_i"><text x="15" y="-4" class="nodelabel cell_sd_cmd_i">sd_cmd_i</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sd_cmd_i" /><g /></g>
+<g transform="translate(3772,2699)" id="cell_sd_cmd_o"><text x="15" y="-4" class="nodelabel cell_sd_cmd_o">sd_cmd_o</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_cmd_o" /><g /></g>
+<g transform="translate(3772,2764)" id="cell_sd_cmd_oe"><text x="15" y="-4" class="nodelabel cell_sd_cmd_oe">sd_cmd_oe</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_cmd_oe" /><g /></g>
+<g transform="translate(2420,730.5)" id="cell_sd_dat0_i"><text x="15" y="-4" class="nodelabel cell_sd_dat0_i">sd_dat0_i</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sd_dat0_i" /><g /></g>
+<g transform="translate(3772,2829)" id="cell_sd_dat0_o"><text x="15" y="-4" class="nodelabel cell_sd_dat0_o">sd_dat0_o</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_dat0_o" /><g /></g>
+<g transform="translate(3771,2894)" id="cell_sd_dat0_oe"><text x="15" y="-4" class="nodelabel cell_sd_dat0_oe">sd_dat0_oe</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_dat0_oe" /><g /></g>
+<g transform="translate(3765,1204.5)" id="cell_dbg_sd_busy"><text x="15" y="-4" class="nodelabel cell_dbg_sd_busy">dbg_sd_busy</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_dbg_sd_busy" /><g /></g>
+<g transform="translate(3747,619.5)" id="cell_dbg_cache_pend"><text x="15" y="-4" class="nodelabel cell_dbg_cache_pend">dbg_cache_pend</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_dbg_cache_pend" /><g /></g>
+<g transform="translate(2420,795.5)" id="cell_sd_dat1_i"><text x="15" y="-4" class="nodelabel cell_sd_dat1_i">sd_dat1_i</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sd_dat1_i" /><g /></g>
+<g transform="translate(3772,2959)" id="cell_sd_dat1_o"><text x="15" y="-4" class="nodelabel cell_sd_dat1_o">sd_dat1_o</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_dat1_o" /><g /></g>
+<g transform="translate(3771,3024)" id="cell_sd_dat1_oe"><text x="15" y="-4" class="nodelabel cell_sd_dat1_oe">sd_dat1_oe</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_dat1_oe" /><g /></g>
+<g transform="translate(2420,860.5)" id="cell_sd_dat2_i"><text x="15" y="-4" class="nodelabel cell_sd_dat2_i">sd_dat2_i</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sd_dat2_i" /><g /></g>
+<g transform="translate(3772,3089)" id="cell_sd_dat2_o"><text x="15" y="-4" class="nodelabel cell_sd_dat2_o">sd_dat2_o</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_dat2_o" /><g /></g>
+<g transform="translate(3771,3154)" id="cell_sd_dat2_oe"><text x="15" y="-4" class="nodelabel cell_sd_dat2_oe">sd_dat2_oe</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_dat2_oe" /><g /></g>
+<g transform="translate(2420,925.5)" id="cell_sd_dat3_i"><text x="15" y="-4" class="nodelabel cell_sd_dat3_i">sd_dat3_i</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sd_dat3_i" /><g /></g>
+<g transform="translate(3772,3219)" id="cell_sd_dat3_o"><text x="15" y="-4" class="nodelabel cell_sd_dat3_o">sd_dat3_o</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_dat3_o" /><g /></g>
+<g transform="translate(3771,3284)" id="cell_sd_dat3_oe"><text x="15" y="-4" class="nodelabel cell_sd_dat3_oe">sd_dat3_oe</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_dat3_oe" /><g /></g>
+<g transform="translate(3772,2439)" id="cell_mem_start"><text x="15" y="-4" class="nodelabel cell_mem_start">mem_start</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_mem_start" /><g /></g>
+<g transform="translate(3772,2569)" id="cell_mem_we"><text x="15" y="-4" class="nodelabel cell_mem_we">mem_we</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_mem_we" /><g /></g>
+<g transform="translate(3772,2270)" id="cell_mem_addr"><text x="15" y="-4" class="nodelabel cell_mem_addr">mem_addr</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_mem_addr" /><g /></g>
+<g transform="translate(3772,2504)" id="cell_mem_wdata"><text x="15" y="-4" class="nodelabel cell_mem_wdata">mem_wdata</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_mem_wdata" /><g /></g>
+<g transform="translate(2420,549.5)" id="cell_mem_rdata"><text x="15" y="-4" class="nodelabel cell_mem_rdata">mem_rdata</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_mem_rdata" /><g /></g>
+<g transform="translate(2420,419.5)" id="cell_mem_busy"><text x="15" y="-4" class="nodelabel cell_mem_busy">mem_busy</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_mem_busy" /><g /></g>
+<g transform="translate(2420,484.5)" id="cell_mem_done"><text x="15" y="-4" class="nodelabel cell_mem_done">mem_done</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_mem_done" /><g /></g>
+<g transform="translate(3772,1304.5)" id="cell_DBG_STATE"><text x="15" y="-4" class="nodelabel cell_DBG_STATE">DBG_STATE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_STATE" /><g /></g>
+<g transform="translate(3772,814.5)" id="cell_DBG_LBA"><text x="15" y="-4" class="nodelabel cell_DBG_LBA">DBG_LBA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_LBA" /><g /></g>
+<g transform="translate(3772,1369.5)" id="cell_DBG_WDATA"><text x="15" y="-4" class="nodelabel cell_DBG_WDATA">DBG_WDATA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_WDATA" /><g /></g>
+<g transform="translate(3772,944.5)" id="cell_DBG_RDATA"><text x="15" y="-4" class="nodelabel cell_DBG_RDATA">DBG_RDATA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_RDATA" /><g /></g>
+<g transform="translate(3772,489.5)" id="cell_DBG_BUFW"><text x="15" y="-4" class="nodelabel cell_DBG_BUFW">DBG_BUFW</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_BUFW" /><g /></g>
+<g transform="translate(3772,554.5)" id="cell_DBG_BUFWE"><text x="15" y="-4" class="nodelabel cell_DBG_BUFWE">DBG_BUFWE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_BUFWE" /><g /></g>
+<g transform="translate(3772,684.5)" id="cell_DBG_FSEC"><text x="15" y="-4" class="nodelabel cell_DBG_FSEC">DBG_FSEC</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_FSEC" /><g /></g>
+<g transform="translate(3771,1139.5)" id="cell_DBG_RX_STB"><text x="15" y="-4" class="nodelabel cell_DBG_RX_STB">DBG_RX_STB</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_RX_STB" /><g /></g>
+<g transform="translate(3771,1074.5)" id="cell_DBG_RX_RAW"><text x="15" y="-4" class="nodelabel cell_DBG_RX_RAW">DBG_RX_RAW</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_RX_RAW" /><g /></g>
+<g transform="translate(3765,1009.5)" id="cell_DBG_RX_BYTE"><text x="15" y="-4" class="nodelabel cell_DBG_RX_BYTE">DBG_RX_BYTE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_RX_BYTE" /><g /></g>
+<g transform="translate(3759,879.5)" id="cell_DBG_PAST_EOF"><text x="15" y="-4" class="nodelabel cell_DBG_PAST_EOF">DBG_PAST_EOF</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_PAST_EOF" /><g /></g>
+<g transform="translate(3772,749.5)" id="cell_DBG_GRANT"><text x="15" y="-4" class="nodelabel cell_DBG_GRANT">DBG_GRANT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBG_GRANT" /><g /></g>
+<g transform="translate(3772,3349)" id="cell_sd_status"><text x="15" y="-4" class="nodelabel cell_sd_status">sd_status</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_sd_status" /><g /></g>
+<g transform="translate(2420,354.5)" id="cell_1"><text x="15" y="-4" class="nodelabel cell_1">1</text><rect width="30" height="20" class="cell_1" /><g /></g>
+<g transform="translate(2420,3414)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(3499,1508.5)" id="cell_0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"><text x="15" y="-4" class="nodelabel cell_0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">0x0</text><rect width="30" height="20" class="cell_0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" /><g /></g>
+<g transform="translate(3499,1921.5)" id="cell_0000000"><text x="15" y="-4" class="nodelabel cell_0000000">0x0</text><rect width="30" height="20" class="cell_0000000" /><g /></g>
+<g transform="translate(2134,22)" id="cell_0000"><text x="15" y="-4" class="nodelabel cell_0000">0x0</text><rect width="30" height="20" class="cell_0000" /><g /></g>
+<g transform="translate(1854,22)" id="cell_0000000000"><text x="15" y="-4" class="nodelabel cell_0000000000">0x0</text><rect width="30" height="20" class="cell_0000000000" /><g /></g>
+<g transform="translate(1991,22)" id="cell_0000000000000000"><text x="15" y="-4" class="nodelabel cell_0000000000000000">0x0</text><rect width="30" height="20" class="cell_0000000000000000" /><g /></g>
+<g transform="translate(3772,1773)" id="cell_$join$,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0:15</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">16:127</text></g></g>
+<g transform="translate(3772,1696)" id="cell_$join$,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0:15</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">16:127</text></g></g>
+<g transform="translate(3772,1901)" id="cell_$join$,504,1242,1243,1244,1245,1246,1247,1248,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1:7</text></g></g>
+<g transform="translate(3772,2055)" id="cell_$join$,505,1242,1243,1244,1245,1246,1247,1248,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1:7</text></g></g>
+<g transform="translate(3772,1978)" id="cell_$join$,538,1242,1243,1244,1245,1246,1247,1248,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1:7</text></g></g>
+<g transform="translate(3281,1455.5)" id="cell_$split$,452,453,454,455,456,457,458,459,460,461,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607,608,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:9</text></g></g>
+<g transform="translate(3281,1498.5)" id="cell_$split$,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,673,674,675,676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,691,692,693,694,695,696,697,698,699,700,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,716,717,718,719,720,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:15</text></g></g>
+<g transform="translate(3281,1541.5)" id="cell_$split$,494,721,722,723,724,725,726,727,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g></g>
+<g transform="translate(3281,1584.5)" id="cell_$split$,495,728,729,730,731,732,733,734,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g></g>
+<g transform="translate(3281,1627.5)" id="cell_$split$,496,735,736,737,738,739,740,741,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g></g>
+<g transform="translate(3281,1670.5)" id="cell_$split$,497,742,743,744,745,746,747,748,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g></g>
+<g transform="translate(3281,1713.5)" id="cell_$split$,498,499,500,501,749,750,751,752,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:3</text></g></g>
+<g transform="translate(3281,1756.5)" id="cell_$split$,502,777,778,779,780,781,782,783,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g></g>
+<g transform="translate(3281,1799.5)" id="cell_$split$,503,784,785,786,787,788,789,790,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g></g>
+<g transform="translate(3281,1853.5)" id="cell_$split$,506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,791,792,793,794,795,796,797,798,799,800,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,816,817,818,819,820,821,822,823,824,825,826,827,828,829,830,831,832,833,834,835,836,837,838,839,840,841,842,843,844,845,846,847,848,849,850,851,852,853,854,855,856,857,858,859,860,861,862,863,864,865,866,867,868,869,870,871,872,873,874,875,876,877,878,879,880,881,882,883,884,885,886,887,888,889,890,891,892,893,894,895,896,897,898,899,900,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,916,917,918,919,920,921,922,923,924,925,926,927,928,929,930,931,932,933,934,935,936,937,938,939,940,941,942,943,944,945,946,947,948,949,950,951,952,953,954,955,956,957,958,959,960,961,962,963,964,965,966,967,968,969,970,971,972,973,974,975,976,977,978,979,980,981,982,983,984,985,986,987,988,989,990,991,992,993,994,995,996,997,998,999,1000,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:31</text></g></g>
+<line x1="2329" x2="2420" y1="192" y2="192" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2329" x2="2365" y1="192" y2="192" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2365" x2="2365" y1="192" y2="1886.5" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2365" x2="2971" y1="1886.5" y2="1886.5" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2971" x2="2971" y1="1886.5" y2="2321.5" class="net_5"><title>rst_cpu_n</title></line>
+<circle cx="2365" cy="192" r="2" style="fill:#000" class="net_5" />
+<circle cx="2971" cy="1886.5" r="2" style="fill:#000" class="net_5" />
+<line x1="2971" x2="3256" y1="2321.5" y2="2321.5" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2329" x2="2365" y1="192" y2="192" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2365" x2="2365" y1="192" y2="1886.5" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2365" x2="3400" y1="1886.5" y2="1886.5" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="3400" x2="3400" y1="1886.5" y2="1844" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="3400" x2="3499" y1="1844" y2="1844" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2329" x2="2365" y1="192" y2="192" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2365" x2="2365" y1="192" y2="579.5" class="net_5"><title>rst_cpu_n</title></line>
+<circle cx="2365" cy="579.5" r="2" style="fill:#000" class="net_5" />
+<line x1="2365" x2="2675" y1="579.5" y2="579.5" class="net_5"><title>rst_cpu_n</title></line>
+<line x1="2329" x2="2385" y1="127" y2="127" class="net_4"><title>clk_cpu</title></line>
+<line x1="2385" x2="2385" y1="127" y2="212" class="net_4"><title>clk_cpu</title></line>
+<circle cx="2385" cy="127" r="2" style="fill:#000" class="net_4" />
+<circle cx="2385" cy="212" r="2" style="fill:#000" class="net_4" />
+<line x1="2385" x2="2420" y1="212" y2="212" class="net_4"><title>clk_cpu</title></line>
+<line x1="2329" x2="2385" y1="127" y2="127" class="net_4"><title>clk_cpu</title></line>
+<line x1="2385" x2="2385" y1="127" y2="1897.5" class="net_4"><title>clk_cpu</title></line>
+<line x1="2385" x2="2821" y1="1897.5" y2="1897.5" class="net_4"><title>clk_cpu</title></line>
+<line x1="2821" x2="2821" y1="1897.5" y2="2341.5" class="net_4"><title>clk_cpu</title></line>
+<line x1="2821" x2="3256" y1="2341.5" y2="2341.5" class="net_4"><title>clk_cpu</title></line>
+<line x1="2329" x2="2385" y1="127" y2="127" class="net_4"><title>clk_cpu</title></line>
+<line x1="2385" x2="2385" y1="127" y2="1832.5" class="net_4"><title>clk_cpu</title></line>
+<line x1="2385" x2="3380" y1="1832.5" y2="1832.5" class="net_4"><title>clk_cpu</title></line>
+<line x1="3380" x2="3380" y1="1832.5" y2="1804" class="net_4"><title>clk_cpu</title></line>
+<circle cx="2385" cy="1832.5" r="2" style="fill:#000" class="net_4" />
+<line x1="3380" x2="3499" y1="1804" y2="1804" class="net_4"><title>clk_cpu</title></line>
+<line x1="2329" x2="2594" y1="127" y2="127" class="net_4"><title>clk_cpu</title></line>
+<line x1="2594" x2="2594" y1="127" y2="439.5" class="net_4"><title>clk_cpu</title></line>
+<line x1="2594" x2="2675" y1="439.5" y2="439.5" class="net_4"><title>clk_cpu</title></line>
+<line x1="3792" x2="3851" y1="32" y2="32" class="net_432" />
+<line x1="3851" x2="3851" y1="32" y2="117" class="net_432" />
+<line x1="3851" x2="2375" y1="117" y2="117" class="net_432" />
+<line x1="2375" x2="2375" y1="117" y2="232" class="net_432" />
+<line x1="2375" x2="2420" y1="232" y2="232" class="net_432" />
+<line x1="2706.6666666666665" x2="2811" y1="1287" y2="1287" class="net_434" />
+<line x1="2811" x2="2811" y1="1287" y2="2361.5" class="net_434" />
+<line x1="2811" x2="3256" y1="2361.5" y2="2361.5" class="net_434" />
+<line x1="2450" x2="2524" y1="364.5" y2="364.5" class="net_1015" />
+<line x1="2524" x2="2524" y1="364.5" y2="1277" class="net_1015" />
+<circle cx="2524" cy="364.5" r="2" style="fill:#000" class="net_1015" />
+<line x1="2524" x2="2686.6666666666665" y1="1277" y2="1277" class="net_1015" />
+<line x1="2450" x2="2524" y1="364.5" y2="364.5" class="net_1015" />
+<line x1="2524" x2="2524" y1="364.5" y2="22" class="net_1015" />
+<line x1="2524" x2="3772" y1="22" y2="22" class="net_1015" />
+<line x1="2450" x2="2524" y1="3424" y2="3424" class="net_1016" />
+<line x1="2524" x2="2524" y1="3424" y2="1297" class="net_1016" />
+<circle cx="2524" cy="3424" r="2" style="fill:#000" class="net_1016" />
+<line x1="2524" x2="2686.6666666666665" y1="1297" y2="1297" class="net_1016" />
+<line x1="2450" x2="3647" y1="3424" y2="3424" class="net_1016" />
+<line x1="3647" x2="3647" y1="3424" y2="3944" class="net_1016" />
+<line x1="3647" x2="3771" y1="3944" y2="3944" class="net_1016" />
+<line x1="2450" x2="3647" y1="3424" y2="3424" class="net_1016" />
+<line x1="3647" x2="3647" y1="3424" y2="3814" class="net_1016" />
+<circle cx="3647" cy="3814" r="2" style="fill:#000" class="net_1016" />
+<line x1="3647" x2="3772" y1="3814" y2="3814" class="net_1016" />
+<line x1="2450" x2="3647" y1="3424" y2="3424" class="net_1016" />
+<line x1="3647" x2="3647" y1="3424" y2="3879" class="net_1016" />
+<circle cx="3647" cy="3879" r="2" style="fill:#000" class="net_1016" />
+<line x1="3647" x2="3772" y1="3879" y2="3879" class="net_1016" />
+<line x1="2450" x2="3647" y1="3424" y2="3424" class="net_1016" />
+<line x1="3647" x2="3647" y1="3424" y2="3489" class="net_1016" />
+<circle cx="3647" cy="3424" r="2" style="fill:#000" class="net_1016" />
+<circle cx="3647" cy="3489" r="2" style="fill:#000" class="net_1016" />
+<line x1="3647" x2="3771" y1="3489" y2="3489" class="net_1016" />
+<line x1="2450" x2="3647" y1="3424" y2="3424" class="net_1016" />
+<line x1="3647" x2="3647" y1="3424" y2="3619" class="net_1016" />
+<circle cx="3647" cy="3619" r="2" style="fill:#000" class="net_1016" />
+<line x1="3647" x2="3772" y1="3619" y2="3619" class="net_1016" />
+<line x1="2450" x2="3647" y1="3424" y2="3424" class="net_1016" />
+<line x1="3647" x2="3647" y1="3424" y2="3684" class="net_1016" />
+<circle cx="3647" cy="3684" r="2" style="fill:#000" class="net_1016" />
+<line x1="3647" x2="3772" y1="3684" y2="3684" class="net_1016" />
+<line x1="2450" x2="3647" y1="3424" y2="3424" class="net_1016" />
+<line x1="3647" x2="3647" y1="3424" y2="3749" class="net_1016" />
+<circle cx="3647" cy="3749" r="2" style="fill:#000" class="net_1016" />
+<line x1="3647" x2="3771" y1="3749" y2="3749" class="net_1016" />
+<line x1="2450" x2="3647" y1="3424" y2="3424" class="net_1016" />
+<line x1="3647" x2="3647" y1="3424" y2="3554" class="net_1016" />
+<circle cx="3647" cy="3554" r="2" style="fill:#000" class="net_1016" />
+<line x1="3647" x2="3772" y1="3554" y2="3554" class="net_1016" />
+<line x1="2450" x2="3772" y1="3424" y2="3424" class="net_1016" />
+<line x1="2451" x2="2514" y1="192" y2="192" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="2514" x2="2514" y1="192" y2="1317" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="2514" x2="2696.6666666666665" y1="1317" y2="1317" class="net_433"><title>gen_tape.s_opened</title></line>
+<circle cx="2514" cy="192" r="2" style="fill:#000" class="net_433" />
+<line x1="2696.6666666666665" x2="2696.6666666666665" y1="1317" y2="1302" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="2451" x2="2514" y1="192" y2="192" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="2514" x2="2514" y1="192" y2="62" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="2514" x2="3647" y1="62" y2="62" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="3647" x2="3647" y1="62" y2="42" class="net_433"><title>gen_tape.s_opened</title></line>
+<circle cx="3647" cy="62" r="2" style="fill:#000" class="net_433" />
+<line x1="3647" x2="3772" y1="42" y2="42" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="2451" x2="2514" y1="192" y2="192" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="2514" x2="2514" y1="192" y2="62" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="2514" x2="3782" y1="62" y2="62" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="3782" x2="3782" y1="62" y2="47" class="net_433"><title>gen_tape.s_opened</title></line>
+<line x1="3284" x2="3410" y1="1410.5" y2="1410.5" class="net_6"><title>byte_req</title></line>
+<line x1="3410" x2="3410" y1="1410.5" y2="1584" class="net_6"><title>byte_req</title></line>
+<line x1="3410" x2="3499" y1="1584" y2="1584" class="net_6"><title>byte_req</title></line>
+<line x1="3286" x2="3400" y1="1466" y2="1466" class="net_452,453,454,455,456,457,458,459,460,461"><title>a_buf_addr</title></line>
+<line x1="3400" x2="3400" y1="1466" y2="1604" class="net_452,453,454,455,456,457,458,459,460,461"><title>a_buf_addr</title></line>
+<line x1="3400" x2="3499" y1="1604" y2="1604" class="net_452,453,454,455,456,457,458,459,460,461"><title>a_buf_addr</title></line>
+<line x1="3286" x2="3390" y1="1509" y2="1509" class="net_478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493"><title>a_buf_wdata</title></line>
+<line x1="3390" x2="3390" y1="1509" y2="1624" class="net_478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493"><title>a_buf_wdata</title></line>
+<line x1="3390" x2="3499" y1="1624" y2="1624" class="net_478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493"><title>a_buf_wdata</title></line>
+<line x1="3286" x2="3380" y1="1552" y2="1552" class="net_494"><title>a_buf_we</title></line>
+<line x1="3380" x2="3380" y1="1552" y2="1644" class="net_494"><title>a_buf_we</title></line>
+<line x1="3380" x2="3499" y1="1644" y2="1644" class="net_494"><title>a_buf_we</title></line>
+<line x1="3286" x2="3370" y1="1595" y2="1595" class="net_495"><title>a_busy</title></line>
+<line x1="3370" x2="3370" y1="1595" y2="1664" class="net_495"><title>a_busy</title></line>
+<line x1="3370" x2="3499" y1="1664" y2="1664" class="net_495"><title>a_busy</title></line>
+<line x1="3286" x2="3360" y1="1638" y2="1638" class="net_496"><title>a_done</title></line>
+<line x1="3360" x2="3360" y1="1638" y2="1684" class="net_496"><title>a_done</title></line>
+<line x1="3360" x2="3499" y1="1684" y2="1684" class="net_496"><title>a_done</title></line>
+<line x1="3286" x2="3350" y1="1681" y2="1681" class="net_497"><title>a_err</title></line>
+<line x1="3350" x2="3350" y1="1681" y2="1704" class="net_497"><title>a_err</title></line>
+<line x1="3350" x2="3499" y1="1704" y2="1704" class="net_497"><title>a_err</title></line>
+<line x1="3286" x2="3499" y1="1724" y2="1724" class="net_498,499,500,501"><title>err_code_w[3:0]</title></line>
+<line x1="3286" x2="3350" y1="1767" y2="1767" class="net_502"><title>a_open_err</title></line>
+<line x1="3350" x2="3350" y1="1767" y2="1744" class="net_502"><title>a_open_err</title></line>
+<line x1="3350" x2="3499" y1="1744" y2="1744" class="net_502"><title>a_open_err</title></line>
+<line x1="3286" x2="3360" y1="1810" y2="1810" class="net_503"><title>a_open_ok</title></line>
+<line x1="3360" x2="3360" y1="1810" y2="1764" class="net_503"><title>a_open_ok</title></line>
+<line x1="3360" x2="3499" y1="1764" y2="1764" class="net_503"><title>a_open_ok</title></line>
+<line x1="3286" x2="3370" y1="1864" y2="1864" class="net_506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537"><title>a_size_bytes</title></line>
+<line x1="3370" x2="3370" y1="1864" y2="1784" class="net_506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537"><title>a_size_bytes</title></line>
+<line x1="3370" x2="3499" y1="1784" y2="1784" class="net_506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537"><title>a_size_bytes</title></line>
+<line x1="3287" x2="3390" y1="2321.5" y2="2321.5" class="net_435"><title>gen_tape.s_open_pulse</title></line>
+<line x1="3390" x2="3390" y1="2321.5" y2="1824" class="net_435"><title>gen_tape.s_open_pulse</title></line>
+<line x1="3390" x2="3499" y1="1824" y2="1824" class="net_435"><title>gen_tape.s_open_pulse</title></line>
+<line x1="3284" x2="3410" y1="2429" y2="2429" class="net_16"><title>source_rewind</title></line>
+<line x1="3410" x2="3410" y1="2429" y2="1864" class="net_16"><title>source_rewind</title></line>
+<line x1="3410" x2="3499" y1="1864" y2="1864" class="net_16"><title>source_rewind</title></line>
+<line x1="3778" x2="3851" y1="1793.5" y2="1793.5" class="net_436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3851" x2="3851" y1="1793.5" y2="128" class="net_436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3851" x2="2675.5" y1="128" y2="128" class="net_436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="2675.5" x2="2675.5" y1="128" y2="399" class="net_436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3778" x2="3841" y1="1716.5" y2="1716.5" class="net_462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3841" x2="3841" y1="1716.5" y2="106" class="net_462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3841" x2="2604" y1="106" y2="106" class="net_462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="2604" x2="2604" y1="106" y2="419.5" class="net_462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="2604" x2="2675" y1="419.5" y2="419.5" class="net_462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="2448" x2="2564" y1="299.5" y2="299.5" class="net_2"><title>clk_stor</title></line>
+<line x1="2564" x2="2564" y1="299.5" y2="459.5" class="net_2"><title>clk_stor</title></line>
+<line x1="2564" x2="2675" y1="459.5" y2="459.5" class="net_2"><title>clk_stor</title></line>
+<line x1="2448" x2="2534" y1="429.5" y2="429.5" class="net_305"><title>mem_busy</title></line>
+<line x1="2534" x2="2534" y1="429.5" y2="479.5" class="net_305"><title>mem_busy</title></line>
+<line x1="2534" x2="2675" y1="479.5" y2="479.5" class="net_305"><title>mem_busy</title></line>
+<line x1="2448" x2="2594" y1="494.5" y2="494.5" class="net_306"><title>mem_done</title></line>
+<line x1="2594" x2="2594" y1="494.5" y2="499.5" class="net_306"><title>mem_done</title></line>
+<line x1="2594" x2="2675" y1="499.5" y2="499.5" class="net_306"><title>mem_done</title></line>
+<line x1="2448" x2="2534" y1="559.5" y2="559.5" class="net_273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304"><title>mem_rdata</title></line>
+<line x1="2534" x2="2534" y1="559.5" y2="519.5" class="net_273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304"><title>mem_rdata</title></line>
+<line x1="2534" x2="2675" y1="519.5" y2="519.5" class="net_273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304"><title>mem_rdata</title></line>
+<line x1="3778" x2="3881" y1="1921.5" y2="1921.5" class="net_504,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3881" x2="3881" y1="1921.5" y2="73" class="net_504,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3881" x2="2574" y1="73" y2="73" class="net_504,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="2574" x2="2574" y1="73" y2="539.5" class="net_504,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="2574" x2="2675" y1="539.5" y2="539.5" class="net_504,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3778" x2="3861" y1="2075.5" y2="2075.5" class="net_505,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3861" x2="3861" y1="2075.5" y2="95" class="net_505,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3861" x2="2584" y1="95" y2="95" class="net_505,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="2584" x2="2584" y1="95" y2="559.5" class="net_505,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="2584" x2="2675" y1="559.5" y2="559.5" class="net_505,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="2448" x2="2564" y1="610.5" y2="610.5" class="net_3"><title>rst_stor_n</title></line>
+<line x1="2564" x2="2564" y1="610.5" y2="599.5" class="net_3"><title>rst_stor_n</title></line>
+<line x1="2564" x2="2675" y1="599.5" y2="599.5" class="net_3"><title>rst_stor_n</title></line>
+<line x1="2448" x2="2534" y1="675.5" y2="675.5" class="net_202"><title>sd_cmd_i</title></line>
+<line x1="2534" x2="2534" y1="675.5" y2="619.5" class="net_202"><title>sd_cmd_i</title></line>
+<line x1="2534" x2="2675" y1="619.5" y2="619.5" class="net_202"><title>sd_cmd_i</title></line>
+<line x1="2448" x2="2544" y1="740.5" y2="740.5" class="net_205"><title>sd_dat0_i</title></line>
+<line x1="2544" x2="2544" y1="740.5" y2="639.5" class="net_205"><title>sd_dat0_i</title></line>
+<line x1="2544" x2="2675" y1="639.5" y2="639.5" class="net_205"><title>sd_dat0_i</title></line>
+<line x1="2448" x2="2564" y1="805.5" y2="805.5" class="net_210"><title>sd_dat1_i</title></line>
+<line x1="2564" x2="2564" y1="805.5" y2="659.5" class="net_210"><title>sd_dat1_i</title></line>
+<line x1="2564" x2="2675" y1="659.5" y2="659.5" class="net_210"><title>sd_dat1_i</title></line>
+<line x1="2448" x2="2574" y1="870.5" y2="870.5" class="net_213"><title>sd_dat2_i</title></line>
+<line x1="2574" x2="2574" y1="870.5" y2="679.5" class="net_213"><title>sd_dat2_i</title></line>
+<line x1="2574" x2="2675" y1="679.5" y2="679.5" class="net_213"><title>sd_dat2_i</title></line>
+<line x1="2448" x2="2584" y1="935.5" y2="935.5" class="net_216"><title>sd_dat3_i</title></line>
+<line x1="2584" x2="2584" y1="935.5" y2="699.5" class="net_216"><title>sd_dat3_i</title></line>
+<line x1="2584" x2="2675" y1="699.5" y2="699.5" class="net_216"><title>sd_dat3_i</title></line>
+<line x1="3778" x2="3871" y1="1998.5" y2="1998.5" class="net_538,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3871" x2="3871" y1="1998.5" y2="84" class="net_538,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3871" x2="2554" y1="84" y2="84" class="net_538,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="2554" x2="2554" y1="84" y2="719.5" class="net_538,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="2554" x2="2675" y1="719.5" y2="719.5" class="net_538,1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3530" x2="3727" y1="1604" y2="1604" class="net_7"><title>byte_valid</title></line>
+<line x1="3727" x2="3727" y1="1604" y2="1649" class="net_7"><title>byte_valid</title></line>
+<line x1="3727" x2="3771" y1="1649" y2="1649" class="net_7"><title>byte_valid</title></line>
+<line x1="3530" x2="3772" y1="1584" y2="1584" class="net_8,9,10,11,12,13,14,15"><title>byte_data</title></line>
+<line x1="3530" x2="3657" y1="1724" y2="1724" class="net_17"><title>TDISK_FAULT</title></line>
+<line x1="3657" x2="3657" y1="1724" y2="2150" class="net_17"><title>TDISK_FAULT</title></line>
+<line x1="3657" x2="3765" y1="2150" y2="2150" class="net_17"><title>TDISK_FAULT</title></line>
+<line x1="3530" x2="3647" y1="1744" y2="1744" class="net_18,19,20,21"><title>TDISK_ERR_CODE</title></line>
+<line x1="3647" x2="3647" y1="1744" y2="2215" class="net_18,19,20,21"><title>TDISK_ERR_CODE</title></line>
+<line x1="3647" x2="3747" y1="2215" y2="2215" class="net_18,19,20,21"><title>TDISK_ERR_CODE</title></line>
+<line x1="2164" x2="2174" y1="32" y2="32" class="net_1265,1266,1267,1268" />
+<line x1="2174" x2="2174" y1="32" y2="97" class="net_1265,1266,1267,1268" />
+<circle cx="2174" cy="32" r="2" style="fill:#000" class="net_1265,1266,1267,1268" />
+<circle cx="2174" cy="97" r="2" style="fill:#000" class="net_1265,1266,1267,1268" />
+<line x1="2174" x2="2199" y1="97" y2="97" class="net_1265,1266,1267,1268" />
+<line x1="2164" x2="2174" y1="32" y2="32" class="net_1265,1266,1267,1268" />
+<line x1="2174" x2="2174" y1="32" y2="162" class="net_1265,1266,1267,1268" />
+<circle cx="2174" cy="162" r="2" style="fill:#000" class="net_1265,1266,1267,1268" />
+<line x1="2174" x2="2199" y1="162" y2="162" class="net_1265,1266,1267,1268" />
+<line x1="2164" x2="2174" y1="32" y2="32" class="net_1265,1266,1267,1268" />
+<line x1="2174" x2="2174" y1="32" y2="227" class="net_1265,1266,1267,1268" />
+<line x1="2174" x2="2199" y1="227" y2="227" class="net_1265,1266,1267,1268" />
+<line x1="2164" x2="2199" y1="32" y2="32" class="net_1265,1266,1267,1268" />
+<line x1="1884" x2="1894" y1="32" y2="32" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<line x1="1894" x2="1894" y1="32" y2="162" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<circle cx="1894" cy="32" r="2" style="fill:#000" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<line x1="1894" x2="1919" y1="162" y2="162" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<line x1="1884" x2="1894" y1="32" y2="32" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<line x1="1894" x2="1894" y1="32" y2="97" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<circle cx="1894" cy="97" r="2" style="fill:#000" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<line x1="1894" x2="1919" y1="97" y2="97" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<line x1="1884" x2="1919" y1="32" y2="32" class="net_1273,1274,1275,1276,1277,1278,1279,1280,1281,1282" />
+<line x1="2021" x2="2031" y1="32" y2="32" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<line x1="2031" x2="2031" y1="32" y2="162" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<circle cx="2031" cy="32" r="2" style="fill:#000" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<line x1="2031" x2="2056" y1="162" y2="162" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<line x1="2021" x2="2056" y1="32" y2="32" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<line x1="2021" x2="2031" y1="32" y2="32" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<line x1="2031" x2="2031" y1="32" y2="97" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<circle cx="2031" cy="97" r="2" style="fill:#000" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<line x1="2031" x2="2056" y1="97" y2="97" class="net_1283,1284,1285,1286,1287,1288,1289,1290,1291,1292,1293,1294,1295,1296,1297,1298" />
+<line x1="2706" x2="2931" y1="979.5" y2="979.5" class="net_201"><title>sd_clk_o</title></line>
+<line x1="2931" x2="2931" y1="979.5" y2="2644" class="net_201"><title>sd_clk_o</title></line>
+<line x1="2931" x2="3772" y1="2644" y2="2644" class="net_201"><title>sd_clk_o</title></line>
+<line x1="2706" x2="2921" y1="999.5" y2="999.5" class="net_203"><title>sd_cmd_o</title></line>
+<line x1="2921" x2="2921" y1="999.5" y2="2709" class="net_203"><title>sd_cmd_o</title></line>
+<line x1="2921" x2="3772" y1="2709" y2="2709" class="net_203"><title>sd_cmd_o</title></line>
+<line x1="2706" x2="2911" y1="1019.5" y2="1019.5" class="net_204"><title>sd_cmd_oe</title></line>
+<line x1="2911" x2="2911" y1="1019.5" y2="2774" class="net_204"><title>sd_cmd_oe</title></line>
+<line x1="2911" x2="3772" y1="2774" y2="2774" class="net_204"><title>sd_cmd_oe</title></line>
+<line x1="2706" x2="2901" y1="1039.5" y2="1039.5" class="net_206"><title>sd_dat0_o</title></line>
+<line x1="2901" x2="2901" y1="1039.5" y2="2839" class="net_206"><title>sd_dat0_o</title></line>
+<line x1="2901" x2="3772" y1="2839" y2="2839" class="net_206"><title>sd_dat0_o</title></line>
+<line x1="2706" x2="2891" y1="1059.5" y2="1059.5" class="net_207"><title>sd_dat0_oe</title></line>
+<line x1="2891" x2="2891" y1="1059.5" y2="2904" class="net_207"><title>sd_dat0_oe</title></line>
+<line x1="2891" x2="3771" y1="2904" y2="2904" class="net_207"><title>sd_dat0_oe</title></line>
+<line x1="2706" x2="3081" y1="719.5" y2="719.5" class="net_208"><title>dbg_sd_busy</title></line>
+<line x1="3081" x2="3081" y1="719.5" y2="1214.5" class="net_208"><title>dbg_sd_busy</title></line>
+<line x1="3081" x2="3765" y1="1214.5" y2="1214.5" class="net_208"><title>dbg_sd_busy</title></line>
+<line x1="2706" x2="3191" y1="539.5" y2="539.5" class="net_209"><title>dbg_cache_pend</title></line>
+<line x1="3191" x2="3191" y1="539.5" y2="629.5" class="net_209"><title>dbg_cache_pend</title></line>
+<line x1="3191" x2="3747" y1="629.5" y2="629.5" class="net_209"><title>dbg_cache_pend</title></line>
+<line x1="2706" x2="2881" y1="1079.5" y2="1079.5" class="net_211"><title>sd_dat1_o</title></line>
+<line x1="2881" x2="2881" y1="1079.5" y2="2969" class="net_211"><title>sd_dat1_o</title></line>
+<line x1="2881" x2="3772" y1="2969" y2="2969" class="net_211"><title>sd_dat1_o</title></line>
+<line x1="2706" x2="2871" y1="1099.5" y2="1099.5" class="net_212"><title>sd_dat1_oe</title></line>
+<line x1="2871" x2="2871" y1="1099.5" y2="3034" class="net_212"><title>sd_dat1_oe</title></line>
+<line x1="2871" x2="3771" y1="3034" y2="3034" class="net_212"><title>sd_dat1_oe</title></line>
+<line x1="2706" x2="2861" y1="1119.5" y2="1119.5" class="net_214"><title>sd_dat2_o</title></line>
+<line x1="2861" x2="2861" y1="1119.5" y2="3099" class="net_214"><title>sd_dat2_o</title></line>
+<line x1="2861" x2="3772" y1="3099" y2="3099" class="net_214"><title>sd_dat2_o</title></line>
+<line x1="2706" x2="2851" y1="1139.5" y2="1139.5" class="net_215"><title>sd_dat2_oe</title></line>
+<line x1="2851" x2="2851" y1="1139.5" y2="3164" class="net_215"><title>sd_dat2_oe</title></line>
+<line x1="2851" x2="3771" y1="3164" y2="3164" class="net_215"><title>sd_dat2_oe</title></line>
+<line x1="2706" x2="2841" y1="1159.5" y2="1159.5" class="net_217"><title>sd_dat3_o</title></line>
+<line x1="2841" x2="2841" y1="1159.5" y2="3229" class="net_217"><title>sd_dat3_o</title></line>
+<line x1="2841" x2="3772" y1="3229" y2="3229" class="net_217"><title>sd_dat3_o</title></line>
+<line x1="2706" x2="2831" y1="1179.5" y2="1179.5" class="net_218"><title>sd_dat3_oe</title></line>
+<line x1="2831" x2="2831" y1="1179.5" y2="3294" class="net_218"><title>sd_dat3_oe</title></line>
+<line x1="2831" x2="3771" y1="3294" y2="3294" class="net_218"><title>sd_dat3_oe</title></line>
+<line x1="2706" x2="2961" y1="879.5" y2="879.5" class="net_219"><title>mem_start</title></line>
+<line x1="2961" x2="2961" y1="879.5" y2="2449" class="net_219"><title>mem_start</title></line>
+<line x1="2961" x2="3772" y1="2449" y2="2449" class="net_219"><title>mem_start</title></line>
+<line x1="2706" x2="2941" y1="919.5" y2="919.5" class="net_220"><title>mem_we</title></line>
+<line x1="2941" x2="2941" y1="919.5" y2="2579" class="net_220"><title>mem_we</title></line>
+<line x1="2941" x2="3772" y1="2579" y2="2579" class="net_220"><title>mem_we</title></line>
+<line x1="2706" x2="3011" y1="859.5" y2="859.5" class="net_221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240"><title>mem_addr</title></line>
+<line x1="3011" x2="3011" y1="859.5" y2="2280" class="net_221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240"><title>mem_addr</title></line>
+<line x1="3011" x2="3772" y1="2280" y2="2280" class="net_221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240"><title>mem_addr</title></line>
+<line x1="2706" x2="2951" y1="899.5" y2="899.5" class="net_241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272"><title>mem_wdata</title></line>
+<line x1="2951" x2="2951" y1="899.5" y2="2514" class="net_241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272"><title>mem_wdata</title></line>
+<line x1="2951" x2="3772" y1="2514" y2="2514" class="net_241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272"><title>mem_wdata</title></line>
+<line x1="2706" x2="3061" y1="739.5" y2="739.5" class="net_307,308,309,310,311"><title>DBG_STATE</title></line>
+<line x1="3061" x2="3061" y1="739.5" y2="1314.5" class="net_307,308,309,310,311"><title>DBG_STATE</title></line>
+<line x1="3061" x2="3772" y1="1314.5" y2="1314.5" class="net_307,308,309,310,311"><title>DBG_STATE</title></line>
+<line x1="2706" x2="3141" y1="599.5" y2="599.5" class="net_312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343"><title>DBG_LBA</title></line>
+<line x1="3141" x2="3141" y1="599.5" y2="824.5" class="net_312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343"><title>DBG_LBA</title></line>
+<line x1="3141" x2="3772" y1="824.5" y2="824.5" class="net_312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343"><title>DBG_LBA</title></line>
+<line x1="2706" x2="3051" y1="759.5" y2="759.5" class="net_344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359"><title>DBG_WDATA</title></line>
+<line x1="3051" x2="3051" y1="759.5" y2="1379.5" class="net_344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359"><title>DBG_WDATA</title></line>
+<line x1="3051" x2="3772" y1="1379.5" y2="1379.5" class="net_344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359"><title>DBG_WDATA</title></line>
+<line x1="2706" x2="3121" y1="639.5" y2="639.5" class="net_360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375"><title>DBG_RDATA</title></line>
+<line x1="3121" x2="3121" y1="639.5" y2="954.5" class="net_360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375"><title>DBG_RDATA</title></line>
+<line x1="3121" x2="3772" y1="954.5" y2="954.5" class="net_360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375"><title>DBG_RDATA</title></line>
+<line x1="2706" x2="3772" y1="499.5" y2="499.5" class="net_376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391"><title>DBG_BUFW</title></line>
+<line x1="2706" x2="3211" y1="519.5" y2="519.5" class="net_392"><title>DBG_BUFWE</title></line>
+<line x1="3211" x2="3211" y1="519.5" y2="564.5" class="net_392"><title>DBG_BUFWE</title></line>
+<line x1="3211" x2="3772" y1="564.5" y2="564.5" class="net_392"><title>DBG_BUFWE</title></line>
+<line x1="2706" x2="3171" y1="559.5" y2="559.5" class="net_393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408"><title>DBG_FSEC</title></line>
+<line x1="3171" x2="3171" y1="559.5" y2="694.5" class="net_393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408"><title>DBG_FSEC</title></line>
+<line x1="3171" x2="3772" y1="694.5" y2="694.5" class="net_393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408"><title>DBG_FSEC</title></line>
+<line x1="2706" x2="3091" y1="699.5" y2="699.5" class="net_409"><title>DBG_RX_STB</title></line>
+<line x1="3091" x2="3091" y1="699.5" y2="1149.5" class="net_409"><title>DBG_RX_STB</title></line>
+<line x1="3091" x2="3771" y1="1149.5" y2="1149.5" class="net_409"><title>DBG_RX_STB</title></line>
+<line x1="2706" x2="3101" y1="679.5" y2="679.5" class="net_410,411,412,413,414,415,416,417"><title>DBG_RX_RAW</title></line>
+<line x1="3101" x2="3101" y1="679.5" y2="1084.5" class="net_410,411,412,413,414,415,416,417"><title>DBG_RX_RAW</title></line>
+<line x1="3101" x2="3771" y1="1084.5" y2="1084.5" class="net_410,411,412,413,414,415,416,417"><title>DBG_RX_RAW</title></line>
+<line x1="2706" x2="3111" y1="659.5" y2="659.5" class="net_418,419,420,421,422,423,424,425"><title>DBG_RX_BYTE</title></line>
+<line x1="3111" x2="3111" y1="659.5" y2="1019.5" class="net_418,419,420,421,422,423,424,425"><title>DBG_RX_BYTE</title></line>
+<line x1="3111" x2="3765" y1="1019.5" y2="1019.5" class="net_418,419,420,421,422,423,424,425"><title>DBG_RX_BYTE</title></line>
+<line x1="2706" x2="3131" y1="619.5" y2="619.5" class="net_426"><title>DBG_PAST_EOF</title></line>
+<line x1="3131" x2="3131" y1="619.5" y2="889.5" class="net_426"><title>DBG_PAST_EOF</title></line>
+<line x1="3131" x2="3759" y1="889.5" y2="889.5" class="net_426"><title>DBG_PAST_EOF</title></line>
+<line x1="2706" x2="3151" y1="579.5" y2="579.5" class="net_427,428,429"><title>DBG_GRANT</title></line>
+<line x1="3151" x2="3151" y1="579.5" y2="759.5" class="net_427,428,429"><title>DBG_GRANT</title></line>
+<line x1="3151" x2="3772" y1="759.5" y2="759.5" class="net_427,428,429"><title>DBG_GRANT</title></line>
+<line x1="2706" x2="2801" y1="1199.5" y2="1199.5" class="net_430,431"><title>sd_status</title></line>
+<line x1="2801" x2="2801" y1="1199.5" y2="3359" class="net_430,431"><title>sd_status</title></line>
+<line x1="2801" x2="3772" y1="3359" y2="3359" class="net_430,431"><title>sd_status</title></line>
+<line x1="3530" x2="3717" y1="1624" y2="1624" class="net_436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451"><title>a_block</title></line>
+<line x1="3717" x2="3717" y1="1624" y2="1783.5" class="net_436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451"><title>a_block</title></line>
+<line x1="3717" x2="3772" y1="1783.5" y2="1783.5" class="net_436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451"><title>a_block</title></line>
+<line x1="3529" x2="3737" y1="1518.5" y2="1518.5" class="net_1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3737" x2="3737" y1="1518.5" y2="1803.5" class="net_1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3737" x2="3772" y1="1803.5" y2="1803.5" class="net_1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3529" x2="3737" y1="1518.5" y2="1518.5" class="net_1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3737" x2="3737" y1="1518.5" y2="1726.5" class="net_1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<circle cx="3737" cy="1726.5" r="2" style="fill:#000" class="net_1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3737" x2="3772" y1="1726.5" y2="1726.5" class="net_1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,1104,1105,1106,1107,1108,1109,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126,1127,1128,1129" />
+<line x1="3530" x2="3707" y1="1644" y2="1644" class="net_462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477"><title>a_buf_rdata</title></line>
+<line x1="3707" x2="3707" y1="1644" y2="1706.5" class="net_462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477"><title>a_buf_rdata</title></line>
+<line x1="3707" x2="3772" y1="1706.5" y2="1706.5" class="net_462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477"><title>a_buf_rdata</title></line>
+<line x1="3530" x2="3697" y1="1664" y2="1664" class="net_504"><title>a_open_req</title></line>
+<line x1="3697" x2="3697" y1="1664" y2="1911.5" class="net_504"><title>a_open_req</title></line>
+<line x1="3697" x2="3772" y1="1911.5" y2="1911.5" class="net_504"><title>a_open_req</title></line>
+<line x1="3529" x2="3772" y1="1931.5" y2="1931.5" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3529" x2="3667" y1="1931.5" y2="1931.5" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3667" x2="3667" y1="1931.5" y2="2085.5" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<circle cx="3667" cy="1931.5" r="2" style="fill:#000" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3667" x2="3772" y1="2085.5" y2="2085.5" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3529" x2="3667" y1="1931.5" y2="1931.5" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3667" x2="3667" y1="1931.5" y2="2008.5" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<circle cx="3667" cy="2008.5" r="2" style="fill:#000" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3667" x2="3772" y1="2008.5" y2="2008.5" class="net_1242,1243,1244,1245,1246,1247,1248" />
+<line x1="3530" x2="3687" y1="1684" y2="1684" class="net_505"><title>a_req</title></line>
+<line x1="3687" x2="3687" y1="1684" y2="2065.5" class="net_505"><title>a_req</title></line>
+<line x1="3687" x2="3772" y1="2065.5" y2="2065.5" class="net_505"><title>a_req</title></line>
+<line x1="3530" x2="3677" y1="1704" y2="1704" class="net_538"><title>a_wr</title></line>
+<line x1="3677" x2="3677" y1="1704" y2="1988.5" class="net_538"><title>a_wr</title></line>
+<line x1="3677" x2="3772" y1="1988.5" y2="1988.5" class="net_538"><title>a_wr</title></line>
+<line x1="2706" x2="3221" y1="399.5" y2="399.5" class="net_452,453,454,455,456,457,458,459,460,461,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607,608"><title>buf_addr_w</title></line>
+<line x1="3221" x2="3221" y1="399.5" y2="1488.5" class="net_452,453,454,455,456,457,458,459,460,461,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607,608"><title>buf_addr_w</title></line>
+<line x1="3221" x2="3281.5" y1="1488.5" y2="1488.5" class="net_452,453,454,455,456,457,458,459,460,461,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607,608"><title>buf_addr_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1488.5" y2="1476.5" class="net_452,453,454,455,456,457,458,459,460,461,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607,608"><title>buf_addr_w</title></line>
+<line x1="2706" x2="3201" y1="419.5" y2="419.5" class="net_478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,673,674,675,676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,691,692,693,694,695,696,697,698,699,700,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,716,717,718,719,720"><title>buf_wdata_w</title></line>
+<line x1="3201" x2="3201" y1="419.5" y2="1531.5" class="net_478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,673,674,675,676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,691,692,693,694,695,696,697,698,699,700,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,716,717,718,719,720"><title>buf_wdata_w</title></line>
+<line x1="3201" x2="3281.5" y1="1531.5" y2="1531.5" class="net_478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,673,674,675,676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,691,692,693,694,695,696,697,698,699,700,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,716,717,718,719,720"><title>buf_wdata_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1531.5" y2="1519.5" class="net_478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,673,674,675,676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,691,692,693,694,695,696,697,698,699,700,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,716,717,718,719,720"><title>buf_wdata_w</title></line>
+<line x1="2706" x2="3181" y1="439.5" y2="439.5" class="net_494,721,722,723,724,725,726,727"><title>buf_we_w</title></line>
+<line x1="3181" x2="3181" y1="439.5" y2="1574.5" class="net_494,721,722,723,724,725,726,727"><title>buf_we_w</title></line>
+<line x1="3181" x2="3281.5" y1="1574.5" y2="1574.5" class="net_494,721,722,723,724,725,726,727"><title>buf_we_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1574.5" y2="1562.5" class="net_494,721,722,723,724,725,726,727"><title>buf_we_w</title></line>
+<line x1="2706" x2="3161" y1="459.5" y2="459.5" class="net_495,728,729,730,731,732,733,734"><title>busy_w</title></line>
+<line x1="3161" x2="3161" y1="459.5" y2="1617.5" class="net_495,728,729,730,731,732,733,734"><title>busy_w</title></line>
+<line x1="3161" x2="3281.5" y1="1617.5" y2="1617.5" class="net_495,728,729,730,731,732,733,734"><title>busy_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1617.5" y2="1605.5" class="net_495,728,729,730,731,732,733,734"><title>busy_w</title></line>
+<line x1="2706" x2="3041" y1="779.5" y2="779.5" class="net_496,735,736,737,738,739,740,741"><title>done_w</title></line>
+<line x1="3041" x2="3041" y1="779.5" y2="1660.5" class="net_496,735,736,737,738,739,740,741"><title>done_w</title></line>
+<line x1="3041" x2="3281.5" y1="1660.5" y2="1660.5" class="net_496,735,736,737,738,739,740,741"><title>done_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1660.5" y2="1648.5" class="net_496,735,736,737,738,739,740,741"><title>done_w</title></line>
+<line x1="2706" x2="3031" y1="799.5" y2="799.5" class="net_497,742,743,744,745,746,747,748"><title>err_w</title></line>
+<line x1="3031" x2="3031" y1="799.5" y2="1703.5" class="net_497,742,743,744,745,746,747,748"><title>err_w</title></line>
+<line x1="3031" x2="3281.5" y1="1703.5" y2="1703.5" class="net_497,742,743,744,745,746,747,748"><title>err_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1703.5" y2="1691.5" class="net_497,742,743,744,745,746,747,748"><title>err_w</title></line>
+<line x1="2706" x2="3021" y1="819.5" y2="819.5" class="net_498,499,500,501,749,750,751,752,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776"><title>err_code_w</title></line>
+<line x1="3021" x2="3021" y1="819.5" y2="1746.5" class="net_498,499,500,501,749,750,751,752,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776"><title>err_code_w</title></line>
+<line x1="3021" x2="3281.5" y1="1746.5" y2="1746.5" class="net_498,499,500,501,749,750,751,752,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776"><title>err_code_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1746.5" y2="1734.5" class="net_498,499,500,501,749,750,751,752,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776"><title>err_code_w</title></line>
+<line x1="2706" x2="3001" y1="939.5" y2="939.5" class="net_502,777,778,779,780,781,782,783"><title>open_err_w</title></line>
+<line x1="3001" x2="3001" y1="939.5" y2="1789.5" class="net_502,777,778,779,780,781,782,783"><title>open_err_w</title></line>
+<line x1="3001" x2="3281.5" y1="1789.5" y2="1789.5" class="net_502,777,778,779,780,781,782,783"><title>open_err_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1789.5" y2="1777.5" class="net_502,777,778,779,780,781,782,783"><title>open_err_w</title></line>
+<line x1="2706" x2="2991" y1="959.5" y2="959.5" class="net_503,784,785,786,787,788,789,790"><title>open_ok_w</title></line>
+<line x1="2991" x2="2991" y1="959.5" y2="1843.5" class="net_503,784,785,786,787,788,789,790"><title>open_ok_w</title></line>
+<line x1="2991" x2="3281.5" y1="1843.5" y2="1843.5" class="net_503,784,785,786,787,788,789,790"><title>open_ok_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="1843.5" y2="1820.5" class="net_503,784,785,786,787,788,789,790"><title>open_ok_w</title></line>
+<line x1="2706" x2="2981" y1="1219.5" y2="1219.5" class="net_506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,791,792,793,794,795,796,797,798,799,800,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,816,817,818,819,820,821,822,823,824,825,826,827,828,829,830,831,832,833,834,835,836,837,838,839,840,841,842,843,844,845,846,847,848,849,850,851,852,853,854,855,856,857,858,859,860,861,862,863,864,865,866,867,868,869,870,871,872,873,874,875,876,877,878,879,880,881,882,883,884,885,886,887,888,889,890,891,892,893,894,895,896,897,898,899,900,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,916,917,918,919,920,921,922,923,924,925,926,927,928,929,930,931,932,933,934,935,936,937,938,939,940,941,942,943,944,945,946,947,948,949,950,951,952,953,954,955,956,957,958,959,960,961,962,963,964,965,966,967,968,969,970,971,972,973,974,975,976,977,978,979,980,981,982,983,984,985,986,987,988,989,990,991,992,993,994,995,996,997,998,999,1000,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014"><title>size_bytes_w</title></line>
+<line x1="2981" x2="2981" y1="1219.5" y2="2291" class="net_506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,791,792,793,794,795,796,797,798,799,800,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,816,817,818,819,820,821,822,823,824,825,826,827,828,829,830,831,832,833,834,835,836,837,838,839,840,841,842,843,844,845,846,847,848,849,850,851,852,853,854,855,856,857,858,859,860,861,862,863,864,865,866,867,868,869,870,871,872,873,874,875,876,877,878,879,880,881,882,883,884,885,886,887,888,889,890,891,892,893,894,895,896,897,898,899,900,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,916,917,918,919,920,921,922,923,924,925,926,927,928,929,930,931,932,933,934,935,936,937,938,939,940,941,942,943,944,945,946,947,948,949,950,951,952,953,954,955,956,957,958,959,960,961,962,963,964,965,966,967,968,969,970,971,972,973,974,975,976,977,978,979,980,981,982,983,984,985,986,987,988,989,990,991,992,993,994,995,996,997,998,999,1000,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014"><title>size_bytes_w</title></line>
+<line x1="2981" x2="3281.5" y1="2291" y2="2291" class="net_506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,791,792,793,794,795,796,797,798,799,800,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,816,817,818,819,820,821,822,823,824,825,826,827,828,829,830,831,832,833,834,835,836,837,838,839,840,841,842,843,844,845,846,847,848,849,850,851,852,853,854,855,856,857,858,859,860,861,862,863,864,865,866,867,868,869,870,871,872,873,874,875,876,877,878,879,880,881,882,883,884,885,886,887,888,889,890,891,892,893,894,895,896,897,898,899,900,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,916,917,918,919,920,921,922,923,924,925,926,927,928,929,930,931,932,933,934,935,936,937,938,939,940,941,942,943,944,945,946,947,948,949,950,951,952,953,954,955,956,957,958,959,960,961,962,963,964,965,966,967,968,969,970,971,972,973,974,975,976,977,978,979,980,981,982,983,984,985,986,987,988,989,990,991,992,993,994,995,996,997,998,999,1000,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014"><title>size_bytes_w</title></line>
+<line x1="3281.5" x2="3281.5" y1="2291" y2="1874.5" class="net_506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,791,792,793,794,795,796,797,798,799,800,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,816,817,818,819,820,821,822,823,824,825,826,827,828,829,830,831,832,833,834,835,836,837,838,839,840,841,842,843,844,845,846,847,848,849,850,851,852,853,854,855,856,857,858,859,860,861,862,863,864,865,866,867,868,869,870,871,872,873,874,875,876,877,878,879,880,881,882,883,884,885,886,887,888,889,890,891,892,893,894,895,896,897,898,899,900,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,916,917,918,919,920,921,922,923,924,925,926,927,928,929,930,931,932,933,934,935,936,937,938,939,940,941,942,943,944,945,946,947,948,949,950,951,952,953,954,955,956,957,958,959,960,961,962,963,964,965,966,967,968,969,970,971,972,973,974,975,976,977,978,979,980,981,982,983,984,985,986,987,988,989,990,991,992,993,994,995,996,997,998,999,1000,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014"><title>size_bytes_w</title></line>
+<line x1="2706" x2="3071" y1="479.5" y2="479.5" class="net_" />
+<line x1="3071" x2="3071" y1="479.5" y2="1259.5" class="net_" />
+<line x1="2706" x2="3071" y1="839.5" y2="839.5" class="net_" />
+<circle cx="3071" cy="839.5" r="2" style="fill:#000" class="net_" />
+<line x1="3071" x2="3071" y1="839.5" y2="1259.5" class="net_" />
+<text x="3287.0" y="2426.0" class="netlabel">source_rewind</text>
+<text x="3533.0" y="1721.0" class="netlabel">TDISK_FAULT</text>
+<text x="3533.0" y="1741.0" class="netlabel">TDISK_ERR_CODE</text>
+<text x="2451.0" y="296.5" class="netlabel">clk_stor</text>
+<text x="2934.0" y="2641.0" class="netlabel">sd_clk_o</text>
+<text x="2537.0" y="616.5" class="netlabel">sd_cmd_i</text>
+<text x="2924.0" y="2706.0" class="netlabel">sd_cmd_o</text>
+<text x="2914.0" y="2771.0" class="netlabel">sd_cmd_oe</text>
+<text x="2547.0" y="636.5" class="netlabel">sd_dat0_i</text>
+<text x="2904.0" y="2836.0" class="netlabel">sd_dat0_o</text>
+<text x="2894.0" y="2901.0" class="netlabel">sd_dat0_oe</text>
+<text x="3084.0" y="1211.5" class="netlabel">dbg_sd_busy</text>
+<text x="3194.0" y="626.5" class="netlabel">dbg_cache_pend</text>
+<text x="2451.0" y="802.5" class="netlabel">sd_dat1_i</text>
+<text x="2884.0" y="2966.0" class="netlabel">sd_dat1_o</text>
+<text x="2874.0" y="3031.0" class="netlabel">sd_dat1_oe</text>
+<text x="2451.0" y="867.5" class="netlabel">sd_dat2_i</text>
+<text x="2864.0" y="3096.0" class="netlabel">sd_dat2_o</text>
+<text x="2854.0" y="3161.0" class="netlabel">sd_dat2_oe</text>
+<text x="2451.0" y="932.5" class="netlabel">sd_dat3_i</text>
+<text x="2844.0" y="3226.0" class="netlabel">sd_dat3_o</text>
+<text x="2834.0" y="3291.0" class="netlabel">sd_dat3_oe</text>
+<text x="2964.0" y="2446.0" class="netlabel">mem_start</text>
+<text x="2944.0" y="2576.0" class="netlabel">mem_we</text>
+<text x="3014.0" y="2277.0" class="netlabel">mem_addr</text>
+<text x="2954.0" y="2511.0" class="netlabel">mem_wdata</text>
+<text x="2537.0" y="516.5" class="netlabel">mem_rdata</text>
+<text x="2451.0" y="607.5" class="netlabel">rst_stor_n</text>
+<text x="2537.0" y="476.5" class="netlabel">mem_busy</text>
+<text x="2451.0" y="491.5" class="netlabel">mem_done</text>
+<text x="3064.0" y="1311.5" class="netlabel">DBG_STATE</text>
+<text x="3144.0" y="821.5" class="netlabel">DBG_LBA</text>
+<text x="3054.0" y="1376.5" class="netlabel">DBG_WDATA</text>
+<text x="3124.0" y="951.5" class="netlabel">DBG_RDATA</text>
+<text x="2709.0" y="496.5" class="netlabel">DBG_BUFW</text>
+<text x="3214.0" y="561.5" class="netlabel">DBG_BUFWE</text>
+<text x="3174.0" y="691.5" class="netlabel">DBG_FSEC</text>
+<text x="2388.0" y="1829.5" class="netlabel">clk_cpu</text>
+<text x="3094.0" y="1146.5" class="netlabel">DBG_RX_STB</text>
+<text x="3104.0" y="1081.5" class="netlabel">DBG_RX_RAW</text>
+<text x="3114.0" y="1016.5" class="netlabel">DBG_RX_BYTE</text>
+<text x="3134.0" y="886.5" class="netlabel">DBG_PAST_EOF</text>
+<text x="3154.0" y="756.5" class="netlabel">DBG_GRANT</text>
+<text x="2804.0" y="3356.0" class="netlabel">sd_status</text>
+<text x="2517.0" y="59.0" class="netlabel">gen_tape.s_opened</text>
+<text x="3393.0" y="1821.0" class="netlabel">gen_tape.s_open_pulse</text>
+<text x="3533.0" y="1621.0" class="netlabel">a_block</text>
+<text x="3289.0" y="1463.0" class="netlabel">a_buf_addr</text>
+<text x="2709.0" y="396.5" class="netlabel">buf_addr_w</text>
+<text x="3533.0" y="1641.0" class="netlabel">a_buf_rdata</text>
+<text x="3393.0" y="1621.0" class="netlabel">a_buf_wdata</text>
+<text x="2709.0" y="416.5" class="netlabel">buf_wdata_w</text>
+<text x="3383.0" y="1641.0" class="netlabel">a_buf_we</text>
+<text x="2709.0" y="436.5" class="netlabel">buf_we_w</text>
+<text x="3373.0" y="1661.0" class="netlabel">a_busy</text>
+<text x="2709.0" y="456.5" class="netlabel">busy_w</text>
+<text x="3363.0" y="1681.0" class="netlabel">a_done</text>
+<text x="2709.0" y="776.5" class="netlabel">done_w</text>
+<text x="3353.0" y="1701.0" class="netlabel">a_err</text>
+<text x="2709.0" y="796.5" class="netlabel">err_w</text>
+<text x="3289.0" y="1721.0" class="netlabel">err_code_w[3:0]</text>
+<text x="2709.0" y="816.5" class="netlabel">err_code_w</text>
+<text x="2368.0" y="1883.5" class="netlabel">rst_cpu_n</text>
+<text x="3353.0" y="1741.0" class="netlabel">a_open_err</text>
+<text x="2709.0" y="936.5" class="netlabel">open_err_w</text>
+<text x="3363.0" y="1761.0" class="netlabel">a_open_ok</text>
+<text x="2994.0" y="1840.5" class="netlabel">open_ok_w</text>
+<text x="3533.0" y="1661.0" class="netlabel">a_open_req</text>
+<text x="3533.0" y="1681.0" class="netlabel">a_req</text>
+<text x="3373.0" y="1781.0" class="netlabel">a_size_bytes</text>
+<text x="2984.0" y="2288.0" class="netlabel">size_bytes_w</text>
+<text x="3533.0" y="1701.0" class="netlabel">a_wr</text>
+<text x="3287.0" y="1407.5" class="netlabel">byte_req</text>
+<text x="3533.0" y="1601.0" class="netlabel">byte_valid</text>
+<text x="3533.0" y="1581.0" class="netlabel">byte_data</text>
+</svg>

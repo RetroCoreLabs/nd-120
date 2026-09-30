@@ -14,6 +14,16 @@ Source: `Verilog/SD-FAT/circuit/sd_fat_rewrite.v`
 
 ![sd_fat_rewrite symbol](sd_fat_rewrite.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![sd_fat_rewrite schematic](sd_fat_rewrite.svg)](sd_fat_rewrite.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 FAT16/FAT32 in-place file replacement ("delete + recreate")
@@ -89,3 +99,685 @@ Ronny Hansen
 | input | `[7:0]` | `eng_rx_data` |  |
 | input | `[8:0]` | `eng_tx_addr` | write data source from the buffer |
 | output | `[7:0]` | `eng_tx_data` |  |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/sd_fat_rewrite.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/sd_fat_rewrite.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of sd_fat_rewrite (670 lines)</summary>
+
+```verilog
+/****************************************************************************
+** FAT16/FAT32 in-place file replacement ("delete + recreate")             **
+**                                                                         **
+** Given a file's directory entry location and the filesystem geometry     **
+** (all exported by the modified sd_file_reader after a successful scan),  **
+** this module makes the file exactly new_size bytes long:                 **
+**                                                                         **
+**   realloc = 0 (target's allocation already big enough):                 **
+**     - patch the SIZE field of the directory entry only                  **
+**   create = 1 (the file does not exist yet):                             **
+**     - scan the root directory for a free 32-byte slot (FAT16 linear     **
+**       region / FAT32 root cluster chain) and write a fresh 8.3 entry    **
+**       (name, Archive attribute, fixed date, zero size/cluster), then    **
+**       proceed exactly like realloc=1                                    **
+**   realloc = 1 (full replacement):                                       **
+**     - FREE the file's old cluster chain (both FAT copies)               **
+**     - SCAN the FAT for a CONTIGUOUS run of enough free clusters         **
+**     - WRITE the new chain (both FAT copies)                             **
+**     - patch the directory entry: size + first cluster                   **
+**                                                                         **
+** The caller then writes the data sectors (the new chain is contiguous,   **
+** first data sector = data_base_sector + cluster_size * new_first).       **
+**                                                                         **
+** All sector traffic goes through one sd_writer engine (CMD17 reads +     **
+** CMD24 writes) on an already-initialized card; an internal 512-byte      **
+** buffer holds the sector being read-modify-written.                      **
+**                                                                         **
+** Scope limits (documented in SD-FAT/README.md):                          **
+**   - the new chain is contiguous (fails with err if no contiguous run    **
+**     of free clusters exists - "no space")                               **
+**   - FAT32: the FSInfo free-cluster count is NOT updated (fsck reports   **
+**     and fixes the summary; the filesystem itself stays consistent),     **
+**     and files beyond cluster 65535 are out of reach (reader limit)      **
+**   - directory entry name/date are left untouched                       **
+**                                                                         **
+** This file is ORIGINAL ND-120 project code (MIT, like the repository).   **
+**                                                                         **
+** Last reviewed: 11-JUL-2026                                              **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module sd_fat_rewrite (
+    input wire clk,
+    input wire rst_n,
+
+    // command
+    input  wire        start,    // 1-cycle pulse; only when busy=0
+    input  wire        realloc,  // 0 = size patch only, 1 = free + allocate + patch
+    output wire        busy,
+    output reg         done,     // 1-cycle pulse
+    output reg         err,      // 1-cycle pulse (engine error, chain loop, no space)
+    output reg  [1:0]  err_kind, // valid with err, held until the next start:
+                                 // 0 = resource verdict (no contiguous free
+                                 //     run / root directory full),
+                                 // 1 = engine READ failed (FAT/dir sector),
+                                 // 2 = engine WRITE failed,
+                                 // 3 = FAT chain corrupt (loop while freeing)
+
+    // filesystem geometry (from sd_file_reader, stable once file_found=1)
+    input wire        fs_is_fat32,
+    input wire [7:0]  cluster_size,      // sectors per cluster (power of two)
+    input wire [31:0] fat0_sector,
+    input wire [31:0] sectors_per_fat,
+    input wire [7:0]  num_fats,          // 1 or 2 (2 on every real card)
+    input wire [31:0] data_base_sector,  // BIASED: cluster c starts at data_base + cluster_size*c
+    input wire [31:0] total_sectors,
+
+    // root directory location (for create): FAT16 linear region and the
+    // FAT32 root cluster
+    input wire [31:0] root_start,        // FAT16: first root dir sector
+    input wire [31:0] root_secs,         // FAT16: number of root dir sectors
+    input wire [31:0] root_cluster,      // FAT32: first cluster of the root dir
+
+    // target file
+    input wire        create,            // 1 = no entry exists: make one first
+    input wire [87:0] name83,            // 11-char 8.3 name, e.g. "IO      DAT"
+    input wire [15:0] fdate,             // FAT date word stamped on creation
+    input wire [31:0] dir_sector,        // absolute sector of the directory entry
+    input wire [3:0]  dir_index,         // entry index within that sector (0-15)
+    input wire [31:0] old_first_cluster,
+    input wire [31:0] new_size,          // bytes
+
+    // result
+    output reg [31:0] new_first_cluster, // = old_first_cluster when realloc=0
+
+    // sd_writer engine (exclusive use while busy)
+    output reg         eng_start,
+    output reg         eng_rd,           // 1 = CMD17 read, 0 = CMD24 write
+    output reg  [31:0] eng_sector,
+    input  wire        eng_busy,
+    input  wire        eng_done,
+    input  wire        eng_err,
+    input  wire        eng_rx_we,        // read data stream into the buffer
+    input  wire [8:0]  eng_rx_addr,
+    input  wire [7:0]  eng_rx_data,
+    input  wire [8:0]  eng_tx_addr,      // write data source from the buffer
+    output reg  [7:0]  eng_tx_data
+);
+
+  // ------------------------------------------------------------- 512 B buffer
+  reg [7:0] sbuf[0:511];
+
+  reg        fsm_we;
+  reg [8:0]  fsm_addr;
+  reg [7:0]  fsm_wdata;
+  reg [7:0]  fsm_q;
+
+  always @(posedge clk) begin
+    if (eng_rx_we) sbuf[eng_rx_addr] <= eng_rx_data;
+    else if (fsm_we) sbuf[fsm_addr] <= fsm_wdata;
+  end
+  always @(posedge clk) fsm_q <= sbuf[fsm_addr];
+  always @(posedge clk) eng_tx_data <= sbuf[eng_tx_addr];
+
+  // ------------------------------------------------------------- helpers
+  // FAT sector and byte offset of a cluster's entry
+  function [31:0] fat_sec(input [31:0] c);
+    fat_sec = fat0_sector + (fs_is_fat32 ? (c >> 7) : (c >> 8));
+  endfunction
+  function [8:0] fat_off(input [31:0] c);
+    fat_off = fs_is_fat32 ? {c[6:0], 2'b00} : {c[7:0], 1'b0};
+  endfunction
+
+  // end-of-chain / invalid-cluster test (masked value)
+  function is_eoc(input [31:0] c);
+    is_eoc = fs_is_fat32 ? (c[27:0] >= 28'hFFFFFF7) : (c[15:0] >= 16'hFFF7);
+  endfunction
+
+  function [4:0] log2cs(input [7:0] cs);
+    casez (cs)
+      8'b1???????: log2cs = 5'd7;
+      8'b01??????: log2cs = 5'd6;
+      8'b001?????: log2cs = 5'd5;
+      8'b0001????: log2cs = 5'd4;
+      8'b00001???: log2cs = 5'd3;
+      8'b000001??: log2cs = 5'd2;
+      8'b0000001?: log2cs = 5'd1;
+      default:     log2cs = 5'd0;
+    endcase
+  endfunction
+
+  // last addressable cluster: clusters 2..max_cluster
+  wire [31:0] usable_sectors = total_sectors - (data_base_sector + {24'b0, cluster_size} * 2);
+  wire [31:0] max_cluster = (usable_sectors >> log2cs(cluster_size)) + 32'd1;
+
+  // ------------------------------------------------------------- FSM
+  localparam S_IDLE = 6'd0;
+  localparam S_KCALC = 6'd1;   // K = clusters needed (subtract loop)
+  localparam S_FREE_CHK = 6'd2;   // old chain: next hop valid?
+  localparam S_FREE_RD = 6'd3;   // read the FAT sector holding entry(c)
+  localparam S_FREE_E0 = 6'd4;   // fetch entry bytes (2 or 4) -> nextc
+  localparam S_FREE_E1 = 6'd5;
+  localparam S_FREE_Z = 6'd6;   // zero the entry bytes in the buffer
+  localparam S_FREE_W1 = 6'd7;   // write FAT #0
+  localparam S_FREE_W2 = 6'd8;   // write FAT #1
+  localparam S_SCAN_RD = 6'd9;   // read the FAT sector holding entry(scan_c)
+  localparam S_SCAN_E0 = 6'd10;  // fetch entry bytes -> val
+  localparam S_SCAN_E1 = 6'd11;
+  localparam S_SCAN_DEC = 6'd12;  // free-run bookkeeping
+  localparam S_CH_RD = 6'd13;  // chain write: read FAT sector
+  localparam S_CH_P = 6'd14;  // patch all new entries within this sector
+  localparam S_CH_W1 = 6'd15;  // write FAT #0
+  localparam S_CH_W2 = 6'd16;  // write FAT #1
+  localparam S_DIR_RD = 6'd17;  // read the directory sector
+  localparam S_DIR_P = 6'd18;  // patch size (+ first cluster)
+  localparam S_DIR_W = 6'd19;  // write it back
+  localparam S_DONE = 6'd20;
+  localparam S_ERR = 6'd21;
+  localparam S_EGO = 6'd22;  // engine op: pulse start
+  localparam S_EWAIT = 6'd23;  // engine op: wait done/err
+  localparam S_BRD = 6'd24;  // buffered byte read: wait 1 cycle
+  localparam S_DIR_P2 = 6'd26;  // patch the first-cluster fields
+  localparam S_CH_NEXT = 6'd27;  // chain write: more entries or done?
+  localparam S_CR_RD   = 6'd28;  // create: read a root directory sector
+  localparam S_CR_SCAN = 6'd29;  // create: hunt for a free entry slot
+  localparam S_CR_WR   = 6'd30;  // create: write the fresh entry bytes
+  localparam S_CR_WSEC = 6'd31;  // create: flush the directory sector
+  localparam S_CR_FE0  = 6'd32;  // create: FAT32 root chain hop
+  localparam S_CR_FE1  = 6'd33;
+
+  reg [5:0]  state, e_ret, b_ret;
+  reg        realloc_r;
+  reg [31:0] tmp;         // K subtract scratch
+  reg [12:0] kclust;      // clusters needed (up to 4096: 2 MB file at 512 B clusters)
+  reg [31:0] cur, nextc;  // chain walk
+  reg [16:0] guard;
+  reg [31:0] scan_c, run_start;
+  reg [31:0] dsec_r;      // directory entry location actually used
+  reg [3:0]  didx_r;
+  reg [31:0] oldc_r;      // first cluster of the chain to free (0 for create)
+  reg [31:0] sl_sec, sl_clu, sl_rem;  // slot search position
+  reg [7:0]  sl_off;      // sector offset inside the FAT32 root cluster
+  reg [4:0]  sl_i;        // entry index inside the sector
+  reg [5:0]  cr_i;        // entry byte counter
+  reg [8:0]  run_len;
+  reg [31:0] cur_sec;     // FAT sector currently in the buffer
+  reg [12:0] chain_i;     // chain write index
+  reg [31:0] ent_val;     // assembled entry value / value to write
+  reg [1:0]  byte_i;
+
+  wire [17:0] bytes_per_cluster = {1'b0, cluster_size, 9'b0};
+
+  assign busy = (state != S_IDLE);
+
+  // a fresh directory entry: 8.3 name, Archive, fixed date, empty file
+  function [7:0] crbyte(input [5:0] i);
+    begin
+      if (i < 6'd11) crbyte = name83[8*(10-i)+:8];
+      else case (i)
+        6'd11: crbyte = 8'h20;        // ATTR_ARCHIVE
+        6'd16: crbyte = fdate[7:0];   // create date
+        6'd17: crbyte = fdate[15:8];
+        6'd18: crbyte = fdate[7:0];   // access date
+        6'd19: crbyte = fdate[15:8];
+        6'd24: crbyte = fdate[7:0];   // write date
+        6'd25: crbyte = fdate[15:8];
+        default: crbyte = 8'h00;      // times, cluster, size: zero
+      endcase
+    end
+  endfunction
+
+  // entry value for chain writing: next cluster or end-of-chain
+  wire [31:0] chain_val = (chain_i == kclust - 13'd1)
+      ? (fs_is_fat32 ? 32'h0FFFFFFF : 32'h0000FFFF)
+      : (new_first_cluster + {19'b0, chain_i} + 32'd1);
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      state <= S_IDLE;
+      e_ret <= S_IDLE;
+      b_ret <= S_IDLE;
+      done <= 1'b0;
+      err <= 1'b0;
+      err_kind <= 2'd0;
+      eng_start <= 1'b0;
+      eng_rd <= 1'b0;
+      eng_sector <= 0;
+      fsm_we <= 1'b0;
+      fsm_addr <= 0;
+      fsm_wdata <= 0;
+      realloc_r <= 1'b0;
+      tmp <= 0;
+      kclust <= 0;
+      cur <= 0;
+      nextc <= 0;
+      guard <= 0;
+      scan_c <= 0;
+      run_start <= 0;
+      run_len <= 0;
+      cur_sec <= 0;
+      chain_i <= 0;
+      ent_val <= 0;
+      byte_i <= 0;
+      new_first_cluster <= 0;
+      dsec_r <= 0;
+      didx_r <= 0;
+      oldc_r <= 0;
+      sl_sec <= 0;
+      sl_clu <= 0;
+      sl_rem <= 0;
+      sl_off <= 0;
+      sl_i <= 0;
+      cr_i <= 0;
+    end else begin
+      done <= 1'b0;
+      err <= 1'b0;
+      eng_start <= 1'b0;
+      fsm_we <= 1'b0;
+
+      case (state)
+        S_IDLE:
+        if (start) begin
+          err_kind <= 2'd0;
+          realloc_r <= realloc | create;
+          dsec_r <= dir_sector;
+          didx_r <= dir_index;
+          oldc_r <= create ? 32'd0 : old_first_cluster;
+          new_first_cluster <= old_first_cluster;
+          guard <= 0;
+          if (create) begin
+            // hunt for a free root directory slot first
+            if (fs_is_fat32) begin
+              sl_clu <= root_cluster;
+              sl_off <= 0;
+              sl_sec <= data_base_sector + {24'b0, cluster_size} * root_cluster;
+            end else begin
+              sl_sec <= root_start;
+              sl_rem <= root_secs;
+            end
+            state <= S_CR_RD;
+          end else if (realloc) begin
+            tmp <= new_size;
+            kclust <= 0;
+            state <= S_KCALC;
+          end else state <= S_DIR_RD;
+        end
+
+        // ---- clusters needed --------------------------------------------
+        S_KCALC:
+        if (tmp == 0) begin
+          if (kclust == 0) kclust <= 13'd1;  // never allocate an empty chain
+          cur <= fs_is_fat32 ? {4'b0, oldc_r[27:0]} : {16'b0, oldc_r[15:0]};
+          state <= S_FREE_CHK;
+        end else if (tmp >= {14'b0, bytes_per_cluster}) begin
+          tmp <= tmp - {14'b0, bytes_per_cluster};
+          kclust <= kclust + 13'd1;
+        end else begin
+          tmp <= 0;
+          kclust <= kclust + 13'd1;
+        end
+
+        // ---- free the old chain -----------------------------------------
+        S_FREE_CHK:
+        if (cur < 32'd2 || is_eoc(cur) || cur > max_cluster) begin
+          scan_c <= 32'd2;  // chain freed: hunt for a contiguous run
+          run_len <= 0;
+          cur_sec <= 32'hFFFFFFFF;
+          state <= S_SCAN_RD;
+        end else if (guard[16]) begin
+          err_kind <= 2'd3;
+          state <= S_ERR;  // chain loop (corrupt FAT)
+        end else begin
+          eng_sector <= fat_sec(cur);
+          eng_rd <= 1'b1;
+          e_ret <= S_FREE_E0;
+          state <= S_EGO;
+        end
+
+        S_FREE_E0: begin  // read entry bytes -> nextc (little endian)
+          fsm_addr <= fat_off(cur);
+          byte_i <= 0;
+          ent_val <= 0;
+          b_ret <= S_FREE_E1;
+          state <= S_BRD;
+        end
+
+        S_FREE_E1: begin
+          ent_val <= ent_val | ({24'b0, fsm_q} << {byte_i, 3'b000});
+          if ({1'b0, byte_i} == (fs_is_fat32 ? 3'd3 : 3'd1)) begin
+            state <= S_FREE_Z;
+            fsm_addr <= fat_off(cur);
+            byte_i <= 0;
+          end else begin
+            byte_i <= byte_i + 2'd1;
+            fsm_addr <= fsm_addr + 9'd1;
+            b_ret <= S_FREE_E1;
+            state <= S_BRD;
+          end
+        end
+
+        S_FREE_Z: begin  // zero the entry (FAT32: preserve the reserved nibble)
+          // NOTE the write latency: fsm_we/addr/wdata registered here take
+          // effect one clock later, so the address for byte k is advanced
+          // WITH byte k (k>=1), never on the first byte
+          fsm_we <= 1'b1;
+          fsm_wdata <= (fs_is_fat32 && byte_i == 2'd3) ? (ent_val[31:24] & 8'hF0) : 8'h00;
+          if (byte_i != 2'd0) fsm_addr <= fsm_addr + 9'd1;
+          if ({1'b0, byte_i} == (fs_is_fat32 ? 3'd3 : 3'd1)) begin
+            nextc <= fs_is_fat32 ? {4'b0, ent_val[27:0]} : {16'b0, ent_val[15:0]};
+            eng_sector <= fat_sec(cur);
+            eng_rd <= 1'b0;
+            e_ret <= S_FREE_W2;
+            state <= S_EGO;
+          end else begin
+            byte_i <= byte_i + 2'd1;
+          end
+        end
+
+        S_FREE_W2:
+        if (num_fats > 8'd1) begin
+          eng_sector <= fat_sec(cur) + sectors_per_fat;
+          eng_rd <= 1'b0;
+          e_ret <= S_FREE_W1;
+          state <= S_EGO;
+        end else state <= S_FREE_W1;
+
+        S_FREE_W1: begin
+          cur <= nextc;
+          guard <= guard + 17'd1;
+          state <= S_FREE_CHK;
+        end
+
+        // ---- scan for a contiguous free run -----------------------------
+        S_SCAN_RD:
+        if (scan_c + {19'b0, kclust} - 32'd1 > max_cluster) begin
+          err_kind <= 2'd0;
+          state <= S_ERR;  // no contiguous space (the scan itself succeeded)
+        end else if (fat_sec(scan_c) == cur_sec) begin
+          state <= S_SCAN_E0;
+        end else begin
+          eng_sector <= fat_sec(scan_c);
+          eng_rd <= 1'b1;
+          e_ret <= S_SCAN_E0;
+          state <= S_EGO;
+        end
+
+        S_SCAN_E0: begin
+          cur_sec <= fat_sec(scan_c);
+          fsm_addr <= fat_off(scan_c);
+          byte_i <= 0;
+          ent_val <= 0;
+          b_ret <= S_SCAN_E1;
+          state <= S_BRD;
+        end
+
+        S_SCAN_E1: begin
+          ent_val <= ent_val | ({24'b0, fsm_q} << {byte_i, 3'b000});
+          if ({1'b0, byte_i} == (fs_is_fat32 ? 3'd3 : 3'd1)) state <= S_SCAN_DEC;
+          else begin
+            byte_i <= byte_i + 2'd1;
+            fsm_addr <= fsm_addr + 9'd1;
+            b_ret <= S_SCAN_E1;
+            state <= S_BRD;
+          end
+        end
+
+        S_SCAN_DEC: begin
+          if ((fs_is_fat32 ? {4'b0, ent_val[27:0]} : {16'b0, ent_val[15:0]}) == 32'd0) begin
+            if (run_len == 0) run_start <= scan_c;
+            if ({4'b0, run_len} + 13'd1 == kclust) begin
+              new_first_cluster <= (run_len == 0) ? scan_c : run_start;
+              chain_i <= 0;
+              cur_sec <= 32'hFFFFFFFF;
+              state <= S_CH_RD;
+            end else begin
+              run_len <= run_len + 9'd1;
+              scan_c <= scan_c + 32'd1;
+              state <= S_SCAN_RD;
+            end
+          end else begin
+            run_len <= 0;
+            scan_c <= scan_c + 32'd1;
+            state <= S_SCAN_RD;
+          end
+        end
+
+        // ---- write the new chain (batched per FAT sector) ---------------
+        S_CH_RD:
+        if (fat_sec(new_first_cluster + {19'b0, chain_i}) == cur_sec) begin
+          state <= S_CH_P;
+          fsm_addr <= fat_off(new_first_cluster + {19'b0, chain_i});
+          byte_i <= 0;
+          ent_val <= chain_val;
+        end else begin
+          eng_sector <= fat_sec(new_first_cluster + {19'b0, chain_i});
+          eng_rd <= 1'b1;
+          e_ret <= S_CH_RD;
+          cur_sec <= fat_sec(new_first_cluster + {19'b0, chain_i});
+          state <= S_EGO;
+        end
+
+        S_CH_P: begin  // write the entry bytes (little endian)
+          // (same write-latency rule as S_FREE_Z: advance the address WITH
+          // byte k for k>=1, never on the first byte)
+          fsm_we <= 1'b1;
+          fsm_wdata <= ent_val[7:0];
+          ent_val <= {8'b0, ent_val[31:8]};
+          if (byte_i != 2'd0) fsm_addr <= fsm_addr + 9'd1;
+          if ({1'b0, byte_i} == (fs_is_fat32 ? 3'd3 : 3'd1)) begin
+            chain_i <= chain_i + 13'd1;
+            // flush when this was the last entry, or the next one lives in
+            // another FAT sector; otherwise patch on in the same buffer
+            if (chain_i + 13'd1 == kclust ||
+                fat_sec(new_first_cluster + {19'b0, chain_i} + 32'd1) != cur_sec)
+              state <= S_CH_W1;
+            else state <= S_CH_RD;  // same sector: re-enter to set up the next entry
+          end else begin
+            byte_i <= byte_i + 2'd1;
+          end
+        end
+
+        S_CH_W1: begin
+          eng_sector <= cur_sec;
+          eng_rd <= 1'b0;
+          e_ret <= S_CH_W2;
+          state <= S_EGO;
+        end
+
+        S_CH_W2:
+        if (num_fats > 8'd1) begin
+          eng_sector <= cur_sec + sectors_per_fat;
+          eng_rd <= 1'b0;
+          e_ret <= S_CH_NEXT;
+          state <= S_EGO;
+        end else state <= S_CH_NEXT;
+
+        S_CH_NEXT: state <= (chain_i >= kclust) ? S_DIR_RD : S_CH_RD;
+
+        // ---- patch the directory entry ----------------------------------
+        S_DIR_RD: begin
+          eng_sector <= dsec_r;
+          eng_rd <= 1'b1;
+          e_ret <= S_DIR_P;
+          byte_i <= 0;
+          state <= S_EGO;
+        end
+
+        S_DIR_P: begin  // size dword at +0x1C; first cluster at +0x1A / +0x14
+          fsm_we <= 1'b1;
+          case (byte_i)
+            2'd0: begin fsm_addr <= {didx_r, 5'h1C}; fsm_wdata <= new_size[7:0]; end
+            2'd1: begin fsm_addr <= {didx_r, 5'h1D}; fsm_wdata <= new_size[15:8]; end
+            2'd2: begin fsm_addr <= {didx_r, 5'h1E}; fsm_wdata <= new_size[23:16]; end
+            2'd3: begin fsm_addr <= {didx_r, 5'h1F}; fsm_wdata <= new_size[31:24]; end
+          endcase
+          if (byte_i == 2'd3) begin
+            byte_i <= 0;
+            state <= realloc_r ? S_DIR_P2 : S_DIR_W;
+          end else byte_i <= byte_i + 2'd1;
+        end
+
+        S_DIR_P2: begin  // patch the first-cluster fields (realloc only)
+          fsm_we <= 1'b1;
+          case (byte_i)
+            2'd0: begin fsm_addr <= {didx_r, 5'h1A}; fsm_wdata <= new_first_cluster[7:0]; end
+            2'd1: begin fsm_addr <= {didx_r, 5'h1B}; fsm_wdata <= new_first_cluster[15:8]; end
+            2'd2: begin fsm_addr <= {didx_r, 5'h14}; fsm_wdata <= fs_is_fat32 ? new_first_cluster[23:16] : 8'h00; end
+            2'd3: begin fsm_addr <= {didx_r, 5'h15}; fsm_wdata <= fs_is_fat32 ? new_first_cluster[31:24] : 8'h00; end
+          endcase
+          // (FAT16: 0x14/0x15 is reserved - writing zeros is correct)
+          if (byte_i == 2'd3) state <= S_DIR_W;
+          else byte_i <= byte_i + 2'd1;
+        end
+
+        S_DIR_W: begin
+          // MUST be dsec_r, not the dir_sector input: on the create path the
+          // entry lives in the root slot found by S_CR_SCAN (dsec_r), while
+          // dir_sector is meaningless (a file that did not exist has no known
+          // entry location - the caller passes stale/zero). Writing to
+          // dir_sector here put a root-directory sector image at sector 0,
+          // destroying the MBR/boot sector (field failure: WRITE test on a
+          // fresh card, then every mount died with FS SCAN TIMEOUT).
+          eng_sector <= dsec_r;
+          eng_rd <= 1'b0;
+          e_ret <= S_DONE;
+          state <= S_EGO;
+        end
+
+        S_DONE: begin
+          done <= 1'b1;
+          state <= S_IDLE;
+        end
+
+        S_ERR: begin
+          err <= 1'b1;
+          state <= S_IDLE;
+        end
+
+        // ---- create: find a free slot, write a fresh entry ---------------
+        S_CR_RD: begin
+          eng_sector <= sl_sec;
+          eng_rd <= 1'b1;
+          sl_i <= 0;
+          fsm_addr <= 9'd0;  // entry 0, byte 0
+          b_ret <= S_CR_SCAN;
+          e_ret <= S_BRD;
+          state <= S_EGO;
+        end
+
+        S_CR_SCAN:
+        if (fsm_q == 8'hE5 || fsm_q == 8'h00) begin
+          // free slot: this becomes the file's directory entry
+          dsec_r <= sl_sec;
+          didx_r <= sl_i[3:0];
+          cr_i <= 0;
+          fsm_addr <= {sl_i[3:0], 5'd0};
+          state <= S_CR_WR;
+        end else if (sl_i == 5'd15) begin
+          // sector exhausted: next root sector
+          if (fs_is_fat32) begin
+            if (sl_off + 8'd1 < cluster_size) begin
+              sl_off <= sl_off + 8'd1;
+              sl_sec <= sl_sec + 32'd1;
+              state <= S_CR_RD;
+            end else begin
+              // follow the root cluster chain
+              eng_sector <= fat_sec(sl_clu);
+              eng_rd <= 1'b1;
+              e_ret <= S_CR_FE0;
+              state <= S_EGO;
+            end
+          end else begin
+            if (sl_rem <= 32'd1) begin
+              err_kind <= 2'd0;
+              state <= S_ERR;  // root directory full
+            end
+            else begin
+              sl_rem <= sl_rem - 32'd1;
+              sl_sec <= sl_sec + 32'd1;
+              state <= S_CR_RD;
+            end
+          end
+        end else begin
+          sl_i <= sl_i + 5'd1;
+          fsm_addr <= {sl_i[3:0] + 4'd1, 5'd0};
+          b_ret <= S_CR_SCAN;
+          state <= S_BRD;
+        end
+
+        S_CR_FE0: begin  // fetch the FAT32 root chain entry
+          fsm_addr <= fat_off(sl_clu);
+          byte_i <= 0;
+          ent_val <= 0;
+          b_ret <= S_CR_FE1;
+          state <= S_BRD;
+        end
+
+        S_CR_FE1: begin
+          ent_val <= ent_val | ({24'b0, fsm_q} << {byte_i, 3'b000});
+          if ({1'b0, byte_i} == 3'd3) begin
+            if (is_eoc((ent_val | ({24'b0, fsm_q} << {byte_i, 3'b000})) & 32'h0FFFFFFF) ||
+                ((ent_val | ({24'b0, fsm_q} << {byte_i, 3'b000})) & 32'h0FFFFFFF) < 32'd2) begin
+              err_kind <= 2'd0;
+              state <= S_ERR;  // root directory full
+            end
+            else begin
+              sl_clu <= (ent_val | ({24'b0, fsm_q} << {byte_i, 3'b000})) & 32'h0FFFFFFF;
+              sl_off <= 0;
+              sl_sec <= data_base_sector + {24'b0, cluster_size} *
+                        ((ent_val | ({24'b0, fsm_q} << {byte_i, 3'b000})) & 32'h0FFFFFFF);
+              state <= S_CR_RD;
+            end
+          end else begin
+            byte_i <= byte_i + 2'd1;
+            fsm_addr <= fsm_addr + 9'd1;
+            b_ret <= S_CR_FE1;
+            state <= S_BRD;
+          end
+        end
+
+        S_CR_WR: begin  // 32 fresh entry bytes (same write-latency rule)
+          fsm_we <= 1'b1;
+          fsm_wdata <= crbyte(cr_i[5:0] - 6'd0);
+          if (cr_i != 6'd0) fsm_addr <= fsm_addr + 9'd1;
+          if (cr_i == 6'd31) begin
+            state <= S_CR_WSEC;
+          end else cr_i <= cr_i + 6'd1;
+        end
+
+        S_CR_WSEC: begin  // flush; the root dir has no mirror copy
+          eng_sector <= dsec_r;
+          eng_rd <= 1'b0;
+          e_ret <= S_KCALC;
+          tmp <= new_size;
+          kclust <= 0;
+          state <= S_EGO;
+        end
+
+        // ---- engine op helper -------------------------------------------
+        S_EGO: begin
+          eng_start <= 1'b1;
+          state <= S_EWAIT;
+        end
+
+        S_EWAIT:
+        if (eng_done) state <= e_ret;
+        else if (eng_err) begin
+          err_kind <= eng_rd ? 2'd1 : 2'd2;  // truthful read-vs-write verdict
+          state    <= S_ERR;
+        end
+
+        // ---- buffered byte read helper (1-cycle BRAM latency) -----------
+        S_BRD: state <= b_ret;  // one wait cycle while fsm_q catches up
+
+        default: state <= S_IDLE;
+      endcase
+    end
+  end
+
+endmodule
+```
+
+</details>

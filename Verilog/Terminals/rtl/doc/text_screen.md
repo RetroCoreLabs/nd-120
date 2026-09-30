@@ -19,6 +19,16 @@ Source: `Verilog/Terminals/rtl/text_screen.v`
 
 ![text_screen symbol](text_screen.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Nexys 4 DDR build, instance `TERMINAL.SCREEN`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![text_screen schematic](text_screen.svg)](text_screen.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Parameters
 
 | Parameter | Default |
@@ -74,3 +84,364 @@ Source: `Verilog/Terminals/rtl/text_screen.v`
 | output | `1` | `frame_end` | one pulse per frame, un-delayed (for blink) |
 | output | `[11:0]` | `x_raw` |  |
 | output | `[11:0]` | `y_raw` |  |
+
+## Verilog source
+
+[`Verilog/Terminals/rtl/text_screen.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Terminals/rtl/text_screen.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of text_screen (349 lines)</summary>
+
+```verilog
+//============================================================================
+//! Text screen - turns the character RAM into pixels
+//!
+//! Part of the board-independent terminal core (Verilog/Terminals/).
+//!
+//! Owns the VGA timing generator, the character RAM read port and the font
+//! ROM, and produces one monochrome pixel per pixel clock plus the sync and
+//! blanking signals. Colour is applied by the board (12-bit on the Nexys, the
+//! framework video mixer on MiSTer) - this module says "ink or paper", which
+//! is all a terminal needs and keeps it portable.
+//!
+//! THE PIPELINE (the part that is easy to get wrong):
+//!
+//!   t+0  address the character RAM with the cell containing pixel X
+//!   t+1  character code is out; address the font ROM with it + the pixel row
+//!   t+2  the font's 8-pixel row is out; select bit X[2:0] and emit it
+//!
+//! So the pixel emitted at time t belongs to the pixel position the counters
+//! held at t-2. Everything that must line up with it - de, hsync, vsync and
+//! the low 3 bits of x - is delayed by the same two clocks. Delaying sync
+//! along with the data (rather than compensating the address) keeps the whole
+//! frame internally consistent; it shifts the image 2 pixels, which no monitor
+//! and no human can see.
+//!
+//! Hardware scrolling: the visible top line is `top_row`, not row 0. Scrolling
+//! is then one register increment instead of moving 1920 words, and the screen
+//! is a ring. terminal_ctrl owns that register and clears the newly exposed
+//! line.
+//!
+//! Written 27-AUG-2026.
+//============================================================================
+
+`default_nettype none
+
+module text_screen #(
+    parameter integer COLS        = 80,
+    parameter integer ROWS        = 24,
+    parameter integer CELL_W      = 8,
+    parameter integer CELL_H      = 16,
+    parameter integer AWIDTH      = 11,
+    //! Which font page a cell's graphics-attribute bit (RAM bit 12) selects.
+    //! 2 = TDV2200 character set 2 (TDV build - reached by both ESC 6 and SS2),
+    //! 3 = DEC Special Graphics (VT100 build) - the two builds never run at
+    //! once, so this is fixed per instantiation, not a runtime signal. See
+    //! terminal_top.v's select, and font/make_font.py for why the TDV set is
+    //! on the proven-present page 2, not page 3.
+    parameter integer GFX_PAGE    = 2,
+    //! Where the character grid sits inside the visible area. 80x25 of 8x16 is
+    //! 640x400; centred in 800x600 that is (800-640)/2 = 80, (600-400)/2 = 100.
+    parameter integer ORIGIN_X    = 80,
+    parameter integer ORIGIN_Y    = 100,
+    parameter         FONT_FILE   = "../font/font8x16.hex",
+
+    // VGA mode - defaults are 800x600@60 from a 40.000 MHz pixel clock
+    parameter integer H_VISIBLE     = 800,
+    parameter integer H_FRONT_PORCH = 40,
+    parameter integer H_SYNC        = 128,
+    parameter integer H_BACK_PORCH  = 88,
+    parameter integer V_VISIBLE     = 600,
+    parameter integer V_FRONT_PORCH = 1,
+    parameter integer V_SYNC        = 4,
+    parameter integer V_BACK_PORCH  = 23,
+
+    // Mode 1: 1920x1080@60 CVT-REDUCED BLANKING, glyphs doubled to 16x32.
+    //
+    // Reduced blanking, not the CEA-861 timings, and the reason is timing not
+    // taste. Same visible 1920x1080, but 2080x1111 total instead of 2200x1125,
+    // so 60 Hz needs 139.7 MHz instead of 148.5. The design was 0.171 ns short
+    // at 148.5 after two rounds of pipelining; the lower clock buys 0.48 ns of
+    // budget without touching the logic again. CVT-RB is a standard mode.
+    parameter integer H2_VISIBLE     = 1920,
+    parameter integer H2_FRONT_PORCH = 48,
+    parameter integer H2_SYNC        = 32,
+    parameter integer H2_BACK_PORCH  = 80,
+    parameter integer V2_VISIBLE     = 1080,
+    parameter integer V2_FRONT_PORCH = 3,
+    parameter integer V2_SYNC        = 5,
+    parameter integer V2_BACK_PORCH  = 23
+) (
+    input wire clk,    //! pixel clock
+    input wire rst_n,  //! async reset, active low
+
+    // Character RAM read port
+    output wire [AWIDTH-1:0] ram_raddr,
+    input  wire [      15:0] ram_rdata,
+
+    // Screen state, driven by terminal_ctrl
+    //! Font page. 0 = US / ISO 646 IRV, 1 = Norwegian (NS 4551-1). It changes
+    //! what six existing byte values LOOK like - it does not add characters.
+    //! A cell whose graphics attribute bit is set overrides this and reads
+    //! the GFX_PAGE font page (page 2 = TDV set 2, page 3 = DEC) instead.
+    input wire       national,
+
+    //! DECSCNM - reverse the whole screen (ink and paper swap everywhere).
+    input wire       rev_screen,
+    //! Blink phase from terminal_ctrl; cells with the blink attribute show
+    //! their glyph only while this is high.
+    input wire       blink_on,
+
+    //! Video mode. 0 = the H_*/V_* parameters at 1x glyphs; 1 = the H2_*/V2_*
+    //! parameters at 2x glyphs. MUST be switched together with the pixel clock.
+    //!
+    //! WHY THE GLYPHS SCALE WITH IT. The grid is a FIXED 80x25 cells, so at 1x
+    //! it is always 640x400 pixels no matter how big the screen is. Raising the
+    //! resolution alone therefore makes the text SMALLER - a 640x400 island in
+    //! a 1920x1080 field. Doubling the glyphs turns that into 1280x800, which
+    //! is a sensible size on a 1080p panel. It costs nothing: the same font ROM
+    //! is read, each pixel and each row simply lasts twice as long.
+    input wire       mode,
+
+    input wire [7:0] top_row,       //! which stored row is displayed at the top
+    input wire [7:0] cursor_col,
+    input wire [7:0] cursor_row,    //! cursor position in SCREEN coordinates
+    input wire       cursor_enable, //! draw the cursor at all
+
+    // Video out
+    output wire pixel,      //! 1 = ink, 0 = paper
+    output wire hsync,
+    output wire vsync,
+    output wire de,         //! display enable, already aligned with `pixel`
+    //! The two halves of `de`, same alignment. MiSTer wants only `de`; the
+    //! MiSTer2MEGA65 framework wants hblank and vblank SEPARATELY (its analog
+    //! path's video mixer derives its own de from them). Added 02-SEP-2026
+    //! for the MEGA65 glue; every other user leaves them unconnected.
+    output wire hblank,
+    output wire vblank,
+    output wire frame_end,  //! one pulse per frame, un-delayed (for blink)
+
+    //! The raw pixel counters, un-delayed. Anything else drawing on this screen
+    //! (the operator panel) works from these and applies the SAME two clocks of
+    //! delay, which is how the two stay aligned without either knowing about
+    //! the other.
+    output wire [11:0] x_raw,
+    output wire [11:0] y_raw
+);
+
+  wire [11:0] s_x;
+  wire [11:0] s_y;
+
+  assign x_raw = s_x;
+  assign y_raw = s_y;
+  wire        s_hsync_raw;
+  wire        s_vsync_raw;
+  wire        s_de_raw;
+  wire        s_hblank_raw;
+  wire        s_vblank_raw;
+
+  vga_timing #(
+      .H_VISIBLE    (H_VISIBLE),
+      .H_FRONT_PORCH(H_FRONT_PORCH),
+      .H_SYNC       (H_SYNC),
+      .H_BACK_PORCH (H_BACK_PORCH),
+      .V_VISIBLE    (V_VISIBLE),
+      .V_FRONT_PORCH(V_FRONT_PORCH),
+      .V_SYNC       (V_SYNC),
+      .V_BACK_PORCH (V_BACK_PORCH),
+      .H2_VISIBLE    (H2_VISIBLE),
+      .H2_FRONT_PORCH(H2_FRONT_PORCH),
+      .H2_SYNC       (H2_SYNC),
+      .H2_BACK_PORCH (H2_BACK_PORCH),
+      .V2_VISIBLE    (V2_VISIBLE),
+      .V2_FRONT_PORCH(V2_FRONT_PORCH),
+      .V2_SYNC       (V2_SYNC),
+      .V2_BACK_PORCH (V2_BACK_PORCH)
+  ) TIMING (
+      .clk      (clk),
+      .rst_n    (rst_n),
+      .mode     (mode),
+      .x        (s_x),
+      .y        (s_y),
+      .hsync    (s_hsync_raw),
+      .vsync    (s_vsync_raw),
+      .de       (s_de_raw),
+      .hblank   (s_hblank_raw),
+      .vblank   (s_vblank_raw),
+      .line_end (),
+      .frame_end(frame_end)
+  );
+
+  //--------------------------------------------------------------------------
+  // Stage 0 - which cell does pixel (s_x, s_y) belong to
+  //--------------------------------------------------------------------------
+
+  // Position inside the character grid. Signed compare against the origin, so
+  // the border around the grid is simply "outside".
+  //! Centre the grid for whichever mode is running. Computed, never written
+  //! down - the same lesson as the 108-vs-100 bug that shipped in terminal_top:
+  //! a hand-maintained origin goes stale the moment anything around it changes.
+  localparam integer ORIGIN2_X = (H2_VISIBLE - COLS * CELL_W * 2) / 2;
+
+  //! NOT centred vertically, unlike mode 0, and that is deliberate.
+  //!
+  //! Centring 800 rows of text in 1080 leaves 140 above and 140 below - which
+  //! in the panel's halved coordinates is only 70 logical rows, and the panel
+  //! needs 80. It was therefore drawn past the bottom of the screen and simply
+  //! disappeared at 1080p while working fine at 800x600.
+  //!
+  //! Sitting the text at y=40 leaves 240 physical rows underneath: the panel
+  //! takes 160 of them and 40 remain as a bottom margin.
+  localparam integer ORIGIN2_Y = 40;
+
+  wire [11:0] s_origin_x = mode ? ORIGIN2_X[11:0] : ORIGIN_X[11:0];
+  wire [11:0] s_origin_y = mode ? ORIGIN2_Y[11:0] : ORIGIN_Y[11:0];
+
+  wire signed [12:0] s_grid_x = $signed({1'b0, s_x}) - $signed({1'b0, s_origin_x});
+  wire signed [12:0] s_grid_y = $signed({1'b0, s_y}) - $signed({1'b0, s_origin_y});
+
+  wire s_in_grid = (s_grid_x >= 0) && (s_grid_x < (mode ? COLS*CELL_W*2 : COLS*CELL_W)) &&
+                   (s_grid_y >= 0) && (s_grid_y < (mode ? ROWS*CELL_H*2 : ROWS*CELL_H));
+
+  wire [11:0] s_gx = s_grid_x[11:0];
+  wire [11:0] s_gy = s_grid_y[11:0];
+
+  //! At 2x, every cell is 16x32 instead of 8x16, so the divide moves up one bit
+  //! and the font is indexed with the position SHIFTED RIGHT - which is the
+  //! whole of pixel doubling: each font pixel is read twice in a row, and each
+  //! font row is read on two consecutive scan lines.
+  wire [7:0] s_col        = mode ? s_gx[11:4] : s_gx[11:3];
+  wire [7:0] s_screen_row = mode ? s_gy[11:5] : s_gy[11:4];
+  wire [3:0] s_pixel_row  = mode ? s_gy[4:1]  : s_gy[3:0];
+  wire [2:0] s_pixel_col  = mode ? s_gx[3:1]  : s_gx[2:0];
+
+  // Hardware scroll: screen row N is stored row (top_row + N) mod ROWS.
+  wire [8:0] s_sum_row    = {1'b0, top_row} + {1'b0, s_screen_row};
+  wire [7:0] s_stored_row = (s_sum_row >= ROWS) ? (s_sum_row[7:0] - ROWS[7:0])
+                                                : s_sum_row[7:0];
+
+  // address = stored_row * COLS + col. COLS is 80 = 64 + 16, so the multiply is
+  // two shifts and an add - no DSP, no multiplier inferred.
+  //
+  // THE ROW HALF IS REGISTERED, and that is what makes 148.4 MHz reachable.
+  // Done in one lump this was the critical path of the whole design:
+  //
+  //   Source: TIMING/s_vcount_reg[1] -> Dest: CHARRAM address
+  //   Data Path Delay: 7.623 ns   Logic Levels: 11 (CARRY4=7)
+  //   Slack: -1.696 ns   (budget 6.737 ns)
+  //
+  // Subtracting the origin, deriving the text row, adding top_row, wrapping it
+  // and multiplying by 80 is seven carry chains - and all of it recomputed for
+  // every pixel, when the row only changes once every 16 SCANLINES.
+  //
+  // Registering it is free of artefacts because of WHEN y changes: the vertical
+  // counter advances at the end of a line, during horizontal blanking, which is
+  // hundreds of clocks before the next visible pixel. The register has long
+  // settled by the time `de` rises. What is left in the per-pixel path is one
+  // adder.
+  reg [AWIDTH-1:0] s_row_base;
+  always @(posedge clk) s_row_base <= ({s_stored_row, 6'b0} + {s_stored_row, 4'b0});
+
+  assign ram_raddr = s_row_base + {{(AWIDTH-8){1'b0}}, s_col};
+
+  //--------------------------------------------------------------------------
+  // Stage 1 - character code out of the RAM, into the font ROM
+  //--------------------------------------------------------------------------
+
+  reg [3:0] s_pixel_row_d1;
+  always @(posedge clk) s_pixel_row_d1 <= s_pixel_row;
+
+  wire [7:0] s_font_pixels;
+
+  //! WHICH FONT PAGE. The ROM holds four 128-glyph pages: page 0 is US /
+  //! ISO 646 IRV, page 1 the Norwegian variant (six bytes draw AE OE AA
+  //! ae oe aa and the currency sign instead of [ \ ] { | } and $ - see the
+  //! long note in font/make_font.py), page 2 the DEC Special Graphics set
+  //! the VT100 build draws boxes with, page 3 the TDV2200 character set 2 the
+  //! TDV build draws boxes with. The cell's graphics attribute (bit 12, set
+  //! by terminal_ctrl(_tdv) from its own charset state at write time) wins
+  //! over `national`: a line-drawing cell is line drawing on both layouts.
+  //! GFX_PAGE picks 2 or 3 - fixed per build, see the parameter comment.
+  //!
+  //! Bit 7 of the stored character is REPLACED, not ORed: the ND-120 is 7-bit,
+  //! so bit 7 carries no information, and replacing it means a stray high byte
+  //! cannot land on the wrong page.
+  wire [1:0] s_font_page = ram_rdata[12] ? GFX_PAGE[1:0] : {1'b0, national};
+
+  font_rom #(
+      .FONT_FILE(FONT_FILE)
+  ) FONT (
+      .clk      (clk),
+      .char_code({s_font_page, ram_rdata[6:0]}),
+      .row      (s_pixel_row_d1),
+      .pixels   (s_font_pixels)
+  );
+
+  //--------------------------------------------------------------------------
+  // Delay lines - everything that must meet the pixel two clocks downstream
+  //--------------------------------------------------------------------------
+
+  reg [1:0] s_de_dly, s_hsync_dly, s_vsync_dly, s_in_grid_dly;
+  reg [1:0] s_hblank_dly, s_vblank_dly;
+  reg [2:0] s_pixel_col_d1, s_pixel_col_d2;
+  //! Per-cell attributes. They arrive WITH the character code, one stage
+  //! later than everything else, so they need one register to reach the
+  //! output while the rest need two.
+  reg s_reverse_d2, s_under_d2, s_blink_d2;
+  reg [3:0] s_pixel_row_d2;  //! for the underline - drawn at one fixed row
+  reg [1:0] s_cursor_dly;    //! this cell is the cursor cell
+
+  // Is the cell being fetched at stage 0 the cursor cell? Compared in SCREEN
+  // coordinates, so the cursor stays put when the screen scrolls under it.
+  wire s_is_cursor_cell = cursor_enable && s_in_grid &&
+                          (s_col == cursor_col) && (s_screen_row == cursor_row);
+
+  always @(posedge clk) begin
+    s_de_dly       <= {s_de_dly[0], s_de_raw};
+    s_hsync_dly    <= {s_hsync_dly[0], s_hsync_raw};
+    s_vsync_dly    <= {s_vsync_dly[0], s_vsync_raw};
+    s_hblank_dly   <= {s_hblank_dly[0], s_hblank_raw};
+    s_vblank_dly   <= {s_vblank_dly[0], s_vblank_raw};
+    s_in_grid_dly  <= {s_in_grid_dly[0], s_in_grid};
+    s_cursor_dly   <= {s_cursor_dly[0], s_is_cursor_cell};
+    s_pixel_col_d1 <= s_pixel_col;
+    s_pixel_col_d2 <= s_pixel_col_d1;
+    s_reverse_d2   <= ram_rdata[8];
+    s_under_d2     <= ram_rdata[10];
+    s_blink_d2     <= ram_rdata[11];
+    s_pixel_row_d2 <= s_pixel_row_d1;
+  end
+
+  //--------------------------------------------------------------------------
+  // Stage 2 - pick the pixel out of the font row
+  //--------------------------------------------------------------------------
+
+  // MSB is the leftmost pixel, so column 0 selects bit 7.
+  wire s_glyph_bit = s_font_pixels[3'd7 - s_pixel_col_d2];
+
+  //! Underline: force pixel row 14 to ink - below the baseline of every glyph
+  //! in the shipped font, the same row the VT100 used relative to its cell.
+  //! Blink: while the phase is low the glyph (underline included) is hidden;
+  //! reverse and the cursor still show, so a blinking reverse cell blinks
+  //! between reverse-space and reverse-glyph, as a real terminal does.
+  wire s_glyph_pixel = (s_glyph_bit | (s_under_d2 && s_pixel_row_d2 == 4'd14))
+                       && (!s_blink_d2 || blink_on);
+
+  // Reverse video (per cell and DECSCNM whole-screen) and the cursor are all
+  // "swap ink and paper". Doing the cursor this way means it works on top of
+  // any character, needs no separate shape, and costs one XOR.
+  wire s_invert = s_reverse_d2 ^ s_cursor_dly[1] ^ rev_screen;
+
+  assign pixel = s_in_grid_dly[1] ? (s_glyph_pixel ^ s_invert) : 1'b0;
+  assign de    = s_de_dly[1];
+  assign hsync = s_hsync_dly[1];
+  assign vsync = s_vsync_dly[1];
+  assign hblank = s_hblank_dly[1];
+  assign vblank = s_vblank_dly[1];
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

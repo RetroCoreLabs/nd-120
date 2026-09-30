@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="724.0" height="677.0" viewBox="-80.0 -80.0 724.0 677.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="724.0" height="677.0" fill="#ffffff" /><a href="../../../../Shared/logisim/doc/OR_GATE.md"><title>GATES_1 (OR_GATE) - open its page</title><g transform="translate(353,198)" id="cell_GATES_1"><text x="15" y="-4" class="nodelabel cell_GATES_1">OR_GATE</text><rect width="30" height="40" class="cell_GATES_1" /><g transform="translate(0,10)" id="port_GATES_1~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input1</text></g><g transform="translate(0,30)" id="port_GATES_1~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input2</text></g><g transform="translate(30,10)" id="port_GATES_1~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_1">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_2 (NAND_GATE) - open its page</title><g transform="translate(208,22)" id="cell_GATES_2"><text x="15" y="-4" class="nodelabel cell_GATES_2">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_2" /><g transform="translate(0,10)" id="port_GATES_2~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input1</text></g><g transform="translate(0,30)" id="port_GATES_2~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input2</text></g><g transform="translate(30,10)" id="port_GATES_2~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_2">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_3 (NAND_GATE) - open its page</title><g transform="translate(208,286)" id="cell_GATES_3"><text x="15" y="-4" class="nodelabel cell_GATES_3">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_3" /><g transform="translate(0,10)" id="port_GATES_3~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input1</text></g><g transform="translate(0,30)" id="port_GATES_3~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input2</text></g><g transform="translate(30,10)" id="port_GATES_3~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_3">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/OR_GATE.md"><title>GATES_4 (OR_GATE) - open its page</title><g transform="translate(353,22)" id="cell_GATES_4"><text x="15" y="-4" class="nodelabel cell_GATES_4">OR_GATE</text><rect width="30" height="40" class="cell_GATES_4" /><g transform="translate(0,10)" id="port_GATES_4~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input1</text></g><g transform="translate(0,30)" id="port_GATES_4~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input2</text></g><g transform="translate(30,10)" id="port_GATES_4~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_4">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_5 (NAND_GATE) - open its page</title><g transform="translate(208,110)" id="cell_GATES_5"><text x="15" y="-4" class="nodelabel cell_GATES_5">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_5" /><g transform="translate(0,10)" id="port_GATES_5~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input1</text></g><g transform="translate(0,30)" id="port_GATES_5~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input2</text></g><g transform="translate(30,10)" id="port_GATES_5~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_5">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_6 (NAND_GATE) - open its page</title><g transform="translate(208,374)" id="cell_GATES_6"><text x="15" y="-4" class="nodelabel cell_GATES_6">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_6" /><g transform="translate(0,10)" id="port_GATES_6~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_6">input1</text></g><g transform="translate(0,30)" id="port_GATES_6~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_6">input2</text></g><g transform="translate(30,10)" id="port_GATES_6~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_6">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/OR_GATE.md"><title>GATES_7 (OR_GATE) - open its page</title><g transform="translate(353,110)" id="cell_GATES_7"><text x="15" y="-4" class="nodelabel cell_GATES_7">OR_GATE</text><rect width="30" height="40" class="cell_GATES_7" /><g transform="translate(0,10)" id="port_GATES_7~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_7">input1</text></g><g transform="translate(0,30)" id="port_GATES_7~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_7">input2</text></g><g transform="translate(30,10)" id="port_GATES_7~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_7">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_8 (NAND_GATE) - open its page</title><g transform="translate(208,198)" id="cell_GATES_8"><text x="15" y="-4" class="nodelabel cell_GATES_8">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_8" /><g transform="translate(0,10)" id="port_GATES_8~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_8">input1</text></g><g transform="translate(0,30)" id="port_GATES_8~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_8">input2</text></g><g transform="translate(30,10)" id="port_GATES_8~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_8">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_9 (NAND_GATE) - open its page</title><g transform="translate(208,462)" id="cell_GATES_9"><text x="15" y="-4" class="nodelabel cell_GATES_9">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_9" /><g transform="translate(0,10)" id="port_GATES_9~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_9">input1</text></g><g transform="translate(0,30)" id="port_GATES_9~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_9">input2</text></g><g transform="translate(30,10)" id="port_GATES_9~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_9">result</text></g></g></a>
+<g transform="translate(12,32.5)" id="cell_HIVEC_2_0"><text x="15" y="-4" class="nodelabel cell_HIVEC_2_0">HIVEC_2_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_HIVEC_2_0" /><g /></g>
+<g transform="translate(101,130.5)" id="cell_HVE"><text x="15" y="-4" class="nodelabel cell_HVE">HVE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_HVE" /><g /></g>
+<g transform="translate(12,296.5)" id="cell_LOVEC_2_0"><text x="15" y="-4" class="nodelabel cell_LOVEC_2_0">LOVEC_2_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LOVEC_2_0" /><g /></g>
+<g transform="translate(101,394.5)" id="cell_LVE"><text x="15" y="-4" class="nodelabel cell_LVE">LVE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LVE" /><g /></g>
+<g transform="translate(504,100.5)" id="cell_PICV_2_0"><text x="15" y="-4" class="nodelabel cell_PICV_2_0">PICV_2_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PICV_2_0" /><g /></g>
+<g transform="translate(463,90)" id="cell_$join$,10,11,12,"><rect width="5" height="60" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g></g>
+<g transform="translate(116.25,22)" id="cell_$split$,2,3,4,"><rect width="5" height="60" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">2</text></g><g transform="translate(4,30)"><text x="5" y="-4">1</text></g><g transform="translate(4,50)"><text x="5" y="-4">0</text></g></g>
+<g transform="translate(116.25,286)" id="cell_$split$,6,7,8,"><rect width="5" height="60" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">2</text></g><g transform="translate(4,30)"><text x="5" y="-4">1</text></g><g transform="translate(4,50)"><text x="5" y="-4">0</text></g></g>
+<line x1="239" x2="353" y1="208.5" y2="208.5" class="net_13"><title>s_hivec0_nand_hve</title></line>
+<line x1="239" x2="306" y1="472.5" y2="472.5" class="net_14"><title>s_lovec0_nand_lve</title></line>
+<line x1="306" x2="306" y1="472.5" y2="228.5" class="net_14"><title>s_lovec0_nand_lve</title></line>
+<line x1="306" x2="353" y1="228.5" y2="228.5" class="net_14"><title>s_lovec0_nand_lve</title></line>
+<line x1="121.25" x2="208" y1="32.5" y2="32.5" class="net_4"><title>HIVEC_2_0[2]</title></line>
+<line x1="129" x2="161" y1="140.5" y2="140.5" class="net_5"><title>HVE</title></line>
+<line x1="161" x2="161" y1="140.5" y2="52.5" class="net_5"><title>HVE</title></line>
+<circle cx="161" cy="140.5" r="2" style="fill:#000" class="net_5" />
+<line x1="161" x2="208" y1="52.5" y2="52.5" class="net_5"><title>HVE</title></line>
+<line x1="129" x2="208" y1="140.5" y2="140.5" class="net_5"><title>HVE</title></line>
+<line x1="129" x2="161" y1="140.5" y2="140.5" class="net_5"><title>HVE</title></line>
+<line x1="161" x2="161" y1="140.5" y2="228.5" class="net_5"><title>HVE</title></line>
+<line x1="161" x2="208" y1="228.5" y2="228.5" class="net_5"><title>HVE</title></line>
+<line x1="121.25" x2="208" y1="296.5" y2="296.5" class="net_8"><title>LOVEC_2_0[2]</title></line>
+<line x1="129" x2="161" y1="404.5" y2="404.5" class="net_9"><title>LVE</title></line>
+<line x1="161" x2="161" y1="404.5" y2="316.5" class="net_9"><title>LVE</title></line>
+<circle cx="161" cy="404.5" r="2" style="fill:#000" class="net_9" />
+<line x1="161" x2="208" y1="316.5" y2="316.5" class="net_9"><title>LVE</title></line>
+<line x1="129" x2="208" y1="404.5" y2="404.5" class="net_9"><title>LVE</title></line>
+<line x1="129" x2="161" y1="404.5" y2="404.5" class="net_9"><title>LVE</title></line>
+<line x1="161" x2="161" y1="404.5" y2="492.5" class="net_9"><title>LVE</title></line>
+<line x1="161" x2="208" y1="492.5" y2="492.5" class="net_9"><title>LVE</title></line>
+<line x1="239" x2="353" y1="32.5" y2="32.5" class="net_15"><title>s_hivec2_nand_hve</title></line>
+<line x1="239" x2="286" y1="296.5" y2="296.5" class="net_16"><title>s_lovec2_nand_lve</title></line>
+<line x1="286" x2="286" y1="296.5" y2="52.5" class="net_16"><title>s_lovec2_nand_lve</title></line>
+<line x1="286" x2="353" y1="52.5" y2="52.5" class="net_16"><title>s_lovec2_nand_lve</title></line>
+<line x1="121.25" x2="151" y1="52.5" y2="52.5" class="net_3"><title>HIVEC_2_0[1]</title></line>
+<line x1="151" x2="151" y1="52.5" y2="120.5" class="net_3"><title>HIVEC_2_0[1]</title></line>
+<line x1="151" x2="208" y1="120.5" y2="120.5" class="net_3"><title>HIVEC_2_0[1]</title></line>
+<line x1="121.25" x2="151" y1="316.5" y2="316.5" class="net_7"><title>LOVEC_2_0[1]</title></line>
+<line x1="151" x2="151" y1="316.5" y2="384.5" class="net_7"><title>LOVEC_2_0[1]</title></line>
+<line x1="151" x2="208" y1="384.5" y2="384.5" class="net_7"><title>LOVEC_2_0[1]</title></line>
+<line x1="239" x2="353" y1="120.5" y2="120.5" class="net_17"><title>s_hivec1_nand_hve</title></line>
+<line x1="239" x2="296" y1="384.5" y2="384.5" class="net_18"><title>s_lovec1_nand_lve</title></line>
+<line x1="296" x2="296" y1="384.5" y2="140.5" class="net_18"><title>s_lovec1_nand_lve</title></line>
+<line x1="296" x2="353" y1="140.5" y2="140.5" class="net_18"><title>s_lovec1_nand_lve</title></line>
+<line x1="121.25" x2="141" y1="72.5" y2="72.5" class="net_2"><title>HIVEC_2_0[0]</title></line>
+<line x1="141" x2="141" y1="72.5" y2="208.5" class="net_2"><title>HIVEC_2_0[0]</title></line>
+<line x1="141" x2="208" y1="208.5" y2="208.5" class="net_2"><title>HIVEC_2_0[0]</title></line>
+<line x1="121.25" x2="141" y1="336.5" y2="336.5" class="net_6"><title>LOVEC_2_0[0]</title></line>
+<line x1="141" x2="141" y1="336.5" y2="472.5" class="net_6"><title>LOVEC_2_0[0]</title></line>
+<line x1="141" x2="208" y1="472.5" y2="472.5" class="net_6"><title>LOVEC_2_0[0]</title></line>
+<line x1="469" x2="504" y1="110.5" y2="110.5" class="net_10,11,12"><title>PICV_2_0</title></line>
+<line x1="384" x2="431" y1="208.5" y2="208.5" class="net_10"><title>PICV_2_0[0]</title></line>
+<line x1="431" x2="431" y1="208.5" y2="100.5" class="net_10"><title>PICV_2_0[0]</title></line>
+<line x1="431" x2="463" y1="100.5" y2="100.5" class="net_10"><title>PICV_2_0[0]</title></line>
+<line x1="384" x2="463" y1="120.5" y2="120.5" class="net_11"><title>PICV_2_0[1]</title></line>
+<line x1="384" x2="441" y1="32.5" y2="32.5" class="net_12"><title>PICV_2_0[2]</title></line>
+<line x1="441" x2="441" y1="32.5" y2="140.5" class="net_12"><title>PICV_2_0[2]</title></line>
+<line x1="441" x2="463" y1="140.5" y2="140.5" class="net_12"><title>PICV_2_0[2]</title></line>
+<line x1="40" x2="116.25" y1="42.5" y2="42.5" class="net_2,3,4"><title>HIVEC_2_0</title></line>
+<line x1="40" x2="116.25" y1="306.5" y2="306.5" class="net_6,7,8"><title>LOVEC_2_0</title></line>
+<text x="387.0" y="205.5" class="netlabel">PICV_2_0[0]</text>
+<text x="472.0" y="107.5" class="netlabel">PICV_2_0</text>
+<text x="387.0" y="117.5" class="netlabel">PICV_2_0[1]</text>
+<text x="387.0" y="29.5" class="netlabel">PICV_2_0[2]</text>
+<text x="242.0" y="205.5" class="netlabel">s_hivec0_nand_hve</text>
+<text x="242.0" y="469.5" class="netlabel">s_lovec0_nand_lve</text>
+<text x="242.0" y="29.5" class="netlabel">s_hivec2_nand_hve</text>
+<text x="289.0" y="49.5" class="netlabel">s_lovec2_nand_lve</text>
+<text x="242.0" y="117.5" class="netlabel">s_hivec1_nand_hve</text>
+<text x="242.0" y="381.5" class="netlabel">s_lovec1_nand_lve</text>
+<text x="144.0" y="205.5" class="netlabel">HIVEC_2_0[0]</text>
+<text x="43.0" y="39.5" class="netlabel">HIVEC_2_0</text>
+<text x="154.0" y="117.5" class="netlabel">HIVEC_2_0[1]</text>
+<text x="124.2" y="29.5" class="netlabel">HIVEC_2_0[2]</text>
+<text x="132.0" y="137.5" class="netlabel">HVE</text>
+<text x="144.0" y="469.5" class="netlabel">LOVEC_2_0[0]</text>
+<text x="43.0" y="303.5" class="netlabel">LOVEC_2_0</text>
+<text x="154.0" y="381.5" class="netlabel">LOVEC_2_0[1]</text>
+<text x="124.2" y="293.5" class="netlabel">LOVEC_2_0[2]</text>
+<text x="132.0" y="401.5" class="netlabel">LVE</text>
+</svg>

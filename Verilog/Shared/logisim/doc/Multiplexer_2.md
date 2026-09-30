@@ -19,6 +19,16 @@ Source: `Verilog/Shared/logisim/Multiplexer_2.v`
 
 ![Multiplexer_2 symbol](Multiplexer_2.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.ALU.AARG0_MUX.PLEXERS_1`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![Multiplexer_2 schematic](Multiplexer_2.svg)](Multiplexer_2.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Component : Multiplexer_2
@@ -31,3 +41,33 @@ Refactored 03.12.2023 Ronny Hansen
 | input | `1` | `muxIn_1` |  |
 | input | `1` | `sel` |  |
 | output | `1` | `muxOut` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/Multiplexer_2.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/Multiplexer_2.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of Multiplexer_2 (18 lines)</summary>
+
+```verilog
+/******************************************************************************
+ **                                                                          **
+ ** Component : Multiplexer_2                                                **
+ **                                                                          **
+ ** Refactored 03.12.2023 Ronny Hansen                                       **
+ *****************************************************************************/
+/* */
+
+module Multiplexer_2( input muxIn_0,
+                      input muxIn_1,                      
+                      input sel,
+                      output wire muxOut
+                      );   
+
+      // Logic for 2-to-1 Multiplexer
+    assign muxOut = sel ? muxIn_1 : muxIn_0;
+
+endmodule
+```
+
+</details>

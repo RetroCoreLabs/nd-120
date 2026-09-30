@@ -19,14 +19,245 @@ Source: `Verilog/Terminals/rtl/key_tdv2200.v`
 
 ![key_tdv2200 symbol](key_tdv2200.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Nexys 4 DDR build, instance `KEYEXP`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![key_tdv2200 schematic](key_tdv2200.svg)](key_tdv2200.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Ports
 
 | Direction | Width | Name | Description |
 |---|---|---|---|
 | input | `1` | `clk` |  |
 | input | `1` | `rst_n` *(active low)* |  |
-| input | `1` | `key_valid` |  |
+| input | `1` | `key_valid` | one clock per character produced (from ps2_decoder_tdv.ascii_valid) |
 | input | `[7:0]` | `key_data` |  |
 | output | `1` | `out_valid` | one clock, only while out_ready |
 | output | `[7:0]` | `out_data` |  |
 | input | `1` | `out_ready` | the UART's "idle" flag |
+
+## Verilog source
+
+[`Verilog/Terminals/rtl/key_tdv2200.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Terminals/rtl/key_tdv2200.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of key_tdv2200 (209 lines)</summary>
+
+```verilog
+//============================================================================
+//! TDV2200 key-sequence expander - markers in, wire bytes out
+//!
+//! Part of the board-independent terminal core (Verilog/Terminals/).
+//! Sibling of key_vt100.v. Ordinary bytes (including the TDV's bare C0
+//! cursor/Home/Delete codes - see ps2_ascii_table_tdv.v) pass through
+//! unchanged; a SEQUENCE MARKER (bit 7 set) becomes a wire byte sequence.
+//! TWO marker families, distinguished by range (see ps2_ascii_table_tdv.v's
+//! header for exactly how each marker value is chosen):
+//!
+//!   0x80-0xC3   ESC [ <2-digit n> _   the F-key/registry family (shift =
+//!               n+1), always exactly 4 bytes after ESC, zero-padded.
+//!   0xC4-0xDC   Alt+key application/editing shortcuts - each marker has
+//!               its OWN fixed byte sequence (4 to 5 bytes after ESC; the
+//!               PUSH-key family runs to 5, including an EMBEDDED ESC as
+//!               plain data mid-sequence, harmless - the FIFO just moves
+//!               bytes, it never re-parses them).
+//!
+//! Same FIFO/handshake reasoning as key_vt100.v: the UART needs ~870 us per
+//! byte at 115200-8N1 and this expander hands it up to 6 at once now (ESC +
+//! up to 5), which is why the queue grew from 4 lookahead registers to 5.
+//!
+//! Written 31-AUG-2026.
+//============================================================================
+
+`default_nettype none
+
+module key_tdv2200 (
+    input wire clk,
+    input wire rst_n,
+
+    // From the keyboard decoder - strobes, no backpressure
+    input wire       key_valid,   //! one clock per character produced (from ps2_decoder_tdv.ascii_valid)
+    input wire [7:0] key_data,
+
+    // To the console UART TX
+    output reg        out_valid,  //! one clock, only while out_ready
+    output reg  [7:0] out_data,
+    input  wire       out_ready   //! the UART's "idle" flag
+);
+
+  localparam [7:0] ESC = 8'h1B;
+
+  //! The ESC[nn_ family's marker is 8'h80|n; n runs up to 86 in the
+  //! registry (NEWPARA) and Insert alone already uses 82 (marker 0xD2) -
+  //! NOT capped at 67. Everything from 0xE0 up is the Alt+key family
+  //! instead (ps2_ascii_table_tdv.v's ALTM_* localparams), chosen with
+  //! headroom past the highest n-based marker in use. key_data[7] alone
+  //! (used by key_vt100.v's sibling logic) is not enough here because
+  //! there are now two DIFFERENT marker shapes sharing the bit7 flag.
+  localparam [7:0] ALT_BASE = 8'hE0;
+
+  //--------------------------------------------------------------------------
+  // The FIFO - 16 bytes, pointers one bit wider than the index so full and
+  // empty are distinct (same construction as byte_fifo.v / key_vt100.v).
+  //--------------------------------------------------------------------------
+  reg [7:0] s_mem[0:15];
+  reg [4:0] s_wptr, s_rptr;
+
+  wire s_empty = (s_wptr == s_rptr);
+  wire s_full  = (s_wptr[4] != s_rptr[4]) && (s_wptr[3:0] == s_rptr[3:0]);
+
+  //--------------------------------------------------------------------------
+  // Push side - expands a marker over up to 5 clocks: ESC now, up to 5 more
+  // bytes lined up in s_q0..s_q4 for the next PU_SEQ cycles, s_len says how
+  // many of them are real (4 for the ESC[nn_ family, 4 or 5 for Alt+key).
+  //--------------------------------------------------------------------------
+  localparam PU_IDLE = 1'b0;
+  localparam PU_SEQ  = 1'b1;
+
+  reg       s_push;
+  reg [7:0] s_q0, s_q1, s_q2, s_q3, s_q4;
+  reg [2:0] s_idx;
+  reg [2:0] s_len;
+
+  //! ESC[nn_ family: n is 0..67 by construction (bits[6:0] of the marker
+  //! when it is below ALT_BASE); always two ASCII decimal digits,
+  //! zero-padded.
+  wire [6:0] s_n    = key_data[6:0];
+  wire [7:0] s_tens = "0" + (s_n / 7'd10);
+  wire [7:0] s_ones = "0" + (s_n % 7'd10);
+
+  //--------------------------------------------------------------------------
+  // Pop side - one UART handshake at a time (identical contract/timing to
+  // key_vt100.v - see that file's header for the full reasoning).
+  //--------------------------------------------------------------------------
+  localparam [1:0] PO_IDLE = 2'd0;
+  localparam [1:0] PO_TAKE = 2'd1;
+
+  reg [1:0] s_pop;
+  reg       s_po_seen;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      s_wptr    <= 5'd0;
+      s_rptr    <= 5'd0;
+      s_push    <= PU_IDLE;
+      s_q0 <= 8'd0; s_q1 <= 8'd0; s_q2 <= 8'd0; s_q3 <= 8'd0; s_q4 <= 8'd0;
+      s_idx     <= 3'd0;
+      s_len     <= 3'd0;
+      s_pop     <= PO_IDLE;
+      out_valid <= 1'b0;
+      out_data  <= 8'd0;
+    end else begin
+      out_valid <= 1'b0;
+
+      // ---- push ----
+      case (s_push)
+        PU_IDLE: begin
+          if (key_valid && !s_full) begin
+            if (!key_data[7]) begin
+              s_mem[s_wptr[3:0]] <= key_data;
+              s_wptr <= s_wptr + 5'd1;
+            end else if (key_data < ALT_BASE) begin
+              // ESC[nn_ family - see the header.
+              s_mem[s_wptr[3:0]] <= ESC;
+              s_wptr <= s_wptr + 5'd1;
+              s_push <= PU_SEQ;
+              s_idx  <= 3'd0;
+              s_len  <= 3'd4;
+              s_q0   <= "[";
+              s_q1   <= s_tens;
+              s_q2   <= s_ones;
+              s_q3   <= "_";
+            end else begin
+              // Alt+key family - each marker's own fixed sequence.
+              s_mem[s_wptr[3:0]] <= ESC;
+              s_wptr <= s_wptr + 5'd1;
+              // Default to staying idle (ESC alone, nothing queued) so an
+              // unrecognised marker can never leave s_len at 0 while
+              // s_push sits in PU_SEQ - "s_idx == s_len-1" would wrap
+              // 3'd0-1 to 3'd7 and PU_SEQ would never see it, pushing
+              // garbage until the FIFO fills. Every real case below
+              // overrides both.
+              s_push <= PU_IDLE;
+              s_idx  <= 3'd0;
+              case (key_data)
+                8'hE0: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="4"; s_q2<="6"; s_q3<="_"; end            // Alt+H HELP -> HJELP ESC[46_
+                8'hE1: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="2"; s_q2<="9"; s_q3<="~"; end            // Alt+D DO (user-specified)
+                8'hE2: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="4"; s_q2<="2"; s_q3<="_"; end            // Alt+U FUNC -> FUNK ESC[42_
+                8'hE3: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="4"; s_q2<="8"; s_q3<="_"; end            // Alt+X EXIT -> SLUTT ESC[48_
+                8'hE4: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="3"; s_q2<="0"; s_q3<="_"; end            // Alt+C CANCEL -> ANGRE ESC[30_
+                8'hE5: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="2"; s_q2<="6"; s_q3<="~"; end            // Alt+M COMMAND (user-specified)
+                8'hE6: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="["; s_q1<="1"; s_q2<=";"; s_q3<="2"; s_q4<="R"; end // Alt+F FIND (user-specified)
+                8'hE7: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="["; s_q1<="4"; s_q2<=";"; s_q3<="2"; s_q4<="~"; end // Alt+S SELECT (user-specified)
+                8'hE8: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="1"; s_q2<="2"; s_q3<="_"; end            // Alt+K COPY -> KOPI ESC[12_
+                8'hE9: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="1"; s_q2<="4"; s_q3<="_"; end            // Alt+V MOVE -> FLYTT ESC[14_
+                8'hEA: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="2"; s_q2<="4"; s_q3<="_"; end            // Alt+J JUST ESC[24_
+                8'hEB: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="0"; s_q2<="0"; s_q3<="_"; end            // Alt+A MARK -> MERK ESC[00_
+                8'hEC: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="0"; s_q2<="2"; s_q3<="_"; end            // Alt+L FIELD -> FELT ESC[02_
+                8'hED: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="0"; s_q2<="4"; s_q3<="_"; end            // Alt+P PARA -> AVSH ESC[04_
+                8'hEE: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="0"; s_q2<="6"; s_q3<="_"; end            // Alt+E SENT -> SETN ESC[06_
+                8'hEF: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="0"; s_q2<="8"; s_q3<="_"; end            // Alt+W WORD -> ORD ESC[08_
+                8'hF0: begin s_push<=PU_SEQ; s_len<=3'd4; s_q0<="["; s_q1<="8"; s_q2<="2"; s_q3<="_"; end            // Alt+I INSERT HERE -> INNS/EXPS ESC[82_ (approximate)
+                // PUSH1-8 (Alt+1..Alt+8): "ESC P N<digit> ESC \" - user-specified,
+                // unconfirmed (registry: PUSH keys have no fixed sequence at all).
+                8'hF1: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="P"; s_q1<="N"; s_q2<="1"; s_q3<=ESC; s_q4<=8'h5C; end
+                8'hF2: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="P"; s_q1<="N"; s_q2<="2"; s_q3<=ESC; s_q4<=8'h5C; end
+                8'hF3: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="P"; s_q1<="N"; s_q2<="3"; s_q3<=ESC; s_q4<=8'h5C; end
+                8'hF4: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="P"; s_q1<="N"; s_q2<="4"; s_q3<=ESC; s_q4<=8'h5C; end
+                8'hF5: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="P"; s_q1<="N"; s_q2<="5"; s_q3<=ESC; s_q4<=8'h5C; end
+                8'hF6: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="P"; s_q1<="N"; s_q2<="6"; s_q3<=ESC; s_q4<=8'h5C; end
+                8'hF7: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="P"; s_q1<="N"; s_q2<="7"; s_q3<=ESC; s_q4<=8'h5C; end
+                8'hF8: begin s_push<=PU_SEQ; s_len<=3'd5; s_q0<="P"; s_q1<="N"; s_q2<="8"; s_q3<=ESC; s_q4<=8'h5C; end
+                default: ;  // unrecognised marker: stays PU_IDLE, ESC alone sent (defensive only - never reached from ps2_ascii_table_tdv.v)
+              endcase
+            end
+          end
+        end
+        PU_SEQ: begin
+          if (!s_full) begin
+            s_mem[s_wptr[3:0]] <= (s_idx == 3'd0) ? s_q0
+                                : (s_idx == 3'd1) ? s_q1
+                                : (s_idx == 3'd2) ? s_q2
+                                : (s_idx == 3'd3) ? s_q3 : s_q4;
+            s_wptr <= s_wptr + 5'd1;
+            if (s_idx == s_len - 3'd1) s_push <= PU_IDLE;
+            else s_idx <= s_idx + 3'd1;
+          end
+        end
+        default: s_push <= PU_IDLE;
+      endcase
+
+      // ---- pop ----
+      case (s_pop)
+        PO_IDLE: begin
+          s_po_seen <= 1'b0;
+          if (!s_empty && out_ready) begin
+            out_valid <= 1'b1;
+            out_data  <= s_mem[s_rptr[3:0]];
+            s_pop     <= PO_TAKE;
+          end
+        end
+        PO_TAKE: begin
+          if (!s_po_seen) begin
+            s_po_seen <= 1'b1;
+          end else begin
+            if (!out_ready) s_rptr <= s_rptr + 5'd1;
+            s_pop <= PO_IDLE;
+          end
+        end
+        default: s_pop <= PO_IDLE;
+      endcase
+    end
+  end
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

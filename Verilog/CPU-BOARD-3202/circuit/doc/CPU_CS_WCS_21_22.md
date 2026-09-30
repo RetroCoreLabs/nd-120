@@ -19,6 +19,16 @@ Source: `Verilog/CPU-BOARD-3202/circuit/CPU_CS_WCS_21_22.v`
 
 ![CPU_CS_WCS_21_22 symbol](CPU_CS_WCS_21_22.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.CS.WCS`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![CPU_CS_WCS_21_22 schematic](CPU_CS_WCS_21_22.svg)](CPU_CS_WCS_21_22.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 CPU, MM&M
@@ -38,9 +48,9 @@ Ronny Hansen
 |---|---|---|---|
 | input | `1` | `sysclk` | System clock in FPGA |
 | input | `1` | `sys_rst_n` *(active low)* | System reset in FPGA |
-| input | `[63:0]` | `CSBITS_63_0` |  |
-| output | `[63:0]` | `CSBITS_63_0_OUT` |  |
-| input | `[11:0]` | `LUA_11_0` |  |
+| input | `[63:0]` | `CSBITS_63_0` | 64 bits CSBITS (output when IDB IN writes a 16 bit part to the CSBITS) (from CPU_CS_TCV_20.CSBITS_OUT) |
+| output | `[63:0]` | `CSBITS_63_0_OUT` | Control Store Bits - 64-bit output containing the control store data/instructions (to CPU_CS_16.CSBITS) |
+| input | `[11:0]` | `LUA_11_0` | Load Upper Address - 13-bit output for upper address bits of control store (same net as CPU_CS_16.LUA_12_0[11:0]) |
 | input | `1` | `ELOW_n` *(active low)* | Enable LOW chips |
 | input | `1` | `WW0_n` *(active low)* |  |
 | input | `1` | `WW1_n` *(active low)* |  |
@@ -52,3 +62,464 @@ Ronny Hansen
 | input | `1` | `WU1_n` *(active low)* |  |
 | input | `1` | `WU2_n` *(active low)* |  |
 | input | `1` | `WU3_n` *(active low)* |  |
+
+## Verilog source
+
+[`Verilog/CPU-BOARD-3202/circuit/CPU_CS_WCS_21_22.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/CPU-BOARD-3202/circuit/CPU_CS_WCS_21_22.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of CPU_CS_WCS_21_22 (449 lines)</summary>
+
+```verilog
+/**************************************************************************
+** ND120 CPU, MM&M                                                       **
+** CPU/CS/WCS                                                            **
+** Writable Control Store                                                **
+** SHEET 21 and 22 of 50                                                 **
+**                                                                       **
+** This module has 16 RAM CHIPS of type 16K (4Kx4) Static RAM for LUA    **
+** (4KByte Microcode)                                                    **
+**                                                                       **
+** This module has 16 RAM CHIPS of type 16K (4Kx4) Static RAM for UUA    **
+** (4KByte for Writable Control Store?)                                  **
+**                                                                       **
+** Last reviewed: 9-NOV-2024                                             **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module CPU_CS_WCS_21_22 (
+    input sysclk,    // System clock in FPGA
+    input sys_rst_n, // System reset in FPGA
+
+    input  [63:0] CSBITS_63_0,  //! 64 bits CSBITS (output when IDB IN writes a 16 bit part to the CSBITS) (from CPU_CS_TCV_20.CSBITS_OUT)
+    output [63:0] CSBITS_63_0_OUT,  //! Control Store Bits - 64-bit output containing the control store data/instructions (to CPU_CS_16.CSBITS)
+
+    input [11:0] LUA_11_0,  //! Load Upper Address - 13-bit output for upper address bits of control store (same net as CPU_CS_16.LUA_12_0[11:0])
+    input        ELOW_n,    //! Enable LOW chips
+    input        WW0_n,
+    input        WW1_n,
+    input        WW2_n,
+    input        WW3_n,
+
+
+    input [11:0] UUA_11_0,
+    input        EUPP_n,    //! Enable UPPER chips
+    input        WU0_n,
+    input        WU1_n,
+    input        WU2_n,
+    input        WU3_n
+);
+
+
+// REFACTOR possibility: SWITCH to ONE big DRAM logic
+
+  /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+  wire [63:0] s_lua_csbits_in;
+  wire [63:0] s_lua_csbits_out;
+  wire [11:0] s_lua_address;
+  wire        s_elow_n;
+
+  wire        s_ww3_n;
+  wire        s_ww2_n;
+  wire        s_ww1_n;
+  wire        s_ww0_n;
+
+  wire [63:0] s_uua_csbits_in;
+  wire [63:0] s_uua_csbits_out;
+  wire [11:0] s_uua_address;
+  wire        s_eupp_n;
+  wire        s_wu3_n;
+  wire        s_wu2_n;
+  wire        s_wu1_n;
+  wire        s_wu0_n;
+
+
+
+  /*******************************************************************************
+   ** Here all input connections are defined                                     **
+   *******************************************************************************/
+
+  // LUA
+  assign s_lua_csbits_in[63:0] = CSBITS_63_0;
+  assign s_lua_address[11:0] = LUA_11_0;
+
+  assign s_elow_n = ELOW_n;  // Enable LUA RAM chips
+  assign s_ww0_n = WW0_n;  // Enable write for LUA bits 15-0
+  assign s_ww1_n = WW1_n;  // Enable write for LUA bits 31-16
+  assign s_ww2_n = WW2_n;  // Enable write for LUA bits 47-32
+  assign s_ww3_n = WW3_n;  // Enable write for LUA bits 63-48
+
+
+  // UUA
+  assign s_uua_csbits_in[63:0] = CSBITS_63_0;
+  assign s_uua_address[11:0] = UUA_11_0;
+
+  assign s_eupp_n = EUPP_n;  // Enable UUA RAM chips
+  assign s_wu0_n = WU0_n;  // Enable write for UUA bits 15-0
+  assign s_wu1_n = WU1_n;  // Enable write for UUA bits 31-16
+  assign s_wu2_n = WU2_n;  // Enable write for UUA bits 47-32
+  assign s_wu3_n = WU3_n;  // Enable write for UUA bits 63-48
+
+
+
+
+  /*******************************************************************************
+   ** Here all output connections are defined                                    **
+   *******************************************************************************/
+  // ELOW_n = 0 means ENABLE LUA RAM CHIPS
+  // EUPP_n = 0 means ENABLE UUA RAM CHIPS
+
+  // mux data out?
+  //assign CSBITS_63_0_OUT = (!s_elow_n) ?  s_lua_csbits_out[63:0] : (!s_eupp_n) ? s_uua_csbits_out[63:0] : 64'b0;
+  // or data out
+  assign CSBITS_63_0_OUT       = s_lua_csbits_out[63:0] | s_uua_csbits_out[63:0];
+
+  /*******************************************************************************
+   ** Here all sub-circuits are defined                                          **
+   *******************************************************************************/
+
+  // Announce the WCS mode at sim start so there is no ambiguity about whether
+  // the WCS was pre-loaded (SKIP_WCS_LOAD) or filled by the runtime load phase.
+  initial begin
+`ifdef SKIP_WCS_LOAD
+    $display("[ND120] WCS mode: PRELOADED (SKIP_WCS_LOAD) - runtime microcode load phase bypassed");
+`else
+    $display("[ND120] WCS mode: RUNTIME LOAD (normal PROM->WCS copy)");
+`endif
+  end
+
+  // Lower address: 0x0000-0x0FFF
+
+  IDT6168A_20 #(.INIT_FILE("wcs_16C.hex")) CHIP_16C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[63:60]),
+      .D_3_0_OUT(s_lua_csbits_out[63:60]),
+      .WE_n(s_ww3_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_17C.hex")) CHIP_17C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[59:56]),
+      .D_3_0_OUT(s_lua_csbits_out[59:56]),
+      .WE_n(s_ww3_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_18C.hex")) CHIP_18C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[55:52]),
+      .D_3_0_OUT(s_lua_csbits_out[55:52]),
+      .WE_n(s_ww3_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_19C.hex")) CHIP_19C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[51:48]),
+      .D_3_0_OUT(s_lua_csbits_out[51:48]),
+      .WE_n(s_ww3_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_20C.hex")) CHIP_20C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[47:44]),
+      .D_3_0_OUT(s_lua_csbits_out[47:44]),
+      .WE_n(s_ww2_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_21C.hex")) CHIP_21C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[43:40]),
+      .D_3_0_OUT(s_lua_csbits_out[43:40]),
+      .WE_n(s_ww2_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_22C.hex")) CHIP_22C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[39:36]),
+      .D_3_0_OUT(s_lua_csbits_out[39:36]),
+      .WE_n(s_ww2_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_23C.hex")) CHIP_23C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[35:32]),
+      .D_3_0_OUT(s_lua_csbits_out[35:32]),
+      .WE_n(s_ww2_n)
+  );
+
+
+  IDT6168A_20 #(.INIT_FILE("wcs_24C.hex")) CHIP_24C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[31:28]),
+      .D_3_0_OUT(s_lua_csbits_out[31:28]),
+      .WE_n(s_ww1_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_25C.hex")) CHIP_25C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[27:24]),
+      .D_3_0_OUT(s_lua_csbits_out[27:24]),
+      .WE_n(s_ww1_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_26C.hex")) CHIP_26C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[23:20]),
+      .D_3_0_OUT(s_lua_csbits_out[23:20]),
+      .WE_n(s_ww1_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_27C.hex")) CHIP_27C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[19:16]),
+      .D_3_0_OUT(s_lua_csbits_out[19:16]),
+      .WE_n(s_ww1_n)
+  );
+
+
+  IDT6168A_20 #(.INIT_FILE("wcs_28C.hex")) CHIP_28C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[15:12]),
+      .D_3_0_OUT(s_lua_csbits_out[15:12]),
+      .WE_n(s_ww0_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_29C.hex")) CHIP_29C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[11:8]),
+      .D_3_0_OUT(s_lua_csbits_out[11:8]),
+      .WE_n(s_ww0_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_30C.hex")) CHIP_30C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[7:4]),
+      .D_3_0_OUT(s_lua_csbits_out[7:4]),
+      .WE_n(s_ww0_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_31C.hex")) CHIP_31C (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_lua_address[11:0]),
+      .CE_n(s_elow_n),
+      .D_3_0_IN(s_lua_csbits_in[3:0]),
+      .D_3_0_OUT(s_lua_csbits_out[3:0]),
+      .WE_n(s_ww0_n)
+  );
+
+
+  // Upper address: 0x1000-0x1FFF
+
+  IDT6168A_20 #(.INIT_FILE("wcs_16D.hex")) CHIP_16D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[63:60]),
+      .D_3_0_OUT(s_uua_csbits_out[63:60]),
+      .WE_n(s_wu3_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_17D.hex")) CHIP_17D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[59:56]),
+      .D_3_0_OUT(s_uua_csbits_out[59:56]),
+      .WE_n(s_wu3_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_18D.hex")) CHIP_18D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[55:52]),
+      .D_3_0_OUT(s_uua_csbits_out[55:52]),
+      .WE_n(s_wu3_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_19D.hex")) CHIP_19D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[51:48]),
+      .D_3_0_OUT(s_uua_csbits_out[51:48]),
+      .WE_n(s_wu3_n)
+  );
+
+
+
+  IDT6168A_20 #(.INIT_FILE("wcs_20D.hex")) CHIP_20D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[47:44]),
+      .D_3_0_OUT(s_uua_csbits_out[47:44]),
+      .WE_n(s_wu2_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_21D.hex")) CHIP_21D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[43:40]),
+      .D_3_0_OUT(s_uua_csbits_out[43:40]),
+      .WE_n(s_wu2_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_22D.hex")) CHIP_22D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[39:36]),
+      .D_3_0_OUT(s_uua_csbits_out[39:36]),
+      .WE_n(s_wu2_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_23D.hex")) CHIP_23D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[35:32]),
+      .D_3_0_OUT(s_uua_csbits_out[35:32]),
+      .WE_n(s_wu2_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_24D.hex")) CHIP_24D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[31:28]),
+      .D_3_0_OUT(s_uua_csbits_out[31:28]),
+      .WE_n(s_wu1_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_25D.hex")) CHIP_25D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[27:24]),
+      .D_3_0_OUT(s_uua_csbits_out[27:24]),
+      .WE_n(s_wu1_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_26D.hex")) CHIP_26D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[23:20]),
+      .D_3_0_OUT(s_uua_csbits_out[23:20]),
+      .WE_n(s_wu1_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_27D.hex")) CHIP_27D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[19:16]),
+      .D_3_0_OUT(s_uua_csbits_out[19:16]),
+      .WE_n(s_wu1_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_28D.hex")) CHIP_28D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[15:12]),
+      .D_3_0_OUT(s_uua_csbits_out[15:12]),
+      .WE_n(s_wu0_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_29D.hex")) CHIP_29D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[11:8]),
+      .D_3_0_OUT(s_uua_csbits_out[11:8]),
+      .WE_n(s_wu0_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_30D.hex")) CHIP_30D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[7:4]),
+      .D_3_0_OUT(s_uua_csbits_out[7:4]),
+      .WE_n(s_wu0_n)
+  );
+
+  IDT6168A_20 #(.INIT_FILE("wcs_31D.hex")) CHIP_31D (
+      .clk(sysclk),
+      .reset_n(sys_rst_n),
+      .A_11_0(s_uua_address[11:0]),
+      .CE_n(s_eupp_n),
+      .D_3_0_IN(s_uua_csbits_in[3:0]),
+      .D_3_0_OUT(s_uua_csbits_out[3:0]),
+      .WE_n(s_wu0_n)
+  );
+
+endmodule
+```
+
+</details>

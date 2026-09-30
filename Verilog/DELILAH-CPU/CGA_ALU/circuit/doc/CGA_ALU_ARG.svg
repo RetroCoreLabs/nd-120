@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="463.0" height="371.0" viewBox="-80.0 -80.0 463.0 371.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="463.0" height="371.0" fill="#ffffff" /><g transform="translate(178,74)" id="cell_$procdff$37126"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37126" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37126" /><g /><g /><g /><g /></g>
+<g transform="translate(115.66666666666667,64)" id="cell_$procmux$10923"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$10923" /><g /><g /><g /><g /></g>
+<g transform="translate(107,179)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(12,149)" id="cell_ALUCLK_EN"><text x="15" y="-4" class="nodelabel cell_ALUCLK_EN">ALUCLK_EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_ALUCLK_EN" /><g /></g>
+<g transform="translate(12,22)" id="cell_ALUCLK"><text x="15" y="-4" class="nodelabel cell_ALUCLK">ALUCLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_ALUCLK" /><g /></g>
+<g transform="translate(12,84)" id="cell_CSBIT_15_0"><text x="15" y="-4" class="nodelabel cell_CSBIT_15_0">CSBIT_15_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CSBIT_15_0" /><g /></g>
+<g transform="translate(243,74)" id="cell_ARG_15_0"><text x="15" y="-4" class="nodelabel cell_ARG_15_0">ARG_15_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_ARG_15_0" /><g /></g>
+<line x1="135" x2="153" y1="189" y2="189" class="net_2"><title>sysclk</title></line>
+<line x1="153" x2="153" y1="189" y2="104" class="net_2"><title>sysclk</title></line>
+<line x1="153" x2="178" y1="104" y2="104" class="net_2"><title>sysclk</title></line>
+<line x1="135.66666666666669" x2="178" y1="84" y2="84" class="net_37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52" />
+<line x1="208" x2="218" y1="84" y2="84" class="net_21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"><title>ARG_15_0</title></line>
+<line x1="218" x2="218" y1="84" y2="54" class="net_21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"><title>ARG_15_0</title></line>
+<line x1="218" x2="82" y1="54" y2="54" class="net_21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"><title>ARG_15_0</title></line>
+<line x1="82" x2="82" y1="54" y2="74" class="net_21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"><title>ARG_15_0</title></line>
+<circle cx="218" cy="84" r="2" style="fill:#000" class="net_21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36" />
+<line x1="82" x2="115.66666666666667" y1="74" y2="74" class="net_21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"><title>ARG_15_0</title></line>
+<line x1="208" x2="243" y1="84" y2="84" class="net_21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"><title>ARG_15_0</title></line>
+<line x1="40" x2="115.66666666666667" y1="94" y2="94" class="net_5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"><title>CSBIT_15_0</title></line>
+<line x1="40" x2="125.66666666666667" y1="159" y2="159" class="net_3"><title>ALUCLK_EN</title></line>
+<line x1="125.66666666666667" x2="125.66666666666667" y1="159" y2="99" class="net_3"><title>ALUCLK_EN</title></line>
+<text x="156.0" y="101.0" class="netlabel">sysclk</text>
+<text x="85.0" y="51.0" class="netlabel">ARG_15_0</text>
+<text x="43.0" y="156.0" class="netlabel">ALUCLK_EN</text>
+<text x="43.0" y="91.0" class="netlabel">CSBIT_15_0</text>
+</svg>

@@ -19,6 +19,16 @@ Source: `Verilog/DELILAH-CPU/CGA_ALU/circuit/CGA_CPU_ALU_CONTR.v`
 
 ![CGA_CPU_ALU_CONTR symbol](CGA_CPU_ALU_CONTR.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.ALU.ALU_CONTR`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![CGA_CPU_ALU_CONTR schematic](CGA_CPU_ALU_CONTR.svg)](CGA_CPU_ALU_CONTR.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 CGA (CPU Gate Array / DELILAH)
@@ -77,3 +87,937 @@ Ronny Hansen
 | output | `1` | `RSN` | Register Source Negative flag |
 | output | `1` | `SA` | Source A selector for ALU operations |
 | output | `1` | `SB` | Source B selector for ALU operations |
+
+## Verilog source
+
+[`Verilog/DELILAH-CPU/CGA_ALU/circuit/CGA_CPU_ALU_CONTR.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/DELILAH-CPU/CGA_ALU/circuit/CGA_CPU_ALU_CONTR.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of CGA_CPU_ALU_CONTR (922 lines)</summary>
+
+```verilog
+/**************************************************************************
+** ND120 CGA (CPU Gate Array / DELILAH)                                  **
+** /CGA/ALU/CONTR                                                        **
+** ALU CONTROLLER                                                        **
+**                                                                       **
+** Page 42                                                               **
+** SHEET 1 of 1                                                          **
+**                                                                       **
+** Last reviewed: 22-MAR-2025                                            **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module CGA_CPU_ALU_CONTR (
+    input sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
+    input ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
+    input ALUCLK,                 //! ALU Clock
+    input [1:0] CD_10_9,          //! CPU Data 10:9
+    input CRY,                    //! ALU Carry
+    input [8:0] CSALUI_8_0,       //! ALU Instruction
+    input [1:0] CSALUM_1_0,       //! ALU Mode
+    input [1:0] CSCINSEL_1_0,     //! Carry In Select (00: Carry In, 01: Carry In Not, 10: Carry In Not, 11: Carry In)
+    input [1:0] CSMIS_1_0,        //! Control Store - MIS
+    input [1:0] CSSST_1_0,        //! Control Store - STSS  (00=Hold STS, 01=Enable Set C O Q, 10=Enable set M, 11=Load STS)
+    input DGPR0N,                 //! GPR0 Not
+    input F0,                     //! F bit 0
+    input F15,                    //! F bit 15
+    input GPR0,                   //! GPR bit 0
+    input LCZN,                   //! Loop Counter Not
+    input LDGPRN,                 //! Load GPR
+    input LDIRV,                  //! Load Instruction Register (MIC)
+    input Q0,                     //! Q0
+    input Q15,                    //! Q15
+    input STS6,                   //! STS bit 6 (Carry Flag - C) - SSC
+    input STS7,                   //! STS bit 7 (Multishift Flag - M) - SSM
+    input UPN,                    //! Up
+    input XFETCHN,                //! XFetch
+
+    output       ALUD2N,    //! ALU Data 2, active low signal
+    output       ALUI4,     //! ALU Instruction bit 4 output
+    output       ALUI7,     //! ALU Instruction bit 7 output
+    output       ALUI8N,    //! ALU Instruction bit 8, active low output
+    output       BDEST,     //! Bus Destination control signal
+    output       CI,        //! Carry In signal for ALU operations
+    output [1:0] CSTS_1_0,  //! Control Store status outputs (2-bit)
+    output       FSEL,      //! Function Select signal
+    output [2:0] GPRC_2_0,  //! General-Purpose Register Code (3-bit)
+    output       GPRLI,     //! General-Purpose Register Load Indicator
+    output       LOG,       //! Logic/Operation control signal
+    output       MI,        //! Microinstruction/Memory interface indicator
+    output       QLI,       //! Q Register Load Indicator
+    output [1:0] QSEL_1_0,  //! Q Register Select control signals (2-bit)
+    output       RA,        //! Register A control signal
+    output       RD,        //! Register D control (or Read) signal
+    output       RLI,       //! Register Load Indicator signal
+    output       RRI,       //! Register Right Immediate control signal
+    output       RSN,       //! Register Source Negative flag
+    output       SA,        //! Source A selector for ALU operations
+    output       SB         //! Source B selector for ALU operations
+);
+  /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+
+  wire [1:0] s_cd_10_9;
+  wire [1:0] s_csalum_1_0;
+  wire [1:0] s_cscinsel_1_0;
+  wire [1:0] s_csmis_1_0;
+  wire [1:0] s_csst_1_0;
+  wire [1:0] s_csts_1_0;
+  wire [1:0] s_qsel_1_0_out;
+  wire [8:0] s_csalui_8_0;
+  wire       s_aluclk;
+  wire       s_alud2_n_out;
+  wire       s_alui1n;
+  wire       s_alui3n;
+  wire       s_alui4_n_out;
+  wire       s_alui4_out;
+  wire       s_alui6_n;
+  wire       s_alui6;
+  wire       s_alui7_n;
+  wire       s_alui7_out;
+  wire       s_alui8_n_out;
+  wire       s_alui8;
+  wire       s_bdest_n;
+  wire       s_bdest_out;
+  wire       s_ci_out;
+  wire       s_cinsel0;
+  wire       s_cinsel1;
+  wire       s_cry;
+  wire       s_csalui0_n;
+  wire       s_csalui2_n;
+  wire       s_csalui3_n;
+  wire       s_csalui4_n;
+  wire       s_csalum_0_n;
+  wire       s_dgpr0_n;
+  wire       s_f0;
+  wire       s_f15;
+  wire       s_fsel_n;
+  wire       s_fsel;
+  wire       s_gates1_out;
+  wire       s_gates10_out;
+  wire       s_gates11_out;
+  wire       s_gates12_out;
+  wire       s_gates13_out;
+  wire       s_gates14_out;
+  wire       s_gates15_out;
+  wire       s_gates16_out;
+  wire       s_gates17_out;
+  wire       s_gates18_out;
+  wire       s_gates2_out;
+  wire       s_gates20_out;
+  wire       s_gates21_out;
+  wire       s_gates22_out;
+  wire       s_gates23_out;
+  wire       s_gates24_out;
+  wire       s_gates28_out;
+  wire       s_gates29_out;
+  wire       s_gates3_out;
+  wire       s_gates30_out;
+  wire       s_gates_31_out;
+  wire       s_gates_32_out;
+  wire       s_gates_33_out;
+  wire       s_gates34_out;
+  wire       s_gates_35_out;
+  wire       s_gates39_out;
+  wire       s_gates4_out;
+  wire       s_gates41_out;
+  wire       s_gates42_out;
+  wire       s_gates43_out;
+  wire       s_gates44_out;
+  wire       s_gates49_out;
+  wire       s_gates5_out;
+  wire       s_gates50_out;
+  wire       s_gates52_out;
+  wire       s_gates53_out;
+  wire       s_gates54_out;
+  wire       s_gates55_out;
+  wire       s_gates56_out;
+  wire       s_gates6_out;
+  wire       s_gates7_out;
+  wire       s_gates8_out;
+  wire       s_gates9_out;
+  wire       s_gnd;
+  wire       s_gpr0;
+  wire       s_gprli_out;
+  wire       s_ialii7_n;
+  wire       s_ialii8_n;
+  wire       s_icsst1;
+  wire       s_isel0_n;
+  wire       s_isel1_n;
+  wire       s_lcz_n;
+  wire       s_ldgpr_n;
+  wire       s_ldirv;
+  wire       s_log_n_out;
+  wire       s_log_out;
+  wire       s_memory46_q;
+  wire       s_memory47_q;
+  wire       s_mi_out;
+  wire       s_power;
+  wire       s_q0;
+  wire       s_q15;
+  wire       s_qli_out;
+  wire       s_qsel_0_n_out;
+  wire       s_qsel_1_n_out;
+  wire       s_ra_n_out;
+  wire       s_ra_out;
+  wire       s_rd_n_out;
+  wire       s_rd_out;
+  wire       s_rli_out;
+  wire       s_rri_out;
+  wire       s_rsn_n_out;
+  wire       s_rsn_out;
+  wire       s_sa_n_out;
+  wire       s_sa_out;
+  wire       s_sb_n_out;
+  wire       s_sb_out;
+  wire       s_ssel0;
+  wire       s_ssel0n;
+  wire       s_ssel1;
+  wire       s_ssel1n;
+  wire       s_sts6;
+  wire       s_sts7;
+  wire       s_up_n;
+  wire       s_xfetch_n;
+
+  /*******************************************************************************
+   ** The module functionality is described here                                 **
+   *******************************************************************************/
+
+  /*******************************************************************************
+   ** Here all input connections are defined                                     **
+   *******************************************************************************/
+  assign s_csst_1_0[1:0]     = CSSST_1_0;
+  assign s_csalum_1_0[1:0]   = CSALUM_1_0;
+  assign s_cd_10_9[1:0]      = CD_10_9;
+  assign s_csmis_1_0[1:0]    = CSMIS_1_0;
+  assign s_cscinsel_1_0[1:0] = CSCINSEL_1_0;
+  assign s_csalui_8_0[8:0]   = CSALUI_8_0;
+  assign s_lcz_n             = LCZN;
+  assign s_sts6              = STS6;
+  assign s_cry               = CRY;
+  assign s_ldgpr_n           = LDGPRN;
+  assign s_sts7              = STS7;
+  assign s_f0                = F0;
+  assign s_q0                = Q0;
+  assign s_f15               = F15;
+  assign s_q15               = Q15;
+  assign s_xfetch_n          = XFETCHN;
+  assign s_dgpr0_n           = DGPR0N;
+  assign s_aluclk            = ALUCLK;
+
+  // P2b (docs/plan-fix-unconstrained-clocks.md): in FF mode the ALUCLK-
+  // clocked registers capture on posedge sysclk gated by ALUCLK_EN
+  // (aligned to the ALUCLK rise) instead of clocking on the routed net.
+`ifdef FPGA_FF_MODE
+  localparam ALUCLK_CE = 1;
+`else
+  localparam ALUCLK_CE = 0;
+`endif
+
+  assign s_up_n              = UPN;
+  assign s_ldirv             = LDIRV;
+  assign s_gpr0              = GPR0;
+
+  /*******************************************************************************
+   ** Here all output connections are defined                                    **
+   *******************************************************************************/
+  assign ALUD2N              = s_alud2_n_out;
+  assign ALUI4               = s_alui4_out;
+  assign ALUI7               = s_alui7_out;
+  assign ALUI8N              = s_alui8_n_out;
+  assign BDEST               = s_bdest_out;
+  assign CI                  = s_ci_out;
+  assign CSTS_1_0            = s_csts_1_0[1:0];
+  assign FSEL                = s_fsel;
+  assign GPRC_2_0            = {~s_gates44_out, ~s_gates43_out, ~s_gates42_out};
+  assign GPRLI               = s_gprli_out;
+  assign LOG                 = s_log_out;
+  assign MI                  = s_mi_out;
+  assign QLI                 = s_qli_out;
+  assign QSEL_1_0            = s_qsel_1_0_out[1:0];
+  assign RA                  = s_ra_out;
+  assign RD                  = s_rd_out;
+  assign RLI                 = s_rli_out;
+  assign RRI                 = s_rri_out;
+  assign RSN                 = s_rsn_out;
+  assign SA                  = s_sa_out;
+  assign SB                  = s_sb_out;
+
+  /*******************************************************************************
+   ** Here all in-lined components are defined                                   **
+   *******************************************************************************/
+
+  // Ground
+  assign s_gnd               = 1'b0;
+  assign s_power             = 1'b1;
+
+
+  // NOT Gate
+  assign s_csalui3_n         = ~s_csalui_8_0[3];
+  assign s_csalui2_n         = ~s_csalui_8_0[2];
+  assign s_csalui0_n         = ~s_csalui_8_0[0];
+  assign s_csalui4_n         = ~s_csalui_8_0[4];
+  assign s_qsel_1_0_out[1]   = ~s_qsel_1_n_out;
+  assign s_qsel_1_0_out[0]   = ~s_qsel_0_n_out;
+  assign s_rsn_out           = ~s_rsn_n_out;
+  assign s_fsel              = ~s_fsel_n;
+  assign s_log_out           = ~s_log_n_out;
+  assign s_alui4_out         = ~s_alui4_n_out;
+  assign s_sb_out            = ~s_sb_n_out;
+  assign s_sa_out            = ~s_sa_n_out;
+  assign s_ra_out            = ~s_ra_n_out;
+  assign s_rd_out            = ~s_rd_n_out;
+  assign s_csalum_0_n        = ~s_csalum_1_0[0];
+
+  // NOT Gate
+  assign s_alui7_out         = ~s_alui7_n;
+  assign s_alui8             = ~s_alui8_n_out;
+  assign s_bdest_out         = ~s_bdest_n;
+
+
+
+  /*******************************************************************************
+   ** Here all normal components are defined                                     **
+   *******************************************************************************/
+  AND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_1 (
+      .input1(s_csalum_1_0[1]),
+      .input2(s_csalum_1_0[0]),
+      .result(s_gates1_out)
+  );
+
+  NOR_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_2 (
+      .input1(s_csalum_1_0[1]),
+      .input2(s_csalum_0_n),
+      .result(s_gates2_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_3 (
+      .input1(s_csalum_1_0[1]),
+      .input2(s_csalum_0_n),
+      .result(s_gates3_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_4 (
+      .input1(s_csalui_8_0[2]),
+      .input2(s_csalui_8_0[0]),
+      .result(s_gates4_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_5 (
+      .input1(s_csalui_8_0[2]),
+      .input2(s_alui1n),
+      .result(s_gates5_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_6 (
+      .input1(s_csalui2_n),
+      .input2(s_csalui_8_0[0]),
+      .result(s_gates6_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_7 (
+      .input1(s_alui1n),
+      .input2(s_csalui2_n),
+      .result(s_gates7_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_8 (
+      .input1(s_alui1n),
+      .input2(s_csalui0_n),
+      .result(s_gates8_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_9 (
+      .input1(s_alui7_out),
+      .input2(s_f15),
+      .result(s_gates9_out)
+  );
+
+  NAND_GATE_3_INPUTS #(
+      .BubblesMask(3'b000)
+  ) GATES_10 (
+      .input1(s_alui7_n),
+      .input2(s_alui6_n),
+      .input3(s_q0),
+      .result(s_gates10_out)
+  );
+
+  NAND_GATE_3_INPUTS #(
+      .BubblesMask(3'b000)
+  ) GATES_11 (
+      .input1(s_alui7_n),
+      .input2(s_alui6),
+      .input3(s_f0),
+      .result(s_gates11_out)
+  );
+
+  NOR_GATE_3_INPUTS #(
+      .BubblesMask(3'b000)
+  ) GATES_12 (
+      .input1(s_gates56_out),
+      .input2(s_csalui_8_0[5]),
+      .input3(s_gnd),
+      .result(s_gates12_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_13 (
+      .input1(s_gates4_out),
+      .input2(s_gates5_out),
+      .result(s_gates13_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_14 (
+      .input1(s_gates5_out),
+      .input2(s_gates6_out),
+      .result(s_gates14_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_15 (
+      .input1(s_gates8_out),
+      .input2(s_csalui_8_0[2]),
+      .result(s_gates15_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_16 (
+      .input1(s_alui6),
+      .input2(s_f0),
+      .result(s_gates16_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_17 (
+      .input1(s_q0),
+      .input2(s_alui6_n),
+      .result(s_gates17_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_18 (
+      .input1(s_alui6_n),
+      .input2(s_q15),
+      .result(s_gates18_out)
+  );
+
+  NAND_GATE_3_INPUTS #(
+      .BubblesMask(3'b000)
+  ) GATES_19 (
+      .input1(s_gates9_out),
+      .input2(s_gates10_out),
+      .input3(s_gates11_out),
+      .result(s_mi_out)
+  );
+
+  NOR_GATE_3_INPUTS #(
+      .BubblesMask(3'b000)
+  ) GATES_20 (
+      .input1(s_ssel1n),
+      .input2(s_ssel0),
+      .input3(s_alui6),
+      .result(s_gates20_out)
+  );
+
+  NOR_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_21 (
+      .input1(s_ssel0n),
+      .input2(s_ssel1),
+      .result(s_gates21_out)
+  );
+
+  NOR_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_22 (
+      .input1(s_ssel0),
+      .input2(s_ssel1),
+      .result(s_gates22_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_23 (
+      .input1(s_gates16_out),
+      .input2(s_gates17_out),
+      .result(s_gates23_out)
+  );
+
+  NOR_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_24 (
+      .input1(s_ssel1n),
+      .input2(s_ssel0n),
+      .result(s_gates24_out)
+  );
+
+  NAND_GATE_3_INPUTS #(
+      .BubblesMask(3'b000)
+  ) GATES_25 (
+      .input1(s_alui6_n),
+      .input2(s_alui7_out),
+      .input3(s_alui8_n_out),
+      .result(s_alud2_n_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_26 (
+      .input1(s_alui6_n),
+      .input2(s_alui8),
+      .result(s_qsel_1_n_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_27 (
+      .input1(s_alui6_n),
+      .input2(s_alui7_n),
+      .result(s_qsel_0_n_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_28 (
+      .input1(s_sts7),
+      .input2(s_cry),
+      .result(s_gates28_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_29 (
+      .input1(s_sts7),
+      .input2(s_gpr0),
+      .result(s_gates29_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_30 (
+      .input1(s_gpr0),
+      .input2(s_cry),
+      .result(s_gates30_out)
+  );
+
+
+
+
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_34 (
+      .input1(s_f15),
+      .input2(s_gates21_out),
+      .result(s_gates34_out)
+  );
+
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_36 (
+      .input1(s_gates_35_out),
+      .input2(s_gates34_out),
+      .result(s_qli_out)
+  );
+
+  /** RRI GATES **/
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_35 (
+      .input1(s_sts7),
+      .input2(s_gates24_out),
+      .result(s_gates_35_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_31 (
+      .input1(s_cry),
+      .input2(s_gates20_out),
+      .result(s_gates_31_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_32 (
+      .input1(s_gates23_out),
+      .input2(s_gates21_out),
+      .result(s_gates_32_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_33 (
+      .input1(s_f15),
+      .input2(s_gates22_out),
+      .result(s_gates_33_out)
+  );
+
+  NAND_GATE_4_INPUTS #(
+      .BubblesMask(4'h0)
+  ) GATES_37 (
+      .input1(s_gates_35_out),
+      .input2(s_gates_31_out),
+      .input3(s_gates_32_out),
+      .input4(s_gates_33_out),
+      .result(s_rri_out)
+  );
+
+  NAND_GATE_3_INPUTS #(
+      .BubblesMask(3'b000)
+  ) GATES_38 (
+      .input1(s_gates28_out),
+      .input2(s_gates29_out),
+      .input3(s_gates30_out),
+      .result(s_gprli_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_39 (
+      .input1(s_qli_out),
+      .input2(s_alui6),
+      .result(s_gates39_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_40 (
+      .input1(s_gates39_out),
+      .input2(s_gates18_out),
+      .result(s_rli_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_41 (
+      .input1(s_xfetch_n),
+      .input2(s_alui7_n),
+      .result(s_gates41_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_42 (
+      .input1(s_gates41_out),
+      .input2(s_ldgpr_n),
+      .result(s_gates42_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_43 (
+      .input1(s_ldgpr_n),
+      .input2(s_xfetch_n),
+      .result(s_gates43_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_44 (
+      .input1(~s_gates43_out),
+      .input2(s_alui8_n_out),
+      .result(s_gates44_out)
+  );
+
+  D_FLIPFLOP_EN #(
+      .USE_ENABLE(ALUCLK_CE)
+  ) MEMORY_45 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .clock(s_aluclk),
+      .d(s_csalui_8_0[6]),
+      .preset(1'b0),
+      .q(s_alui6),
+      .qBar(s_alui6_n),
+      .reset(1'b0),
+      .tick(1'b1)
+  );
+
+  // Shift-type capture (instruction bits 10:9 -> SSEL via the CSMIS muxes).
+  // Must be a TRANSPARENT LATCH on LDIRV, exactly like the MIC IR latch
+  // (CGA_MIC IRLATCH): the instruction word is valid on the CD bus late in
+  // the LDIRV-high window and is gone again before the next rise, so a
+  // rising-edge flip-flop can never capture it (measured: CD=000000 at
+  // every LDIRV rise, instruction present at every fall). As flip-flops
+  // these bits stayed 0, SSEL decoded as 00 and every SHA/SHD/SHT/SAD
+  // ROT / ZIN-right / LIN shift executed as a plain arithmetic shift
+  // (INSTRUCTION-B SHIFT sub-tests 5OP-8OP, 256 failures each).
+  L8 SSEL_LATCH (
+      .sysclk(sysclk),
+      .sys_rst_n(1'b1),
+
+      .L(s_ldirv),
+
+      .A(s_cd_10_9[1]),
+      .B(s_cd_10_9[0]),
+      .C(1'b0),
+      .D(1'b0),
+      .E(1'b0),
+      .F(1'b0),
+      .G(1'b0),
+      .H(1'b0),
+
+      .QA (s_memory46_q),
+      .QAN(),
+      .QB (s_memory47_q),
+      .QBN(),
+      .QC (),
+      .QCN(),
+      .QD (),
+      .QDN(),
+      .QE (),
+      .QEN(),
+      .QF (),
+      .QFN(),
+      .QG (),
+      .QGN(),
+      .QH (),
+      .QHN(),
+      // registered-value taps: deliberately unconnected here -
+      // the transparent output is the wanted one (see L8/L4 header).
+      .QA_R(),
+      .QB_R(),
+      .QC_R(),
+      .QD_R(),
+      .QE_R(),
+      .QF_R(),
+      .QG_R(),
+      .QH_R()
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_48 (
+      .input1(s_icsst1),
+      .input2(s_gates49_out),
+      .result(s_csts_1_0[1])
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_49 (
+      .input1(s_alui8),
+      .input2(s_gates1_out),
+      .result(s_gates49_out)
+  );
+
+  AND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_50 (
+      .input1(s_ialii7_n),
+      .input2(s_ialii8_n),
+      .result(s_gates50_out)
+  );
+
+  D_FLIPFLOP_EN #(
+      .USE_ENABLE(ALUCLK_CE)
+  ) MEMORY_51 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .clock(s_aluclk),
+      .d(s_gates50_out),
+      .preset(1'b0),
+      .q(s_bdest_n),
+      .qBar(),
+      .reset(1'b0),
+      .tick(1'b1)
+  );
+
+  AND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_52 (
+      .input1(s_alui3n),
+      .input2(s_csalui_8_0[5]),
+      .result(s_gates52_out)
+  );
+
+  AND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_53 (
+      .input1(s_csalui4_n),
+      .input2(s_alui3n),
+      .result(s_gates53_out)
+  );
+
+  NOR_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_54 (
+      .input1(s_gates53_out),
+      .input2(s_gates52_out),
+      .result(s_gates54_out)
+  );
+
+  NAND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_55 (
+      .input1(s_csalui_8_0[5]),
+      .input2(s_csalui_8_0[4]),
+      .result(s_gates55_out)
+  );
+
+  AND_GATE #(
+      .BubblesMask(2'b00)
+  ) GATES_56 (
+      .input1(s_alui3n),
+      .input2(s_csalui_8_0[4]),
+      .result(s_gates56_out)
+  );
+
+
+  /*******************************************************************************
+   ** Here all sub-circuits are defined                                          **
+   *******************************************************************************/
+
+  MUX21LP CSMIS1_MUX (
+      .A (s_csmis_1_0[1]),
+      .B (s_memory46_q),
+      .S (s_gates1_out),
+      .ZN(s_isel1_n)
+  );
+
+  MUX21LP CSMIS0_MUX (
+      .A (s_csmis_1_0[0]),
+      .B (s_memory47_q),
+      .S (s_gates1_out),
+      .ZN(s_isel0_n)
+  );
+
+  MUX21LP CSALUI7_MUX (
+      .A (s_csalui_8_0[7]),
+      .B (s_up_n),
+      .S (s_gates1_out),
+      .ZN(s_ialii7_n)
+  );
+
+  MUX21LP CSALUI8_MUX (
+      .A (s_csalui_8_0[8]),
+      .B (s_lcz_n),
+      .S (s_gates1_out),
+      .ZN(s_ialii8_n)
+  );
+
+  MUX21LP ALUI3_MUX (
+      .A (s_dgpr0_n),
+      .B (s_csalui3_n),
+      .S (s_gates3_out),
+      .ZN(s_alui3n)
+  );
+
+  MUX21LP ALUI1N_MUX (
+      .A (s_csalui_8_0[1]),
+      .B (s_dgpr0_n),
+      .S (s_gates2_out),
+      .ZN(s_alui1n)
+  );
+
+  R41P_EN #(.USE_ENABLE(ALUCLK_CE)) REG_RFLA4 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CP(s_aluclk),
+      .A  (s_gates54_out),
+      .B  (s_gates55_out),
+      .C  (s_gates12_out),
+      .D  (s_csalui_8_0[4]),
+      .QA (s_rsn_n_out),
+      .QAN(),
+      .QB (),
+      .QBN(s_fsel_n),
+      .QC (s_log_n_out),
+      .QCN(),
+      .QD (),
+      .QDN(s_alui4_n_out)
+  );
+
+  R41P_EN #(.USE_ENABLE(ALUCLK_CE)) REG_BAAD (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CP(s_aluclk),
+      .A  (s_gates13_out),
+      .B  (s_gates14_out),
+      .C  (s_gates7_out),
+      .D  (s_gates15_out),
+      .QA (),
+      .QAN(s_sb_n_out),
+      .QB (),
+      .QBN(s_sa_n_out),
+      .QC (s_ra_n_out),
+      .QCN(),
+      .QD (s_rd_n_out),
+      .QDN()
+  );
+
+  R81_EN #(.USE_ENABLE(ALUCLK_CE)) CONTR_REG (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CP(s_aluclk),
+      .A (s_isel1_n),
+      .B (s_isel0_n),
+      .C (s_ialii7_n),
+      .D (s_ialii8_n),
+      .E (s_csst_1_0[0]),
+      .F (s_csst_1_0[1]),
+      .G (s_cscinsel_1_0[0]),
+      .H (s_cscinsel_1_0[1]),
+
+      .QA (s_ssel1n),
+      .QAN(s_ssel1),
+      .QB (s_ssel0n),
+      .QBN(s_ssel0),
+      .QC (s_alui7_n),
+      .QCN(),
+      .QD (s_alui8_n_out),
+      .QDN(),
+      .QE (s_csts_1_0[0]),
+      .QEN(),
+      .QF (),
+      .QFN(s_icsst1),
+      .QG (s_cinsel0),
+      .QGN(),
+      .QH (s_cinsel1),
+      .QHN()
+  );
+
+  MUX41P CI_SEL_MUX (
+      .A (s_cinsel0),
+      .B (s_cinsel1),
+      .D0(s_gnd),
+      .D1(s_power),
+      .D2(s_sts6),
+      .D3(s_gpr0),
+      .Z (s_ci_out)
+  );
+
+endmodule
+```
+
+</details>

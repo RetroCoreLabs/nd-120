@@ -1,0 +1,427 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1385.0" height="2225.5" viewBox="-80.0 -80.0 1385.0 2225.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="1385.0" height="2225.5" fill="#ffffff" /><g transform="translate(77,1702.5)" id="cell_$not$CGA_MIC_IPOS.v:78$10442"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_IPOS.v:78$10442" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_IPOS.v:78$10442" /><g /><g /></g>
+<g transform="translate(459.5,1750.5)" id="cell_$not$CGA_MIC_IPOS.v:79$10443"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_IPOS.v:79$10443" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_IPOS.v:79$10443" /><g /><g /></g>
+<g transform="translate(459.5,1662.5)" id="cell_$not$CGA_MIC_IPOS.v:80$10444"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_IPOS.v:80$10444" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_IPOS.v:80$10444" /><g /><g /></g>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_1 (NAND_GATE) - open its page</title><g transform="translate(179,1682)" id="cell_GATES_1"><text x="15" y="-4" class="nodelabel cell_GATES_1">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_1" /><g transform="translate(0,10)" id="port_GATES_1~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input1</text></g><g transform="translate(0,30)" id="port_GATES_1~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input2</text></g><g transform="translate(30,10)" id="port_GATES_1~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_1">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_2 (AND_GATE) - open its page</title><g transform="translate(319,1750)" id="cell_GATES_2"><text x="15" y="-4" class="nodelabel cell_GATES_2">AND_GATE</text><rect width="30" height="40" class="cell_GATES_2" /><g transform="translate(0,10)" id="port_GATES_2~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input1</text></g><g transform="translate(0,30)" id="port_GATES_2~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input2</text></g><g transform="translate(30,10)" id="port_GATES_2~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_2">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_3 (AND_GATE) - open its page</title><g transform="translate(319,1662)" id="cell_GATES_3"><text x="15" y="-4" class="nodelabel cell_GATES_3">AND_GATE</text><rect width="30" height="40" class="cell_GATES_3" /><g transform="translate(0,10)" id="port_GATES_3~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input1</text></g><g transform="translate(0,30)" id="port_GATES_3~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input2</text></g><g transform="translate(30,10)" id="port_GATES_3~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_3">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE_3_INPUTS.md"><title>GATES_4 (NAND_GATE_3_INPUTS) - open its page</title><g transform="translate(459,1990.5)" id="cell_GATES_4"><text x="15" y="-4" class="nodelabel cell_GATES_4">NAND_GATE_3_INPUTS</text><rect width="30" height="60" class="cell_GATES_4" /><g transform="translate(0,10)" id="port_GATES_4~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input1</text></g><g transform="translate(0,30)" id="port_GATES_4~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input2</text></g><g transform="translate(0,50)" id="port_GATES_4~input3"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input3</text></g><g transform="translate(30,10)" id="port_GATES_4~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_4">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_5 (NAND_GATE) - open its page</title><g transform="translate(459,1902.5)" id="cell_GATES_5"><text x="15" y="-4" class="nodelabel cell_GATES_5">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_5" /><g transform="translate(0,10)" id="port_GATES_5~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input1</text></g><g transform="translate(0,30)" id="port_GATES_5~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input2</text></g><g transform="translate(30,10)" id="port_GATES_5~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_5">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_10 (Multiplexer_4) - open its page</title><g transform="translate(1005,624)" id="cell_PLEXERS_10"><text x="15" y="-4" class="nodelabel cell_PLEXERS_10">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_10" /><g transform="translate(0,10)" id="port_PLEXERS_10~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_10">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_10~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_10">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_10~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_10">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_10~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_10">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_10~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_10">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_10~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_10">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_11 (Multiplexer_4) - open its page</title><g transform="translate(1005,772)" id="cell_PLEXERS_11"><text x="15" y="-4" class="nodelabel cell_PLEXERS_11">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_11" /><g transform="translate(0,10)" id="port_PLEXERS_11~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_11">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_11~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_11">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_11~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_11">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_11~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_11">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_11~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_11">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_11~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_11">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_12 (Multiplexer_4) - open its page</title><g transform="translate(1005,920)" id="cell_PLEXERS_12"><text x="15" y="-4" class="nodelabel cell_PLEXERS_12">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_12" /><g transform="translate(0,10)" id="port_PLEXERS_12~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_12">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_12~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_12">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_12~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_12">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_12~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_12">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_12~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_12">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_12~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_12">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_13 (Multiplexer_4) - open its page</title><g transform="translate(1005,32)" id="cell_PLEXERS_13"><text x="15" y="-4" class="nodelabel cell_PLEXERS_13">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_13" /><g transform="translate(0,10)" id="port_PLEXERS_13~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_13">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_13~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_13">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_13~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_13">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_13~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_13">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_13~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_13">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_13~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_13">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_14 (Multiplexer_4) - open its page</title><g transform="translate(1005,180)" id="cell_PLEXERS_14"><text x="15" y="-4" class="nodelabel cell_PLEXERS_14">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_14" /><g transform="translate(0,10)" id="port_PLEXERS_14~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_14">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_14~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_14">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_14~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_14">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_14~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_14">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_14~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_14">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_14~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_14">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_15 (Multiplexer_4) - open its page</title><g transform="translate(1005,328)" id="cell_PLEXERS_15"><text x="15" y="-4" class="nodelabel cell_PLEXERS_15">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_15" /><g transform="translate(0,10)" id="port_PLEXERS_15~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_15">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_15~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_15">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_15~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_15">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_15~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_15">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_15~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_15">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_15~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_15">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_16 (Multiplexer_4) - open its page</title><g transform="translate(1005,476)" id="cell_PLEXERS_16"><text x="15" y="-4" class="nodelabel cell_PLEXERS_16">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_16" /><g transform="translate(0,10)" id="port_PLEXERS_16~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_16">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_16~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_16">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_16~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_16">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_16~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_16">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_16~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_16">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_16~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_16">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_17 (Multiplexer_4) - open its page</title><g transform="translate(1005,1808)" id="cell_PLEXERS_17"><text x="15" y="-4" class="nodelabel cell_PLEXERS_17">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_17" /><g transform="translate(0,10)" id="port_PLEXERS_17~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_17">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_17~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_17">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_17~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_17">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_17~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_17">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_17~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_17">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_17~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_17">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_18 (Multiplexer_4) - open its page</title><g transform="translate(1005,1512)" id="cell_PLEXERS_18"><text x="15" y="-4" class="nodelabel cell_PLEXERS_18">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_18" /><g transform="translate(0,10)" id="port_PLEXERS_18~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_18">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_18~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_18">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_18~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_18">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_18~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_18">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_18~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_18">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_18~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_18">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_6 (Multiplexer_4) - open its page</title><g transform="translate(1005,1660)" id="cell_PLEXERS_6"><text x="15" y="-4" class="nodelabel cell_PLEXERS_6">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_6" /><g transform="translate(0,10)" id="port_PLEXERS_6~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_6">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_6~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_6">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_6~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_6">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_6~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_6">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_6~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_6">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_6~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_6">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_7 (Multiplexer_4) - open its page</title><g transform="translate(1005,1068)" id="cell_PLEXERS_7"><text x="15" y="-4" class="nodelabel cell_PLEXERS_7">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_7" /><g transform="translate(0,10)" id="port_PLEXERS_7~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_7">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_7~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_7">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_7~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_7">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_7~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_7">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_7~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_7">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_7~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_7">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_8 (Multiplexer_4) - open its page</title><g transform="translate(1005,1216)" id="cell_PLEXERS_8"><text x="15" y="-4" class="nodelabel cell_PLEXERS_8">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_8" /><g transform="translate(0,10)" id="port_PLEXERS_8~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_8">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_8~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_8">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_8~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_8">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_8~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_8">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_8~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_8">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_8~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_8">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_4.md"><title>PLEXERS_9 (Multiplexer_4) - open its page</title><g transform="translate(1005,1364)" id="cell_PLEXERS_9"><text x="15" y="-4" class="nodelabel cell_PLEXERS_9">Multiplexer_4</text><rect width="30" height="100" class="cell_PLEXERS_9" /><g transform="translate(0,10)" id="port_PLEXERS_9~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_9">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_9~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_9">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_9~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_9">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_9~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_9">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_9~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_9">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_9~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_9">muxOut</text></g></g></a>
+<g transform="translate(459,124.5)" id="cell_CD_15_0"><text x="15" y="-4" class="nodelabel cell_CD_15_0">CD_15_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CD_15_0" /><g /></g>
+<g transform="translate(12,2011)" id="cell_EWCAN"><text x="15" y="-4" class="nodelabel cell_EWCAN">EWCAN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EWCAN" /><g /></g>
+<g transform="translate(77,1903)" id="cell_MAPN"><text x="15" y="-4" class="nodelabel cell_MAPN">MAPN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MAPN" /><g /></g>
+<g transform="translate(179,1991)" id="cell_TRAPN"><text x="15" y="-4" class="nodelabel cell_TRAPN">TRAPN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TRAPN" /><g /></g>
+<g transform="translate(459,22.5)" id="cell_TVEC_3_0"><text x="15" y="-4" class="nodelabel cell_TVEC_3_0">TVEC_3_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TVEC_3_0" /><g /></g>
+<g transform="translate(459,994)" id="cell_WCA_12_0"><text x="15" y="-4" class="nodelabel cell_WCA_12_0">WCA_12_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WCA_12_0" /><g /></g>
+<g transform="translate(459,334)" id="cell_W_12_0"><text x="15" y="-4" class="nodelabel cell_W_12_0">W_12_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_W_12_0" /><g /></g>
+<g transform="translate(1171,850.5)" id="cell_MA_12_0"><text x="15" y="-4" class="nodelabel cell_MA_12_0">MA_12_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_MA_12_0" /><g /></g>
+<g transform="translate(562,1868.5)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(562,1933.5)" id="cell_1"><text x="15" y="-4" class="nodelabel cell_1">1</text><rect width="30" height="20" class="cell_1" /><g /></g>
+<g transform="translate(573,1730)" id="cell_$join$,68,66,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g></g>
+<g transform="translate(573,1990.5)" id="cell_$join$,70,71,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g></g>
+<g transform="translate(1130,840)" id="cell_$join$,51,52,53,54,55,56,57,58,59,60,61,62,63,"><rect width="5" height="260" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g><g transform="translate(0,90)"><text x="-3" y="-4" class="inputPortLabel">4</text></g><g transform="translate(0,110)"><text x="-3" y="-4" class="inputPortLabel">5</text></g><g transform="translate(0,130)"><text x="-3" y="-4" class="inputPortLabel">6</text></g><g transform="translate(0,150)"><text x="-3" y="-4" class="inputPortLabel">7</text></g><g transform="translate(0,170)"><text x="-3" y="-4" class="inputPortLabel">8</text></g><g transform="translate(0,190)"><text x="-3" y="-4" class="inputPortLabel">9</text></g><g transform="translate(0,210)"><text x="-3" y="-4" class="inputPortLabel">10</text></g><g transform="translate(0,230)"><text x="-3" y="-4" class="inputPortLabel">11</text></g><g transform="translate(0,250)"><text x="-3" y="-4" class="inputPortLabel">12</text></g></g>
+<g transform="translate(574,356)" id="cell_$split$,38,39,40,41,42,43,44,45,46,47,48,49,50,"><rect width="5" height="260" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">6</text></g><g transform="translate(4,30)"><text x="5" y="-4">5</text></g><g transform="translate(4,50)"><text x="5" y="-4">4</text></g><g transform="translate(4,70)"><text x="5" y="-4">3</text></g><g transform="translate(4,90)"><text x="5" y="-4">2</text></g><g transform="translate(4,110)"><text x="5" y="-4">1</text></g><g transform="translate(4,130)"><text x="5" y="-4">0</text></g><g transform="translate(4,150)"><text x="5" y="-4">12</text></g><g transform="translate(4,170)"><text x="5" y="-4">11</text></g><g transform="translate(4,190)"><text x="5" y="-4">10</text></g><g transform="translate(4,210)"><text x="5" y="-4">9</text></g><g transform="translate(4,230)"><text x="5" y="-4">8</text></g><g transform="translate(4,250)"><text x="5" y="-4">7</text></g></g>
+<g transform="translate(574,1016)" id="cell_$split$,25,26,27,28,29,30,31,32,33,34,35,36,37,"><rect width="5" height="260" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">6</text></g><g transform="translate(4,30)"><text x="5" y="-4">5</text></g><g transform="translate(4,50)"><text x="5" y="-4">4</text></g><g transform="translate(4,70)"><text x="5" y="-4">3</text></g><g transform="translate(4,90)"><text x="5" y="-4">2</text></g><g transform="translate(4,110)"><text x="5" y="-4">1</text></g><g transform="translate(4,130)"><text x="5" y="-4">0</text></g><g transform="translate(4,150)"><text x="5" y="-4">12</text></g><g transform="translate(4,170)"><text x="5" y="-4">11</text></g><g transform="translate(4,190)"><text x="5" y="-4">10</text></g><g transform="translate(4,210)"><text x="5" y="-4">9</text></g><g transform="translate(4,230)"><text x="5" y="-4">8</text></g><g transform="translate(4,250)"><text x="5" y="-4">7</text></g></g>
+<g transform="translate(574,114)" id="cell_$split$,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,"><rect width="5" height="200" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">12</text></g><g transform="translate(4,30)"><text x="5" y="-4">11</text></g><g transform="translate(4,50)"><text x="5" y="-4">10</text></g><g transform="translate(4,70)"><text x="5" y="-4">9</text></g><g transform="translate(4,90)"><text x="5" y="-4">8</text></g><g transform="translate(4,110)"><text x="5" y="-4">7</text></g><g transform="translate(4,130)"><text x="5" y="-4">6</text></g><g transform="translate(4,150)"><text x="5" y="-4">15</text></g><g transform="translate(4,170)"><text x="5" y="-4">14</text></g><g transform="translate(4,190)"><text x="5" y="-4">13</text></g></g>
+<g transform="translate(574.2,12)" id="cell_$split$,21,22,23,24,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">3</text></g><g transform="translate(4,30)"><text x="5" y="-4">2</text></g><g transform="translate(4,50)"><text x="5" y="-4">1</text></g><g transform="translate(4,70)"><text x="5" y="-4">0</text></g></g>
+<line x1="40" x2="52" y1="2021" y2="2021" class="net_18"><title>EWCAN</title></line>
+<line x1="52" x2="52" y1="2021" y2="1712.5" class="net_18"><title>EWCAN</title></line>
+<circle cx="52" cy="2021" r="2" style="fill:#000" class="net_18" />
+<line x1="52" x2="77" y1="1712.5" y2="1712.5" class="net_18"><title>EWCAN</title></line>
+<line x1="40" x2="459" y1="2021" y2="2021" class="net_18"><title>EWCAN</title></line>
+<line x1="350" x2="459.5" y1="1760.5" y2="1760.5" class="net_65"><title>s_gates2_out</title></line>
+<line x1="350" x2="459.5" y1="1672.5" y2="1672.5" class="net_67"><title>s_gates3_out</title></line>
+<line x1="105" x2="117" y1="1913" y2="1913" class="net_19"><title>MAPN</title></line>
+<line x1="117" x2="117" y1="1913" y2="1692.5" class="net_19"><title>MAPN</title></line>
+<circle cx="117" cy="1913" r="2" style="fill:#000" class="net_19" />
+<line x1="117" x2="179" y1="1692.5" y2="1692.5" class="net_19"><title>MAPN</title></line>
+<line x1="105" x2="267" y1="1913" y2="1913" class="net_19"><title>MAPN</title></line>
+<line x1="267" x2="267" y1="1913" y2="1760.5" class="net_19"><title>MAPN</title></line>
+<circle cx="267" cy="1913" r="2" style="fill:#000" class="net_19" />
+<line x1="267" x2="319" y1="1760.5" y2="1760.5" class="net_19"><title>MAPN</title></line>
+<line x1="105" x2="397" y1="1913" y2="1913" class="net_19"><title>MAPN</title></line>
+<line x1="397" x2="397" y1="1913" y2="2041" class="net_19"><title>MAPN</title></line>
+<circle cx="397" cy="1913" r="2" style="fill:#000" class="net_19" />
+<line x1="397" x2="459" y1="2041" y2="2041" class="net_19"><title>MAPN</title></line>
+<line x1="105" x2="459" y1="1913" y2="1913" class="net_19"><title>MAPN</title></line>
+<line x1="102" x2="179" y1="1712.5" y2="1712.5" class="net_64"><title>s_ewca</title></line>
+<line x1="207" x2="257" y1="2001" y2="2001" class="net_20"><title>TRAPN</title></line>
+<line x1="257" x2="257" y1="2001" y2="1780.5" class="net_20"><title>TRAPN</title></line>
+<circle cx="257" cy="2001" r="2" style="fill:#000" class="net_20" />
+<circle cx="257" cy="1780.5" r="2" style="fill:#000" class="net_20" />
+<line x1="257" x2="319" y1="1780.5" y2="1780.5" class="net_20"><title>TRAPN</title></line>
+<line x1="207" x2="257" y1="2001" y2="2001" class="net_20"><title>TRAPN</title></line>
+<line x1="257" x2="257" y1="2001" y2="1672.5" class="net_20"><title>TRAPN</title></line>
+<line x1="257" x2="319" y1="1672.5" y2="1672.5" class="net_20"><title>TRAPN</title></line>
+<line x1="207" x2="459" y1="2001" y2="2001" class="net_20"><title>TRAPN</title></line>
+<line x1="207" x2="407" y1="2001" y2="2001" class="net_20"><title>TRAPN</title></line>
+<line x1="407" x2="407" y1="2001" y2="1933" class="net_20"><title>TRAPN</title></line>
+<circle cx="407" cy="2001" r="2" style="fill:#000" class="net_20" />
+<line x1="407" x2="459" y1="1933" y2="1933" class="net_20"><title>TRAPN</title></line>
+<line x1="210" x2="319" y1="1692.5" y2="1692.5" class="net_69"><title>s_gates1_out</title></line>
+<line x1="578.5" x2="578.5" y1="366" y2="334" class="net_44"><title>W_12_0[6]</title></line>
+<line x1="578.5" x2="772" y1="334" y2="334" class="net_44"><title>W_12_0[6]</title></line>
+<line x1="772" x2="772" y1="334" y2="634.5" class="net_44"><title>W_12_0[6]</title></line>
+<line x1="772" x2="1005" y1="634.5" y2="634.5" class="net_44"><title>W_12_0[6]</title></line>
+<line x1="578.5" x2="578.5" y1="1026" y2="654.5" class="net_31"><title>WCA_12_0[6]</title></line>
+<line x1="578.5" x2="1005" y1="654.5" y2="654.5" class="net_31"><title>WCA_12_0[6]</title></line>
+<line x1="578.5" x2="578.5" y1="124" y2="102" class="net_14"><title>CD_15_0[12]</title></line>
+<line x1="578.5" x2="782" y1="102" y2="102" class="net_14"><title>CD_15_0[12]</title></line>
+<line x1="782" x2="782" y1="102" y2="674.5" class="net_14"><title>CD_15_0[12]</title></line>
+<line x1="782" x2="1005" y1="674.5" y2="674.5" class="net_14"><title>CD_15_0[12]</title></line>
+<line x1="592" x2="932" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="932" x2="932" y1="1878.5" y2="694.5" class="net_72" />
+<circle cx="932" cy="1878.5" r="2" style="fill:#000" class="net_72" />
+<line x1="932" x2="1005" y1="694.5" y2="694.5" class="net_72" />
+<line x1="592" x2="932" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="932" x2="932" y1="1878.5" y2="842.5" class="net_72" />
+<circle cx="932" cy="842.5" r="2" style="fill:#000" class="net_72" />
+<line x1="932" x2="1005" y1="842.5" y2="842.5" class="net_72" />
+<line x1="592" x2="932" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="932" x2="932" y1="1878.5" y2="990.5" class="net_72" />
+<circle cx="932" cy="990.5" r="2" style="fill:#000" class="net_72" />
+<line x1="932" x2="1005" y1="990.5" y2="990.5" class="net_72" />
+<line x1="592" x2="1005" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="592" x2="932" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="932" x2="932" y1="1878.5" y2="1582.5" class="net_72" />
+<circle cx="932" cy="1582.5" r="2" style="fill:#000" class="net_72" />
+<line x1="932" x2="1005" y1="1582.5" y2="1582.5" class="net_72" />
+<line x1="592" x2="932" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="932" x2="932" y1="1878.5" y2="1730.5" class="net_72" />
+<circle cx="932" cy="1730.5" r="2" style="fill:#000" class="net_72" />
+<line x1="932" x2="1005" y1="1730.5" y2="1730.5" class="net_72" />
+<line x1="592" x2="932" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="932" x2="932" y1="1878.5" y2="1138.5" class="net_72" />
+<circle cx="932" cy="1138.5" r="2" style="fill:#000" class="net_72" />
+<line x1="932" x2="1005" y1="1138.5" y2="1138.5" class="net_72" />
+<line x1="592" x2="932" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="932" x2="932" y1="1878.5" y2="1286.5" class="net_72" />
+<circle cx="932" cy="1286.5" r="2" style="fill:#000" class="net_72" />
+<line x1="932" x2="1005" y1="1286.5" y2="1286.5" class="net_72" />
+<line x1="592" x2="932" y1="1878.5" y2="1878.5" class="net_72" />
+<line x1="932" x2="932" y1="1878.5" y2="1434.5" class="net_72" />
+<circle cx="932" cy="1434.5" r="2" style="fill:#000" class="net_72" />
+<line x1="932" x2="1005" y1="1434.5" y2="1434.5" class="net_72" />
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="714.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="1750.5" r="2" style="fill:#000" class="net_68,66" />
+<circle cx="922" cy="714.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="714.5" y2="714.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="862.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="862.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="862.5" y2="862.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="1010.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="1010.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="1010.5" y2="1010.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="122.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="1005" y1="122.5" y2="122.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="270.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="270.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="270.5" y2="270.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="418.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="418.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="418.5" y2="418.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="566.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="566.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="566.5" y2="566.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="1602.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="1602.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="1602.5" y2="1602.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="1005" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="1158.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="1158.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="1158.5" y2="1158.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="1306.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="1306.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="1306.5" y2="1306.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="922" y1="1750.5" y2="1750.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="922" x2="922" y1="1750.5" y2="1454.5" class="net_68,66"><title>mux_selector</title></line>
+<circle cx="922" cy="1454.5" r="2" style="fill:#000" class="net_68,66" />
+<line x1="922" x2="1005" y1="1454.5" y2="1454.5" class="net_68,66"><title>mux_selector</title></line>
+<line x1="579" x2="752" y1="386.5" y2="386.5" class="net_43"><title>W_12_0[5]</title></line>
+<line x1="752" x2="752" y1="386.5" y2="782.5" class="net_43"><title>W_12_0[5]</title></line>
+<line x1="752" x2="1005" y1="782.5" y2="782.5" class="net_43"><title>W_12_0[5]</title></line>
+<line x1="579" x2="602" y1="1046.5" y2="1046.5" class="net_30"><title>WCA_12_0[5]</title></line>
+<line x1="602" x2="602" y1="1046.5" y2="802.5" class="net_30"><title>WCA_12_0[5]</title></line>
+<line x1="602" x2="1005" y1="802.5" y2="802.5" class="net_30"><title>WCA_12_0[5]</title></line>
+<line x1="579" x2="762" y1="144.5" y2="144.5" class="net_13"><title>CD_15_0[11]</title></line>
+<line x1="762" x2="762" y1="144.5" y2="822.5" class="net_13"><title>CD_15_0[11]</title></line>
+<line x1="762" x2="1005" y1="822.5" y2="822.5" class="net_13"><title>CD_15_0[11]</title></line>
+<line x1="579" x2="732" y1="406.5" y2="406.5" class="net_42"><title>W_12_0[4]</title></line>
+<line x1="732" x2="732" y1="406.5" y2="930.5" class="net_42"><title>W_12_0[4]</title></line>
+<line x1="732" x2="1005" y1="930.5" y2="930.5" class="net_42"><title>W_12_0[4]</title></line>
+<line x1="579" x2="912" y1="1066.5" y2="1066.5" class="net_29"><title>WCA_12_0[4]</title></line>
+<line x1="912" x2="912" y1="1066.5" y2="950.5" class="net_29"><title>WCA_12_0[4]</title></line>
+<line x1="912" x2="1005" y1="950.5" y2="950.5" class="net_29"><title>WCA_12_0[4]</title></line>
+<line x1="579" x2="742" y1="164.5" y2="164.5" class="net_12"><title>CD_15_0[10]</title></line>
+<line x1="742" x2="742" y1="164.5" y2="970.5" class="net_12"><title>CD_15_0[10]</title></line>
+<line x1="742" x2="1005" y1="970.5" y2="970.5" class="net_12"><title>CD_15_0[10]</title></line>
+<line x1="579" x2="842" y1="426.5" y2="426.5" class="net_41"><title>W_12_0[3]</title></line>
+<line x1="842" x2="842" y1="426.5" y2="42.5" class="net_41"><title>W_12_0[3]</title></line>
+<line x1="842" x2="1005" y1="42.5" y2="42.5" class="net_41"><title>W_12_0[3]</title></line>
+<line x1="579" x2="852" y1="1086.5" y2="1086.5" class="net_28"><title>WCA_12_0[3]</title></line>
+<line x1="852" x2="852" y1="1086.5" y2="62.5" class="net_28"><title>WCA_12_0[3]</title></line>
+<line x1="852" x2="1005" y1="62.5" y2="62.5" class="net_28"><title>WCA_12_0[3]</title></line>
+<line x1="579" x2="862" y1="184.5" y2="184.5" class="net_11"><title>CD_15_0[9]</title></line>
+<line x1="862" x2="862" y1="184.5" y2="82.5" class="net_11"><title>CD_15_0[9]</title></line>
+<line x1="862" x2="1005" y1="82.5" y2="82.5" class="net_11"><title>CD_15_0[9]</title></line>
+<line x1="579.2" x2="872" y1="22.5" y2="22.5" class="net_24"><title>TVEC_3_0[3]</title></line>
+<line x1="872" x2="872" y1="22.5" y2="102.5" class="net_24"><title>TVEC_3_0[3]</title></line>
+<line x1="872" x2="1005" y1="102.5" y2="102.5" class="net_24"><title>TVEC_3_0[3]</title></line>
+<line x1="579" x2="862" y1="446.5" y2="446.5" class="net_40"><title>W_12_0[2]</title></line>
+<line x1="862" x2="862" y1="446.5" y2="190.5" class="net_40"><title>W_12_0[2]</title></line>
+<line x1="862" x2="1005" y1="190.5" y2="190.5" class="net_40"><title>W_12_0[2]</title></line>
+<line x1="579" x2="872" y1="1106.5" y2="1106.5" class="net_27"><title>WCA_12_0[2]</title></line>
+<line x1="872" x2="872" y1="1106.5" y2="210.5" class="net_27"><title>WCA_12_0[2]</title></line>
+<line x1="872" x2="1005" y1="210.5" y2="210.5" class="net_27"><title>WCA_12_0[2]</title></line>
+<line x1="579" x2="932" y1="204.5" y2="204.5" class="net_10"><title>CD_15_0[8]</title></line>
+<line x1="932" x2="932" y1="204.5" y2="230.5" class="net_10"><title>CD_15_0[8]</title></line>
+<line x1="932" x2="1005" y1="230.5" y2="230.5" class="net_10"><title>CD_15_0[8]</title></line>
+<line x1="579.2" x2="832" y1="42.5" y2="42.5" class="net_23"><title>TVEC_3_0[2]</title></line>
+<line x1="832" x2="832" y1="42.5" y2="250.5" class="net_23"><title>TVEC_3_0[2]</title></line>
+<line x1="832" x2="1005" y1="250.5" y2="250.5" class="net_23"><title>TVEC_3_0[2]</title></line>
+<line x1="579" x2="882" y1="466.5" y2="466.5" class="net_39"><title>W_12_0[1]</title></line>
+<line x1="882" x2="882" y1="466.5" y2="338.5" class="net_39"><title>W_12_0[1]</title></line>
+<line x1="882" x2="1005" y1="338.5" y2="338.5" class="net_39"><title>W_12_0[1]</title></line>
+<line x1="579" x2="892" y1="1126.5" y2="1126.5" class="net_26"><title>WCA_12_0[1]</title></line>
+<line x1="892" x2="892" y1="1126.5" y2="358.5" class="net_26"><title>WCA_12_0[1]</title></line>
+<line x1="892" x2="1005" y1="358.5" y2="358.5" class="net_26"><title>WCA_12_0[1]</title></line>
+<line x1="579" x2="812" y1="224.5" y2="224.5" class="net_9"><title>CD_15_0[7]</title></line>
+<line x1="812" x2="812" y1="224.5" y2="378.5" class="net_9"><title>CD_15_0[7]</title></line>
+<line x1="812" x2="1005" y1="378.5" y2="378.5" class="net_9"><title>CD_15_0[7]</title></line>
+<line x1="579.2" x2="822" y1="62.5" y2="62.5" class="net_22"><title>TVEC_3_0[1]</title></line>
+<line x1="822" x2="822" y1="62.5" y2="398.5" class="net_22"><title>TVEC_3_0[1]</title></line>
+<line x1="822" x2="1005" y1="398.5" y2="398.5" class="net_22"><title>TVEC_3_0[1]</title></line>
+<line x1="579" x2="1005" y1="486.5" y2="486.5" class="net_38"><title>W_12_0[0]</title></line>
+<line x1="579" x2="902" y1="1146.5" y2="1146.5" class="net_25"><title>WCA_12_0[0]</title></line>
+<line x1="902" x2="902" y1="1146.5" y2="506.5" class="net_25"><title>WCA_12_0[0]</title></line>
+<line x1="902" x2="1005" y1="506.5" y2="506.5" class="net_25"><title>WCA_12_0[0]</title></line>
+<line x1="579" x2="792" y1="244.5" y2="244.5" class="net_8"><title>CD_15_0[6]</title></line>
+<line x1="792" x2="792" y1="244.5" y2="526.5" class="net_8"><title>CD_15_0[6]</title></line>
+<line x1="792" x2="1005" y1="526.5" y2="526.5" class="net_8"><title>CD_15_0[6]</title></line>
+<line x1="579.2" x2="802" y1="82.5" y2="82.5" class="net_21"><title>TVEC_3_0[0]</title></line>
+<line x1="802" x2="802" y1="82.5" y2="546.5" class="net_21"><title>TVEC_3_0[0]</title></line>
+<line x1="802" x2="1005" y1="546.5" y2="546.5" class="net_21"><title>TVEC_3_0[0]</title></line>
+<line x1="579" x2="622" y1="506.5" y2="506.5" class="net_50"><title>W_12_0[12]</title></line>
+<line x1="622" x2="622" y1="506.5" y2="1818.5" class="net_50"><title>W_12_0[12]</title></line>
+<line x1="622" x2="1005" y1="1818.5" y2="1818.5" class="net_50"><title>W_12_0[12]</title></line>
+<line x1="579" x2="602" y1="1166.5" y2="1166.5" class="net_37"><title>WCA_12_0[12]</title></line>
+<line x1="602" x2="602" y1="1166.5" y2="1838.5" class="net_37"><title>WCA_12_0[12]</title></line>
+<line x1="602" x2="1005" y1="1838.5" y2="1838.5" class="net_37"><title>WCA_12_0[12]</title></line>
+<line x1="592" x2="942" y1="1943.5" y2="1943.5" class="net_75" />
+<line x1="942" x2="942" y1="1943.5" y2="1858.5" class="net_75" />
+<circle cx="942" cy="1858.5" r="2" style="fill:#000" class="net_75" />
+<line x1="942" x2="1005" y1="1858.5" y2="1858.5" class="net_75" />
+<line x1="592" x2="942" y1="1943.5" y2="1943.5" class="net_75" />
+<line x1="942" x2="942" y1="1943.5" y2="1562.5" class="net_75" />
+<line x1="942" x2="1005" y1="1562.5" y2="1562.5" class="net_75" />
+<line x1="592" x2="942" y1="1943.5" y2="1943.5" class="net_75" />
+<line x1="942" x2="942" y1="1943.5" y2="1710.5" class="net_75" />
+<circle cx="942" cy="1710.5" r="2" style="fill:#000" class="net_75" />
+<line x1="942" x2="1005" y1="1710.5" y2="1710.5" class="net_75" />
+<line x1="579" x2="952" y1="2011" y2="2011" class="net_70,71"><title>mux_selector_12</title></line>
+<line x1="952" x2="952" y1="2011" y2="1898.5" class="net_70,71"><title>mux_selector_12</title></line>
+<line x1="952" x2="1005" y1="1898.5" y2="1898.5" class="net_70,71"><title>mux_selector_12</title></line>
+<line x1="579" x2="652" y1="526.5" y2="526.5" class="net_49"><title>W_12_0[11]</title></line>
+<line x1="652" x2="652" y1="526.5" y2="1522.5" class="net_49"><title>W_12_0[11]</title></line>
+<line x1="652" x2="1005" y1="1522.5" y2="1522.5" class="net_49"><title>W_12_0[11]</title></line>
+<line x1="579" x2="642" y1="1186.5" y2="1186.5" class="net_36"><title>WCA_12_0[11]</title></line>
+<line x1="642" x2="642" y1="1186.5" y2="1542.5" class="net_36"><title>WCA_12_0[11]</title></line>
+<line x1="642" x2="1005" y1="1542.5" y2="1542.5" class="net_36"><title>WCA_12_0[11]</title></line>
+<line x1="579" x2="632" y1="546.5" y2="546.5" class="net_48"><title>W_12_0[10]</title></line>
+<line x1="632" x2="632" y1="546.5" y2="1670.5" class="net_48"><title>W_12_0[10]</title></line>
+<line x1="632" x2="1005" y1="1670.5" y2="1670.5" class="net_48"><title>W_12_0[10]</title></line>
+<line x1="579" x2="612" y1="1206.5" y2="1206.5" class="net_35"><title>WCA_12_0[10]</title></line>
+<line x1="612" x2="612" y1="1206.5" y2="1690.5" class="net_35"><title>WCA_12_0[10]</title></line>
+<line x1="612" x2="1005" y1="1690.5" y2="1690.5" class="net_35"><title>WCA_12_0[10]</title></line>
+<line x1="579" x2="722" y1="566.5" y2="566.5" class="net_47"><title>W_12_0[9]</title></line>
+<line x1="722" x2="722" y1="566.5" y2="1078.5" class="net_47"><title>W_12_0[9]</title></line>
+<line x1="722" x2="1005" y1="1078.5" y2="1078.5" class="net_47"><title>W_12_0[9]</title></line>
+<line x1="579" x2="702" y1="1226.5" y2="1226.5" class="net_34"><title>WCA_12_0[9]</title></line>
+<line x1="702" x2="702" y1="1226.5" y2="1098.5" class="net_34"><title>WCA_12_0[9]</title></line>
+<line x1="702" x2="1005" y1="1098.5" y2="1098.5" class="net_34"><title>WCA_12_0[9]</title></line>
+<line x1="579" x2="692" y1="264.5" y2="264.5" class="net_17"><title>CD_15_0[15]</title></line>
+<line x1="692" x2="692" y1="264.5" y2="1118.5" class="net_17"><title>CD_15_0[15]</title></line>
+<line x1="692" x2="1005" y1="1118.5" y2="1118.5" class="net_17"><title>CD_15_0[15]</title></line>
+<line x1="579" x2="712" y1="586.5" y2="586.5" class="net_46"><title>W_12_0[8]</title></line>
+<line x1="712" x2="712" y1="586.5" y2="1226.5" class="net_46"><title>W_12_0[8]</title></line>
+<line x1="712" x2="1005" y1="1226.5" y2="1226.5" class="net_46"><title>W_12_0[8]</title></line>
+<line x1="579" x2="1005" y1="1246.5" y2="1246.5" class="net_33"><title>WCA_12_0[8]</title></line>
+<line x1="579" x2="682" y1="284.5" y2="284.5" class="net_16"><title>CD_15_0[14]</title></line>
+<line x1="682" x2="682" y1="284.5" y2="1266.5" class="net_16"><title>CD_15_0[14]</title></line>
+<line x1="682" x2="1005" y1="1266.5" y2="1266.5" class="net_16"><title>CD_15_0[14]</title></line>
+<line x1="578.5" x2="578.5" y1="607" y2="644.5" class="net_45"><title>W_12_0[7]</title></line>
+<line x1="578.5" x2="662" y1="644.5" y2="644.5" class="net_45"><title>W_12_0[7]</title></line>
+<line x1="662" x2="662" y1="644.5" y2="1374.5" class="net_45"><title>W_12_0[7]</title></line>
+<line x1="662" x2="1005" y1="1374.5" y2="1374.5" class="net_45"><title>W_12_0[7]</title></line>
+<line x1="578.5" x2="578.5" y1="1267" y2="1394.5" class="net_32"><title>WCA_12_0[7]</title></line>
+<line x1="578.5" x2="1005" y1="1394.5" y2="1394.5" class="net_32"><title>WCA_12_0[7]</title></line>
+<line x1="578.5" x2="578.5" y1="305" y2="324" class="net_15"><title>CD_15_0[13]</title></line>
+<line x1="578.5" x2="672" y1="324" y2="324" class="net_15"><title>CD_15_0[13]</title></line>
+<line x1="672" x2="672" y1="324" y2="1414.5" class="net_15"><title>CD_15_0[13]</title></line>
+<line x1="672" x2="1005" y1="1414.5" y2="1414.5" class="net_15"><title>CD_15_0[13]</title></line>
+<line x1="1136" x2="1171" y1="860.5" y2="860.5" class="net_51,52,53,54,55,56,57,58,59,60,61,62,63"><title>MA_12_0</title></line>
+<line x1="484.5" x2="537" y1="1672.5" y2="1672.5" class="net_68"><title>mux_selector[0]</title></line>
+<line x1="537" x2="537" y1="1672.5" y2="1740.5" class="net_68"><title>mux_selector[0]</title></line>
+<line x1="537" x2="573" y1="1740.5" y2="1740.5" class="net_68"><title>mux_selector[0]</title></line>
+<line x1="484.5" x2="573" y1="1760.5" y2="1760.5" class="net_66"><title>mux_selector[1]</title></line>
+<line x1="490" x2="573" y1="2001" y2="2001" class="net_70"><title>mux_selector_12[0]</title></line>
+<line x1="490" x2="537" y1="1913" y2="1913" class="net_71"><title>mux_selector_12[1]</title></line>
+<line x1="537" x2="537" y1="1913" y2="2021" class="net_71"><title>mux_selector_12[1]</title></line>
+<line x1="537" x2="573" y1="2021" y2="2021" class="net_71"><title>mux_selector_12[1]</title></line>
+<line x1="1036" x2="1130.5" y1="486.5" y2="486.5" class="net_51"><title>MA_12_0[0]</title></line>
+<line x1="1130.5" x2="1130.5" y1="486.5" y2="850" class="net_51"><title>MA_12_0[0]</title></line>
+<line x1="1036" x2="1130.5" y1="338.5" y2="338.5" class="net_52"><title>MA_12_0[1]</title></line>
+<line x1="1130.5" x2="1130.5" y1="338.5" y2="870" class="net_52"><title>MA_12_0[1]</title></line>
+<line x1="1036" x2="1103" y1="190.5" y2="190.5" class="net_53"><title>MA_12_0[2]</title></line>
+<line x1="1103" x2="1103" y1="190.5" y2="890.5" class="net_53"><title>MA_12_0[2]</title></line>
+<line x1="1103" x2="1130" y1="890.5" y2="890.5" class="net_53"><title>MA_12_0[2]</title></line>
+<line x1="1036" x2="1113" y1="42.5" y2="42.5" class="net_54"><title>MA_12_0[3]</title></line>
+<line x1="1113" x2="1113" y1="42.5" y2="910.5" class="net_54"><title>MA_12_0[3]</title></line>
+<line x1="1113" x2="1130" y1="910.5" y2="910.5" class="net_54"><title>MA_12_0[3]</title></line>
+<line x1="1036" x2="1130" y1="930.5" y2="930.5" class="net_55"><title>MA_12_0[4]</title></line>
+<line x1="1036" x2="1093" y1="782.5" y2="782.5" class="net_56"><title>MA_12_0[5]</title></line>
+<line x1="1093" x2="1093" y1="782.5" y2="950.5" class="net_56"><title>MA_12_0[5]</title></line>
+<line x1="1093" x2="1130" y1="950.5" y2="950.5" class="net_56"><title>MA_12_0[5]</title></line>
+<line x1="1036" x2="1083" y1="634.5" y2="634.5" class="net_57"><title>MA_12_0[6]</title></line>
+<line x1="1083" x2="1083" y1="634.5" y2="970.5" class="net_57"><title>MA_12_0[6]</title></line>
+<line x1="1083" x2="1130" y1="970.5" y2="970.5" class="net_57"><title>MA_12_0[6]</title></line>
+<line x1="1036" x2="1103" y1="1374.5" y2="1374.5" class="net_58"><title>MA_12_0[7]</title></line>
+<line x1="1103" x2="1103" y1="1374.5" y2="990.5" class="net_58"><title>MA_12_0[7]</title></line>
+<line x1="1103" x2="1130" y1="990.5" y2="990.5" class="net_58"><title>MA_12_0[7]</title></line>
+<line x1="1036" x2="1093" y1="1226.5" y2="1226.5" class="net_59"><title>MA_12_0[8]</title></line>
+<line x1="1093" x2="1093" y1="1226.5" y2="1010.5" class="net_59"><title>MA_12_0[8]</title></line>
+<line x1="1093" x2="1130" y1="1010.5" y2="1010.5" class="net_59"><title>MA_12_0[8]</title></line>
+<line x1="1036" x2="1083" y1="1078.5" y2="1078.5" class="net_60"><title>MA_12_0[9]</title></line>
+<line x1="1083" x2="1083" y1="1078.5" y2="1030.5" class="net_60"><title>MA_12_0[9]</title></line>
+<line x1="1083" x2="1130" y1="1030.5" y2="1030.5" class="net_60"><title>MA_12_0[9]</title></line>
+<line x1="1036" x2="1113" y1="1670.5" y2="1670.5" class="net_61"><title>MA_12_0[10]</title></line>
+<line x1="1113" x2="1113" y1="1670.5" y2="1050.5" class="net_61"><title>MA_12_0[10]</title></line>
+<line x1="1113" x2="1130" y1="1050.5" y2="1050.5" class="net_61"><title>MA_12_0[10]</title></line>
+<line x1="1036" x2="1130.5" y1="1522.5" y2="1522.5" class="net_62"><title>MA_12_0[11]</title></line>
+<line x1="1130.5" x2="1130.5" y1="1522.5" y2="1071" class="net_62"><title>MA_12_0[11]</title></line>
+<line x1="1036" x2="1130.5" y1="1818.5" y2="1818.5" class="net_63"><title>MA_12_0[12]</title></line>
+<line x1="1130.5" x2="1130.5" y1="1818.5" y2="1091" class="net_63"><title>MA_12_0[12]</title></line>
+<line x1="487" x2="574.5" y1="344" y2="344" class="net_38,39,40,41,42,43,44,45,46,47,48,49,50"><title>W_12_0</title></line>
+<line x1="574.5" x2="574.5" y1="344" y2="376" class="net_38,39,40,41,42,43,44,45,46,47,48,49,50"><title>W_12_0</title></line>
+<line x1="487" x2="574.5" y1="1004" y2="1004" class="net_25,26,27,28,29,30,31,32,33,34,35,36,37"><title>WCA_12_0</title></line>
+<line x1="574.5" x2="574.5" y1="1004" y2="1036" class="net_25,26,27,28,29,30,31,32,33,34,35,36,37"><title>WCA_12_0</title></line>
+<line x1="487" x2="574" y1="134.5" y2="134.5" class="net_2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17"><title>CD_15_0</title></line>
+<line x1="487" x2="574.2" y1="32.5" y2="32.5" class="net_21,22,23,24"><title>TVEC_3_0</title></line>
+<text x="582.0" y="201.5" class="netlabel">CD_15_0[8]</text>
+<text x="582.0" y="181.5" class="netlabel">CD_15_0[9]</text>
+<text x="745.0" y="967.5" class="netlabel">CD_15_0[10]</text>
+<text x="765.0" y="819.5" class="netlabel">CD_15_0[11]</text>
+<text x="785.0" y="671.5" class="netlabel">CD_15_0[12]</text>
+<text x="675.0" y="1411.5" class="netlabel">CD_15_0[13]</text>
+<text x="685.0" y="1263.5" class="netlabel">CD_15_0[14]</text>
+<text x="695.0" y="1115.5" class="netlabel">CD_15_0[15]</text>
+<text x="43.0" y="2018.0" class="netlabel">EWCAN</text>
+<text x="108.0" y="1910.0" class="netlabel">MAPN</text>
+<text x="490.0" y="131.5" class="netlabel">CD_15_0</text>
+<text x="210.0" y="1998.0" class="netlabel">TRAPN</text>
+<text x="582.2" y="79.5" class="netlabel">TVEC_3_0[0]</text>
+<text x="490.0" y="29.5" class="netlabel">TVEC_3_0</text>
+<text x="582.2" y="59.5" class="netlabel">TVEC_3_0[1]</text>
+<text x="582.2" y="39.5" class="netlabel">TVEC_3_0[2]</text>
+<text x="582.2" y="19.5" class="netlabel">TVEC_3_0[3]</text>
+<text x="582.0" y="1143.5" class="netlabel">WCA_12_0[0]</text>
+<text x="490.0" y="1001.0" class="netlabel">WCA_12_0</text>
+<text x="582.0" y="1123.5" class="netlabel">WCA_12_0[1]</text>
+<text x="582.0" y="1103.5" class="netlabel">WCA_12_0[2]</text>
+<text x="582.0" y="1083.5" class="netlabel">WCA_12_0[3]</text>
+<text x="582.0" y="1063.5" class="netlabel">WCA_12_0[4]</text>
+<text x="605.0" y="799.5" class="netlabel">WCA_12_0[5]</text>
+<text x="581.5" y="651.5" class="netlabel">WCA_12_0[6]</text>
+<text x="581.5" y="1391.5" class="netlabel">WCA_12_0[7]</text>
+<text x="582.0" y="1243.5" class="netlabel">WCA_12_0[8]</text>
+<text x="705.0" y="1095.5" class="netlabel">WCA_12_0[9]</text>
+<text x="615.0" y="1687.5" class="netlabel">WCA_12_0[10]</text>
+<text x="645.0" y="1539.5" class="netlabel">WCA_12_0[11]</text>
+<text x="605.0" y="1835.5" class="netlabel">WCA_12_0[12]</text>
+<text x="582.0" y="483.5" class="netlabel">W_12_0[0]</text>
+<text x="490.0" y="341.0" class="netlabel">W_12_0</text>
+<text x="582.0" y="463.5" class="netlabel">W_12_0[1]</text>
+<text x="582.0" y="443.5" class="netlabel">W_12_0[2]</text>
+<text x="582.0" y="423.5" class="netlabel">W_12_0[3]</text>
+<text x="735.0" y="927.5" class="netlabel">W_12_0[4]</text>
+<text x="755.0" y="779.5" class="netlabel">W_12_0[5]</text>
+<text x="775.0" y="631.5" class="netlabel">W_12_0[6]</text>
+<text x="665.0" y="1371.5" class="netlabel">W_12_0[7]</text>
+<text x="715.0" y="1223.5" class="netlabel">W_12_0[8]</text>
+<text x="725.0" y="1075.5" class="netlabel">W_12_0[9]</text>
+<text x="635.0" y="1667.5" class="netlabel">W_12_0[10]</text>
+<text x="655.0" y="1519.5" class="netlabel">W_12_0[11]</text>
+<text x="625.0" y="1815.5" class="netlabel">W_12_0[12]</text>
+<text x="1039.0" y="483.5" class="netlabel">MA_12_0[0]</text>
+<text x="1139.0" y="857.5" class="netlabel">MA_12_0</text>
+<text x="1039.0" y="335.5" class="netlabel">MA_12_0[1]</text>
+<text x="1039.0" y="187.5" class="netlabel">MA_12_0[2]</text>
+<text x="1039.0" y="39.5" class="netlabel">MA_12_0[3]</text>
+<text x="1039.0" y="927.5" class="netlabel">MA_12_0[4]</text>
+<text x="1039.0" y="779.5" class="netlabel">MA_12_0[5]</text>
+<text x="1039.0" y="631.5" class="netlabel">MA_12_0[6]</text>
+<text x="1039.0" y="1371.5" class="netlabel">MA_12_0[7]</text>
+<text x="1039.0" y="1223.5" class="netlabel">MA_12_0[8]</text>
+<text x="1039.0" y="1075.5" class="netlabel">MA_12_0[9]</text>
+<text x="1039.0" y="1667.5" class="netlabel">MA_12_0[10]</text>
+<text x="1039.0" y="1519.5" class="netlabel">MA_12_0[11]</text>
+<text x="1039.0" y="1815.5" class="netlabel">MA_12_0[12]</text>
+<text x="105.0" y="1709.5" class="netlabel">s_ewca</text>
+<text x="353.0" y="1757.5" class="netlabel">s_gates2_out</text>
+<text x="487.5" y="1757.5" class="netlabel">mux_selector[1]</text>
+<text x="353.0" y="1669.5" class="netlabel">s_gates3_out</text>
+<text x="487.5" y="1669.5" class="netlabel">mux_selector[0]</text>
+<text x="582.0" y="1747.5" class="netlabel">mux_selector</text>
+<text x="213.0" y="1689.5" class="netlabel">s_gates1_out</text>
+<text x="493.0" y="1998.0" class="netlabel">mux_selector_12[0]</text>
+<text x="582.0" y="2008.0" class="netlabel">mux_selector_12</text>
+<text x="493.0" y="1910.0" class="netlabel">mux_selector_12[1]</text>
+<text x="582.0" y="241.5" class="netlabel">CD_15_0[6]</text>
+<text x="582.0" y="221.5" class="netlabel">CD_15_0[7]</text>
+</svg>

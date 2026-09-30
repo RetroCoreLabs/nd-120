@@ -6,8 +6,8 @@ Source: `Verilog/Shared/logisim/NAND_GATE_3_INPUTS.v`
 
 <!-- HIERARCHY-NAV:BEGIN - written by Verilog/tests/gen_hierarchy.py, do not edit -->
 
-**Where it sits** (Simulation): [ND120_TOP](../../../doc/ND120_TOP.md) > [ND120_CORE](../../../doc/ND120_CORE.md) > [ND3202D](../../../CPU-BOARD-3202/circuit/doc/ND3202D.md) > [IO_37](../../../CPU-BOARD-3202/circuit/doc/IO_37.md) > [IO_DCD_38](../../../CPU-BOARD-3202/circuit/doc/IO_DCD_38.md) > [DECODE_DGA](../../../DECODE-GateArray/DGA/circuit/doc/DECODE_DGA.md) > [DECODE_DGA_COMM](../../../DECODE-GateArray/DGA/circuit/doc/DECODE_DGA_COMM.md) > **NAND_GATE_3_INPUTS**
-- instance path: `CORE.CPU_BOARD.IO.DCD.DGA.COMM.A158`
+**Where it sits** (Simulation): [ND120_TOP](../../../doc/ND120_TOP.md) > [ND120_CORE](../../../doc/ND120_CORE.md) > [ND3202D](../../../CPU-BOARD-3202/circuit/doc/ND3202D.md) > [CPU_15](../../../CPU-BOARD-3202/circuit/doc/CPU_15.md) > [CPU_PROC_32](../../../CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md) > [CPU_PROC_CGA_33](../../../CPU-BOARD-3202/circuit/doc/CPU_PROC_CGA_33.md) > [CGA](../../../DELILAH-CPU/CGA/circuit/doc/CGA.md) > [CGA_TRAP](../../../DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP.md) > [CGA_TRAP_BRKDET](../../../DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_BRKDET.md) > **NAND_GATE_3_INPUTS**
+- instance path: `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.TRAP.BRKDET.GATES_16`
 
 **Used in:** [CGA_CPU_ALU_CONTR](../../../DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_CONTR.md) (all tops), [CGA_CPU_ALU_RALU](../../../DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_RALU.md) (all tops), [CGA_DCD](../../../DELILAH-CPU/CGA_DCD/circuit/doc/CGA_DCD.md) (all tops), [CGA_INTR_CNTLR_IRGEL_HIGEL](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_HIGEL.md) (all tops), [CGA_INTR_CNTLR_IRGEL_HIRL](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_HIRL.md) (all tops), [CGA_INTR_CNTLR_IRGEL_LOGEL](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_LOGEL.md) (all tops), [CGA_INTR_CNTLR_IRGEL_LORL](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_LORL.md) (all tops), [CGA_INTR_CNTLR_IRQ_MASK_MASKBIT](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_MASK_MASKBIT.md) (all tops), [CGA_INTR_CNTLR_VECGEN_CMP_MAGCMP](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_CMP_MAGCMP.md) (all tops), [CGA_INTR_CNTLR_VECGEN_PTY_PTYENC](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_PTY_PTYENC.md) (all tops), [CGA_INTR_CNTLR_VECGEN_STAT_SBIT](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_STAT_SBIT.md) (all tops), [CGA_MAC_DECODE](../../../DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_DECODE.md) (all tops), [CGA_MAC_LASEL](../../../DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_LASEL.md) (all tops), [CGA_MIC](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC.md) (all tops), [CGA_MIC_IPOS](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IPOS.md) (all tops), [CGA_MIC_STACK_BIT](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK_BIT.md) (all tops), [CGA_MIC_STACK_BIT12](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK_BIT12.md) (all tops), [CGA_TRAP_BRKDET](../../../DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_BRKDET.md) (all tops), [CGA_TRAP_TVGEN](../../../DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_TVGEN.md) (all tops), [CGA_TRAP_TVGEN_P2](../../../DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_TVGEN_P2.md) (all tops), [DECODE_DGA_COMM](../../../DECODE-GateArray/DGA/circuit/doc/DECODE_DGA_COMM.md) (all tops)
 
@@ -18,6 +18,16 @@ Source: `Verilog/Shared/logisim/NAND_GATE_3_INPUTS.v`
 <!-- HIERARCHY-NAV:END -->
 
 ![NAND_GATE_3_INPUTS symbol](NAND_GATE_3_INPUTS.png)
+
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.IO.DCD.DGA.COMM.A158`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![NAND_GATE_3_INPUTS schematic](NAND_GATE_3_INPUTS.svg)](NAND_GATE_3_INPUTS.svg)
+
+<!-- SCHEMATIC:END -->
 
 ## Description
 
@@ -33,3 +43,71 @@ Component : NAND_GATE_3_INPUTS
 | input | `1` | `input2` |  |
 | input | `1` | `input3` |  |
 | output | `1` | `result` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/NAND_GATE_3_INPUTS.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/NAND_GATE_3_INPUTS.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of NAND_GATE_3_INPUTS (56 lines)</summary>
+
+```verilog
+/******************************************************************************
+ ** Logisim-evolution goes FPGA automatic generated Verilog code             **
+ ** https://github.com/logisim-evolution/                                    **
+ **                                                                          **
+ ** Component : NAND_GATE_3_INPUTS                                           **
+ **                                                                          **
+ *****************************************************************************/
+
+module NAND_GATE_3_INPUTS( input1,
+                           input2,
+                           input3,
+                           result );
+
+   /*******************************************************************************
+   ** Here all module parameters are defined with a dummy value                  **
+   *******************************************************************************/
+   parameter [64:0] BubblesMask = 1;
+
+   /*******************************************************************************
+   ** The inputs are defined here                                                **
+   *******************************************************************************/
+   input input1;
+   input input2;
+   input input3;
+
+   /*******************************************************************************
+   ** The outputs are defined here                                               **
+   *******************************************************************************/
+   output result;
+
+   /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+   wire s_realInput1;
+   wire s_realInput2;
+   wire s_realInput3;
+
+   /*******************************************************************************
+   ** The module functionality is described here                                 **
+   *******************************************************************************/
+
+   /*******************************************************************************
+   ** Here the bubbles are processed                                             **
+   *******************************************************************************/
+   assign  s_realInput1 = (BubblesMask[0] == 1'b0) ? input1 : ~input1;
+   assign  s_realInput2 = (BubblesMask[1] == 1'b0) ? input2 : ~input2;
+   assign  s_realInput3 = (BubblesMask[2] == 1'b0) ? input3 : ~input3;
+
+   /*******************************************************************************
+   ** Here the functionality is defined                                          **
+   *******************************************************************************/
+   assign result = ~(s_realInput1&
+                     s_realInput2&
+                     s_realInput3);
+
+endmodule
+```
+
+</details>

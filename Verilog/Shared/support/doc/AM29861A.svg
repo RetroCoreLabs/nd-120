@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="464.0" height="469.0" viewBox="-80.0 -80.0 464.0 469.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="464.0" height="469.0" fill="#ffffff" /><g transform="translate(142,142)" id="cell_$and$AM29861A.v:36$7739"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$AM29861A.v:36$7739" /><g /><g /><g /></g>
+<g transform="translate(142,267)" id="cell_$and$AM29861A.v:37$7741"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$AM29861A.v:37$7741" /><g /><g /><g /></g>
+<g transform="translate(77,132)" id="cell_$logic_not$AM29861A.v:36$7738"><path d="M0,0 L0,20 L20,10 Z" class="cell_$logic_not$AM29861A.v:36$7738" /><circle cx="23" cy="10" r="3" class="cell_$logic_not$AM29861A.v:36$7738" /><g /><g /></g>
+<g transform="translate(77,277)" id="cell_$logic_not$AM29861A.v:37$7740"><path d="M0,0 L0,20 L20,10 Z" class="cell_$logic_not$AM29861A.v:37$7740" /><circle cx="23" cy="10" r="3" class="cell_$logic_not$AM29861A.v:37$7740" /><g /><g /></g>
+<g transform="translate(207,192)" id="cell_$ternary$AM29861A.v:40$7742"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$AM29861A.v:40$7742" /><g /><g /><g /><g /></g>
+<g transform="translate(207,87)" id="cell_$ternary$AM29861A.v:41$7743"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$AM29861A.v:41$7743" /><g /><g /><g /><g /></g>
+<g transform="translate(12,212)" id="cell_OER_n"><text x="15" y="-4" class="nodelabel cell_OER_n">OER_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_OER_n" /><g /></g>
+<g transform="translate(12,277)" id="cell_OET_n"><text x="15" y="-4" class="nodelabel cell_OET_n">OET_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_OET_n" /><g /></g>
+<g transform="translate(142,212)" id="cell_D_IN"><text x="15" y="-4" class="nodelabel cell_D_IN">D_IN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D_IN" /><g /></g>
+<g transform="translate(142,22)" id="cell_Y_IN"><text x="15" y="-4" class="nodelabel cell_Y_IN">Y_IN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_Y_IN" /><g /></g>
+<g transform="translate(262,97)" id="cell_D_OUT"><text x="15" y="-4" class="nodelabel cell_D_OUT">D_OUT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_D_OUT" /><g /></g>
+<g transform="translate(262,202)" id="cell_Y_OUT"><text x="15" y="-4" class="nodelabel cell_Y_OUT">Y_OUT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_Y_OUT" /><g /></g>
+<g transform="translate(142,87)" id="cell_0000000000"><text x="15" y="-4" class="nodelabel cell_0000000000">0x0</text><rect width="30" height="20" class="cell_0000000000" /><g /></g>
+<line x1="102" x2="117" y1="142" y2="142" class="net_44" />
+<line x1="117" x2="117" y1="142" y2="147" class="net_44" />
+<line x1="117" x2="142" y1="147" y2="147" class="net_44" />
+<line x1="40" x2="62" y1="287" y2="287" class="net_3"><title>OET_n</title></line>
+<line x1="62" x2="62" y1="287" y2="162" class="net_3"><title>OET_n</title></line>
+<circle cx="62" cy="287" r="2" style="fill:#000" class="net_3" />
+<line x1="62" x2="142" y1="162" y2="162" class="net_3"><title>OET_n</title></line>
+<line x1="40" x2="77" y1="287" y2="287" class="net_3"><title>OET_n</title></line>
+<line x1="40" x2="117" y1="222" y2="222" class="net_2"><title>OER_n</title></line>
+<line x1="117" x2="117" y1="222" y2="272" class="net_2"><title>OER_n</title></line>
+<line x1="117" x2="142" y1="272" y2="272" class="net_2"><title>OER_n</title></line>
+<line x1="40" x2="52" y1="222" y2="222" class="net_2"><title>OER_n</title></line>
+<line x1="52" x2="52" y1="222" y2="142" class="net_2"><title>OER_n</title></line>
+<circle cx="52" cy="222" r="2" style="fill:#000" class="net_2" />
+<line x1="52" x2="77" y1="142" y2="142" class="net_2"><title>OER_n</title></line>
+<line x1="102" x2="142" y1="287" y2="287" class="net_46" />
+<line x1="172" x2="182" y1="97" y2="97" class="net_48,49,50,51,52,53,54,55,56,57" />
+<line x1="182" x2="182" y1="97" y2="202" class="net_48,49,50,51,52,53,54,55,56,57" />
+<circle cx="182" cy="97" r="2" style="fill:#000" class="net_48,49,50,51,52,53,54,55,56,57" />
+<line x1="182" x2="207" y1="202" y2="202" class="net_48,49,50,51,52,53,54,55,56,57" />
+<line x1="172" x2="207" y1="97" y2="97" class="net_48,49,50,51,52,53,54,55,56,57" />
+<line x1="170" x2="207" y1="222" y2="222" class="net_4,5,6,7,8,9,10,11,12,13"><title>D_IN</title></line>
+<line x1="172" x2="217" y1="279.5" y2="279.5" class="net_47"><title>s_transmit</title></line>
+<line x1="217" x2="217" y1="279.5" y2="227" class="net_47"><title>s_transmit</title></line>
+<line x1="170" x2="192" y1="32" y2="32" class="net_14,15,16,17,18,19,20,21,22,23"><title>Y_IN</title></line>
+<line x1="192" x2="192" y1="32" y2="117" class="net_14,15,16,17,18,19,20,21,22,23"><title>Y_IN</title></line>
+<line x1="192" x2="207" y1="117" y2="117" class="net_14,15,16,17,18,19,20,21,22,23"><title>Y_IN</title></line>
+<line x1="172" x2="217" y1="154.5" y2="154.5" class="net_45"><title>s_receive</title></line>
+<line x1="217" x2="217" y1="154.5" y2="122" class="net_45"><title>s_receive</title></line>
+<line x1="227" x2="262" y1="107" y2="107" class="net_24,25,26,27,28,29,30,31,32,33"><title>D_OUT</title></line>
+<line x1="227" x2="262" y1="212" y2="212" class="net_34,35,36,37,38,39,40,41,42,43"><title>Y_OUT</title></line>
+<text x="173.0" y="29.0" class="netlabel">Y_IN</text>
+<text x="43.0" y="219.0" class="netlabel">OER_n</text>
+<text x="230.0" y="104.0" class="netlabel">D_OUT</text>
+<text x="65.0" y="159.0" class="netlabel">OET_n</text>
+<text x="230.0" y="209.0" class="netlabel">Y_OUT</text>
+<text x="173.0" y="219.0" class="netlabel">D_IN</text>
+<text x="175.0" y="151.5" class="netlabel">s_receive</text>
+<text x="175.0" y="276.5" class="netlabel">s_transmit</text>
+</svg>

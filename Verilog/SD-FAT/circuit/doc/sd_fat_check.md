@@ -14,6 +14,16 @@ Source: `Verilog/SD-FAT/circuit/sd_fat_check.v`
 
 ![sd_fat_check symbol](sd_fat_check.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![sd_fat_check schematic](sd_fat_check.svg)](sd_fat_check.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 FAT cluster-chain validator ("fsck-lite")
@@ -68,3 +78,440 @@ Ronny Hansen
 | input | `[7:0]` | `eng_rx_data` |  |
 | output | `1` | `ck_we` |  |
 | output | `[7:0]` | `ck_byte` |  |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/sd_fat_check.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/sd_fat_check.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of sd_fat_check (425 lines)</summary>
+
+```verilog
+/****************************************************************************
+** FAT cluster-chain validator ("fsck-lite")                               **
+**                                                                         **
+** Walks the cluster chain of every file in a table of root-directory      **
+** entries (captured by the caller during a directory scan) and emits an   **
+** ASCII report, one line per entry:                                       **
+**                                                                         **
+**   BOOT.BPUN        CL 00013AF2 LEN 00003 EXP 00003 OK                   **
+**   TEST.TXT         CL 00000002 LEN 00003 EXP 00003 OK                   **
+**   HDD              CL 00000004 DIR                                       **
+**   CHECK DONE                                                            **
+**                                                                         **
+** LEN = clusters actually reachable by following the FAT until a proper   **
+** end-of-chain mark; EXP = ceil(size / cluster bytes). A chain that hits  **
+** a FREE entry, an out-of-range pointer or a loop, or whose length        **
+** differs from EXP, is flagged BAD - exactly the damage a wrong FAT       **
+** write leaves behind. Directories are listed but not walked (their       **
+** length is not derivable from the size field).                           **
+**                                                                         **
+** Uses the sd_writer engine in read mode (CMD17) on an already-           **
+** initialized card; the reader must be parked. Read-only - this module    **
+** never writes to the card.                                               **
+**                                                                         **
+** This file is ORIGINAL ND-120 project code (MIT, like the repository).   **
+**                                                                         **
+** Last reviewed: 11-JUL-2026                                              **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module sd_fat_check (
+    input wire clk,
+    input wire rst_n,
+
+    input  wire start,  // 1-cycle pulse; only when busy=0
+    output wire busy,
+    output reg  done,   // 1-cycle pulse: report finished
+    output reg  err,    // 1-cycle pulse: engine error (report incomplete)
+
+    // filesystem geometry (as latched from the reader)
+    input wire        fs_is_fat32,
+    input wire [7:0]  cluster_size,      // sectors per cluster (power of two)
+    input wire [31:0] fat0_sector,
+    input wire [31:0] data_base_sector,  // biased, as exported by the reader
+    input wire [31:0] total_sectors,
+
+    // entry table (combinational read by index at the caller)
+    input  wire [4:0]  n_entries,
+    output reg  [3:0]  t_idx,
+    input  wire [127:0] t_name,    // first 16 characters, byte 0 in the low byte
+    input  wire [31:0] t_cluster,
+    input  wire [31:0] t_size,
+    input  wire        t_isdir,
+
+    // sd_writer engine, read mode only (exclusive use while busy)
+    output reg         eng_start,
+    output wire        eng_rd,
+    output reg  [31:0] eng_sector,
+    input  wire        eng_done,
+    input  wire        eng_err,
+    input  wire        eng_rx_we,
+    input  wire [8:0]  eng_rx_addr,
+    input  wire [7:0]  eng_rx_data,
+
+    // report byte stream (goes into the caller's text buffer)
+    output reg       ck_we,
+    output reg [7:0] ck_byte
+);
+
+  assign eng_rd = 1'b1;  // this module only reads
+
+  // ------------------------------------------------------------- FAT buffer
+  reg [7:0] fbuf[0:511];
+  always @(posedge clk) if (eng_rx_we) fbuf[eng_rx_addr] <= eng_rx_data;
+
+  reg [8:0] fb_addr;
+  reg [7:0] fb_q;
+  always @(posedge clk) fb_q <= fbuf[fb_addr];
+
+  // ------------------------------------------------------------- helpers
+  function [31:0] fat_sec(input [31:0] c);
+    fat_sec = fat0_sector + (fs_is_fat32 ? (c >> 7) : (c >> 8));
+  endfunction
+  function [8:0] fat_off(input [31:0] c);
+    fat_off = fs_is_fat32 ? {c[6:0], 2'b00} : {c[7:0], 1'b0};
+  endfunction
+  function is_eoc(input [31:0] c);
+    is_eoc = fs_is_fat32 ? (c[27:0] >= 28'hFFFFFF7) : (c[15:0] >= 16'hFFF7);
+  endfunction
+  function [7:0] hexd(input [3:0] n);
+    hexd = (n < 4'd10) ? (8'h30 + {4'b0, n}) : (8'h37 + {4'b0, n});
+  endfunction
+  function [4:0] log2cs(input [7:0] cs);
+    casez (cs)
+      8'b1???????: log2cs = 5'd7;
+      8'b01??????: log2cs = 5'd6;
+      8'b001?????: log2cs = 5'd5;
+      8'b0001????: log2cs = 5'd4;
+      8'b00001???: log2cs = 5'd3;
+      8'b000001??: log2cs = 5'd2;
+      8'b0000001?: log2cs = 5'd1;
+      default:     log2cs = 5'd0;
+    endcase
+  endfunction
+  function [16:0] pow10_5(input [2:0] i);
+    case (i)
+      3'd0: pow10_5 = 17'd1;
+      3'd1: pow10_5 = 17'd10;
+      3'd2: pow10_5 = 17'd100;
+      3'd3: pow10_5 = 17'd1000;
+      default: pow10_5 = 17'd10000;
+    endcase
+  endfunction
+
+  wire [31:0] usable_sectors = total_sectors - (data_base_sector + {24'b0, cluster_size} * 2);
+  wire [31:0] max_cluster = (usable_sectors >> log2cs(cluster_size)) + 32'd1;
+  wire [17:0] bytes_per_cluster = {1'b0, cluster_size, 9'b0};
+
+  localparam S_NAME  = " CL ";      // (emitted char-wise, strings below)
+  localparam S_LEN   = " LEN ";
+  localparam S_EXP   = " EXP ";
+  localparam S_OK    = " OK\015\012";
+  localparam S_BAD   = " BAD\015\012";
+  localparam S_DIR   = " DIR\015\012";
+  localparam S_DONE  = "CHECK DONE\015\012";
+
+  function [7:0] strchar(input [8*12-1:0] s, input integer len, input integer i);
+    strchar = (i < len) ? s[8*(len-1-i)+:8] : 8'h00;
+  endfunction
+
+  // ------------------------------------------------------------- FSM
+  localparam C_IDLE    = 5'd0;
+  localparam C_ENTRY   = 5'd1;   // next table entry or the DONE line
+  localparam C_NAME    = 5'd2;   // 12 name chars (0 -> space)
+  localparam C_CLHDR   = 5'd3;   // "CL "
+  localparam C_CLHEX   = 5'd4;   // 8 hex digits of the first cluster
+  localparam C_KIND    = 5'd5;   // DIR line or LEN walk
+  localparam C_EXPCALC = 5'd6;   // EXP = ceil(size/bpc) subtract loop
+  localparam C_WALK    = 5'd7;   // chain hop: valid cluster?
+  localparam C_WRD     = 5'd8;   // read the FAT sector (engine)
+  localparam C_WENT0   = 5'd9;   // fetch the entry bytes
+  localparam C_WENT1   = 5'd10;
+  localparam C_LENHDR  = 5'd11;  // " LEN "
+  localparam C_LENDEC  = 5'd12;  // 5 decimal digits
+  localparam C_EXPHDR  = 5'd13;  // " EXP "
+  localparam C_EXPDEC  = 5'd14;
+  localparam C_VERDICT = 5'd15;  // " OK" / " BAD" + CRLF
+  localparam C_DONELN  = 5'd16;  // "CHECK DONE"
+  localparam C_FIN     = 5'd17;
+  localparam C_ERR     = 5'd18;
+  localparam C_EGO     = 5'd19;  // engine read helper
+  localparam C_EWAIT   = 5'd20;
+  localparam C_BRD     = 5'd21;  // buffered byte read wait
+  localparam C_STR     = 5'd22;  // generic string emitter
+
+  reg [4:0] state, e_ret, b_ret, str_ret;
+  reg [2:0] str_sel;  // 0 LEN,1 EXP,2 OK,3 BAD,4 DIR,5 DONE,6 CLHDR
+  reg [3:0] sidx;
+  reg [3:0] nidx;     // name/hex char counter
+  reg [31:0] cur, ent_val, cur_sec;
+  reg [1:0] byte_i;
+  reg [16:0] chain_len, expct, decval;
+  reg [2:0] decpow;
+  reg [3:0] decdig;
+  reg [31:0] szrem;
+  reg [17:0] guard;
+  reg bad;
+
+  assign busy = (state != C_IDLE);
+
+  reg [7:0] str_ch;
+  always @(*) begin
+    case (str_sel)
+      3'd0: str_ch = strchar({56'b0, S_LEN}, 5, sidx);
+      3'd1: str_ch = strchar({56'b0, S_EXP}, 5, sidx);
+      3'd2: str_ch = strchar({56'b0, S_OK}, 5, sidx);
+      3'd3: str_ch = strchar({48'b0, S_BAD}, 6, sidx);
+      3'd4: str_ch = strchar({48'b0, S_DIR}, 6, sidx);
+      3'd5: str_ch = strchar(S_DONE, 12, sidx);
+      default: str_ch = strchar({64'b0, S_NAME}, 4, sidx);
+    endcase
+  end
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      state <= C_IDLE;
+      e_ret <= C_IDLE;
+      b_ret <= C_IDLE;
+      str_ret <= C_IDLE;
+      str_sel <= 0;
+      sidx <= 0;
+      nidx <= 0;
+      done <= 1'b0;
+      err <= 1'b0;
+      eng_start <= 1'b0;
+      eng_sector <= 0;
+      ck_we <= 1'b0;
+      ck_byte <= 0;
+      t_idx <= 0;
+      fb_addr <= 0;
+      cur <= 0;
+      ent_val <= 0;
+      cur_sec <= 0;
+      byte_i <= 0;
+      chain_len <= 0;
+      expct <= 0;
+      decval <= 0;
+      decpow <= 0;
+      decdig <= 0;
+      szrem <= 0;
+      guard <= 0;
+      bad <= 1'b0;
+    end else begin
+      done <= 1'b0;
+      err <= 1'b0;
+      eng_start <= 1'b0;
+      ck_we <= 1'b0;
+
+      case (state)
+        C_IDLE:
+        if (start) begin
+          t_idx <= 0;
+          state <= (n_entries == 0) ? C_DONELN : C_ENTRY;
+          if (n_entries == 0) begin
+            str_sel <= 3'd5;
+            sidx <= 0;
+            str_ret <= C_FIN;
+            state <= C_STR;
+          end
+        end
+
+        C_ENTRY: begin
+          nidx <= 0;
+          state <= C_NAME;
+        end
+
+        C_NAME: begin  // 16 chars, NUL padded with spaces
+          ck_we <= 1'b1;
+          ck_byte <= (t_name[8*nidx+:8] == 8'h00) ? 8'h20 : t_name[8*nidx+:8];
+          if (nidx == 4'd15) begin
+            nidx <= 0;
+            str_sel <= 3'd6;  // "CL "
+            sidx <= 0;
+            str_ret <= C_CLHEX;
+            state <= C_STR;
+          end else nidx <= nidx + 4'd1;
+        end
+
+        C_CLHEX: begin
+          ck_we <= 1'b1;
+          ck_byte <= hexd(t_cluster[31-4*nidx-:4]);
+          if (nidx == 4'd7) begin
+            nidx <= 0;
+            state <= C_KIND;
+          end else nidx <= nidx + 4'd1;
+        end
+
+        C_KIND:
+        if (t_isdir) begin
+          str_sel <= 3'd4;  // " DIR" CRLF
+          sidx <= 0;
+          str_ret <= C_FIN;
+          state <= C_STR;
+        end else begin
+          szrem <= t_size;
+          expct <= 0;
+          state <= C_EXPCALC;
+        end
+
+        C_EXPCALC:
+        if (szrem == 0) begin
+          cur <= fs_is_fat32 ? {4'b0, t_cluster[27:0]} : {16'b0, t_cluster[15:0]};
+          chain_len <= 0;
+          cur_sec <= 32'hFFFFFFFF;
+          guard <= 0;
+          bad <= 1'b0;
+          state <= C_WALK;
+        end else if (szrem >= {14'b0, bytes_per_cluster}) begin
+          szrem <= szrem - {14'b0, bytes_per_cluster};
+          expct <= expct + 17'd1;
+        end else begin
+          szrem <= 0;
+          expct <= expct + 17'd1;
+        end
+
+        // ---- chain walk ---------------------------------------------------
+        C_WALK:
+        if (cur < 32'd2) begin
+          // free/reserved pointer: fine ONLY as "no chain at all" (size 0)
+          bad <= bad | (chain_len != 0) | (expct != 0);
+          state <= C_LENHDR;
+        end else if (is_eoc(cur)) begin
+          state <= C_LENHDR;  // proper end of chain
+        end else if (cur > max_cluster || guard[17]) begin
+          bad <= 1'b1;        // out of range pointer, or a loop
+          state <= C_LENHDR;
+        end else begin
+          chain_len <= chain_len + 17'd1;
+          guard <= guard + 18'd1;
+          if (fat_sec(cur) == cur_sec) state <= C_WENT0;
+          else begin
+            eng_sector <= fat_sec(cur);
+            cur_sec <= fat_sec(cur);
+            e_ret <= C_WENT0;
+            state <= C_EGO;
+          end
+        end
+
+        C_WENT0: begin
+          fb_addr <= fat_off(cur);
+          byte_i <= 0;
+          ent_val <= 0;
+          b_ret <= C_WENT1;
+          state <= C_BRD;
+        end
+
+        C_WENT1: begin
+          ent_val <= ent_val | ({24'b0, fb_q} << {byte_i, 3'b000});
+          if ({1'b0, byte_i} == (fs_is_fat32 ? 3'd3 : 3'd1)) begin
+            state <= C_WALK;
+            cur <= fs_is_fat32
+                 ? ((ent_val | ({24'b0, fb_q} << {byte_i, 3'b000})) & 32'h0FFFFFFF)
+                 : ((ent_val | ({24'b0, fb_q} << {byte_i, 3'b000})) & 32'h0000FFFF);
+          end else begin
+            byte_i <= byte_i + 2'd1;
+            fb_addr <= fb_addr + 9'd1;
+            b_ret <= C_WENT1;
+            state <= C_BRD;
+          end
+        end
+
+        // ---- report tail ---------------------------------------------------
+        C_LENHDR: begin
+          str_sel <= 3'd0;
+          sidx <= 0;
+          str_ret <= C_LENDEC;
+          decval <= chain_len;
+          decpow <= 3'd4;
+          decdig <= 0;
+          state <= C_STR;
+        end
+
+        C_LENDEC:
+        if (decval >= pow10_5(decpow)) begin
+          decval <= decval - pow10_5(decpow);
+          decdig <= decdig + 4'd1;
+        end else begin
+          ck_we <= 1'b1;
+          ck_byte <= 8'h30 + {4'b0, decdig};
+          decdig <= 0;
+          if (decpow == 0) begin
+            str_sel <= 3'd1;
+            sidx <= 0;
+            str_ret <= C_EXPDEC;
+            decval <= expct;
+            decpow <= 3'd4;
+            state <= C_STR;
+          end else decpow <= decpow - 3'd1;
+        end
+
+        C_EXPDEC:
+        if (decval >= pow10_5(decpow)) begin
+          decval <= decval - pow10_5(decpow);
+          decdig <= decdig + 4'd1;
+        end else begin
+          ck_we <= 1'b1;
+          ck_byte <= 8'h30 + {4'b0, decdig};
+          decdig <= 0;
+          if (decpow == 0) state <= C_VERDICT;
+          else decpow <= decpow - 3'd1;
+        end
+
+        C_VERDICT: begin
+          str_sel <= (bad || chain_len != expct) ? 3'd3 : 3'd2;  // BAD / OK
+          sidx <= 0;
+          str_ret <= C_FIN;
+          state <= C_STR;
+        end
+
+        C_FIN:
+        if (t_idx + 5'd1 >= n_entries[4:0]) begin
+          str_sel <= 3'd5;  // "CHECK DONE"
+          sidx <= 0;
+          str_ret <= C_ERR;  // (reused as terminal-done, see below)
+          state <= C_STR;
+        end else begin
+          t_idx <= t_idx + 4'd1;
+          state <= C_ENTRY;
+        end
+
+        C_ERR: begin  // terminal state: emit done (err path jumps here too)
+          done <= 1'b1;
+          state <= C_IDLE;
+        end
+
+        C_DONELN: state <= C_ERR;
+
+        // ---- helpers -------------------------------------------------------
+        C_EGO: begin
+          eng_start <= 1'b1;
+          state <= C_EWAIT;
+        end
+
+        C_EWAIT:
+        if (eng_done) state <= e_ret;
+        else if (eng_err) begin
+          err <= 1'b1;
+          state <= C_IDLE;
+        end
+
+        C_BRD: state <= b_ret;
+
+        C_STR:
+        if (str_ch == 8'h00) state <= str_ret;
+        else begin
+          ck_we <= 1'b1;
+          ck_byte <= str_ch;
+          sidx <= sidx + 4'd1;
+        end
+
+        default: state <= C_IDLE;
+      endcase
+    end
+  end
+
+endmodule
+```
+
+</details>

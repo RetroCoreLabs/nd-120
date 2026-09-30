@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="805.0" height="697.0" viewBox="-80.0 -80.0 805.0 697.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="805.0" height="697.0" fill="#ffffff" /><a href="../../../../Shared/logisim/doc/OR_GATE.md"><title>GATES_1 (OR_GATE) - open its page</title><g transform="translate(434,276)" id="cell_GATES_1"><text x="15" y="-4" class="nodelabel cell_GATES_1">OR_GATE</text><rect width="30" height="40" class="cell_GATES_1" /><g transform="translate(0,10)" id="port_GATES_1~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input1</text></g><g transform="translate(0,30)" id="port_GATES_1~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input2</text></g><g transform="translate(30,10)" id="port_GATES_1~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_1">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_10 (NAND_GATE) - open its page</title><g transform="translate(289,22)" id="cell_GATES_10"><text x="15" y="-4" class="nodelabel cell_GATES_10">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_10" /><g transform="translate(0,10)" id="port_GATES_10~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_10">input1</text></g><g transform="translate(0,30)" id="port_GATES_10~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_10">input2</text></g><g transform="translate(30,10)" id="port_GATES_10~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_10">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_11 (NAND_GATE) - open its page</title><g transform="translate(289,296)" id="cell_GATES_11"><text x="15" y="-4" class="nodelabel cell_GATES_11">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_11" /><g transform="translate(0,10)" id="port_GATES_11~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_11">input1</text></g><g transform="translate(0,30)" id="port_GATES_11~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_11">input2</text></g><g transform="translate(30,10)" id="port_GATES_11~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_11">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_2 (NAND_GATE) - open its page</title><g transform="translate(289,110)" id="cell_GATES_2"><text x="15" y="-4" class="nodelabel cell_GATES_2">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_2" /><g transform="translate(0,10)" id="port_GATES_2~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input1</text></g><g transform="translate(0,30)" id="port_GATES_2~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input2</text></g><g transform="translate(30,10)" id="port_GATES_2~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_2">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_3 (NAND_GATE) - open its page</title><g transform="translate(289,384)" id="cell_GATES_3"><text x="15" y="-4" class="nodelabel cell_GATES_3">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_3" /><g transform="translate(0,10)" id="port_GATES_3~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input1</text></g><g transform="translate(0,30)" id="port_GATES_3~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input2</text></g><g transform="translate(30,10)" id="port_GATES_3~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_3">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/OR_GATE.md"><title>GATES_4 (OR_GATE) - open its page</title><g transform="translate(434,364)" id="cell_GATES_4"><text x="15" y="-4" class="nodelabel cell_GATES_4">OR_GATE</text><rect width="30" height="40" class="cell_GATES_4" /><g transform="translate(0,10)" id="port_GATES_4~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input1</text></g><g transform="translate(0,30)" id="port_GATES_4~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input2</text></g><g transform="translate(30,10)" id="port_GATES_4~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_4">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_5 (AND_GATE) - open its page</title><g transform="translate(144,110)" id="cell_GATES_5"><text x="15" y="-4" class="nodelabel cell_GATES_5">AND_GATE</text><rect width="30" height="40" class="cell_GATES_5" /><g transform="translate(0,10)" id="port_GATES_5~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input1</text></g><g transform="translate(0,30)" id="port_GATES_5~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input2</text></g><g transform="translate(30,10)" id="port_GATES_5~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_5">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_6 (AND_GATE) - open its page</title><g transform="translate(144,384)" id="cell_GATES_6"><text x="15" y="-4" class="nodelabel cell_GATES_6">AND_GATE</text><rect width="30" height="40" class="cell_GATES_6" /><g transform="translate(0,10)" id="port_GATES_6~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_6">input1</text></g><g transform="translate(0,30)" id="port_GATES_6~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_6">input2</text></g><g transform="translate(30,10)" id="port_GATES_6~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_6">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_7 (NAND_GATE) - open its page</title><g transform="translate(289,208)" id="cell_GATES_7"><text x="15" y="-4" class="nodelabel cell_GATES_7">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_7" /><g transform="translate(0,10)" id="port_GATES_7~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_7">input1</text></g><g transform="translate(0,30)" id="port_GATES_7~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_7">input2</text></g><g transform="translate(30,10)" id="port_GATES_7~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_7">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_8 (NAND_GATE) - open its page</title><g transform="translate(289,482)" id="cell_GATES_8"><text x="15" y="-4" class="nodelabel cell_GATES_8">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_8" /><g transform="translate(0,10)" id="port_GATES_8~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_8">input1</text></g><g transform="translate(0,30)" id="port_GATES_8~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_8">input2</text></g><g transform="translate(30,10)" id="port_GATES_8~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_8">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/OR_GATE.md"><title>GATES_9 (OR_GATE) - open its page</title><g transform="translate(434,462)" id="cell_GATES_9"><text x="15" y="-4" class="nodelabel cell_GATES_9">OR_GATE</text><rect width="30" height="40" class="cell_GATES_9" /><g transform="translate(0,10)" id="port_GATES_9~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_9">input1</text></g><g transform="translate(0,30)" id="port_GATES_9~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_9">input2</text></g><g transform="translate(30,10)" id="port_GATES_9~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_9">result</text></g></g></a>
+<g transform="translate(12,65.5)" id="cell_HIGSN"><text x="15" y="-4" class="nodelabel cell_HIGSN">HIGSN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_HIGSN" /><g /></g>
+<g transform="translate(12,198.5)" id="cell_HISTAT_2_0"><text x="15" y="-4" class="nodelabel cell_HISTAT_2_0">HISTAT_2_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_HISTAT_2_0" /><g /></g>
+<g transform="translate(12,404.5)" id="cell_LOGSN"><text x="15" y="-4" class="nodelabel cell_LOGSN">LOGSN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LOGSN" /><g /></g>
+<g transform="translate(12,472.5)" id="cell_LOSTAT_2_0"><text x="15" y="-4" class="nodelabel cell_LOSTAT_2_0">LOSTAT_2_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LOSTAT_2_0" /><g /></g>
+<g transform="translate(12,130.5)" id="cell_OESN"><text x="15" y="-4" class="nodelabel cell_OESN">OESN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_OESN" /><g /></g>
+<g transform="translate(585,374.5)" id="cell_PICS_2_0"><text x="15" y="-4" class="nodelabel cell_PICS_2_0">PICS_2_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PICS_2_0" /><g /></g>
+<g transform="translate(544,364)" id="cell_$join$,11,12,13,"><rect width="5" height="60" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g></g>
+<g transform="translate(163,188)" id="cell_$split$,3,4,5,"><rect width="5" height="60" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">1</text></g><g transform="translate(4,30)"><text x="5" y="-4">0</text></g><g transform="translate(4,50)"><text x="5" y="-4">2</text></g></g>
+<g transform="translate(163,462)" id="cell_$split$,7,8,9,"><rect width="5" height="60" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">1</text></g><g transform="translate(4,30)"><text x="5" y="-4">0</text></g><g transform="translate(4,50)"><text x="5" y="-4">2</text></g></g>
+<line x1="320" x2="387" y1="32.5" y2="32.5" class="net_14"><title>s_gates10_out</title></line>
+<line x1="387" x2="387" y1="32.5" y2="286.5" class="net_14"><title>s_gates10_out</title></line>
+<line x1="387" x2="434" y1="286.5" y2="286.5" class="net_14"><title>s_gates10_out</title></line>
+<line x1="320" x2="434" y1="306.5" y2="306.5" class="net_15"><title>s_gates11_out</title></line>
+<line x1="175" x2="242" y1="120.5" y2="120.5" class="net_16"><title>s_gates5_out</title></line>
+<line x1="242" x2="242" y1="120.5" y2="32.5" class="net_16"><title>s_gates5_out</title></line>
+<circle cx="242" cy="120.5" r="2" style="fill:#000" class="net_16" />
+<line x1="242" x2="289" y1="32.5" y2="32.5" class="net_16"><title>s_gates5_out</title></line>
+<line x1="175" x2="289" y1="120.5" y2="120.5" class="net_16"><title>s_gates5_out</title></line>
+<line x1="175" x2="242" y1="120.5" y2="120.5" class="net_16"><title>s_gates5_out</title></line>
+<line x1="242" x2="242" y1="120.5" y2="218.5" class="net_16"><title>s_gates5_out</title></line>
+<line x1="242" x2="289" y1="218.5" y2="218.5" class="net_16"><title>s_gates5_out</title></line>
+<line x1="168" x2="222" y1="198.5" y2="198.5" class="net_4"><title>HISTAT_2_0[1]</title></line>
+<line x1="222" x2="222" y1="198.5" y2="52.5" class="net_4"><title>HISTAT_2_0[1]</title></line>
+<line x1="222" x2="289" y1="52.5" y2="52.5" class="net_4"><title>HISTAT_2_0[1]</title></line>
+<line x1="175" x2="242" y1="394.5" y2="394.5" class="net_17"><title>s_gates6_out</title></line>
+<line x1="242" x2="242" y1="394.5" y2="306.5" class="net_17"><title>s_gates6_out</title></line>
+<circle cx="242" cy="394.5" r="2" style="fill:#000" class="net_17" />
+<line x1="242" x2="289" y1="306.5" y2="306.5" class="net_17"><title>s_gates6_out</title></line>
+<line x1="175" x2="289" y1="394.5" y2="394.5" class="net_17"><title>s_gates6_out</title></line>
+<line x1="175" x2="242" y1="394.5" y2="394.5" class="net_17"><title>s_gates6_out</title></line>
+<line x1="242" x2="242" y1="394.5" y2="492.5" class="net_17"><title>s_gates6_out</title></line>
+<line x1="242" x2="289" y1="492.5" y2="492.5" class="net_17"><title>s_gates6_out</title></line>
+<line x1="168" x2="222" y1="472.5" y2="472.5" class="net_8"><title>LOSTAT_2_0[1]</title></line>
+<line x1="222" x2="222" y1="472.5" y2="326.5" class="net_8"><title>LOSTAT_2_0[1]</title></line>
+<line x1="222" x2="289" y1="326.5" y2="326.5" class="net_8"><title>LOSTAT_2_0[1]</title></line>
+<line x1="168" x2="232" y1="218.5" y2="218.5" class="net_3"><title>HISTAT_2_0[0]</title></line>
+<line x1="232" x2="232" y1="218.5" y2="140.5" class="net_3"><title>HISTAT_2_0[0]</title></line>
+<line x1="232" x2="289" y1="140.5" y2="140.5" class="net_3"><title>HISTAT_2_0[0]</title></line>
+<line x1="168" x2="232" y1="492.5" y2="492.5" class="net_7"><title>LOSTAT_2_0[0]</title></line>
+<line x1="232" x2="232" y1="492.5" y2="414.5" class="net_7"><title>LOSTAT_2_0[0]</title></line>
+<line x1="232" x2="289" y1="414.5" y2="414.5" class="net_7"><title>LOSTAT_2_0[0]</title></line>
+<line x1="320" x2="377" y1="120.5" y2="120.5" class="net_18"><title>s_gates2_out</title></line>
+<line x1="377" x2="377" y1="120.5" y2="374.5" class="net_18"><title>s_gates2_out</title></line>
+<line x1="377" x2="434" y1="374.5" y2="374.5" class="net_18"><title>s_gates2_out</title></line>
+<line x1="320" x2="434" y1="394.5" y2="394.5" class="net_19"><title>s_gates3_out</title></line>
+<line x1="40" x2="82" y1="75.5" y2="75.5" class="net_2"><title>HIGSN</title></line>
+<line x1="82" x2="82" y1="75.5" y2="120.5" class="net_2"><title>HIGSN</title></line>
+<line x1="82" x2="144" y1="120.5" y2="120.5" class="net_2"><title>HIGSN</title></line>
+<line x1="40" x2="144" y1="140.5" y2="140.5" class="net_10"><title>OESN</title></line>
+<line x1="40" x2="82" y1="140.5" y2="140.5" class="net_10"><title>OESN</title></line>
+<line x1="82" x2="82" y1="140.5" y2="394.5" class="net_10"><title>OESN</title></line>
+<circle cx="82" cy="140.5" r="2" style="fill:#000" class="net_10" />
+<line x1="82" x2="144" y1="394.5" y2="394.5" class="net_10"><title>OESN</title></line>
+<line x1="40" x2="144" y1="414.5" y2="414.5" class="net_6"><title>LOGSN</title></line>
+<line x1="168" x2="289" y1="238.5" y2="238.5" class="net_5"><title>HISTAT_2_0[2]</title></line>
+<line x1="168" x2="289" y1="512.5" y2="512.5" class="net_9"><title>LOSTAT_2_0[2]</title></line>
+<line x1="320" x2="367" y1="218.5" y2="218.5" class="net_20"><title>s_gates7_out</title></line>
+<line x1="367" x2="367" y1="218.5" y2="472.5" class="net_20"><title>s_gates7_out</title></line>
+<line x1="367" x2="434" y1="472.5" y2="472.5" class="net_20"><title>s_gates7_out</title></line>
+<line x1="320" x2="434" y1="492.5" y2="492.5" class="net_21"><title>s_gates8_out</title></line>
+<line x1="550" x2="585" y1="384.5" y2="384.5" class="net_11,12,13"><title>PICS_2_0</title></line>
+<line x1="465" x2="544" y1="374.5" y2="374.5" class="net_11"><title>PICS_2_0[0]</title></line>
+<line x1="465" x2="512" y1="286.5" y2="286.5" class="net_12"><title>PICS_2_0[1]</title></line>
+<line x1="512" x2="512" y1="286.5" y2="394.5" class="net_12"><title>PICS_2_0[1]</title></line>
+<line x1="512" x2="544" y1="394.5" y2="394.5" class="net_12"><title>PICS_2_0[1]</title></line>
+<line x1="465" x2="512" y1="472.5" y2="472.5" class="net_13"><title>PICS_2_0[2]</title></line>
+<line x1="512" x2="512" y1="472.5" y2="414.5" class="net_13"><title>PICS_2_0[2]</title></line>
+<line x1="512" x2="544" y1="414.5" y2="414.5" class="net_13"><title>PICS_2_0[2]</title></line>
+<line x1="40" x2="163" y1="208.5" y2="208.5" class="net_3,4,5"><title>HISTAT_2_0</title></line>
+<line x1="40" x2="163" y1="482.5" y2="482.5" class="net_7,8,9"><title>LOSTAT_2_0</title></line>
+<text x="43.0" y="137.5" class="netlabel">OESN</text>
+<text x="468.0" y="371.5" class="netlabel">PICS_2_0[0]</text>
+<text x="553.0" y="381.5" class="netlabel">PICS_2_0</text>
+<text x="468.0" y="283.5" class="netlabel">PICS_2_0[1]</text>
+<text x="468.0" y="469.5" class="netlabel">PICS_2_0[2]</text>
+<text x="323.0" y="29.5" class="netlabel">s_gates10_out</text>
+<text x="323.0" y="303.5" class="netlabel">s_gates11_out</text>
+<text x="178.0" y="117.5" class="netlabel">s_gates5_out</text>
+<text x="178.0" y="391.5" class="netlabel">s_gates6_out</text>
+<text x="323.0" y="117.5" class="netlabel">s_gates2_out</text>
+<text x="323.0" y="391.5" class="netlabel">s_gates3_out</text>
+<text x="85.0" y="117.5" class="netlabel">HIGSN</text>
+<text x="370.0" y="469.5" class="netlabel">s_gates7_out</text>
+<text x="323.0" y="489.5" class="netlabel">s_gates8_out</text>
+<text x="171.0" y="215.5" class="netlabel">HISTAT_2_0[0]</text>
+<text x="43.0" y="205.5" class="netlabel">HISTAT_2_0</text>
+<text x="225.0" y="49.5" class="netlabel">HISTAT_2_0[1]</text>
+<text x="171.0" y="235.5" class="netlabel">HISTAT_2_0[2]</text>
+<text x="43.0" y="411.5" class="netlabel">LOGSN</text>
+<text x="171.0" y="489.5" class="netlabel">LOSTAT_2_0[0]</text>
+<text x="43.0" y="479.5" class="netlabel">LOSTAT_2_0</text>
+<text x="225.0" y="323.5" class="netlabel">LOSTAT_2_0[1]</text>
+<text x="171.0" y="509.5" class="netlabel">LOSTAT_2_0[2]</text>
+</svg>

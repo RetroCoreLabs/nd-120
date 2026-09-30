@@ -1,0 +1,993 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2447.0" height="3259.5" viewBox="-80.0 -80.0 2447.0 3259.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="2447.0" height="3259.5" fill="#ffffff" /><g transform="translate(1955.3333333333333,862.5)" id="cell_$add$DECODE_DGA_POW.v:423$9385"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$add$DECODE_DGA_POW.v:423$9385" /><line x1="7.5" x2="17.5" y1="12.5" y2="12.5" class="cell_$add$DECODE_DGA_POW.v:423$9385" /><line x1="12.5" x2="12.5" y1="7.5" y2="17.5" class="cell_$add$DECODE_DGA_POW.v:423$9385" /><g /><g /><g /></g>
+<g transform="translate(1793.3333333333333,493.5)" id="cell_$add$DECODE_DGA_POW.v:490$9395"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$add$DECODE_DGA_POW.v:490$9395" /><line x1="7.5" x2="17.5" y1="12.5" y2="12.5" class="cell_$add$DECODE_DGA_POW.v:490$9395" /><line x1="12.5" x2="12.5" y1="7.5" y2="17.5" class="cell_$add$DECODE_DGA_POW.v:490$9395" /><g /><g /><g /></g>
+<g transform="translate(1725,2530.5)" id="cell_$and$DECODE_DGA_POW.v:212$9328"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:212$9328" /><g /><g /><g /></g>
+<g transform="translate(1790,2538)" id="cell_$and$DECODE_DGA_POW.v:212$9329"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:212$9329" /><g /><g /><g /></g>
+<g transform="translate(1864,2902.5)" id="cell_$and$DECODE_DGA_POW.v:215$9331"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:215$9331" /><g /><g /><g /></g>
+<g transform="translate(1952,2910)" id="cell_$and$DECODE_DGA_POW.v:215$9332"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:215$9332" /><g /><g /><g /></g>
+<g transform="translate(1790,1866.5)" id="cell_$and$DECODE_DGA_POW.v:218$9334"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:218$9334" /><g /><g /><g /></g>
+<g transform="translate(1725,2132.5)" id="cell_$and$DECODE_DGA_POW.v:221$9336"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:221$9336" /><g /><g /><g /></g>
+<g transform="translate(1790,2140)" id="cell_$and$DECODE_DGA_POW.v:221$9337"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:221$9337" /><g /><g /><g /></g>
+<g transform="translate(1864,2147.5)" id="cell_$and$DECODE_DGA_POW.v:221$9338"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:221$9338" /><g /><g /><g /></g>
+<g transform="translate(1864,2478)" id="cell_$and$DECODE_DGA_POW.v:224$9340"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:224$9340" /><g /><g /><g /></g>
+<g transform="translate(1952,2485.5)" id="cell_$and$DECODE_DGA_POW.v:224$9341"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:224$9341" /><g /><g /><g /></g>
+<g transform="translate(203,2199.5)" id="cell_$and$DECODE_DGA_POW.v:227$9343"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:227$9343" /><g /><g /><g /></g>
+<g transform="translate(270,2207)" id="cell_$and$DECODE_DGA_POW.v:227$9344"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:227$9344" /><g /><g /><g /></g>
+<g transform="translate(1952,1286)" id="cell_$and$DECODE_DGA_POW.v:230$9346"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:230$9346" /><g /><g /><g /></g>
+<g transform="translate(2022,1293.5)" id="cell_$and$DECODE_DGA_POW.v:230$9347"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:230$9347" /><g /><g /><g /></g>
+<g transform="translate(2087,1301)" id="cell_$and$DECODE_DGA_POW.v:230$9348"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:230$9348" /><g /><g /><g /></g>
+<g transform="translate(1348.3333333333333,3007)" id="cell_$and$DECODE_DGA_POW.v:240$9350"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:240$9350" /><g /><g /><g /></g>
+<g transform="translate(1541.3333333333333,3014.5)" id="cell_$and$DECODE_DGA_POW.v:240$9351"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:240$9351" /><g /><g /><g /></g>
+<g transform="translate(1655,3022)" id="cell_$and$DECODE_DGA_POW.v:240$9352"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:240$9352" /><g /><g /><g /></g>
+<g transform="translate(1725,3029.5)" id="cell_$and$DECODE_DGA_POW.v:240$9353"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:240$9353" /><g /><g /><g /></g>
+<g transform="translate(1790,3037)" id="cell_$and$DECODE_DGA_POW.v:240$9354"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:240$9354" /><g /><g /><g /></g>
+<g transform="translate(1864,3044.5)" id="cell_$and$DECODE_DGA_POW.v:240$9355"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:240$9355" /><g /><g /><g /></g>
+<g transform="translate(1952,3052)" id="cell_$and$DECODE_DGA_POW.v:240$9356"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:240$9356" /><g /><g /><g /></g>
+<g transform="translate(1952,2545.5)" id="cell_$and$DECODE_DGA_POW.v:244$9358"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:244$9358" /><g /><g /><g /></g>
+<g transform="translate(2022,2553)" id="cell_$and$DECODE_DGA_POW.v:244$9359"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:244$9359" /><g /><g /><g /></g>
+<g transform="translate(2087,2560.5)" id="cell_$and$DECODE_DGA_POW.v:244$9360"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:244$9360" /><g /><g /><g /></g>
+<g transform="translate(1952,1850.5)" id="cell_$and$DECODE_DGA_POW.v:247$9362"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:247$9362" /><g /><g /><g /></g>
+<g transform="translate(2022,1858)" id="cell_$and$DECODE_DGA_POW.v:247$9363"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:247$9363" /><g /><g /><g /></g>
+<g transform="translate(2087,1865.5)" id="cell_$and$DECODE_DGA_POW.v:247$9364"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:247$9364" /><g /><g /><g /></g>
+<g transform="translate(2087,2991)" id="cell_$and$DECODE_DGA_POW.v:250$9366"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:250$9366" /><g /><g /><g /></g>
+<g transform="translate(641.3333333333334,2173.5)" id="cell_$and$DECODE_DGA_POW.v:253$9368"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:253$9368" /><g /><g /><g /></g>
+<g transform="translate(775,2339.5)" id="cell_$and$DECODE_DGA_POW.v:262$9374"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:262$9374" /><g /><g /><g /></g>
+<g transform="translate(874.6666666666666,1990)" id="cell_$and$DECODE_DGA_POW.v:262$9375"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:262$9375" /><g /><g /><g /></g>
+<g transform="translate(641.3333333333334,2437)" id="cell_$and$DECODE_DGA_POW.v:317$9379"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:317$9379" /><g /><g /><g /></g>
+<g transform="translate(1725,566.5)" id="cell_$and$DECODE_DGA_POW.v:478$9387"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:478$9387" /><g /><g /><g /></g>
+<g transform="translate(1547,1004.5)" id="cell_$and$DECODE_DGA_POW.v:480$9392"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$DECODE_DGA_POW.v:480$9392" /><g /><g /><g /></g>
+<g transform="translate(878,1805.5)" id="cell_$ge$DECODE_DGA_POW.v:419$9384"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$ge$DECODE_DGA_POW.v:419$9384" /><line x1="7.5" x2="17.5" y1="7.5" y2="12.5" class="cell_$ge$DECODE_DGA_POW.v:419$9384" /><line x1="7.5" x2="17.5" y1="17.5" y2="12.5" class="cell_$ge$DECODE_DGA_POW.v:419$9384" /><line x1="7.5" x2="17.5" y1="20" y2="15" class="cell_$ge$DECODE_DGA_POW.v:419$9384" /><g /><g /><g /></g>
+<g transform="translate(2152,1238.5)" id="cell_$not$DECODE_DGA_POW.v:196$9318"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:196$9318" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:196$9318" /><g /><g /></g>
+<g transform="translate(1725,2077.5)" id="cell_$not$DECODE_DGA_POW.v:198$9320"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:198$9320" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:198$9320" /><g /><g /></g>
+<g transform="translate(1182.5,1937.5)" id="cell_$not$DECODE_DGA_POW.v:199$9321"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:199$9321" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:199$9321" /><g /><g /></g>
+<g transform="translate(1345.5,1882.5)" id="cell_$not$DECODE_DGA_POW.v:200$9322"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:200$9322" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:200$9322" /><g /><g /></g>
+<g transform="translate(1725,2590.5)" id="cell_$not$DECODE_DGA_POW.v:202$9324"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:202$9324" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:202$9324" /><g /><g /></g>
+<g transform="translate(1655,2127.5)" id="cell_$not$DECODE_DGA_POW.v:204$9326"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:204$9326" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:204$9326" /><g /><g /></g>
+<g transform="translate(349,2342)" id="cell_$not$DECODE_DGA_POW.v:205$9327"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:205$9327" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:205$9327" /><g /><g /></g>
+<g transform="translate(1866,2540.5)" id="cell_$not$DECODE_DGA_POW.v:212$9330"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:212$9330" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:212$9330" /><g /><g /></g>
+<g transform="translate(2022,2912.5)" id="cell_$not$DECODE_DGA_POW.v:215$9333"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:215$9333" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:215$9333" /><g /><g /></g>
+<g transform="translate(1866,1869)" id="cell_$not$DECODE_DGA_POW.v:218$9335"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:218$9335" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:218$9335" /><g /><g /></g>
+<g transform="translate(1952,2150)" id="cell_$not$DECODE_DGA_POW.v:221$9339"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:221$9339" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:221$9339" /><g /><g /></g>
+<g transform="translate(2022,2488)" id="cell_$not$DECODE_DGA_POW.v:224$9342"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:224$9342" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:224$9342" /><g /><g /></g>
+<g transform="translate(349,2209.5)" id="cell_$not$DECODE_DGA_POW.v:227$9345"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:227$9345" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:227$9345" /><g /><g /></g>
+<g transform="translate(2152,1303.5)" id="cell_$not$DECODE_DGA_POW.v:230$9349"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:230$9349" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:230$9349" /><g /><g /></g>
+<g transform="translate(2022,3054.5)" id="cell_$not$DECODE_DGA_POW.v:240$9357"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:240$9357" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:240$9357" /><g /><g /></g>
+<g transform="translate(2152,2563)" id="cell_$not$DECODE_DGA_POW.v:244$9361"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:244$9361" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:244$9361" /><g /><g /></g>
+<g transform="translate(2152,1547.5)" id="cell_$not$DECODE_DGA_POW.v:247$9365"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:247$9365" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:247$9365" /><g /><g /></g>
+<g transform="translate(2152,2993.5)" id="cell_$not$DECODE_DGA_POW.v:250$9367"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:250$9367" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:250$9367" /><g /><g /></g>
+<g transform="translate(2152,152)" id="cell_$not$DECODE_DGA_POW.v:253$9369"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:253$9369" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:253$9369" /><g /><g /></g>
+<g transform="translate(2152,217)" id="cell_$not$DECODE_DGA_POW.v:256$9371"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:256$9371" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:256$9371" /><g /><g /></g>
+<g transform="translate(879.5,1733)" id="cell_$not$DECODE_DGA_POW.v:259$9373"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:259$9373" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:259$9373" /><g /><g /></g>
+<g transform="translate(1017.5,1992.5)" id="cell_$not$DECODE_DGA_POW.v:262$9376"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:262$9376" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:262$9376" /><g /><g /></g>
+<g transform="translate(475.5,2453)" id="cell_$not$DECODE_DGA_POW.v:317$9378"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:317$9378" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:317$9378" /><g /><g /></g>
+<g transform="translate(1017.5,2660.5)" id="cell_$not$DECODE_DGA_POW.v:324$9381"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:324$9381" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:324$9381" /><g /><g /></g>
+<g transform="translate(1655,582.5)" id="cell_$not$DECODE_DGA_POW.v:478$9386"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:478$9386" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:478$9386" /><g /><g /></g>
+<g transform="translate(1725,657.5)" id="cell_$not$DECODE_DGA_POW.v:479$9388"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:479$9388" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:479$9388" /><g /><g /></g>
+<g transform="translate(2217,1602.5)" id="cell_$not$DECODE_DGA_POW.v:480$9391"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:480$9391" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:480$9391" /><g /><g /></g>
+<g transform="translate(1860,217)" id="cell_$not$DECODE_DGA_POW.v:487$9394"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:487$9394" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:487$9394" /><g /><g /></g>
+<g transform="translate(2022,922.5)" id="cell_$not$DECODE_DGA_POW.v:499$9398"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:499$9398" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:499$9398" /><g /><g /></g>
+<g transform="translate(2152,87)" id="cell_$not$DECODE_DGA_POW.v:500$9399"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:500$9399" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:500$9399" /><g /><g /></g>
+<g transform="translate(2152,22)" id="cell_$not$DECODE_DGA_POW.v:506$9405"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$DECODE_DGA_POW.v:506$9405" /><circle cx="23" cy="10" r="3" class="cell_$not$DECODE_DGA_POW.v:506$9405" /><g /><g /></g>
+<g transform="translate(2087,421)" id="cell_$or$DECODE_DGA_POW.v:256$9370"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$DECODE_DGA_POW.v:256$9370" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$DECODE_DGA_POW.v:256$9370" /><g /><g /><g /></g>
+<g transform="translate(775,1730.5)" id="cell_$or$DECODE_DGA_POW.v:259$9372"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$DECODE_DGA_POW.v:259$9372" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$DECODE_DGA_POW.v:259$9372" /><g /><g /><g /></g>
+<g transform="translate(1541.3333333333333,582.5)" id="cell_$procdff$37315"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37315" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37315" /><g /><g /><g /><g /></g>
+<g transform="translate(1952,922.5)" id="cell_$procdff$37316"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37316" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37316" /><g /><g /><g /><g /></g>
+<g transform="translate(2087,343)" id="cell_$procdff$37317"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37317" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37317" /><g /><g /><g /><g /></g>
+<g transform="translate(2022,258)" id="cell_$procdff$37318"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37318" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37318" /><g /><g /><g /><g /></g>
+<g transform="translate(1790,1039.5)" id="cell_$procdff$37319"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37319" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37319" /><g /><g /><g /><g /></g>
+<g transform="translate(2022,416)" id="cell_$procdff$37320"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37320" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37320" /><g /><g /><g /><g /></g>
+<g transform="translate(2217,1368.5)" id="cell_$procdff$37321"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37321" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37321" /><g /><g /><g /><g /></g>
+<g transform="translate(1542.75,2847.5)" id="cell_$procdff$37322"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37322" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37322" /><g /><g /><g /><g /></g>
+<g transform="translate(865,2660)" id="cell_$procdff$37325"><text x="15" y="-4" class="nodelabel cell_$procdff$37325">$adff</text><rect width="30" height="60" class="cell_$procdff$37325" /><g transform="translate(0,10)" id="port_$procdff$37325~ARST"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37325">ARST</text></g><g transform="translate(0,30)" id="port_$procdff$37325~CLK"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37325">CLK</text></g><g transform="translate(0,50)" id="port_$procdff$37325~D"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37325">D</text></g><g transform="translate(30,10)" id="port_$procdff$37325~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_$procdff$37325">Q</text></g></g>
+<g transform="translate(345.66666666666663,2453)" id="cell_$procdff$37326"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37326" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37326" /><g /><g /><g /><g /></g>
+<g transform="translate(1870.6666666666667,566.5)" id="cell_$procmux$11279"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11279" /><g /><g /><g /><g /></g>
+<g transform="translate(1955.3333333333333,767.5)" id="cell_$procmux$11282"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11282" /><g /><g /><g /><g /></g>
+<g transform="translate(1661.6666666666667,1050.5)" id="cell_$procmux$11284"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11284" /><g /><g /><g /><g /></g>
+<g transform="translate(1728.3333333333333,1029.5)" id="cell_$procmux$11287"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11287" /><g /><g /><g /><g /></g>
+<g transform="translate(1870.6666666666667,476)" id="cell_$procmux$11289"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11289" /><g /><g /><g /><g /></g>
+<g transform="translate(1955.3333333333333,707.5)" id="cell_$procmux$11292"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11292" /><g /><g /><g /><g /></g>
+<g transform="translate(1958.6666666666667,197)" id="cell_$procmux$11294"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11294" /><g /><g /><g /><g /></g>
+<g transform="translate(2025.3333333333333,333)" id="cell_$procmux$11297"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11297" /><g /><g /><g /><g /></g>
+<g transform="translate(2025.3333333333333,1379.5)" id="cell_$procmux$11300"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11300" /><g /><g /><g /><g /></g>
+<g transform="translate(2090.333333333333,1389.5)" id="cell_$procmux$11303"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11303" /><g /><g /><g /><g /></g>
+<g transform="translate(2155.333333333333,1358.5)" id="cell_$procmux$11306"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11306" /><g /><g /><g /><g /></g>
+<g transform="translate(1023,2047.5)" id="cell_$procmux$11309"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11309" /><g /><g /><g /><g /></g>
+<g transform="translate(1188.6666666666667,2216)" id="cell_$procmux$11312"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11312" /><g /><g /><g /><g /></g>
+<g transform="translate(1351.6666666666667,2195)" id="cell_$procmux$11315"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11315" /><g /><g /><g /><g /></g>
+<g transform="translate(781.6666666666666,2399.5)" id="cell_$procmux$11317"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11317" /><g /><g /><g /><g /></g>
+<g transform="translate(778.3333333333334,1805.5)" id="cell_$ternary$DECODE_DGA_POW.v:402$9382"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$DECODE_DGA_POW.v:402$9382" /><g /><g /><g /><g /></g>
+<g transform="translate(1796.6666666666667,637.5)" id="cell_$ternary$DECODE_DGA_POW.v:479$9389"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$DECODE_DGA_POW.v:479$9389" /><g /><g /><g /><g /></g>
+<g transform="translate(1867.3333333333333,963.5)" id="cell_$ternary$DECODE_DGA_POW.v:479$9390"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$DECODE_DGA_POW.v:479$9390" /><g /><g /><g /><g /></g>
+<a href="F595.md"><title>A570 (F595) - open its page</title><g transform="translate(647,2650)" id="cell_A570"><text x="15" y="-4" class="nodelabel cell_A570">F595</text><rect width="30" height="100" class="cell_A570" /><g transform="translate(0,10)" id="port_A570~H01_S"><text x="-3" y="-4" class="inputPortLabel cell_A570">H01_S</text></g><g transform="translate(0,30)" id="port_A570~H02_R"><text x="-3" y="-4" class="inputPortLabel cell_A570">H02_R</text></g><g transform="translate(0,50)" id="port_A570~H03_G"><text x="-3" y="-4" class="inputPortLabel cell_A570">H03_G</text></g><g transform="translate(0,70)" id="port_A570~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_A570">sys_rst_n</text></g><g transform="translate(0,90)" id="port_A570~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_A570">sysclk</text></g><g transform="translate(30,10)" id="port_A570~N01_Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A570">N01_Q</text></g><g transform="translate(30,30)" id="port_A570~N02_QB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A570">N02_QB</text></g></g></a>
+<a href="F595.md"><title>A571 (F595) - open its page</title><g transform="translate(484,2301.5)" id="cell_A571"><text x="15" y="-4" class="nodelabel cell_A571">F595</text><rect width="30" height="100" class="cell_A571" /><g transform="translate(0,10)" id="port_A571~H01_S"><text x="-3" y="-4" class="inputPortLabel cell_A571">H01_S</text></g><g transform="translate(0,30)" id="port_A571~H02_R"><text x="-3" y="-4" class="inputPortLabel cell_A571">H02_R</text></g><g transform="translate(0,50)" id="port_A571~H03_G"><text x="-3" y="-4" class="inputPortLabel cell_A571">H03_G</text></g><g transform="translate(0,70)" id="port_A571~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_A571">sys_rst_n</text></g><g transform="translate(0,90)" id="port_A571~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_A571">sysclk</text></g><g transform="translate(30,10)" id="port_A571~N01_Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A571">N01_Q</text></g><g transform="translate(30,30)" id="port_A571~N02_QB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A571">N02_QB</text></g></g></a>
+<a href="F595.md"><title>A574 (F595) - open its page</title><g transform="translate(1191,2723.5)" id="cell_A574"><text x="15" y="-4" class="nodelabel cell_A574">F595</text><rect width="30" height="100" class="cell_A574" /><g transform="translate(0,10)" id="port_A574~H01_S"><text x="-3" y="-4" class="inputPortLabel cell_A574">H01_S</text></g><g transform="translate(0,30)" id="port_A574~H02_R"><text x="-3" y="-4" class="inputPortLabel cell_A574">H02_R</text></g><g transform="translate(0,50)" id="port_A574~H03_G"><text x="-3" y="-4" class="inputPortLabel cell_A574">H03_G</text></g><g transform="translate(0,70)" id="port_A574~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_A574">sys_rst_n</text></g><g transform="translate(0,90)" id="port_A574~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_A574">sysclk</text></g><g transform="translate(30,10)" id="port_A574~N01_Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A574">N01_Q</text></g><g transform="translate(30,30)" id="port_A574~N02_QB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A574">N02_QB</text></g></g></a>
+<a href="F595.md"><title>A575 (F595) - open its page</title><g transform="translate(1354,2057)" id="cell_A575"><text x="15" y="-4" class="nodelabel cell_A575">F595</text><rect width="30" height="100" class="cell_A575" /><g transform="translate(0,10)" id="port_A575~H01_S"><text x="-3" y="-4" class="inputPortLabel cell_A575">H01_S</text></g><g transform="translate(0,30)" id="port_A575~H02_R"><text x="-3" y="-4" class="inputPortLabel cell_A575">H02_R</text></g><g transform="translate(0,50)" id="port_A575~H03_G"><text x="-3" y="-4" class="inputPortLabel cell_A575">H03_G</text></g><g transform="translate(0,70)" id="port_A575~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_A575">sys_rst_n</text></g><g transform="translate(0,90)" id="port_A575~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_A575">sysclk</text></g><g transform="translate(30,10)" id="port_A575~N01_Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A575">N01_Q</text></g><g transform="translate(30,30)" id="port_A575~N02_QB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A575">N02_QB</text></g></g></a>
+<a href="F595.md"><title>A576 (F595) - open its page</title><g transform="translate(1547,2556.5)" id="cell_A576"><text x="15" y="-4" class="nodelabel cell_A576">F595</text><rect width="30" height="100" class="cell_A576" /><g transform="translate(0,10)" id="port_A576~H01_S"><text x="-3" y="-4" class="inputPortLabel cell_A576">H01_S</text></g><g transform="translate(0,30)" id="port_A576~H02_R"><text x="-3" y="-4" class="inputPortLabel cell_A576">H02_R</text></g><g transform="translate(0,50)" id="port_A576~H03_G"><text x="-3" y="-4" class="inputPortLabel cell_A576">H03_G</text></g><g transform="translate(0,70)" id="port_A576~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_A576">sys_rst_n</text></g><g transform="translate(0,90)" id="port_A576~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_A576">sysclk</text></g><g transform="translate(30,10)" id="port_A576~N01_Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A576">N01_Q</text></g><g transform="translate(30,30)" id="port_A576~N02_QB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A576">N02_QB</text></g></g></a>
+<a href="F091.md"><title>A613B (F091) - open its page</title><g transform="translate(339,2690)" id="cell_A613B"><text x="15" y="-4" class="nodelabel cell_A613B">F091</text><rect width="30" height="40" class="cell_A613B" /><g transform="translate(30,10)" id="port_A613B~N01"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A613B">N01</text></g><g transform="translate(30,30)" id="port_A613B~N02"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A613B">N02</text></g></g></a>
+<a href="F103.md"><title>A628 (F103) - open its page</title><g transform="translate(1014,1732.5)" id="cell_A628"><text x="15" y="-4" class="nodelabel cell_A628">F103</text><rect width="30" height="20" class="cell_A628" /><g transform="translate(0,10)" id="port_A628~F_IN"><text x="-3" y="-4" class="inputPortLabel cell_A628">F_IN</text></g><g transform="translate(30,10)" id="port_A628~F_OUT"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_A628">F_OUT</text></g></g></a>
+<g transform="translate(268,2277)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(114,1238.5)" id="cell_sys_rst_n"><text x="15" y="-4" class="nodelabel cell_sys_rst_n">sys_rst_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sys_rst_n" /><g /></g>
+<g transform="translate(1860,807.5)" id="cell_BDRY50N"><text x="15" y="-4" class="nodelabel cell_BDRY50N">BDRY50N</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_BDRY50N" /><g /></g>
+<g transform="translate(647,1122.5)" id="cell_CLOSC"><text x="15" y="-4" class="nodelabel cell_CLOSC">CLOSC</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLOSC" /><g /></g>
+<g transform="translate(647,2308.5)" id="cell_CLRTIN"><text x="15" y="-4" class="nodelabel cell_CLRTIN">CLRTIN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLRTIN" /><g /></g>
+<g transform="translate(1014,1937.5)" id="cell_CONTINUEN"><text x="15" y="-4" class="nodelabel cell_CONTINUEN">CONTINUEN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CONTINUEN" /><g /></g>
+<g transform="translate(484,2168.5)" id="cell_EMCLN"><text x="15" y="-4" class="nodelabel cell_EMCLN">EMCLN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EMCLN" /><g /></g>
+<g transform="translate(1191,1882.5)" id="cell_LOADN"><text x="15" y="-4" class="nodelabel cell_LOADN">LOADN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LOADN" /><g /></g>
+<g transform="translate(54,22)" id="cell_POWSENSE"><text x="15" y="-4" class="nodelabel cell_POWSENSE">POWSENSE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_POWSENSE" /><g /></g>
+<g transform="translate(1655,2775)" id="cell_PRQN"><text x="15" y="-4" class="nodelabel cell_PRQN">PRQN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PRQN" /><g /></g>
+<g transform="translate(484,2670.5)" id="cell_PWCL"><text x="15" y="-4" class="nodelabel cell_PWCL">PWCL</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PWCL" /><g /></g>
+<g transform="translate(1655,1153.5)" id="cell_REFN"><text x="15" y="-4" class="nodelabel cell_REFN">REFN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_REFN" /><g /></g>
+<g transform="translate(647,1740.5)" id="cell_RESET"><text x="15" y="-4" class="nodelabel cell_RESET">RESET</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_RESET" /><g /></g>
+<g transform="translate(1354,561.5)" id="cell_RTOSC"><text x="15" y="-4" class="nodelabel cell_RTOSC">RTOSC</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_RTOSC" /><g /></g>
+<g transform="translate(647,2243.5)" id="cell_SEL5MSN"><text x="15" y="-4" class="nodelabel cell_SEL5MSN">SEL5MSN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SEL5MSN" /><g /></g>
+<g transform="translate(114,2194.5)" id="cell_SSTOPN"><text x="15" y="-4" class="nodelabel cell_SSTOPN">SSTOPN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SSTOPN" /><g /></g>
+<g transform="translate(268,2342)" id="cell_STARTN"><text x="15" y="-4" class="nodelabel cell_STARTN">STARTN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_STARTN" /><g /></g>
+<g transform="translate(203,2269.5)" id="cell_STOPN"><text x="15" y="-4" class="nodelabel cell_STOPN">STOPN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_STOPN" /><g /></g>
+<g transform="translate(12,22)" id="cell_TESTE"><text x="15" y="-4" class="nodelabel cell_TESTE">TESTE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TESTE" /><g /></g>
+<g transform="translate(2217,1238.5)" id="cell_CLEAR"><text x="15" y="-4" class="nodelabel cell_CLEAR">CLEAR</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_CLEAR" /><g /></g>
+<g transform="translate(2217,1547.5)" id="cell_IDB0"><text x="15" y="-4" class="nodelabel cell_IDB0">IDB0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IDB0" /><g /></g>
+<g transform="translate(2217,2563)" id="cell_IDB1"><text x="15" y="-4" class="nodelabel cell_IDB1">IDB1</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IDB1" /><g /></g>
+<g transform="translate(2217,1303.5)" id="cell_IDB2"><text x="15" y="-4" class="nodelabel cell_IDB2">IDB2</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IDB2" /><g /></g>
+<g transform="translate(2217,152)" id="cell_MCL"><text x="15" y="-4" class="nodelabel cell_MCL">MCL</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_MCL" /><g /></g>
+<g transform="translate(2217,2993.5)" id="cell_PANN"><text x="15" y="-4" class="nodelabel cell_PANN">PANN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PANN" /><g /></g>
+<g transform="translate(2217,87)" id="cell_PANOSC"><text x="15" y="-4" class="nodelabel cell_PANOSC">PANOSC</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PANOSC" /><g /></g>
+<g transform="translate(2217,1667.5)" id="cell_POWFAILN"><text x="15" y="-4" class="nodelabel cell_POWFAILN">POWFAILN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_POWFAILN" /><g /></g>
+<g transform="translate(2217,1482.5)" id="cell_REFRQN"><text x="15" y="-4" class="nodelabel cell_REFRQN">REFRQN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_REFRQN" /><g /></g>
+<g transform="translate(2217,1173.5)" id="cell_STPN"><text x="15" y="-4" class="nodelabel cell_STPN">STPN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_STPN" /><g /></g>
+<g transform="translate(2217,22)" id="cell_TESTO"><text x="15" y="-4" class="nodelabel cell_TESTO">TESTO</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_TESTO" /><g /></g>
+<g transform="translate(2217,217)" id="cell_TOUT"><text x="15" y="-4" class="nodelabel cell_TOUT">TOUT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_TOUT" /><g /></g>
+<g transform="translate(1860,872.5)" id="cell_000000000000000000001"><text x="15" y="-4" class="nodelabel cell_000000000000000000001">0x1</text><rect width="30" height="20" class="cell_000000000000000000001" /><g /></g>
+<g transform="translate(1725,503.5)" id="cell_000001"><text x="15" y="-4" class="nodelabel cell_000001">0x1</text><rect width="30" height="20" class="cell_000001" /><g /></g>
+<g transform="translate(1014,1667.5)" id="cell_1"><text x="15" y="-4" class="nodelabel cell_1">1</text><rect width="30" height="20" class="cell_1" /><g /></g>
+<g transform="translate(865,426)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(1860,727.5)" id="cell_000000"><text x="15" y="-4" class="nodelabel cell_000000">0x0</text><rect width="30" height="20" class="cell_000000" /><g /></g>
+<g transform="translate(1952,1358.5)" id="cell_000000000000000000000"><text x="15" y="-4" class="nodelabel cell_000000000000000000000">0x0</text><rect width="30" height="20" class="cell_000000000000000000000" /><g /></g>
+<g transform="translate(647,1805.5)" id="cell_000000000100000000000"><text x="15" y="-4" class="nodelabel cell_000000000100000000000">0x800</text><rect width="30" height="20" class="cell_000000000100000000000" /><g /></g>
+<g transform="translate(647,1870.5)" id="cell_000000010000000000000"><text x="15" y="-4" class="nodelabel cell_000000010000000000000">0x2000</text><rect width="30" height="20" class="cell_000000010000000000000" /><g /></g>
+<g transform="translate(2105,21.5)" id="cell_$split$,74,75,76,77,78,79,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">5</text></g></g>
+<line x1="2247" x2="2275" y1="1378.5" y2="1378.5" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="2275" x2="2275" y1="1378.5" y2="247" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="2275" x2="1932" y1="247" y2="247" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="1932" x2="1932" y1="247" y2="867.5" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<circle cx="2275" cy="1378.5" r="2" style="fill:#000" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52" />
+<line x1="1932" x2="1958.3333333333333" y1="867.5" y2="867.5" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="2247" x2="2275" y1="1378.5" y2="1378.5" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="2275" x2="2275" y1="1378.5" y2="1451.5" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="2275" x2="825" y1="1451.5" y2="1451.5" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="825" x2="825" y1="1451.5" y2="1810.5" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="825" x2="881" y1="1810.5" y2="1810.5" class="net_32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52"><title>s_rtc_cnt</title></line>
+<line x1="1890" x2="1958.3333333333333" y1="882.5" y2="882.5" class="net_269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289" />
+<line x1="2052" x2="2062" y1="268" y2="268" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="2062" x2="2062" y1="268" y2="394" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="2062" x2="1775" y1="394" y2="394" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="1775" x2="1775" y1="394" y2="498.5" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="1775" x2="1796.3333333333333" y1="498.5" y2="498.5" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="2052" x2="2062" y1="268" y2="268" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="2062" x2="2062" y1="268" y2="394" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="2062" x2="1850" y1="394" y2="394" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="1850" x2="1850" y1="394" y2="486" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<circle cx="1850" cy="394" r="2" style="fill:#000" class="net_74,75,76,77,78,79" />
+<circle cx="2062" cy="268" r="2" style="fill:#000" class="net_74,75,76,77,78,79" />
+<line x1="1850" x2="1870.6666666666667" y1="486" y2="486" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="2052" x2="2105.5" y1="268" y2="268" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="2105.5" x2="2105.5" y1="268" y2="42.5" class="net_74,75,76,77,78,79"><title>r_cnt6</title></line>
+<line x1="1755" x2="1796.3333333333333" y1="513.5" y2="513.5" class="net_290,291,292,293,294,295" />
+<line x1="1385" x2="1472" y1="2087.5" y2="2087.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1472" x2="1472" y1="2087.5" y2="2535.5" class="net_86"><title>s_conn_n</title></line>
+<circle cx="1472" cy="2087.5" r="2" style="fill:#000" class="net_86" />
+<circle cx="1472" cy="2535.5" r="2" style="fill:#000" class="net_86" />
+<line x1="1472" x2="1725" y1="2535.5" y2="2535.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1385" x2="1472" y1="2087.5" y2="2087.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1472" x2="1472" y1="2087.5" y2="2907.5" class="net_86"><title>s_conn_n</title></line>
+<circle cx="1472" cy="2907.5" r="2" style="fill:#000" class="net_86" />
+<line x1="1472" x2="1864" y1="2907.5" y2="2907.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1385" x2="1472" y1="2087.5" y2="2087.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1472" x2="1472" y1="2087.5" y2="1306" class="net_86"><title>s_conn_n</title></line>
+<line x1="1472" x2="1952" y1="1306" y2="1306" class="net_86"><title>s_conn_n</title></line>
+<line x1="1385" x2="1472" y1="2087.5" y2="2087.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1472" x2="1472" y1="2087.5" y2="3034.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1472" x2="1541.3333333333333" y1="3034.5" y2="3034.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1385" x2="1725" y1="2087.5" y2="2087.5" class="net_86"><title>s_conn_n</title></line>
+<line x1="1578" x2="1715" y1="2587" y2="2587" class="net_87"><title>s_lod_n</title></line>
+<line x1="1715" x2="1715" y1="2587" y2="2550.5" class="net_87"><title>s_lod_n</title></line>
+<line x1="1715" x2="1725" y1="2550.5" y2="2550.5" class="net_87"><title>s_lod_n</title></line>
+<line x1="1578" x2="1645" y1="2587" y2="2587" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1645" y1="2587" y2="2918.5" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1830" y1="2918.5" y2="2918.5" class="net_87"><title>s_lod_n</title></line>
+<line x1="1830" x2="1830" y1="2918.5" y2="2922.5" class="net_87"><title>s_lod_n</title></line>
+<circle cx="1645" cy="2587" r="2" style="fill:#000" class="net_87" />
+<circle cx="1645" cy="2918.5" r="2" style="fill:#000" class="net_87" />
+<line x1="1830" x2="1864" y1="2922.5" y2="2922.5" class="net_87"><title>s_lod_n</title></line>
+<line x1="1578" x2="1645" y1="2587" y2="2587" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1645" y1="2587" y2="2167.5" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1765" y1="2167.5" y2="2167.5" class="net_87"><title>s_lod_n</title></line>
+<line x1="1765" x2="1765" y1="2167.5" y2="2160" class="net_87"><title>s_lod_n</title></line>
+<circle cx="1645" cy="2167.5" r="2" style="fill:#000" class="net_87" />
+<line x1="1765" x2="1790" y1="2160" y2="2160" class="net_87"><title>s_lod_n</title></line>
+<line x1="1578" x2="1645" y1="2587" y2="2587" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1645" y1="2587" y2="2498" class="net_87"><title>s_lod_n</title></line>
+<circle cx="1645" cy="2498" r="2" style="fill:#000" class="net_87" />
+<line x1="1645" x2="1864" y1="2498" y2="2498" class="net_87"><title>s_lod_n</title></line>
+<line x1="1578" x2="1645" y1="2587" y2="2587" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1645" y1="2587" y2="1291" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1952" y1="1291" y2="1291" class="net_87"><title>s_lod_n</title></line>
+<line x1="1578" x2="1645" y1="2587" y2="2587" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1645" y1="2587" y2="3042" class="net_87"><title>s_lod_n</title></line>
+<line x1="1645" x2="1655" y1="3042" y2="3042" class="net_87"><title>s_lod_n</title></line>
+<line x1="1755" x2="1790" y1="2543" y2="2543" class="net_88" />
+<line x1="1750" x2="1765" y1="2600.5" y2="2600.5" class="net_89"><title>s_prq</title></line>
+<line x1="1765" x2="1765" y1="2600.5" y2="2558" class="net_89"><title>s_prq</title></line>
+<line x1="1765" x2="1790" y1="2558" y2="2558" class="net_89"><title>s_prq</title></line>
+<line x1="1894" x2="1952" y1="2915" y2="2915" class="net_91" />
+<line x1="370" x2="399" y1="2720.5" y2="2720.5" class="net_92"><title>s_zz0</title></line>
+<line x1="399" x2="399" y1="2720.5" y2="2937.5" class="net_92"><title>s_zz0</title></line>
+<line x1="399" x2="1912" y1="2937.5" y2="2937.5" class="net_92"><title>s_zz0</title></line>
+<line x1="1912" x2="1912" y1="2937.5" y2="2930" class="net_92"><title>s_zz0</title></line>
+<circle cx="399" cy="2720.5" r="2" style="fill:#000" class="net_92" />
+<line x1="1912" x2="1952" y1="2930" y2="2930" class="net_92"><title>s_zz0</title></line>
+<line x1="370" x2="399" y1="2720.5" y2="2720.5" class="net_92"><title>s_zz0</title></line>
+<line x1="399" x2="399" y1="2720.5" y2="2483" class="net_92"><title>s_zz0</title></line>
+<line x1="399" x2="1864" y1="2483" y2="2483" class="net_92"><title>s_zz0</title></line>
+<line x1="1222" x2="1279" y1="2754" y2="2754" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="1279" y1="2754" y2="1871.5" class="net_94"><title>s_rst_n</title></line>
+<circle cx="1279" cy="2754" r="2" style="fill:#000" class="net_94" />
+<circle cx="1279" cy="1871.5" r="2" style="fill:#000" class="net_94" />
+<line x1="1279" x2="1790" y1="1871.5" y2="1871.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1222" x2="1279" y1="2754" y2="2754" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="1279" y1="2754" y2="1871.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="1482" y1="1871.5" y2="1871.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1482" x2="1482" y1="1871.5" y2="2178.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1482" x2="1830" y1="2178.5" y2="2178.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1830" x2="1830" y1="2178.5" y2="2167.5" class="net_94"><title>s_rst_n</title></line>
+<circle cx="1482" cy="1871.5" r="2" style="fill:#000" class="net_94" />
+<line x1="1830" x2="1864" y1="2167.5" y2="2167.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1222" x2="1279" y1="2754" y2="2754" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="1279" y1="2754" y2="2513" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="1912" y1="2513" y2="2513" class="net_94"><title>s_rst_n</title></line>
+<line x1="1912" x2="1912" y1="2513" y2="2505.5" class="net_94"><title>s_rst_n</title></line>
+<circle cx="1279" cy="2513" r="2" style="fill:#000" class="net_94" />
+<line x1="1912" x2="1952" y1="2505.5" y2="2505.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1222" x2="1279" y1="2754" y2="2754" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="1279" y1="2754" y2="1321" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="2012" y1="1321" y2="1321" class="net_94"><title>s_rst_n</title></line>
+<line x1="2012" x2="2012" y1="1321" y2="1313.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="2012" x2="2022" y1="1313.5" y2="1313.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1222" x2="1279" y1="2754" y2="2754" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="1279" y1="2754" y2="3027" class="net_94"><title>s_rst_n</title></line>
+<line x1="1279" x2="1348.3333333333333" y1="3027" y2="3027" class="net_94"><title>s_rst_n</title></line>
+<line x1="1222" x2="1912" y1="2754" y2="2754" class="net_94"><title>s_rst_n</title></line>
+<line x1="1912" x2="1912" y1="2754" y2="2565.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1912" x2="1952" y1="2565.5" y2="2565.5" class="net_94"><title>s_rst_n</title></line>
+<line x1="1750" x2="1765" y1="2087.5" y2="2087.5" class="net_95"><title>s_conn</title></line>
+<line x1="1765" x2="1765" y1="2087.5" y2="1886.5" class="net_95"><title>s_conn</title></line>
+<line x1="1765" x2="1790" y1="1886.5" y2="1886.5" class="net_95"><title>s_conn</title></line>
+<line x1="1680" x2="1725" y1="2137.5" y2="2137.5" class="net_97"><title>s_rtc</title></line>
+<line x1="1683" x2="1705" y1="2785" y2="2785" class="net_11"><title>PRQN</title></line>
+<line x1="1705" x2="1705" y1="2785" y2="2152.5" class="net_11"><title>PRQN</title></line>
+<circle cx="1705" cy="2785" r="2" style="fill:#000" class="net_11" />
+<line x1="1705" x2="1725" y1="2152.5" y2="2152.5" class="net_11"><title>PRQN</title></line>
+<line x1="1683" x2="1705" y1="2785" y2="2785" class="net_11"><title>PRQN</title></line>
+<line x1="1705" x2="1705" y1="2785" y2="3064.5" class="net_11"><title>PRQN</title></line>
+<line x1="1705" x2="1765" y1="3064.5" y2="3064.5" class="net_11"><title>PRQN</title></line>
+<line x1="1765" x2="1765" y1="3064.5" y2="3057" class="net_11"><title>PRQN</title></line>
+<line x1="1765" x2="1790" y1="3057" y2="3057" class="net_11"><title>PRQN</title></line>
+<line x1="1683" x2="1705" y1="2785" y2="2785" class="net_11"><title>PRQN</title></line>
+<line x1="1705" x2="1705" y1="2785" y2="2600.5" class="net_11"><title>PRQN</title></line>
+<circle cx="1705" cy="2600.5" r="2" style="fill:#000" class="net_11" />
+<line x1="1705" x2="1725" y1="2600.5" y2="2600.5" class="net_11"><title>PRQN</title></line>
+<line x1="1755" x2="1790" y1="2145" y2="2145" class="net_98" />
+<line x1="1820" x2="1864" y1="2152.5" y2="2152.5" class="net_99" />
+<line x1="1894" x2="1952" y1="2490.5" y2="2490.5" class="net_101" />
+<line x1="142" x2="203" y1="2204.5" y2="2204.5" class="net_17"><title>SSTOPN</title></line>
+<line x1="142" x2="178" y1="2204.5" y2="2204.5" class="net_17"><title>SSTOPN</title></line>
+<line x1="178" x2="178" y1="2204.5" y2="2996" class="net_17"><title>SSTOPN</title></line>
+<circle cx="178" cy="2204.5" r="2" style="fill:#000" class="net_17" />
+<line x1="178" x2="2087" y1="2996" y2="2996" class="net_17"><title>SSTOPN</title></line>
+<line x1="142" x2="188" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="188" y1="1248.5" y2="2219.5" class="net_3"><title>sys_rst_n</title></line>
+<circle cx="188" cy="1248.5" r="2" style="fill:#000" class="net_3" />
+<circle cx="188" cy="2219.5" r="2" style="fill:#000" class="net_3" />
+<line x1="188" x2="203" y1="2219.5" y2="2219.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="324" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="324" y1="1248.5" y2="2198.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="582" y1="2198.5" y2="2198.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="582" x2="582" y1="2198.5" y2="2193.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="582" x2="641.3333333333334" y1="2193.5" y2="2193.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="188" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="188" y1="1248.5" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="324" y1="2372" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="324" y1="2372" y2="2442" class="net_3"><title>sys_rst_n</title></line>
+<circle cx="324" cy="2372" r="2" style="fill:#000" class="net_3" />
+<circle cx="324" cy="2442" r="2" style="fill:#000" class="net_3" />
+<line x1="324" x2="641.3333333333334" y1="2442" y2="2442" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="2152" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="188" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="188" y1="1248.5" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="324" y1="2372" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="324" y1="2372" y2="2463" class="net_3"><title>sys_rst_n</title></line>
+<circle cx="324" cy="2463" r="2" style="fill:#000" class="net_3" />
+<line x1="324" x2="345.66666666666663" y1="2463" y2="2463" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="188" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="188" y1="1248.5" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="324" y1="2372" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="324" y1="2372" y2="2743" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="572" y1="2743" y2="2743" class="net_3"><title>sys_rst_n</title></line>
+<line x1="572" x2="572" y1="2743" y2="2720.5" class="net_3"><title>sys_rst_n</title></line>
+<circle cx="324" cy="2743" r="2" style="fill:#000" class="net_3" />
+<line x1="572" x2="647" y1="2720.5" y2="2720.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="188" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="188" y1="1248.5" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="484" y1="2372" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="188" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="188" y1="1248.5" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="324" y1="2372" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="324" y1="2372" y2="2785" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="1086" y1="2785" y2="2785" class="net_3"><title>sys_rst_n</title></line>
+<line x1="1086" x2="1086" y1="2785" y2="2794" class="net_3"><title>sys_rst_n</title></line>
+<line x1="1086" x2="1191" y1="2794" y2="2794" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="324" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="324" y1="1248.5" y2="2118.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="1289" y1="2118.5" y2="2118.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="1289" x2="1289" y1="2118.5" y2="2127.5" class="net_3"><title>sys_rst_n</title></line>
+<circle cx="324" cy="1248.5" r="2" style="fill:#000" class="net_3" />
+<circle cx="324" cy="2118.5" r="2" style="fill:#000" class="net_3" />
+<line x1="1289" x2="1354" y1="2127.5" y2="2127.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="142" x2="188" y1="1248.5" y2="1248.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="188" y1="1248.5" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="188" x2="324" y1="2372" y2="2372" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="324" y1="2372" y2="2618" class="net_3"><title>sys_rst_n</title></line>
+<line x1="324" x2="1482" y1="2618" y2="2618" class="net_3"><title>sys_rst_n</title></line>
+<line x1="1482" x2="1482" y1="2618" y2="2627" class="net_3"><title>sys_rst_n</title></line>
+<circle cx="324" cy="2618" r="2" style="fill:#000" class="net_3" />
+<line x1="1482" x2="1547" y1="2627" y2="2627" class="net_3"><title>sys_rst_n</title></line>
+<line x1="233" x2="270" y1="2212" y2="2212" class="net_103" />
+<line x1="231" x2="243" y1="2279.5" y2="2279.5" class="net_19"><title>STOPN</title></line>
+<line x1="243" x2="243" y1="2279.5" y2="2227" class="net_19"><title>STOPN</title></line>
+<line x1="243" x2="270" y1="2227" y2="2227" class="net_19"><title>STOPN</title></line>
+<line x1="1982" x2="2022" y1="1298.5" y2="1298.5" class="net_105" />
+<line x1="2052" x2="2087" y1="1306" y2="1306" class="net_106" />
+<line x1="671.3333333333334" x2="735" y1="2186" y2="2186" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="735" y1="2186" y2="1332" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="2062" y1="1332" y2="1332" class="net_107"><title>s_mcl_n</title></line>
+<line x1="2062" x2="2062" y1="1332" y2="1321" class="net_107"><title>s_mcl_n</title></line>
+<circle cx="735" cy="2186" r="2" style="fill:#000" class="net_107" />
+<circle cx="735" cy="1332" r="2" style="fill:#000" class="net_107" />
+<line x1="2062" x2="2087" y1="1321" y2="1321" class="net_107"><title>s_mcl_n</title></line>
+<line x1="671.3333333333334" x2="735" y1="2186" y2="2186" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="735" y1="2186" y2="3012" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="1348.3333333333333" y1="3012" y2="3012" class="net_107"><title>s_mcl_n</title></line>
+<line x1="671.3333333333334" x2="735" y1="2186" y2="2186" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="735" y1="2186" y2="2836.5" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="1992" y1="2836.5" y2="2836.5" class="net_107"><title>s_mcl_n</title></line>
+<line x1="1992" x2="1992" y1="2836.5" y2="2573" class="net_107"><title>s_mcl_n</title></line>
+<circle cx="735" cy="2836.5" r="2" style="fill:#000" class="net_107" />
+<line x1="1992" x2="2022" y1="2573" y2="2573" class="net_107"><title>s_mcl_n</title></line>
+<line x1="671.3333333333334" x2="735" y1="2186" y2="2186" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="735" y1="2186" y2="1855.5" class="net_107"><title>s_mcl_n</title></line>
+<circle cx="735" cy="1855.5" r="2" style="fill:#000" class="net_107" />
+<line x1="735" x2="1952" y1="1855.5" y2="1855.5" class="net_107"><title>s_mcl_n</title></line>
+<line x1="671.3333333333334" x2="735" y1="2186" y2="2186" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="735" y1="2186" y2="2344.5" class="net_107"><title>s_mcl_n</title></line>
+<circle cx="735" cy="2344.5" r="2" style="fill:#000" class="net_107" />
+<line x1="735" x2="775" y1="2344.5" y2="2344.5" class="net_107"><title>s_mcl_n</title></line>
+<line x1="671.3333333333334" x2="735" y1="2186" y2="2186" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="735" y1="2186" y2="162" class="net_107"><title>s_mcl_n</title></line>
+<line x1="735" x2="2152" y1="162" y2="162" class="net_107"><title>s_mcl_n</title></line>
+<line x1="1378.3333333333333" x2="1541.3333333333333" y1="3019.5" y2="3019.5" class="net_109" />
+<line x1="1571.3333333333333" x2="1655" y1="3027" y2="3027" class="net_110" />
+<line x1="1685" x2="1725" y1="3034.5" y2="3034.5" class="net_111" />
+<line x1="370" x2="409" y1="2700.5" y2="2700.5" class="net_112"><title>s_zz1</title></line>
+<line x1="409" x2="409" y1="2700.5" y2="3057" class="net_112"><title>s_zz1</title></line>
+<line x1="409" x2="1695" y1="3057" y2="3057" class="net_112"><title>s_zz1</title></line>
+<line x1="1695" x2="1695" y1="3057" y2="3049.5" class="net_112"><title>s_zz1</title></line>
+<circle cx="409" cy="2700.5" r="2" style="fill:#000" class="net_112" />
+<line x1="1695" x2="1725" y1="3049.5" y2="3049.5" class="net_112"><title>s_zz1</title></line>
+<line x1="370" x2="647" y1="2700.5" y2="2700.5" class="net_112"><title>s_zz1</title></line>
+<line x1="370" x2="409" y1="2700.5" y2="2700.5" class="net_112"><title>s_zz1</title></line>
+<line x1="409" x2="409" y1="2700.5" y2="2352" class="net_112"><title>s_zz1</title></line>
+<circle cx="409" cy="2352" r="2" style="fill:#000" class="net_112" />
+<line x1="409" x2="484" y1="2352" y2="2352" class="net_112"><title>s_zz1</title></line>
+<line x1="370" x2="409" y1="2700.5" y2="2700.5" class="net_112"><title>s_zz1</title></line>
+<line x1="409" x2="409" y1="2700.5" y2="2774" class="net_112"><title>s_zz1</title></line>
+<circle cx="409" cy="2774" r="2" style="fill:#000" class="net_112" />
+<line x1="409" x2="1191" y1="2774" y2="2774" class="net_112"><title>s_zz1</title></line>
+<line x1="370" x2="409" y1="2700.5" y2="2700.5" class="net_112"><title>s_zz1</title></line>
+<line x1="409" x2="409" y1="2700.5" y2="2107.5" class="net_112"><title>s_zz1</title></line>
+<line x1="409" x2="1354" y1="2107.5" y2="2107.5" class="net_112"><title>s_zz1</title></line>
+<line x1="370" x2="409" y1="2700.5" y2="2700.5" class="net_112"><title>s_zz1</title></line>
+<line x1="409" x2="409" y1="2700.5" y2="2607" class="net_112"><title>s_zz1</title></line>
+<circle cx="409" cy="2607" r="2" style="fill:#000" class="net_112" />
+<line x1="409" x2="1547" y1="2607" y2="2607" class="net_112"><title>s_zz1</title></line>
+<line x1="1755" x2="1790" y1="3042" y2="3042" class="net_113" />
+<line x1="1820" x2="1864" y1="3049.5" y2="3049.5" class="net_114" />
+<line x1="1572.75" x2="1625" y1="2857.5" y2="2857.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1625" x2="1625" y1="2857.5" y2="3075.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1625" x2="1830" y1="3075.5" y2="3075.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1830" x2="1830" y1="3075.5" y2="3064.5" class="net_115"><title>s_rtc_n</title></line>
+<circle cx="1625" cy="2857.5" r="2" style="fill:#000" class="net_115" />
+<line x1="1830" x2="1864" y1="3064.5" y2="3064.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1572.75" x2="1625" y1="2857.5" y2="2857.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1625" x2="1625" y1="2857.5" y2="2137.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1625" x2="1655" y1="2137.5" y2="2137.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1572.75" x2="1625" y1="2857.5" y2="2857.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1625" x2="1625" y1="2857.5" y2="2897.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1625" x2="979" y1="2897.5" y2="2897.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="979" x2="979" y1="2897.5" y2="2057.5" class="net_115"><title>s_rtc_n</title></line>
+<circle cx="1625" cy="2897.5" r="2" style="fill:#000" class="net_115" />
+<line x1="979" x2="1023" y1="2057.5" y2="2057.5" class="net_115"><title>s_rtc_n</title></line>
+<line x1="1894" x2="1952" y1="3057" y2="3057" class="net_116" />
+<line x1="515" x2="562" y1="2332" y2="2332" class="net_29"><title>STPN</title></line>
+<line x1="562" x2="562" y1="2332" y2="3086.5" class="net_29"><title>STPN</title></line>
+<line x1="562" x2="1912" y1="3086.5" y2="3086.5" class="net_29"><title>STPN</title></line>
+<line x1="1912" x2="1912" y1="3086.5" y2="3072" class="net_29"><title>STPN</title></line>
+<circle cx="562" cy="2332" r="2" style="fill:#000" class="net_29" />
+<line x1="1912" x2="1952" y1="3072" y2="3072" class="net_29"><title>STPN</title></line>
+<line x1="515" x2="562" y1="2332" y2="2332" class="net_29"><title>STPN</title></line>
+<line x1="562" x2="562" y1="2332" y2="2660.5" class="net_29"><title>STPN</title></line>
+<circle cx="562" cy="2660.5" r="2" style="fill:#000" class="net_29" />
+<line x1="562" x2="647" y1="2660.5" y2="2660.5" class="net_29"><title>STPN</title></line>
+<line x1="515" x2="562" y1="2332" y2="2332" class="net_29"><title>STPN</title></line>
+<line x1="562" x2="562" y1="2332" y2="1183.5" class="net_29"><title>STPN</title></line>
+<line x1="562" x2="2217" y1="1183.5" y2="1183.5" class="net_29"><title>STPN</title></line>
+<line x1="1891" x2="1952" y1="2550.5" y2="2550.5" class="net_118"><title>a597_nand_out</title></line>
+<line x1="1982" x2="2022" y1="2558" y2="2558" class="net_119" />
+<line x1="2052" x2="2087" y1="2565.5" y2="2565.5" class="net_120" />
+<line x1="2047" x2="2062" y1="2922.5" y2="2922.5" class="net_121"><title>a609_nand_out</title></line>
+<line x1="2062" x2="2062" y1="2922.5" y2="2580.5" class="net_121"><title>a609_nand_out</title></line>
+<line x1="2062" x2="2087" y1="2580.5" y2="2580.5" class="net_121"><title>a609_nand_out</title></line>
+<line x1="1891" x2="1912" y1="1879" y2="1879" class="net_123"><title>a598_nand_out</title></line>
+<line x1="1912" x2="1912" y1="1879" y2="1870.5" class="net_123"><title>a598_nand_out</title></line>
+<line x1="1912" x2="1952" y1="1870.5" y2="1870.5" class="net_123"><title>a598_nand_out</title></line>
+<line x1="1982" x2="2022" y1="1863" y2="1863" class="net_124" />
+<line x1="1977" x2="1992" y1="2160" y2="2160" class="net_125"><title>a599_nand_out</title></line>
+<line x1="1992" x2="1992" y1="2160" y2="1878" class="net_125"><title>a599_nand_out</title></line>
+<line x1="1992" x2="2022" y1="1878" y2="1878" class="net_125"><title>a599_nand_out</title></line>
+<line x1="2052" x2="2087" y1="1870.5" y2="1870.5" class="net_126" />
+<line x1="2047" x2="2062" y1="2498" y2="2498" class="net_127"><title>a590_nand_out</title></line>
+<line x1="2062" x2="2062" y1="2498" y2="1885.5" class="net_127"><title>a590_nand_out</title></line>
+<line x1="2062" x2="2087" y1="1885.5" y2="1885.5" class="net_127"><title>a590_nand_out</title></line>
+<line x1="2047" x2="2062" y1="3064.5" y2="3064.5" class="net_129"><title>a592_nand_out</title></line>
+<line x1="2062" x2="2062" y1="3064.5" y2="3011" class="net_129"><title>a592_nand_out</title></line>
+<line x1="2062" x2="2087" y1="3011" y2="3011" class="net_129"><title>a592_nand_out</title></line>
+<line x1="512" x2="641.3333333333334" y1="2178.5" y2="2178.5" class="net_8"><title>EMCLN</title></line>
+<line x1="675" x2="745" y1="2318.5" y2="2318.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="745" x2="745" y1="2318.5" y2="2359.5" class="net_6"><title>CLRTIN</title></line>
+<circle cx="745" cy="2318.5" r="2" style="fill:#000" class="net_6" />
+<circle cx="745" cy="2359.5" r="2" style="fill:#000" class="net_6" />
+<line x1="745" x2="775" y1="2359.5" y2="2359.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="675" x2="745" y1="2318.5" y2="2318.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="745" x2="745" y1="2318.5" y2="2670.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="745" x2="865" y1="2670.5" y2="2670.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="675" x2="745" y1="2318.5" y2="2318.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="745" x2="745" y1="2318.5" y2="1537.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="745" x2="2165.333333333333" y1="1537.5" y2="1537.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="2165.333333333333" x2="2165.333333333333" y1="1537.5" y2="1393.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="675" x2="1361.6666666666667" y1="2318.5" y2="2318.5" class="net_6"><title>CLRTIN</title></line>
+<line x1="1361.6666666666667" x2="1361.6666666666667" y1="2318.5" y2="2230" class="net_6"><title>CLRTIN</title></line>
+<line x1="805" x2="815" y1="2352" y2="2352" class="net_131" />
+<line x1="815" x2="815" y1="2352" y2="1995" class="net_131" />
+<line x1="815" x2="874.6666666666666" y1="1995" y2="1995" class="net_131" />
+<line x1="515" x2="572" y1="2312" y2="2312" class="net_132"><title>s_stp</title></line>
+<line x1="572" x2="572" y1="2312" y2="2010" class="net_132"><title>s_stp</title></line>
+<line x1="572" x2="874.6666666666666" y1="2010" y2="2010" class="net_132"><title>s_stp</title></line>
+<line x1="500.5" x2="572" y1="2463" y2="2463" class="net_134" />
+<line x1="572" x2="572" y1="2463" y2="2457" class="net_134" />
+<line x1="572" x2="641.3333333333334" y1="2457" y2="2457" class="net_134" />
+<line x1="1382" x2="1725" y1="571.5" y2="571.5" class="net_15"><title>RTOSC</title></line>
+<line x1="1382" x2="1442" y1="571.5" y2="571.5" class="net_15"><title>RTOSC</title></line>
+<line x1="1442" x2="1442" y1="571.5" y2="592.5" class="net_15"><title>RTOSC</title></line>
+<circle cx="1442" cy="571.5" r="2" style="fill:#000" class="net_15" />
+<line x1="1442" x2="1541.3333333333333" y1="592.5" y2="592.5" class="net_15"><title>RTOSC</title></line>
+<line x1="1680" x2="1695" y1="592.5" y2="592.5" class="net_136" />
+<line x1="1695" x2="1695" y1="592.5" y2="586.5" class="net_136" />
+<line x1="1695" x2="1725" y1="586.5" y2="586.5" class="net_136" />
+<line x1="1982" x2="2012" y1="932.5" y2="932.5" class="net_138"><title>r_q633</title></line>
+<line x1="2012" x2="2012" y1="932.5" y2="555.5" class="net_138"><title>r_q633</title></line>
+<line x1="2012" x2="1432" y1="555.5" y2="555.5" class="net_138"><title>r_q633</title></line>
+<line x1="1432" x2="1432" y1="555.5" y2="1009.5" class="net_138"><title>r_q633</title></line>
+<circle cx="2012" cy="932.5" r="2" style="fill:#000" class="net_138" />
+<line x1="1432" x2="1547" y1="1009.5" y2="1009.5" class="net_138"><title>r_q633</title></line>
+<line x1="1982" x2="2012" y1="932.5" y2="932.5" class="net_138"><title>r_q633</title></line>
+<line x1="2012" x2="2012" y1="932.5" y2="555.5" class="net_138"><title>r_q633</title></line>
+<line x1="2012" x2="1705" y1="555.5" y2="555.5" class="net_138"><title>r_q633</title></line>
+<line x1="1705" x2="1705" y1="555.5" y2="667.5" class="net_138"><title>r_q633</title></line>
+<circle cx="1705" cy="555.5" r="2" style="fill:#000" class="net_138" />
+<line x1="1705" x2="1725" y1="667.5" y2="667.5" class="net_138"><title>r_q633</title></line>
+<line x1="1982" x2="2022" y1="932.5" y2="932.5" class="net_138"><title>r_q633</title></line>
+<line x1="1982" x2="2012" y1="932.5" y2="932.5" class="net_138"><title>r_q633</title></line>
+<line x1="2012" x2="2012" y1="932.5" y2="555.5" class="net_138"><title>r_q633</title></line>
+<line x1="2012" x2="1912" y1="555.5" y2="555.5" class="net_138"><title>r_q633</title></line>
+<line x1="1912" x2="1912" y1="555.5" y2="627.5" class="net_138"><title>r_q633</title></line>
+<line x1="1912" x2="1775" y1="627.5" y2="627.5" class="net_138"><title>r_q633</title></line>
+<line x1="1775" x2="1775" y1="627.5" y2="647.5" class="net_138"><title>r_q633</title></line>
+<circle cx="1912" cy="555.5" r="2" style="fill:#000" class="net_138" />
+<line x1="1775" x2="1796.6666666666667" y1="647.5" y2="647.5" class="net_138"><title>r_q633</title></line>
+<line x1="2242" x2="2275" y1="1612.5" y2="1612.5" class="net_139" />
+<line x1="2275" x2="2275" y1="1612.5" y2="1462.5" class="net_139" />
+<line x1="2275" x2="1482" y1="1462.5" y2="1462.5" class="net_139" />
+<line x1="1482" x2="1482" y1="1462.5" y2="1024.5" class="net_139" />
+<line x1="1482" x2="1547" y1="1024.5" y2="1024.5" class="net_139" />
+<line x1="798.3333333333334" x2="881" y1="1825.5" y2="1825.5" class="net_141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161"><title>s_rtc_limit</title></line>
+<line x1="1042" x2="1182.5" y1="1947.5" y2="1947.5" class="net_7"><title>CONTINUEN</title></line>
+<line x1="1219" x2="1345.5" y1="1892.5" y2="1892.5" class="net_9"><title>LOADN</title></line>
+<line x1="296" x2="349" y1="2352" y2="2352" class="net_18"><title>STARTN</title></line>
+<line x1="1820" x2="1866" y1="2550.5" y2="2550.5" class="net_90" />
+<line x1="1982" x2="2022" y1="2922.5" y2="2922.5" class="net_93" />
+<line x1="1820" x2="1866" y1="1879" y2="1879" class="net_96" />
+<line x1="1894" x2="1952" y1="2160" y2="2160" class="net_100" />
+<line x1="1982" x2="2022" y1="2498" y2="2498" class="net_102" />
+<line x1="300" x2="349" y1="2219.5" y2="2219.5" class="net_104" />
+<line x1="2117" x2="2152" y1="1313.5" y2="1313.5" class="net_108" />
+<line x1="1982" x2="2022" y1="3064.5" y2="3064.5" class="net_117" />
+<line x1="2117" x2="2152" y1="2573" y2="2573" class="net_122" />
+<line x1="2117" x2="2127" y1="1878" y2="1878" class="net_128" />
+<line x1="2127" x2="2127" y1="1878" y2="1557.5" class="net_128" />
+<line x1="2127" x2="2152" y1="1557.5" y2="1557.5" class="net_128" />
+<line x1="2117" x2="2152" y1="3003.5" y2="3003.5" class="net_130" />
+<line x1="2117" x2="2137" y1="433.5" y2="433.5" class="net_167" />
+<line x1="2137" x2="2137" y1="433.5" y2="227" class="net_167" />
+<line x1="2137" x2="2152" y1="227" y2="227" class="net_167" />
+<line x1="805" x2="879.5" y1="1743" y2="1743" class="net_168" />
+<line x1="904.6666666666666" x2="1017.5" y1="2002.5" y2="2002.5" class="net_133" />
+<line x1="375.66666666666663" x2="475.5" y1="2463" y2="2463" class="net_171"><title>r_a572_clear_n_d</title></line>
+<line x1="896" x2="1017.5" y1="2670.5" y2="2670.5" class="net_172"><title>r_a572_q</title></line>
+<line x1="896" x2="959" y1="2670.5" y2="2670.5" class="net_172"><title>r_a572_q</title></line>
+<line x1="959" x2="959" y1="2670.5" y2="2640" class="net_172"><title>r_a572_q</title></line>
+<line x1="959" x2="755" y1="2640" y2="2640" class="net_172"><title>r_a572_q</title></line>
+<line x1="755" x2="755" y1="2640" y2="2409.5" class="net_172"><title>r_a572_q</title></line>
+<circle cx="959" cy="2670.5" r="2" style="fill:#000" class="net_172" />
+<line x1="755" x2="781.6666666666666" y1="2409.5" y2="2409.5" class="net_172"><title>r_a572_q</title></line>
+<line x1="1571.3333333333333" x2="1655" y1="592.5" y2="592.5" class="net_174"><title>r_rtosc_d</title></line>
+<line x1="1887.3333333333333" x2="1912" y1="983.5" y2="983.5" class="net_176"><title>s_q633_next</title></line>
+<line x1="1912" x2="1912" y1="983.5" y2="1503.5" class="net_176"><title>s_q633_next</title></line>
+<line x1="1912" x2="2192" y1="1503.5" y2="1503.5" class="net_176"><title>s_q633_next</title></line>
+<line x1="2192" x2="2192" y1="1503.5" y2="1612.5" class="net_176"><title>s_q633_next</title></line>
+<circle cx="1912" cy="983.5" r="2" style="fill:#000" class="net_176" />
+<line x1="2192" x2="2217" y1="1612.5" y2="1612.5" class="net_176"><title>s_q633_next</title></line>
+<line x1="1887.3333333333333" x2="1912" y1="983.5" y2="983.5" class="net_176"><title>s_q633_next</title></line>
+<line x1="1912" x2="1912" y1="983.5" y2="932.5" class="net_176"><title>s_q633_next</title></line>
+<line x1="1912" x2="1952" y1="932.5" y2="932.5" class="net_176"><title>s_q633_next</title></line>
+<line x1="2117" x2="2127" y1="353" y2="353" class="net_177"><title>r_q629</title></line>
+<line x1="2127" x2="2127" y1="353" y2="151" class="net_177"><title>r_q629</title></line>
+<line x1="2127" x2="1850" y1="151" y2="151" class="net_177"><title>r_q629</title></line>
+<line x1="1850" x2="1850" y1="151" y2="227" class="net_177"><title>r_q629</title></line>
+<line x1="1850" x2="1860" y1="227" y2="227" class="net_177"><title>r_q629</title></line>
+<line x1="2117" x2="2127" y1="353" y2="353" class="net_177"><title>r_q629</title></line>
+<line x1="2127" x2="2127" y1="353" y2="97" class="net_177"><title>r_q629</title></line>
+<line x1="2127" x2="2152" y1="97" y2="97" class="net_177"><title>r_q629</title></line>
+<line x1="2117" x2="2127" y1="353" y2="353" class="net_177"><title>r_q629</title></line>
+<line x1="2127" x2="2127" y1="353" y2="151" class="net_177"><title>r_q629</title></line>
+<line x1="2127" x2="1912" y1="151" y2="151" class="net_177"><title>r_q629</title></line>
+<line x1="1912" x2="1912" y1="151" y2="207" class="net_177"><title>r_q629</title></line>
+<circle cx="1912" cy="151" r="2" style="fill:#000" class="net_177" />
+<circle cx="2127" cy="151" r="2" style="fill:#000" class="net_177" />
+<line x1="1912" x2="1958.6666666666667" y1="207" y2="207" class="net_177"><title>r_q629</title></line>
+<line x1="2110" x2="2152" y1="32" y2="32" class="net_79"><title>r_cnt6[5]</title></line>
+<line x1="2052" x2="2090" y1="426" y2="426" class="net_180"><title>r_a631_q</title></line>
+<line x1="2052" x2="2062" y1="426" y2="426" class="net_180"><title>r_a631_q</title></line>
+<line x1="2062" x2="2062" y1="426" y2="466" class="net_180"><title>r_a631_q</title></line>
+<line x1="2062" x2="1840" y1="466" y2="466" class="net_180"><title>r_a631_q</title></line>
+<line x1="1840" x2="1840" y1="466" y2="576.5" class="net_180"><title>r_a631_q</title></line>
+<circle cx="2062" cy="426" r="2" style="fill:#000" class="net_180" />
+<line x1="1840" x2="1870.6666666666667" y1="576.5" y2="576.5" class="net_180"><title>r_a631_q</title></line>
+<line x1="2047" x2="2072" y1="932.5" y2="932.5" class="net_179"><title>s_rfclk</title></line>
+<line x1="2072" x2="2072" y1="932.5" y2="441" class="net_179"><title>s_rfclk</title></line>
+<line x1="2072" x2="2090" y1="441" y2="441" class="net_179"><title>s_rfclk</title></line>
+<line x1="675" x2="755" y1="1132.5" y2="1132.5" class="net_5"><title>CLOSC</title></line>
+<line x1="755" x2="755" y1="1132.5" y2="1735.5" class="net_5"><title>CLOSC</title></line>
+<circle cx="755" cy="1132.5" r="2" style="fill:#000" class="net_5" />
+<line x1="755" x2="778" y1="1735.5" y2="1735.5" class="net_5"><title>CLOSC</title></line>
+<line x1="675" x2="755" y1="1132.5" y2="1132.5" class="net_5"><title>CLOSC</title></line>
+<line x1="755" x2="755" y1="1132.5" y2="383" class="net_5"><title>CLOSC</title></line>
+<line x1="755" x2="2035.3333333333333" y1="383" y2="383" class="net_5"><title>CLOSC</title></line>
+<line x1="2035.3333333333333" x2="2035.3333333333333" y1="383" y2="368" class="net_5"><title>CLOSC</title></line>
+<line x1="675" x2="1877.3333333333333" y1="1132.5" y2="1132.5" class="net_5"><title>CLOSC</title></line>
+<line x1="1877.3333333333333" x2="1877.3333333333333" y1="1132.5" y2="998.5" class="net_5"><title>CLOSC</title></line>
+<line x1="675" x2="778" y1="1750.5" y2="1750.5" class="net_14"><title>RESET</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="765" y1="288" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="765" y1="288" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="1269" y1="405" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="1269" x2="1269" y1="405" y2="612.5" class="net_2"><title>sysclk</title></line>
+<circle cx="314" cy="2287" r="2" style="fill:#000" class="net_2" />
+<circle cx="1269" cy="405" r="2" style="fill:#000" class="net_2" />
+<line x1="1269" x2="1541.3333333333333" y1="612.5" y2="612.5" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="765" y1="288" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="765" y1="288" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="1126" y1="405" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="1126" x2="1126" y1="405" y2="952.5" class="net_2"><title>sysclk</title></line>
+<circle cx="1126" cy="405" r="2" style="fill:#000" class="net_2" />
+<line x1="1126" x2="1952" y1="952.5" y2="952.5" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="765" y1="288" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="765" y1="288" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="2072" y1="405" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="2072" x2="2072" y1="405" y2="373" class="net_2"><title>sysclk</title></line>
+<circle cx="765" cy="288" r="2" style="fill:#000" class="net_2" />
+<line x1="2072" x2="2087" y1="373" y2="373" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="2022" y1="288" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="765" y1="288" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="765" y1="288" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="979" y1="405" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="979" x2="979" y1="405" y2="1110.5" class="net_2"><title>sysclk</title></line>
+<line x1="979" x2="1765" y1="1110.5" y2="1110.5" class="net_2"><title>sysclk</title></line>
+<line x1="1765" x2="1765" y1="1110.5" y2="1069.5" class="net_2"><title>sysclk</title></line>
+<circle cx="979" cy="405" r="2" style="fill:#000" class="net_2" />
+<line x1="1765" x2="1790" y1="1069.5" y2="1069.5" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="765" y1="288" y2="288" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="765" y1="288" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="765" x2="1695" y1="405" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="1695" x2="1695" y1="405" y2="533.5" class="net_2"><title>sysclk</title></line>
+<line x1="1695" x2="1830" y1="533.5" y2="533.5" class="net_2"><title>sysclk</title></line>
+<line x1="1830" x2="1830" y1="533.5" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="1830" x2="2012" y1="405" y2="405" class="net_2"><title>sysclk</title></line>
+<line x1="2012" x2="2012" y1="405" y2="446" class="net_2"><title>sysclk</title></line>
+<circle cx="1695" cy="405" r="2" style="fill:#000" class="net_2" />
+<circle cx="1830" cy="405" r="2" style="fill:#000" class="net_2" />
+<circle cx="2012" cy="405" r="2" style="fill:#000" class="net_2" />
+<line x1="2012" x2="2022" y1="446" y2="446" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="1440.5" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="2192" y1="1440.5" y2="1440.5" class="net_2"><title>sysclk</title></line>
+<line x1="2192" x2="2192" y1="1440.5" y2="1398.5" class="net_2"><title>sysclk</title></line>
+<circle cx="314" cy="1440.5" r="2" style="fill:#000" class="net_2" />
+<line x1="2192" x2="2217" y1="1398.5" y2="1398.5" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="2796" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="745" y1="2796" y2="2796" class="net_2"><title>sysclk</title></line>
+<line x1="745" x2="745" y1="2796" y2="2877.5" class="net_2"><title>sysclk</title></line>
+<circle cx="745" cy="2796" r="2" style="fill:#000" class="net_2" />
+<line x1="745" x2="1542.75" y1="2877.5" y2="2877.5" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="2763" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="815" y1="2763" y2="2763" class="net_2"><title>sysclk</title></line>
+<line x1="815" x2="815" y1="2763" y2="2690.5" class="net_2"><title>sysclk</title></line>
+<circle cx="314" cy="2763" r="2" style="fill:#000" class="net_2" />
+<line x1="815" x2="865" y1="2690.5" y2="2690.5" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="2483" class="net_2"><title>sysclk</title></line>
+<circle cx="314" cy="2483" r="2" style="fill:#000" class="net_2" />
+<line x1="314" x2="345.66666666666663" y1="2483" y2="2483" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="2763" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="582" y1="2763" y2="2763" class="net_2"><title>sysclk</title></line>
+<line x1="582" x2="582" y1="2763" y2="2740.5" class="net_2"><title>sysclk</title></line>
+<circle cx="582" cy="2763" r="2" style="fill:#000" class="net_2" />
+<line x1="582" x2="647" y1="2740.5" y2="2740.5" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="2383" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="419" y1="2383" y2="2383" class="net_2"><title>sysclk</title></line>
+<line x1="419" x2="419" y1="2383" y2="2392" class="net_2"><title>sysclk</title></line>
+<circle cx="314" cy="2383" r="2" style="fill:#000" class="net_2" />
+<line x1="419" x2="484" y1="2392" y2="2392" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="2796" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="1086" y1="2796" y2="2796" class="net_2"><title>sysclk</title></line>
+<line x1="1086" x2="1086" y1="2796" y2="2814" class="net_2"><title>sysclk</title></line>
+<line x1="1086" x2="1191" y1="2814" y2="2814" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="2147.5" class="net_2"><title>sysclk</title></line>
+<circle cx="314" cy="2147.5" r="2" style="fill:#000" class="net_2" />
+<line x1="314" x2="1354" y1="2147.5" y2="2147.5" class="net_2"><title>sysclk</title></line>
+<line x1="296" x2="314" y1="2287" y2="2287" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="314" y1="2287" y2="2629" class="net_2"><title>sysclk</title></line>
+<line x1="314" x2="1482" y1="2629" y2="2629" class="net_2"><title>sysclk</title></line>
+<line x1="1482" x2="1482" y1="2629" y2="2647" class="net_2"><title>sysclk</title></line>
+<circle cx="314" cy="2629" r="2" style="fill:#000" class="net_2" />
+<line x1="1482" x2="1547" y1="2647" y2="2647" class="net_2"><title>sysclk</title></line>
+<line x1="2045.3333333333333" x2="2087" y1="353" y2="353" class="net_181" />
+<line x1="1975.3333333333333" x2="1992" y1="727.5" y2="727.5" class="net_182,183,184,185,186,187" />
+<line x1="1992" x2="1992" y1="727.5" y2="268" class="net_182,183,184,185,186,187" />
+<line x1="1992" x2="2022" y1="268" y2="268" class="net_182,183,184,185,186,187" />
+<line x1="1748.3333333333333" x2="1790" y1="1049.5" y2="1049.5" class="net_188" />
+<line x1="1975.3333333333333" x2="2002" y1="787.5" y2="787.5" class="net_189" />
+<line x1="2002" x2="2002" y1="787.5" y2="426" class="net_189" />
+<line x1="2002" x2="2022" y1="426" y2="426" class="net_189" />
+<line x1="2175.333333333333" x2="2217" y1="1378.5" y2="1378.5" class="net_190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210" />
+<line x1="1371.6666666666667" x2="1442" y1="2215" y2="2215" class="net_211" />
+<line x1="1442" x2="1442" y1="2215" y2="2857.5" class="net_211" />
+<line x1="1442" x2="1542.75" y1="2857.5" y2="2857.5" class="net_211" />
+<line x1="801.6666666666666" x2="825" y1="2419.5" y2="2419.5" class="net_212" />
+<line x1="825" x2="825" y1="2419.5" y2="2710.5" class="net_212" />
+<line x1="825" x2="865" y1="2710.5" y2="2710.5" class="net_212" />
+<line x1="1820" x2="1830" y1="1049.5" y2="1049.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1830" x2="1830" y1="1049.5" y2="596.5" class="net_28"><title>REFRQN</title></line>
+<circle cx="1830" cy="1049.5" r="2" style="fill:#000" class="net_28" />
+<line x1="1830" x2="1870.6666666666667" y1="596.5" y2="596.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1820" x2="1830" y1="1049.5" y2="1049.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1830" x2="1830" y1="1049.5" y2="1121.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1830" x2="1625" y1="1121.5" y2="1121.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1625" x2="1625" y1="1121.5" y2="1060.5" class="net_28"><title>REFRQN</title></line>
+<circle cx="1830" cy="1121.5" r="2" style="fill:#000" class="net_28" />
+<line x1="1625" x2="1661.6666666666667" y1="1060.5" y2="1060.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1820" x2="1830" y1="1049.5" y2="1049.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1830" x2="1830" y1="1049.5" y2="1492.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1830" x2="2217" y1="1492.5" y2="1492.5" class="net_28"><title>REFRQN</title></line>
+<line x1="1577" x2="1635" y1="1017" y2="1017" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1635" x2="1635" y1="1017" y2="616.5" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1635" x2="1880.6666666666667" y1="616.5" y2="616.5" class="net_140"><title>s_rfclk_rise</title></line>
+<circle cx="1635" cy="1017" r="2" style="fill:#000" class="net_140" />
+<line x1="1880.6666666666667" x2="1880.6666666666667" y1="616.5" y2="601.5" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1577" x2="1635" y1="1017" y2="1017" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1635" x2="1635" y1="1017" y2="1100.5" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1635" x2="1671.6666666666667" y1="1100.5" y2="1100.5" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1671.6666666666667" x2="1671.6666666666667" y1="1100.5" y2="1085.5" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1577" x2="1635" y1="1017" y2="1017" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1635" x2="1635" y1="1017" y2="616.5" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1635" x2="1695" y1="616.5" y2="616.5" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1695" x2="1695" y1="616.5" y2="697.5" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1695" x2="1968.6666666666667" y1="697.5" y2="697.5" class="net_140"><title>s_rfclk_rise</title></line>
+<circle cx="1695" cy="616.5" r="2" style="fill:#000" class="net_140" />
+<line x1="1968.6666666666667" x2="1968.6666666666667" y1="697.5" y2="232" class="net_140"><title>s_rfclk_rise</title></line>
+<line x1="1044" x2="1116" y1="1677.5" y2="1677.5" class="net_296" />
+<line x1="1116" x2="1116" y1="1677.5" y2="777.5" class="net_296" />
+<circle cx="1116" cy="1677.5" r="2" style="fill:#000" class="net_296" />
+<line x1="1116" x2="1955.3333333333333" y1="777.5" y2="777.5" class="net_296" />
+<line x1="1044" x2="1116" y1="1677.5" y2="1677.5" class="net_296" />
+<line x1="1116" x2="1116" y1="1677.5" y2="1039.5" class="net_296" />
+<circle cx="1116" cy="1039.5" r="2" style="fill:#000" class="net_296" />
+<line x1="1116" x2="1728.3333333333333" y1="1039.5" y2="1039.5" class="net_296" />
+<line x1="1044" x2="1116" y1="1677.5" y2="1677.5" class="net_296" />
+<line x1="1116" x2="1116" y1="1677.5" y2="2246" class="net_296" />
+<line x1="1116" x2="1188.6666666666667" y1="2246" y2="2246" class="net_296" />
+<line x1="1044" x2="1116" y1="1677.5" y2="1677.5" class="net_296" />
+<line x1="1116" x2="1116" y1="1677.5" y2="2205" class="net_296" />
+<circle cx="1116" cy="2205" r="2" style="fill:#000" class="net_296" />
+<line x1="1116" x2="1351.6666666666667" y1="2205" y2="2205" class="net_296" />
+<line x1="1044" x2="2217" y1="1677.5" y2="1677.5" class="net_296" />
+<line x1="1890.6666666666667" x2="1922" y1="586.5" y2="586.5" class="net_213" />
+<line x1="1922" x2="1922" y1="586.5" y2="797.5" class="net_213" />
+<line x1="1922" x2="1955.3333333333333" y1="797.5" y2="797.5" class="net_213" />
+<line x1="1888" x2="1965.3333333333333" y1="817.5" y2="817.5" class="net_4"><title>BDRY50N</title></line>
+<line x1="1965.3333333333333" x2="1965.3333333333333" y1="817.5" y2="802.5" class="net_4"><title>BDRY50N</title></line>
+<line x1="895" x2="969" y1="436" y2="436" class="net_297" />
+<line x1="969" x2="969" y1="436" y2="993.5" class="net_297" />
+<line x1="969" x2="1126" y1="993.5" y2="993.5" class="net_297" />
+<line x1="1126" x2="1126" y1="993.5" y2="1080.5" class="net_297" />
+<circle cx="969" cy="436" r="2" style="fill:#000" class="net_297" />
+<circle cx="969" cy="993.5" r="2" style="fill:#000" class="net_297" />
+<circle cx="1126" cy="993.5" r="2" style="fill:#000" class="net_297" />
+<line x1="1126" x2="1661.6666666666667" y1="1080.5" y2="1080.5" class="net_297" />
+<line x1="895" x2="969" y1="436" y2="436" class="net_297" />
+<line x1="969" x2="969" y1="436" y2="363" class="net_297" />
+<line x1="969" x2="2025.3333333333333" y1="363" y2="363" class="net_297" />
+<line x1="895" x2="969" y1="436" y2="436" class="net_297" />
+<line x1="969" x2="969" y1="436" y2="2077.5" class="net_297" />
+<line x1="969" x2="1023" y1="2077.5" y2="2077.5" class="net_297" />
+<line x1="895" x2="969" y1="436" y2="436" class="net_297" />
+<line x1="969" x2="969" y1="436" y2="993.5" class="net_297" />
+<line x1="969" x2="1867.3333333333333" y1="993.5" y2="993.5" class="net_297" />
+<line x1="1681.6666666666667" x2="1695" y1="1070.5" y2="1070.5" class="net_214" />
+<line x1="1695" x2="1695" y1="1070.5" y2="1059.5" class="net_214" />
+<line x1="1695" x2="1728.3333333333333" y1="1059.5" y2="1059.5" class="net_214" />
+<line x1="1683" x2="1738.3333333333333" y1="1163.5" y2="1163.5" class="net_13"><title>REFN</title></line>
+<line x1="1738.3333333333333" x2="1738.3333333333333" y1="1163.5" y2="1064.5" class="net_13"><title>REFN</title></line>
+<line x1="1818.3333333333333" x2="1870.6666666666667" y1="506" y2="506" class="net_80,81,82,83,84,85" />
+<line x1="1755" x2="1765" y1="579" y2="579" class="net_137"><title>s_rtosc_rise</title></line>
+<line x1="1765" x2="1765" y1="579" y2="544.5" class="net_137"><title>s_rtosc_rise</title></line>
+<line x1="1765" x2="1880.6666666666667" y1="544.5" y2="544.5" class="net_137"><title>s_rtosc_rise</title></line>
+<circle cx="1765" cy="579" r="2" style="fill:#000" class="net_137" />
+<line x1="1880.6666666666667" x2="1880.6666666666667" y1="544.5" y2="511" class="net_137"><title>s_rtosc_rise</title></line>
+<line x1="1755" x2="1765" y1="579" y2="579" class="net_137"><title>s_rtosc_rise</title></line>
+<line x1="1765" x2="1765" y1="579" y2="687.5" class="net_137"><title>s_rtosc_rise</title></line>
+<line x1="1765" x2="1806.6666666666667" y1="687.5" y2="687.5" class="net_137"><title>s_rtosc_rise</title></line>
+<line x1="1806.6666666666667" x2="1806.6666666666667" y1="687.5" y2="672.5" class="net_137"><title>s_rtosc_rise</title></line>
+<line x1="1890.6666666666667" x2="1942" y1="496" y2="496" class="net_215,216,217,218,219,220" />
+<line x1="1942" x2="1942" y1="496" y2="717.5" class="net_215,216,217,218,219,220" />
+<line x1="1942" x2="1955.3333333333333" y1="717.5" y2="717.5" class="net_215,216,217,218,219,220" />
+<line x1="1890" x2="1955.3333333333333" y1="737.5" y2="737.5" class="net_299,300,301,302,303,304" />
+<line x1="1045" x2="1086" y1="1743" y2="1743" class="net_221"><title>s_rescl</title></line>
+<line x1="1086" x2="1086" y1="1743" y2="757.5" class="net_221"><title>s_rescl</title></line>
+<line x1="1086" x2="1965.3333333333333" y1="757.5" y2="757.5" class="net_221"><title>s_rescl</title></line>
+<circle cx="1086" cy="1743" r="2" style="fill:#000" class="net_221" />
+<line x1="1965.3333333333333" x2="1965.3333333333333" y1="757.5" y2="742.5" class="net_221"><title>s_rescl</title></line>
+<line x1="1045" x2="2100.333333333333" y1="1743" y2="1743" class="net_221"><title>s_rescl</title></line>
+<line x1="2100.333333333333" x2="2100.333333333333" y1="1743" y2="1424.5" class="net_221"><title>s_rescl</title></line>
+<line x1="1045" x2="1086" y1="1743" y2="1743" class="net_221"><title>s_rescl</title></line>
+<line x1="1086" x2="1086" y1="1743" y2="2640" class="net_221"><title>s_rescl</title></line>
+<line x1="1086" x2="1198.6666666666667" y1="2640" y2="2640" class="net_221"><title>s_rescl</title></line>
+<line x1="1198.6666666666667" x2="1198.6666666666667" y1="2640" y2="2251" class="net_221"><title>s_rescl</title></line>
+<line x1="1885" x2="1958.6666666666667" y1="227" y2="227" class="net_178" />
+<line x1="1978.6666666666667" x2="2002" y1="217" y2="217" class="net_222" />
+<line x1="2002" x2="2002" y1="217" y2="343" class="net_222" />
+<line x1="2002" x2="2025.3333333333333" y1="343" y2="343" class="net_222" />
+<line x1="1980.3333333333333" x2="2002" y1="875" y2="875" class="net_53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73" />
+<line x1="2002" x2="2002" y1="875" y2="1389.5" class="net_53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73" />
+<line x1="2002" x2="2025.3333333333333" y1="1389.5" y2="1389.5" class="net_53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73" />
+<line x1="1982" x2="1992" y1="1368.5" y2="1368.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="1992" x2="1992" y1="1368.5" y2="1409.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<circle cx="1992" cy="1368.5" r="2" style="fill:#000" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<circle cx="1992" cy="1409.5" r="2" style="fill:#000" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="1992" x2="2025.3333333333333" y1="1409.5" y2="1409.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="1982" x2="1992" y1="1368.5" y2="1368.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="1992" x2="1992" y1="1368.5" y2="1429.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="1992" x2="2062" y1="1429.5" y2="1429.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="2062" x2="2062" y1="1429.5" y2="1419.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="2062" x2="2090.333333333333" y1="1419.5" y2="1419.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="1982" x2="2155.333333333333" y1="1368.5" y2="1368.5" class="net_306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326" />
+<line x1="903" x2="2035.3333333333333" y1="1818" y2="1818" class="net_162" />
+<line x1="2035.3333333333333" x2="2035.3333333333333" y1="1818" y2="1414.5" class="net_162" />
+<line x1="903" x2="959" y1="1818" y2="1818" class="net_162" />
+<line x1="959" x2="959" y1="1818" y2="2097.5" class="net_162" />
+<line x1="959" x2="1033" y1="2097.5" y2="2097.5" class="net_162" />
+<circle cx="959" cy="1818" r="2" style="fill:#000" class="net_162" />
+<line x1="1033" x2="1033" y1="2097.5" y2="2082.5" class="net_162" />
+<line x1="2045.3333333333333" x2="2090.333333333333" y1="1399.5" y2="1399.5" class="net_223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243" />
+<line x1="2110.333333333333" x2="2127" y1="1409.5" y2="1409.5" class="net_244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264" />
+<line x1="2127" x2="2127" y1="1409.5" y2="1388.5" class="net_244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264" />
+<line x1="2127" x2="2155.333333333333" y1="1388.5" y2="1388.5" class="net_244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264" />
+<line x1="1043" x2="1106" y1="2067.5" y2="2067.5" class="net_265" />
+<line x1="1106" x2="1106" y1="2067.5" y2="2226" class="net_265" />
+<line x1="1106" x2="1188.6666666666667" y1="2226" y2="2226" class="net_265" />
+<line x1="1208.6666666666667" x2="1289" y1="2236" y2="2236" class="net_266" />
+<line x1="1289" x2="1289" y1="2236" y2="2225" class="net_266" />
+<line x1="1289" x2="1351.6666666666667" y1="2225" y2="2225" class="net_266" />
+<line x1="678" x2="765" y1="2680.5" y2="2680.5" class="net_267"><title>s_esload_n</title></line>
+<line x1="765" x2="765" y1="2680.5" y2="2429.5" class="net_267"><title>s_esload_n</title></line>
+<line x1="765" x2="781.6666666666666" y1="2429.5" y2="2429.5" class="net_267"><title>s_esload_n</title></line>
+<line x1="671.3333333333334" x2="791.6666666666666" y1="2449.5" y2="2449.5" class="net_135"><title>s_a572_clearn_rise</title></line>
+<line x1="791.6666666666666" x2="791.6666666666666" y1="2449.5" y2="2434.5" class="net_135"><title>s_a572_clearn_rise</title></line>
+<line x1="677" x2="778.3333333333334" y1="1815.5" y2="1815.5" class="net_372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392" />
+<line x1="677" x2="725" y1="1880.5" y2="1880.5" class="net_393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413" />
+<line x1="725" x2="725" y1="1880.5" y2="1835.5" class="net_393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413" />
+<line x1="725" x2="778.3333333333334" y1="1835.5" y2="1835.5" class="net_393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413" />
+<line x1="675" x2="755" y1="2253.5" y2="2253.5" class="net_16"><title>SEL5MSN</title></line>
+<line x1="755" x2="755" y1="2253.5" y2="2329.5" class="net_16"><title>SEL5MSN</title></line>
+<line x1="755" x2="788.3333333333334" y1="2329.5" y2="2329.5" class="net_16"><title>SEL5MSN</title></line>
+<line x1="788.3333333333334" x2="788.3333333333334" y1="2329.5" y2="1840.5" class="net_16"><title>SEL5MSN</title></line>
+<line x1="1750" x2="1796.6666666666667" y1="667.5" y2="667.5" class="net_175" />
+<line x1="1816.6666666666667" x2="1840" y1="657.5" y2="657.5" class="net_268" />
+<line x1="1840" x2="1840" y1="657.5" y2="973.5" class="net_268" />
+<line x1="1840" x2="1867.3333333333333" y1="973.5" y2="973.5" class="net_268" />
+<line x1="512" x2="647" y1="2680.5" y2="2680.5" class="net_12"><title>PWCL</title></line>
+<line x1="374" x2="419" y1="2219.5" y2="2219.5" class="net_166"><title>a580_nand_out</title></line>
+<line x1="419" x2="419" y1="2219.5" y2="2312" class="net_166"><title>a580_nand_out</title></line>
+<line x1="419" x2="484" y1="2312" y2="2312" class="net_166"><title>a580_nand_out</title></line>
+<line x1="374" x2="399" y1="2352" y2="2352" class="net_165"><title>s_start</title></line>
+<line x1="399" x2="399" y1="2352" y2="2332" class="net_165"><title>s_start</title></line>
+<line x1="399" x2="484" y1="2332" y2="2332" class="net_165"><title>s_start</title></line>
+<line x1="1042.5" x2="1106" y1="2670.5" y2="2670.5" class="net_173"><title>s_lrst</title></line>
+<line x1="1106" x2="1106" y1="2670.5" y2="2734" class="net_173"><title>s_lrst</title></line>
+<line x1="1106" x2="1191" y1="2734" y2="2734" class="net_173"><title>s_lrst</title></line>
+<line x1="1042.5" x2="1096" y1="2002.5" y2="2002.5" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1096" x2="1096" y1="2002.5" y2="2754" class="net_170"><title>s_a579_out_n</title></line>
+<circle cx="1096" cy="2002.5" r="2" style="fill:#000" class="net_170" />
+<line x1="1096" x2="1191" y1="2754" y2="2754" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1042.5" x2="1269" y1="2002.5" y2="2002.5" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1269" x2="1269" y1="2002.5" y2="2087.5" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1269" x2="1354" y1="2087.5" y2="2087.5" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1042.5" x2="1096" y1="2002.5" y2="2002.5" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1096" x2="1096" y1="2002.5" y2="2524" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1096" x2="1452" y1="2524" y2="2524" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1452" x2="1452" y1="2524" y2="2587" class="net_170"><title>s_a579_out_n</title></line>
+<circle cx="1096" cy="2524" r="2" style="fill:#000" class="net_170" />
+<line x1="1452" x2="1547" y1="2587" y2="2587" class="net_170"><title>s_a579_out_n</title></line>
+<line x1="1207.5" x2="1289" y1="1947.5" y2="1947.5" class="net_163"><title>s_continue</title></line>
+<line x1="1289" x2="1289" y1="1947.5" y2="2067.5" class="net_163"><title>s_continue</title></line>
+<line x1="1289" x2="1354" y1="2067.5" y2="2067.5" class="net_163"><title>s_continue</title></line>
+<line x1="1370.5" x2="1462" y1="1892.5" y2="1892.5" class="net_164"><title>s_load</title></line>
+<line x1="1462" x2="1462" y1="1892.5" y2="2567" class="net_164"><title>s_load</title></line>
+<line x1="1462" x2="1547" y1="2567" y2="2567" class="net_164"><title>s_load</title></line>
+<line x1="904.5" x2="1014" y1="1743" y2="1743" class="net_169"><title>s_rescl_n</title></line>
+<line x1="2177" x2="2217" y1="1248.5" y2="1248.5" class="net_21"><title>CLEAR</title></line>
+<line x1="2177" x2="2217" y1="1557.5" y2="1557.5" class="net_22"><title>IDB0</title></line>
+<line x1="2177" x2="2217" y1="2573" y2="2573" class="net_23"><title>IDB1</title></line>
+<line x1="2177" x2="2217" y1="1313.5" y2="1313.5" class="net_24"><title>IDB2</title></line>
+<line x1="2177" x2="2217" y1="162" y2="162" class="net_25"><title>MCL</title></line>
+<line x1="2177" x2="2217" y1="3003.5" y2="3003.5" class="net_26"><title>PANN</title></line>
+<line x1="2177" x2="2217" y1="97" y2="97" class="net_27"><title>PANOSC</title></line>
+<line x1="2177" x2="2217" y1="32" y2="32" class="net_30"><title>TESTO</title></line>
+<line x1="2177" x2="2217" y1="227" y2="227" class="net_31"><title>TOUT</title></line>
+<line x1="678" x2="725" y1="2660.5" y2="2660.5" class="net_" />
+<line x1="725" x2="1635" y1="2660.5" y2="2948.5" class="net_" />
+<line x1="1222" x2="1269" y1="2734" y2="2734" class="net_" />
+<circle cx="1269" cy="2948.5" r="2" style="fill:#000" class="net_" />
+<line x1="1269" x2="1635" y1="2734" y2="2948.5" class="net_" />
+<line x1="1385" x2="1432" y1="2067.5" y2="2067.5" class="net_" />
+<circle cx="1432" cy="2948.5" r="2" style="fill:#000" class="net_" />
+<line x1="1432" x2="1635" y1="2067.5" y2="2948.5" class="net_" />
+<line x1="1578" x2="1635" y1="2567" y2="2567" class="net_" />
+<line x1="1635" x2="1635" y1="2567" y2="2948.5" class="net_" />
+<text x="738.0" y="159.0" class="netlabel">s_mcl_n</text>
+<text x="1708.0" y="3061.5" class="netlabel">PRQN</text>
+<text x="412.0" y="3054.0" class="netlabel">s_zz1</text>
+<text x="982.0" y="2894.5" class="netlabel">s_rtc_n</text>
+<text x="1894.0" y="2547.5" class="netlabel">a597_nand_out</text>
+<text x="515.0" y="2677.5" class="netlabel">PWCL</text>
+<text x="2065.0" y="2577.5" class="netlabel">a609_nand_out</text>
+<text x="1915.0" y="1867.5" class="netlabel">a598_nand_out</text>
+<text x="1995.0" y="1875.0" class="netlabel">a599_nand_out</text>
+<text x="2065.0" y="1882.5" class="netlabel">a590_nand_out</text>
+<text x="2065.0" y="3008.0" class="netlabel">a592_nand_out</text>
+<text x="1686.0" y="1160.5" class="netlabel">REFN</text>
+<text x="575.0" y="2007.0" class="netlabel">s_stp</text>
+<text x="674.3" y="2446.5" class="netlabel">s_a572_clearn_rise</text>
+<text x="1768.0" y="541.5" class="netlabel">s_rtosc_rise</text>
+<text x="1435.0" y="552.5" class="netlabel">r_q633</text>
+<text x="678.0" y="1747.5" class="netlabel">RESET</text>
+<text x="1698.0" y="694.5" class="netlabel">s_rfclk_rise</text>
+<text x="801.3" y="1822.5" class="netlabel">s_rtc_limit</text>
+<text x="1385.0" y="568.5" class="netlabel">RTOSC</text>
+<text x="678.0" y="2250.5" class="netlabel">SEL5MSN</text>
+<text x="1210.5" y="1944.5" class="netlabel">s_continue</text>
+<text x="1373.5" y="1889.5" class="netlabel">s_load</text>
+<text x="402.0" y="2329.0" class="netlabel">s_start</text>
+<text x="422.0" y="2309.0" class="netlabel">a580_nand_out</text>
+<text x="907.5" y="1740.0" class="netlabel">s_rescl_n</text>
+<text x="181.0" y="2993.0" class="netlabel">SSTOPN</text>
+<text x="1099.0" y="2521.0" class="netlabel">s_a579_out_n</text>
+<text x="378.7" y="2460.0" class="netlabel">r_a572_clear_n_d</text>
+<text x="758.0" y="2637.0" class="netlabel">r_a572_q</text>
+<text x="1109.0" y="2731.0" class="netlabel">s_lrst</text>
+<text x="1574.3" y="589.5" class="netlabel">r_rtosc_d</text>
+<text x="1915.0" y="1500.5" class="netlabel">s_q633_next</text>
+<text x="1853.0" y="148.0" class="netlabel">r_q629</text>
+<text x="2050.0" y="929.5" class="netlabel">s_rfclk</text>
+<text x="299.0" y="2349.0" class="netlabel">STARTN</text>
+<text x="1843.0" y="463.0" class="netlabel">r_a631_q</text>
+<text x="246.0" y="2224.0" class="netlabel">STOPN</text>
+<text x="317.0" y="1437.5" class="netlabel">sysclk</text>
+<text x="2180.0" y="1245.5" class="netlabel">CLEAR</text>
+<text x="2180.0" y="1554.5" class="netlabel">IDB0</text>
+<text x="1048.0" y="1740.0" class="netlabel">s_rescl</text>
+<text x="2180.0" y="2570.0" class="netlabel">IDB1</text>
+<text x="2180.0" y="1310.5" class="netlabel">IDB2</text>
+<text x="2180.0" y="159.0" class="netlabel">MCL</text>
+<text x="2180.0" y="3000.5" class="netlabel">PANN</text>
+<text x="681.0" y="2677.5" class="netlabel">s_esload_n</text>
+<text x="2180.0" y="94.0" class="netlabel">PANOSC</text>
+<text x="1833.0" y="1489.5" class="netlabel">REFRQN</text>
+<text x="565.0" y="1180.5" class="netlabel">STPN</text>
+<text x="145.0" y="1245.5" class="netlabel">sys_rst_n</text>
+<text x="2180.0" y="29.0" class="netlabel">TESTO</text>
+<text x="2180.0" y="224.0" class="netlabel">TOUT</text>
+<text x="828.0" y="1448.5" class="netlabel">s_rtc_cnt</text>
+<text x="1891.0" y="814.5" class="netlabel">BDRY50N</text>
+<text x="758.0" y="380.0" class="netlabel">CLOSC</text>
+<text x="748.0" y="1534.5" class="netlabel">CLRTIN</text>
+<text x="1045.0" y="1944.5" class="netlabel">CONTINUEN</text>
+<text x="1778.0" y="391.0" class="netlabel">r_cnt6</text>
+<text x="2113.0" y="29.0" class="netlabel">r_cnt6[5]</text>
+<text x="515.0" y="2175.5" class="netlabel">EMCLN</text>
+<text x="1475.0" y="1303.0" class="netlabel">s_conn_n</text>
+<text x="1648.0" y="1288.0" class="netlabel">s_lod_n</text>
+<text x="1768.0" y="2555.0" class="netlabel">s_prq</text>
+<text x="1222.0" y="1889.5" class="netlabel">LOADN</text>
+<text x="402.0" y="2934.5" class="netlabel">s_zz0</text>
+<text x="1282.0" y="1318.0" class="netlabel">s_rst_n</text>
+<text x="1768.0" y="1883.5" class="netlabel">s_conn</text>
+<text x="1683.0" y="2134.5" class="netlabel">s_rtc</text>
+</svg>

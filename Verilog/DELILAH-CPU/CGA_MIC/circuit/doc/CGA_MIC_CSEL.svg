@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="898.0" height="1201.0" viewBox="-80.0 -80.0 898.0 1201.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="898.0" height="1201.0" fill="#ffffff" /><g transform="translate(496,637)" id="cell_$not$CGA_MIC_CSEL.v:110$10440"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_CSEL.v:110$10440" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_CSEL.v:110$10440" /><g /><g /></g>
+<g transform="translate(496,744.5)" id="cell_$not$CGA_MIC_CSEL.v:113$10441"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_CSEL.v:113$10441" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_CSEL.v:113$10441" /><g /><g /></g>
+<a href="../../../../Shared/ndlib/doc/LATCH.md"><title>CSEL_LATCH (LATCH) - open its page</title><g transform="translate(601,724)" id="cell_CSEL_LATCH"><text x="15" y="-4" class="nodelabel cell_CSEL_LATCH">LATCH</text><rect width="30" height="60" class="cell_CSEL_LATCH" /><g transform="translate(0,10)" id="port_CSEL_LATCH~D"><text x="-3" y="-4" class="inputPortLabel cell_CSEL_LATCH">D</text></g><g transform="translate(0,30)" id="port_CSEL_LATCH~ENABLE"><text x="-3" y="-4" class="inputPortLabel cell_CSEL_LATCH">ENABLE</text></g><g transform="translate(0,50)" id="port_CSEL_LATCH~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSEL_LATCH">sysclk</text></g><g transform="translate(30,10)" id="port_CSEL_LATCH~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSEL_LATCH">Q</text></g><g transform="translate(30,30)" id="port_CSEL_LATCH~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSEL_LATCH">QN</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_8.md"><title>PLEXERS_1 (Multiplexer_8) - open its page</title><g transform="translate(244,201.5)" id="cell_PLEXERS_1"><text x="15" y="-4" class="nodelabel cell_PLEXERS_1">Multiplexer_8</text><rect width="30" height="180" class="cell_PLEXERS_1" /><g transform="translate(0,10)" id="port_PLEXERS_1~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_1~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_1~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_1~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_1~muxIn_4"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_4</text></g><g transform="translate(0,110)" id="port_PLEXERS_1~muxIn_5"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_5</text></g><g transform="translate(0,130)" id="port_PLEXERS_1~muxIn_6"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_6</text></g><g transform="translate(0,150)" id="port_PLEXERS_1~muxIn_7"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_7</text></g><g transform="translate(0,170)" id="port_PLEXERS_1~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_1~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_1">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_8.md"><title>PLEXERS_2 (Multiplexer_8) - open its page</title><g transform="translate(244,656.5)" id="cell_PLEXERS_2"><text x="15" y="-4" class="nodelabel cell_PLEXERS_2">Multiplexer_8</text><rect width="30" height="180" class="cell_PLEXERS_2" /><g transform="translate(0,10)" id="port_PLEXERS_2~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_2~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_2~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_2~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_2~muxIn_4"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_4</text></g><g transform="translate(0,110)" id="port_PLEXERS_2~muxIn_5"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_5</text></g><g transform="translate(0,130)" id="port_PLEXERS_2~muxIn_6"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_6</text></g><g transform="translate(0,150)" id="port_PLEXERS_2~muxIn_7"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_7</text></g><g transform="translate(0,170)" id="port_PLEXERS_2~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_2~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_2">muxOut</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/Multiplexer_2.md"><title>PLEXERS_3 (Multiplexer_2) - open its page</title><g transform="translate(390,636.5)" id="cell_PLEXERS_3"><text x="15" y="-4" class="nodelabel cell_PLEXERS_3">Multiplexer_2</text><rect width="30" height="60" class="cell_PLEXERS_3" /><g transform="translate(0,10)" id="port_PLEXERS_3~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_3">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_3~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_3">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_3~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_3">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_3~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_3">muxOut</text></g></g></a>
+<g transform="translate(493,809.5)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(390,744.5)" id="cell_ALUCLK"><text x="15" y="-4" class="nodelabel cell_ALUCLK">ALUCLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_ALUCLK" /><g /></g>
+<g transform="translate(95,282)" id="cell_CFETCH"><text x="15" y="-4" class="nodelabel cell_CFETCH">CFETCH</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CFETCH" /><g /></g>
+<g transform="translate(95,477)" id="cell_COND"><text x="15" y="-4" class="nodelabel cell_COND">COND</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_COND" /><g /></g>
+<g transform="translate(95,672)" id="cell_CRY"><text x="15" y="-4" class="nodelabel cell_CRY">CRY</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CRY" /><g /></g>
+<g transform="translate(95,22)" id="cell_DZD"><text x="15" y="-4" class="nodelabel cell_DZD">DZD</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_DZD" /><g /></g>
+<g transform="translate(95,737)" id="cell_F11"><text x="15" y="-4" class="nodelabel cell_F11">F11</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_F11" /><g /></g>
+<g transform="translate(95,802)" id="cell_F15"><text x="15" y="-4" class="nodelabel cell_F15">F15</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_F15" /><g /></g>
+<g transform="translate(95,152)" id="cell_IRQ"><text x="15" y="-4" class="nodelabel cell_IRQ">IRQ</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IRQ" /><g /></g>
+<g transform="translate(95,87)" id="cell_LCZ"><text x="15" y="-4" class="nodelabel cell_LCZ">LCZ</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LCZ" /><g /></g>
+<g transform="translate(95,347)" id="cell_OOD"><text x="15" y="-4" class="nodelabel cell_OOD">OOD</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_OOD" /><g /></g>
+<g transform="translate(95,607)" id="cell_OVF"><text x="15" y="-4" class="nodelabel cell_OVF">OVF</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_OVF" /><g /></g>
+<g transform="translate(95,217)" id="cell_RESTR"><text x="15" y="-4" class="nodelabel cell_RESTR">RESTR</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_RESTR" /><g /></g>
+<g transform="translate(95,412)" id="cell_SPARE"><text x="15" y="-4" class="nodelabel cell_SPARE">SPARE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SPARE" /><g /></g>
+<g transform="translate(95,932)" id="cell_STP"><text x="15" y="-4" class="nodelabel cell_STP">STP</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_STP" /><g /></g>
+<g transform="translate(12,999.5)" id="cell_TSEL_3_0"><text x="15" y="-4" class="nodelabel cell_TSEL_3_0">TSEL_3_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TSEL_3_0" /><g /></g>
+<g transform="translate(95,867)" id="cell_ZF"><text x="15" y="-4" class="nodelabel cell_ZF">ZF</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_ZF" /><g /></g>
+<g transform="translate(696,724.5)" id="cell_CONDN"><text x="15" y="-4" class="nodelabel cell_CONDN">CONDN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_CONDN" /><g /></g>
+<g transform="translate(95,542)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(107,989)" id="cell_$split$,17,18,19,20,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:2</text></g><g transform="translate(4,30)"><text x="5" y="-4">3</text></g></g>
+<line x1="421" x2="496" y1="647" y2="647" class="net_23"><title>s_plexer3_out</title></line>
+<line x1="418" x2="496" y1="754.5" y2="754.5" class="net_3"><title>ALUCLK</title></line>
+<line x1="521" x2="539" y1="647" y2="647" class="net_24"><title>s_pcond_n</title></line>
+<line x1="539" x2="539" y1="647" y2="734.5" class="net_24"><title>s_pcond_n</title></line>
+<line x1="539" x2="601" y1="734.5" y2="734.5" class="net_24"><title>s_pcond_n</title></line>
+<line x1="521" x2="601" y1="754.5" y2="754.5" class="net_25"><title>s_aluclk_n</title></line>
+<line x1="521" x2="539" y1="819.5" y2="819.5" class="net_2"><title>sysclk</title></line>
+<line x1="539" x2="539" y1="819.5" y2="774.5" class="net_2"><title>sysclk</title></line>
+<line x1="539" x2="601" y1="774.5" y2="774.5" class="net_2"><title>sysclk</title></line>
+<line x1="123" x2="171" y1="32" y2="32" class="net_7"><title>DZD</title></line>
+<line x1="171" x2="171" y1="32" y2="212" class="net_7"><title>DZD</title></line>
+<line x1="171" x2="244" y1="212" y2="212" class="net_7"><title>DZD</title></line>
+<line x1="123" x2="161" y1="97" y2="97" class="net_11"><title>LCZ</title></line>
+<line x1="161" x2="161" y1="97" y2="232" class="net_11"><title>LCZ</title></line>
+<line x1="161" x2="244" y1="232" y2="232" class="net_11"><title>LCZ</title></line>
+<line x1="123" x2="151" y1="162" y2="162" class="net_10"><title>IRQ</title></line>
+<line x1="151" x2="151" y1="162" y2="252" class="net_10"><title>IRQ</title></line>
+<line x1="151" x2="244" y1="252" y2="252" class="net_10"><title>IRQ</title></line>
+<line x1="123" x2="141" y1="227" y2="227" class="net_14"><title>RESTR</title></line>
+<line x1="141" x2="141" y1="227" y2="272" class="net_14"><title>RESTR</title></line>
+<line x1="141" x2="244" y1="272" y2="272" class="net_14"><title>RESTR</title></line>
+<line x1="123" x2="244" y1="292" y2="292" class="net_4"><title>CFETCH</title></line>
+<line x1="123" x2="141" y1="357" y2="357" class="net_12"><title>OOD</title></line>
+<line x1="141" x2="141" y1="357" y2="312" class="net_12"><title>OOD</title></line>
+<line x1="141" x2="244" y1="312" y2="312" class="net_12"><title>OOD</title></line>
+<line x1="123" x2="151" y1="422" y2="422" class="net_15"><title>SPARE</title></line>
+<line x1="151" x2="151" y1="422" y2="332" class="net_15"><title>SPARE</title></line>
+<line x1="151" x2="244" y1="332" y2="332" class="net_15"><title>SPARE</title></line>
+<line x1="123" x2="161" y1="487" y2="487" class="net_5"><title>COND</title></line>
+<line x1="161" x2="161" y1="487" y2="352" class="net_5"><title>COND</title></line>
+<line x1="161" x2="244" y1="352" y2="352" class="net_5"><title>COND</title></line>
+<line x1="112" x2="171" y1="999.5" y2="999.5" class="net_17,18,19"><title>s_mux_selector</title></line>
+<line x1="171" x2="171" y1="999.5" y2="372" class="net_17,18,19"><title>s_mux_selector</title></line>
+<line x1="171" x2="244" y1="372" y2="372" class="net_17,18,19"><title>s_mux_selector</title></line>
+<line x1="112" x2="171" y1="999.5" y2="999.5" class="net_17,18,19"><title>s_mux_selector</title></line>
+<line x1="171" x2="171" y1="999.5" y2="827" class="net_17,18,19"><title>s_mux_selector</title></line>
+<circle cx="171" cy="827" r="2" style="fill:#000" class="net_17,18,19" />
+<line x1="171" x2="244" y1="827" y2="827" class="net_17,18,19"><title>s_mux_selector</title></line>
+<line x1="125" x2="191" y1="552" y2="552" class="net_28" />
+<line x1="191" x2="191" y1="552" y2="667" class="net_28" />
+<circle cx="191" cy="667" r="2" style="fill:#000" class="net_28" />
+<line x1="191" x2="244" y1="667" y2="667" class="net_28" />
+<line x1="125" x2="191" y1="552" y2="552" class="net_28" />
+<line x1="191" x2="191" y1="552" y2="687" class="net_28" />
+<line x1="191" x2="244" y1="687" y2="687" class="net_28" />
+<line x1="123" x2="181" y1="617" y2="617" class="net_13"><title>OVF</title></line>
+<line x1="181" x2="181" y1="617" y2="707" class="net_13"><title>OVF</title></line>
+<line x1="181" x2="244" y1="707" y2="707" class="net_13"><title>OVF</title></line>
+<line x1="123" x2="141" y1="682" y2="682" class="net_6"><title>CRY</title></line>
+<line x1="141" x2="141" y1="682" y2="727" class="net_6"><title>CRY</title></line>
+<line x1="141" x2="244" y1="727" y2="727" class="net_6"><title>CRY</title></line>
+<line x1="123" x2="244" y1="747" y2="747" class="net_8"><title>F11</title></line>
+<line x1="123" x2="141" y1="812" y2="812" class="net_9"><title>F15</title></line>
+<line x1="141" x2="141" y1="812" y2="767" class="net_9"><title>F15</title></line>
+<line x1="141" x2="244" y1="767" y2="767" class="net_9"><title>F15</title></line>
+<line x1="123" x2="151" y1="877" y2="877" class="net_21"><title>ZF</title></line>
+<line x1="151" x2="151" y1="877" y2="787" class="net_21"><title>ZF</title></line>
+<line x1="151" x2="244" y1="787" y2="787" class="net_21"><title>ZF</title></line>
+<line x1="123" x2="161" y1="942" y2="942" class="net_16"><title>STP</title></line>
+<line x1="161" x2="161" y1="942" y2="807" class="net_16"><title>STP</title></line>
+<line x1="161" x2="244" y1="807" y2="807" class="net_16"><title>STP</title></line>
+<line x1="275" x2="322" y1="212" y2="212" class="net_26"><title>s_plexer1_out</title></line>
+<line x1="322" x2="322" y1="212" y2="647" class="net_26"><title>s_plexer1_out</title></line>
+<line x1="322" x2="390" y1="647" y2="647" class="net_26"><title>s_plexer1_out</title></line>
+<line x1="275" x2="390" y1="667" y2="667" class="net_27"><title>s_plexer2_out</title></line>
+<line x1="112" x2="322" y1="1019.5" y2="1019.5" class="net_20"><title>TSEL_3_0[3]</title></line>
+<line x1="322" x2="322" y1="1019.5" y2="687" class="net_20"><title>TSEL_3_0[3]</title></line>
+<line x1="322" x2="390" y1="687" y2="687" class="net_20"><title>TSEL_3_0[3]</title></line>
+<line x1="632" x2="696" y1="734.5" y2="734.5" class="net_22"><title>CONDN</title></line>
+<line x1="40" x2="107" y1="1009.5" y2="1009.5" class="net_17,18,19,20"><title>TSEL_3_0</title></line>
+<text x="154.0" y="249.0" class="netlabel">IRQ</text>
+<text x="164.0" y="229.0" class="netlabel">LCZ</text>
+<text x="144.0" y="309.0" class="netlabel">OOD</text>
+<text x="184.0" y="704.0" class="netlabel">OVF</text>
+<text x="144.0" y="269.0" class="netlabel">RESTR</text>
+<text x="154.0" y="329.0" class="netlabel">SPARE</text>
+<text x="164.0" y="804.0" class="netlabel">STP</text>
+<text x="174.0" y="369.0" class="netlabel">s_mux_selector</text>
+<text x="43.0" y="1006.5" class="netlabel">TSEL_3_0</text>
+<text x="542.0" y="771.5" class="netlabel">sysclk</text>
+<text x="115.0" y="1016.5" class="netlabel">TSEL_3_0[3]</text>
+<text x="154.0" y="784.0" class="netlabel">ZF</text>
+<text x="635.0" y="731.5" class="netlabel">CONDN</text>
+<text x="424.0" y="644.0" class="netlabel">s_plexer3_out</text>
+<text x="542.0" y="731.5" class="netlabel">s_pcond_n</text>
+<text x="524.0" y="751.5" class="netlabel">s_aluclk_n</text>
+<text x="325.0" y="644.0" class="netlabel">s_plexer1_out</text>
+<text x="278.0" y="664.0" class="netlabel">s_plexer2_out</text>
+<text x="421.0" y="751.5" class="netlabel">ALUCLK</text>
+<text x="126.0" y="289.0" class="netlabel">CFETCH</text>
+<text x="164.0" y="349.0" class="netlabel">COND</text>
+<text x="144.0" y="724.0" class="netlabel">CRY</text>
+<text x="174.0" y="209.0" class="netlabel">DZD</text>
+<text x="126.0" y="744.0" class="netlabel">F11</text>
+<text x="144.0" y="764.0" class="netlabel">F15</text>
+</svg>

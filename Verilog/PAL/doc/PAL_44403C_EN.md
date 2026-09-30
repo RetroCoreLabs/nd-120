@@ -19,6 +19,16 @@ Source: `Verilog/PAL/PAL_44403C_EN.v`
 
 ![PAL_44403C_EN symbol](PAL_44403C_EN.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CYC.PAL_44403_UCYIN0`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![PAL_44403C_EN schematic](PAL_44403C_EN.svg)](PAL_44403C_EN.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 PALASM CODE CONVERTED TO VERILOG
@@ -63,3 +73,165 @@ Ronny Hansen
 | output | `1` | `DMAP_n` *(active low)* | Q3_n |
 | output | `1` | `DLY0_n` *(active low)* | B0_n |
 | output | `1` | `SLCOND_n` *(active low)* | B2_n |
+
+## Verilog source
+
+[`Verilog/PAL/PAL_44403C_EN.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/PAL/PAL_44403C_EN.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of PAL_44403C_EN (150 lines)</summary>
+
+```verilog
+/**********************************************************************************************************
+** ND120 PALASM CODE CONVERTED TO VERILOG                                                                **
+**                                                                                                       **
+** Component PAL 44403C - clock-enable wrapper                                                           **
+**                                                                                                       **
+** USE_ENABLE=0 (default): instantiates the original PAL_44403C untouched                                **
+**   (posedge CLK registered outputs).                                                                   **
+** USE_ENABLE=1: structural copy of PAL_44403C with the registered                                       **
+**   equations captured on `posedge sysclk + if (EN)` (P2 clock-domain                                   **
+**   conversion, docs/plan-fix-unconstrained-clocks.md - EN is CYC_36's                                  **
+**   CLK_EN pulse aligned with the CLK rise). Equations are line-for-line                                **
+**   identical to PAL_44403C.v; only the flop trigger changes.                                           **
+**                                                                                                       **
+** The original PAL_44403C.v is generated from PALASM and is never                                       **
+** modified - keep the equations here in sync with it.                                                   **
+**                                                                                                       **
+** Last reviewed: 10-JUL-2026                                                                            **
+** Ronny Hansen                                                                                          **
+***********************************************************************************************************/
+
+module PAL_44403C_EN #(
+    parameter integer USE_ENABLE = 0
+) (
+    input sysclk,  //! FPGA system clock (used only when USE_ENABLE=1)
+    input EN,      //! Clock enable    (used only when USE_ENABLE=1)
+
+    input CLK,  //! Clock signal (used only when USE_ENABLE=0)
+    input OE_n, //! OUTPUT ENABLE (active-low) for Q0-Q3
+
+    input CSDELAY0,  //! I0
+    input CSDLY,     //! I1
+    input CSECOND,   //! I2
+    input CSLOOP,    //! I3
+    input ACOND_n,   //! I4
+    input MR_n,      //! I5
+    input LUA12,     //! I6
+    input MAP_n,     //! I7
+
+    output LCS_n,    //! Q0_n
+    output MDLY_n,   //! Q1_n
+    output DMA12_n,  //! Q2_n
+    output DMAP_n,   //! Q3_n
+
+    output DLY0_n,   //! B0_n
+    output SLCOND_n  //! B2_n
+);
+
+  generate
+    if (USE_ENABLE == 1) begin : gen_enable
+      /* verilator lint_off UNUSEDSIGNAL */
+      wire unused_clk = CLK;
+      /* verilator lint_on UNUSEDSIGNAL */
+
+      reg LCS = 1'b0;
+      reg MDLY = 1'b0;
+      reg DMA12 = 1'b0;
+      reg DMAP = 1'b0;
+
+      // Creating non-negated wires for active-low inputs
+      wire ACOND = ~ACOND_n;
+      wire MR = ~MR_n;
+      wire MAP = ~MAP_n;
+      wire LUA12_n = ~LUA12;
+
+      wire s_dma12_n = ~DMA12;
+
+      // Flip-flop logic for Q0, Q1, Q2 and Q3 - equations identical to
+      // PAL_44403C.v, captured on the enable instead of posedge CLK.
+      always @(posedge sysclk) begin
+        if (EN) begin
+          // Q0 flip-flop
+          // Logic for LCS_n (active-low)
+`ifdef SKIP_WCS_LOAD
+          // WCS is pre-loaded (see docs/skip-wcs-load.md): never enter the
+          // load phase (see PAL_44403C.v for the full comment).
+          LCS <= 1'b0;
+`else
+          if (
+              (MR)
+              | (s_dma12_n & LUA12_n & LCS)  // LCS FROM MR AND UNTIL MA12 HAS GONE HIGH AND
+              | (DMA12 & LUA12 & LCS)        // I.E. LMA COUNTED FROM 0 to 8K.
+              | (s_dma12_n & LUA12 & LCS))
+            LCS <= 1'b1;
+          else LCS <= 1'b0;
+`endif
+
+          // Q1 flip-flop
+          // Logic for MDLY
+          MDLY  <= CSDLY;
+
+          // Q2 flip-flop
+          // Logic for DMA12
+          DMA12 <= LUA12;
+
+          // Q3 flip-flop
+          // Logic for DMAP
+          DMAP  <= MAP;
+        end
+      end
+
+      // Output logic for Q0_n, Q1_n, Q2_n
+      assign LCS_n = OE_n ? 1'b0 : ~LCS;
+      assign MDLY_n = OE_n ? 1'b0 : ~MDLY;
+      assign DMA12_n = OE_n ? 1'b0 : s_dma12_n;
+      assign DMAP_n = OE_n ? 1'b0 : ~DMAP;
+
+      // B0 pin
+      // Logic for DLY0_n (active-low)
+      // PALASM 44403C: DLY0 = MDLY + CSDELAY0 + ACOND*CSECOND + ACOND*CSLOOP
+      //                     + LUA12*/DMA12 + /LUA12*DMA12 + DMAP
+      // Same 30-JUL audit fix as PAL_44403C.v: MDLY_n -> MDLY, XNOR -> XOR
+      // on the LUA12/DMA12 pair, raw MAP -> registered DMAP.
+      assign DLY0_n = ~(MDLY |  // 25NS DELAY ON MICROCODE REQUEST
+          CSDELAY0 |  // 25NS DELAY ON PREVIOUS CYCLE ON MICROCODE REQ
+          (ACOND & CSECOND) |  // CONDITIONAL MICROSEQUENCING
+          (ACOND & CSLOOP) |  // USING ALU RESULT
+          (LUA12 & ~DMA12) |  // CHANGING FROM LOWER TO UPPER CONTROL STORE A
+          (~LUA12 & DMA12) |  // (one clock after LUA12 changes - XOR)
+          DMAP);  // AFTER MAP TO AVOID CSDELAY BEING TOO LATE
+
+      // B2 pin
+      // Logic for SLCOND_n (active-low)
+      assign SLCOND_n = ~(ACOND & CSECOND |  //
+          ACOND & CSLOOP);  //
+    end else begin : gen_orig
+      /* verilator lint_off UNUSEDSIGNAL */
+      wire unused_sys = sysclk & EN;
+      /* verilator lint_on UNUSEDSIGNAL */
+      PAL_44403C PAL (
+          .CLK(CLK),
+          .OE_n(OE_n),
+          .CSDELAY0(CSDELAY0),
+          .CSDLY(CSDLY),
+          .CSECOND(CSECOND),
+          .CSLOOP(CSLOOP),
+          .ACOND_n(ACOND_n),
+          .MR_n(MR_n),
+          .LUA12(LUA12),
+          .MAP_n(MAP_n),
+          .LCS_n(LCS_n),
+          .MDLY_n(MDLY_n),
+          .DMA12_n(DMA12_n),
+          .DMAP_n(DMAP_n),
+          .DLY0_n(DLY0_n),
+          .SLCOND_n(SLCOND_n)
+      );
+    end
+  endgenerate
+
+endmodule
+```
+
+</details>

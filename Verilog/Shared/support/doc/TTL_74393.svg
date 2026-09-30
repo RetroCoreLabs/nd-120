@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="571.0" height="409.0" viewBox="-80.0 -80.0 571.0 409.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="571.0" height="409.0" fill="#ffffff" /><g transform="translate(77,207)" id="cell_$add$TTL_74393.v:24$2"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$add$TTL_74393.v:24$2" /><line x1="7.5" x2="17.5" y1="12.5" y2="12.5" class="cell_$add$TTL_74393.v:24$2" /><line x1="12.5" x2="12.5" y1="7.5" y2="17.5" class="cell_$add$TTL_74393.v:24$2" /><g /><g /><g /></g>
+<g transform="translate(227,121.5)" id="cell_$procdff$6"><text x="15" y="-4" class="nodelabel cell_$procdff$6">$adff</text><rect width="30" height="60" class="cell_$procdff$6" /><g transform="translate(0,10)" id="port_$procdff$6~ARST"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$6">ARST</text></g><g transform="translate(0,30)" id="port_$procdff$6~CLK"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$6">CLK</text></g><g transform="translate(0,50)" id="port_$procdff$6~D"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$6">D</text></g><g transform="translate(30,10)" id="port_$procdff$6~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_$procdff$6">Q</text></g></g>
+<g transform="translate(137,106.5)" id="cell_CLK_n"><text x="15" y="-4" class="nodelabel cell_CLK_n">CLK_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLK_n" /><g /></g>
+<g transform="translate(137,41.5)" id="cell_RESET"><text x="15" y="-4" class="nodelabel cell_RESET">RESET</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_RESET" /><g /></g>
+<g transform="translate(369,22)" id="cell_QA"><text x="15" y="-4" class="nodelabel cell_QA">QA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QA" /><g /></g>
+<g transform="translate(369,87)" id="cell_QB"><text x="15" y="-4" class="nodelabel cell_QB">QB</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QB" /><g /></g>
+<g transform="translate(369,152)" id="cell_QC"><text x="15" y="-4" class="nodelabel cell_QC">QC</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QC" /><g /></g>
+<g transform="translate(369,217)" id="cell_QD"><text x="15" y="-4" class="nodelabel cell_QD">QD</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QD" /><g /></g>
+<g transform="translate(12,217)" id="cell_00000000000000000000000000000001"><text x="15" y="-4" class="nodelabel cell_00000000000000000000000000000001">0x1</text><rect width="30" height="20" class="cell_00000000000000000000000000000001" /><g /></g>
+<g transform="translate(143,161.5)" id="cell_$split$,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:3</text></g></g>
+<g transform="translate(322,111.5)" id="cell_$split$,4,5,6,7,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g><g transform="translate(4,30)"><text x="5" y="-4">1</text></g><g transform="translate(4,50)"><text x="5" y="-4">2</text></g><g transform="translate(4,70)"><text x="5" y="-4">3</text></g></g>
+<line x1="258" x2="297" y1="132" y2="132" class="net_4,5,6,7"><title>counter1</title></line>
+<line x1="297" x2="297" y1="132" y2="20.5" class="net_4,5,6,7"><title>counter1</title></line>
+<line x1="297" x2="52" y1="20.5" y2="20.5" class="net_4,5,6,7"><title>counter1</title></line>
+<line x1="52" x2="52" y1="20.5" y2="212" class="net_4,5,6,7"><title>counter1</title></line>
+<circle cx="297" cy="132" r="2" style="fill:#000" class="net_4,5,6,7" />
+<line x1="52" x2="80" y1="212" y2="212" class="net_4,5,6,7"><title>counter1</title></line>
+<line x1="258" x2="322" y1="132" y2="132" class="net_4,5,6,7"><title>counter1</title></line>
+<line x1="42" x2="80" y1="227" y2="227" class="net_40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71" />
+<line x1="165" x2="187" y1="51.5" y2="51.5" class="net_3"><title>RESET</title></line>
+<line x1="187" x2="187" y1="51.5" y2="132" class="net_3"><title>RESET</title></line>
+<line x1="187" x2="227" y1="132" y2="132" class="net_3"><title>RESET</title></line>
+<line x1="165" x2="177" y1="116.5" y2="116.5" class="net_2"><title>CLK_n</title></line>
+<line x1="177" x2="177" y1="116.5" y2="152" class="net_2"><title>CLK_n</title></line>
+<line x1="177" x2="227" y1="152" y2="152" class="net_2"><title>CLK_n</title></line>
+<line x1="148" x2="227" y1="172" y2="172" class="net_8,9,10,11" />
+<line x1="327" x2="344" y1="122" y2="122" class="net_4"><title>QA</title></line>
+<line x1="344" x2="344" y1="122" y2="32" class="net_4"><title>QA</title></line>
+<line x1="344" x2="369" y1="32" y2="32" class="net_4"><title>QA</title></line>
+<line x1="327" x2="354" y1="142" y2="142" class="net_5"><title>QB</title></line>
+<line x1="354" x2="354" y1="142" y2="97" class="net_5"><title>QB</title></line>
+<line x1="354" x2="369" y1="97" y2="97" class="net_5"><title>QB</title></line>
+<line x1="327" x2="369" y1="162" y2="162" class="net_6"><title>QC</title></line>
+<line x1="327" x2="344" y1="182" y2="182" class="net_7"><title>QD</title></line>
+<line x1="344" x2="344" y1="182" y2="227" class="net_7"><title>QD</title></line>
+<line x1="344" x2="369" y1="227" y2="227" class="net_7"><title>QD</title></line>
+<line x1="102" x2="143.5" y1="219.5" y2="219.5" class="net_8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39" />
+<line x1="143.5" x2="143.5" y1="219.5" y2="182.5" class="net_8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39" />
+<text x="180.0" y="149.0" class="netlabel">CLK_n</text>
+<text x="190.0" y="129.0" class="netlabel">RESET</text>
+<text x="347.0" y="29.0" class="netlabel">QA</text>
+<text x="55.0" y="17.5" class="netlabel">counter1</text>
+<text x="330.0" y="139.0" class="netlabel">QB</text>
+<text x="330.0" y="159.0" class="netlabel">QC</text>
+<text x="347.0" y="224.0" class="netlabel">QD</text>
+</svg>

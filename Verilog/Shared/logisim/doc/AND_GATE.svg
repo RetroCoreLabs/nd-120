@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="421.0" height="279.0" viewBox="-80.0 -80.0 421.0 279.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="421.0" height="279.0" fill="#ffffff" /><g transform="translate(148,27)" id="cell_$and$AND_GATE.v:48$9973"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$AND_GATE.v:48$9973" /><g /><g /><g /></g>
+<g transform="translate(83,22)" id="cell_$not$AND_GATE.v:42$9971"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$AND_GATE.v:42$9971" /><circle cx="23" cy="10" r="3" class="cell_$not$AND_GATE.v:42$9971" /><g /><g /></g>
+<g transform="translate(83,87)" id="cell_$not$AND_GATE.v:43$9972"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$AND_GATE.v:43$9972" /><circle cx="23" cy="10" r="3" class="cell_$not$AND_GATE.v:43$9972" /><g /><g /></g>
+<g transform="translate(12,22)" id="cell_input1"><text x="15" y="-4" class="nodelabel cell_input1">input1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_input1" /><g /></g>
+<g transform="translate(12,87)" id="cell_input2"><text x="15" y="-4" class="nodelabel cell_input2">input2</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_input2" /><g /></g>
+<g transform="translate(213,29.5)" id="cell_result"><text x="15" y="-4" class="nodelabel cell_result">result</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_result" /><g /></g>
+<line x1="108" x2="148" y1="32" y2="32" class="net_5"><title>s_realInput1</title></line>
+<line x1="108" x2="123" y1="97" y2="97" class="net_6"><title>s_realInput2</title></line>
+<line x1="123" x2="123" y1="97" y2="47" class="net_6"><title>s_realInput2</title></line>
+<line x1="123" x2="148" y1="47" y2="47" class="net_6"><title>s_realInput2</title></line>
+<line x1="40" x2="83" y1="32" y2="32" class="net_2"><title>input1</title></line>
+<line x1="40" x2="83" y1="97" y2="97" class="net_3"><title>input2</title></line>
+<line x1="178" x2="213" y1="39.5" y2="39.5" class="net_4"><title>result</title></line>
+<text x="43.0" y="29.0" class="netlabel">input1</text>
+<text x="43.0" y="94.0" class="netlabel">input2</text>
+<text x="181.0" y="36.5" class="netlabel">result</text>
+<text x="111.0" y="29.0" class="netlabel">s_realInput1</text>
+<text x="126.0" y="44.0" class="netlabel">s_realInput2</text>
+</svg>

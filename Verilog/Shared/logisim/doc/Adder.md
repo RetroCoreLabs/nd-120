@@ -19,6 +19,16 @@ Source: `Verilog/Shared/logisim/Adder.v`
 
 ![Adder symbol](Adder.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.ALU.ALU_RALU.ARITH_12`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![Adder schematic](Adder.svg)](Adder.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Component : Adder
@@ -32,3 +42,54 @@ Component : Adder
 | input | `[nrOfBits-1:0]` | `dataA` |  |
 | input | `[nrOfBits-1:0]` | `dataB` |  |
 | output | `[nrOfBits-1:0]` | `result` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/Adder.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/Adder.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of Adder (39 lines)</summary>
+
+```verilog
+/******************************************************************************
+ **                                                                          **
+ ** Component : Adder                                                        **
+ **                                                                          **
+ *****************************************************************************/
+
+module Adder( carryIn, carryOut, dataA, dataB, result );
+
+   // Parameters are declared here
+   parameter extendedBits = 1;
+   parameter nrOfBits = 1;
+
+   // Validate parameters
+   initial begin
+      if (nrOfBits <= 0) begin
+         $display("Error: nrOfBits must be greater than 0.");
+         $finish;
+      end
+      if (extendedBits <= 0) begin
+         $display("Error: extendedBits must be greater than 0.");
+         $finish;
+      end
+   end
+
+   // Inputs using the parameters in their declarations
+   input carryIn;
+   input [nrOfBits-1:0] dataA;
+   input [nrOfBits-1:0] dataB;
+
+   // Outputs using the parameters in their declarations
+   output reg carryOut;
+   output reg [nrOfBits-1:0] result;
+
+   // Combinational logic for addition
+   always @* begin
+      {carryOut, result} = dataA + dataB + carryIn;
+   end
+
+endmodule
+```
+
+</details>

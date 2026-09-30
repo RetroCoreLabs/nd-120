@@ -14,6 +14,16 @@ Source: `Verilog/SD-FAT/circuit/sd_fat_freescan.v`
 
 ![sd_fat_freescan symbol](sd_fat_freescan.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![sd_fat_freescan schematic](sd_fat_freescan.svg)](sd_fat_freescan.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 FAT free-space scanner
@@ -60,3 +70,221 @@ Ronny Hansen
 | input | `[7:0]` | `eng_rx_data` |  |
 | output | `[31:0]` | `free_clusters` |  |
 | output | `[31:0]` | `free_mb` |  |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/sd_fat_freescan.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/sd_fat_freescan.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of sd_fat_freescan (206 lines)</summary>
+
+```verilog
+/****************************************************************************
+** FAT free-space scanner                                                  **
+**                                                                         **
+** Reads FAT #0 sector by sector through the sd_writer engine (read mode,  **
+** CMD17) and counts the FREE entries (value 0) between cluster 2 and the  **
+** volume's last cluster - a FAT32 entry is masked to its low 28 bits, a   **
+** FAT16 entry is the full 16. The counting rides directly on the          **
+** engine's rx byte stream, so a sector costs no extra pass; the scan      **
+** stops with the sector that holds the last real cluster (a 32 GB FAT32   **
+** card is ~30k FAT sectors, roughly 10 s at the 13.5 MHz 1-bit engine     **
+** clock - the caller prints a SCANNING line first).                       **
+**                                                                         **
+**   free_clusters  raw count                                              **
+**   free_mb        free_clusters * cluster bytes / 1 MB (truncated)       **
+**                                                                         **
+** Uses the engine on an already-initialized card; the reader must be      **
+** parked (the sd_fat_check.v pattern). Read-only - never writes.          **
+**                                                                         **
+** This file is ORIGINAL ND-120 project code (MIT, like the repository).   **
+**                                                                         **
+** Last reviewed: 11-JUL-2026                                              **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module sd_fat_freescan (
+    input wire clk,
+    input wire rst_n,
+
+    input  wire start,     // 1-cycle pulse; only when busy=0
+    output wire busy,
+    output reg  done,      // 1-cycle pulse: free_clusters / free_mb valid
+    output reg  err,       // 1-cycle pulse: engine error (counts invalid)
+    output reg  sec_tick,  // 1-cycle pulse per finished FAT sector (watchdog)
+
+    // filesystem geometry (as latched from the reader)
+    input wire        fs_is_fat32,
+    input wire [7:0]  cluster_size,      // sectors per cluster (power of two)
+    input wire [31:0] fat0_sector,
+    input wire [31:0] sectors_per_fat,
+    input wire [31:0] data_base_sector,  // biased, as exported by the reader
+    input wire [31:0] total_sectors,
+
+    // sd_writer engine, read mode only (exclusive use while busy)
+    output reg         eng_start,
+    output wire        eng_rd,
+    output reg  [31:0] eng_sector,
+    input  wire        eng_done,
+    input  wire        eng_err,
+    input  wire        eng_rx_we,
+    input  wire [8:0]  eng_rx_addr,
+    input  wire [7:0]  eng_rx_data,
+
+    output reg [31:0] free_clusters,
+    output reg [31:0] free_mb
+);
+
+  assign eng_rd = 1'b1;  // this module only reads
+
+  function [4:0] log2cs(input [7:0] cs);
+    casez (cs)
+      8'b1???????: log2cs = 5'd7;
+      8'b01??????: log2cs = 5'd6;
+      8'b001?????: log2cs = 5'd5;
+      8'b0001????: log2cs = 5'd4;
+      8'b00001???: log2cs = 5'd3;
+      8'b000001??: log2cs = 5'd2;
+      8'b0000001?: log2cs = 5'd1;
+      default:     log2cs = 5'd0;
+    endcase
+  endfunction
+
+  // same cluster arithmetic as sd_fat_check.v: data_base_sector is biased
+  // by -2 clusters, so data_base + 2*cs is the first data sector and the
+  // usable clusters are 2 .. s_max_cluster
+  wire [31:0] s_usable = total_sectors -
+                         (data_base_sector + {24'b0, cluster_size} * 2);
+  wire [4:0]  s_l2cs = log2cs(cluster_size);
+
+  localparam [2:0] FS_IDLE = 3'd0;
+  localparam [2:0] FS_PREP = 3'd1;  // max_cluster = usable >> l2cs, bit by bit
+  localparam [2:0] FS_RD   = 3'd2;  // kick one FAT-sector read
+  localparam [2:0] FS_WAIT = 3'd3;  // count entries as the bytes stream in
+  localparam [2:0] FS_MB   = 3'd4;  // free sectors = free << l2cs, bit by bit
+  localparam [2:0] FS_FIN  = 3'd5;  // free_mb = free sectors >> 11, done
+
+  // the two shift-by-l2cs conversions run one bit per clock through s_acc:
+  // a variable barrel shifter here costs hundreds of LUTs for nothing (the
+  // scan itself takes milliseconds; at most 7 extra clocks each)
+  reg [2:0]  s_state;
+  reg [23:0] s_left;         // FAT sectors still to read (spec max 2^22)
+  reg [27:0] s_clu;          // cluster of the entry being assembled (28-bit)
+  reg        s_nz;           // nonzero masked byte seen in the current entry
+  reg [38:0] s_acc;          // sequential shifter (usable / free sectors)
+  reg [4:0]  s_sh;           // shifts still to do
+  reg [27:0] s_max_cluster;  // last real cluster (valid from FS_RD on)
+
+  assign busy = (s_state != FS_IDLE);
+
+  // last byte of a FAT entry: every 2nd byte (FAT16) / 4th byte (FAT32);
+  // the FAT32 top nibble is reserved and masked out of the free test
+  wire s_last  = fs_is_fat32 ? (eng_rx_addr[1:0] == 2'b11)
+                             : (eng_rx_addr[0] == 1'b1);
+  wire [7:0] s_masked = (fs_is_fat32 && s_last) ? (eng_rx_data & 8'h0F)
+                                                : eng_rx_data;
+  wire s_entry_free = !s_nz && (s_masked == 8'h00);
+  wire s_clu_valid  = (s_clu >= 28'd2) && (s_clu <= s_max_cluster);
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      s_state       <= FS_IDLE;
+      done          <= 1'b0;
+      err           <= 1'b0;
+      sec_tick      <= 1'b0;
+      eng_start     <= 1'b0;
+      eng_sector    <= 32'd0;
+      s_left        <= 24'd0;
+      s_clu         <= 28'd0;
+      s_nz          <= 1'b0;
+      s_acc         <= 39'd0;
+      s_sh          <= 5'd0;
+      s_max_cluster <= 28'd0;
+      free_clusters <= 32'd0;
+      free_mb       <= 32'd0;
+    end else begin
+      done      <= 1'b0;
+      err       <= 1'b0;
+      sec_tick  <= 1'b0;
+      eng_start <= 1'b0;
+
+      // entry counter: rides the engine's rx stream while we own it
+      if (s_state == FS_WAIT && eng_rx_we) begin
+        if (s_last) begin
+          if (s_clu_valid && s_entry_free)
+            free_clusters <= free_clusters + 32'd1;
+          s_clu <= s_clu + 28'd1;
+          s_nz  <= 1'b0;
+        end else if (s_masked != 8'h00) begin
+          s_nz <= 1'b1;
+        end
+      end
+
+      case (s_state)
+        FS_IDLE:
+        if (start) begin
+          eng_sector    <= fat0_sector;  // then a running +1 per sector
+          s_left        <= sectors_per_fat[23:0];
+          s_clu         <= 28'd0;
+          s_nz          <= 1'b0;
+          free_clusters <= 32'd0;
+          s_acc         <= {7'd0, s_usable};
+          s_sh          <= s_l2cs;
+          s_state       <= FS_PREP;
+        end
+
+        FS_PREP:  // s_max_cluster = (usable >> l2cs) + 1, one bit per clock
+        if (s_sh == 5'd0) begin
+          s_max_cluster <= s_acc[27:0] + 28'd1;
+          s_state       <= FS_RD;
+        end else begin
+          s_acc <= {1'b0, s_acc[38:1]};
+          s_sh  <= s_sh - 5'd1;
+        end
+
+        FS_RD: begin
+          eng_start <= 1'b1;
+          s_state   <= FS_WAIT;
+        end
+
+        FS_WAIT:
+        if (eng_done) begin
+          sec_tick <= 1'b1;
+          // stop with the sector holding the last real cluster, or at the
+          // end of the FAT - whichever comes first
+          if (s_clu > s_max_cluster || s_left <= 24'd1) begin
+            s_acc   <= {7'd0, free_clusters};
+            s_sh    <= s_l2cs;
+            s_state <= FS_MB;
+          end else begin
+            eng_sector <= eng_sector + 32'd1;
+            s_left     <= s_left - 24'd1;
+            s_state    <= FS_RD;
+          end
+        end else if (eng_err) begin
+          err     <= 1'b1;
+          s_state <= FS_IDLE;
+        end
+
+        FS_MB:  // free sectors = free clusters << l2cs, one bit per clock
+        if (s_sh == 5'd0) s_state <= FS_FIN;
+        else begin
+          s_acc <= {s_acc[37:0], 1'b0};
+          s_sh  <= s_sh - 5'd1;
+        end
+
+        FS_FIN: begin  // MB = free sectors * 512 / 2^20 = >> 11 (constant)
+          free_mb <= {4'd0, s_acc[38:11]};
+          done    <= 1'b1;
+          s_state <= FS_IDLE;
+        end
+
+        default: s_state <= FS_IDLE;
+      endcase
+    end
+  end
+
+endmodule
+```
+
+</details>

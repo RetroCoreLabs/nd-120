@@ -19,6 +19,16 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_engine.v`
 
 ![nd_storage_engine symbol](nd_storage_engine.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `TAPE_SDFAT_SOURCE.u_nd_storage.u_engine`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd_storage_engine schematic](nd_storage_engine.svg)](nd_storage_engine.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Parameters
 
 | Parameter | Default |
@@ -33,3 +43,1389 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_engine.v`
 | `SLOT5_BASE_BLK` | `32'd1632` |
 | `SLOT6_BASE_BLK` | `32'd1792` |
 | `SLOT7_BASE_BLK` | `32'd1920` |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/nd_storage_engine.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/nd_storage_engine.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd_storage_engine (1374 lines)</summary>
+
+```verilog
+`include "nd_storage_status.vh"
+/****************************************************************************
+** nd_storage block engine: arbiter, client front-ends, CDC word bridge   **
+**                                                                         **
+** Core of the multi-client storage facade (docs/nd-storage-design.md     **
+** section 2.2; binding contract docs/nd-storage-interface-spec.md).      **
+** Serves N_CLIENTS client ports (clk_cpu domain) with 2048-byte block    **
+** operations against the abstract mem port (clk_stor domain, SDRAM      **
+** device region behind the board glue, nds_mem_model.v in sim):          **
+**                                                                         **
+**   - Round-robin arbiter: per-client pending latches, one request per  **
+**     client (no queue), scan starts at ptr+1 and the pointer advances  **
+**     past the winner at op completion - starvation impossible.         **
+**   - Per-client front-ends (generate, clk_cpu): latch {wr, block} on   **
+**     req, flip the request toggle, master the CLIENT's buffer through  **
+**     buf_addr/buf_wdata/buf_we (read) and buf_rdata (write: address    **
+**     presented in cycle A, one wait cycle for a registered BRAM read,  **
+**     data sampled in cycle C - also correct for combinational reads).  **
+**   - CDC word bridge: one 16-bit word at a time, toggle handshake in   **
+**     each direction via nds_sync.v; data crosses as stable payload.    **
+**   - READ path: 512 mem-port reads, each 32-bit word pushed as two     **
+**     big-endian client words (word 2m = mem[31:16]).                   **
+**   - WRITE path: 1024 words pulled from the client into the 512x32     **
+**     staging BRAM, then 4 CMD24 sectors through the sd_writer command  **
+**     port (sdw_*), then 512 mem-port writes. Ordering rule: card       **
+**     first, SDRAM second, done last - a failed CMD24 leaves the SDRAM  **
+**     copy untouched. The staging BRAM is a documented deviation from   **
+**     the "nd_storage never stores payload" rationale: one shared 2 KB  **
+**     block avoids pulling the client buffer twice over the CDC and     **
+**     makes the card-first ordering natural.                            **
+**   - Range check: block >= n_blocks[c] answers done+err with ZERO      **
+**     mem/SD traffic.                                                   **
+**   - Open requests are handed to the mount FSM (mnt_* port,            **
+**     nd_storage_mount.v); geometry (n_blocks, first_sector) and the    **
+**     open_ok/open_err/size levels are inputs from the mount logic.     **
+**                                                                         **
+** Step-4 change (the one flagged in docs/nd-storage-design.md for the   **
+** step-4 implementer): N_CLIENTS grows to 7 (owner file set TAPE.BPUN,  **
+** FLOPPY1/2.IMG, SMD0-3.IMG), so every 2-bit client index (grant,       **
+** round-robin pointer, mnt_client, the synced grant id) widened to 3    **
+** bits and the slot-base table gained SLOT4..6. No behavior change for  **
+** N_CLIENTS <= 4 (the step-2/3 testbenches still pass unmodified).      **
+**                                                                         **
+** Every wait state carries the WD_MAX watchdog; a timeout ends the op   **
+** with done+err and raises the sticky eng_wd_err level (the top folds   **
+** it into sd_status = SD_ERROR).                                        **
+**                                                                         **
+** The W_SEC card phase drives the sdw_* command port (shaped like       **
+** sd_writer's start/busy/done/err interface); the sd_writer byte fetch  **
+** is served from the staging BRAM through a 2-stage registered read     **
+** (word + lane latch, then byte mux) - well inside sd_writer's 8-bit-   **
+** tick fetch spacing. Exercised against the real sd_writer + card       **
+** model in nd_storage_write_tb.v (sim step 3).                           **
+**                                                                         **
+** Last reviewed: 11-JUL-2026                                              **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module nd_storage_engine #(
+    parameter         N_CLIENTS      = 4,             // 1..8
+    parameter [31:0]  WD_MAX         = 32'd270_000_000,
+    parameter [31:0]  SLOT0_BASE_BLK = 32'd0,
+    parameter [31:0]  SLOT1_BASE_BLK = 32'd32,
+    parameter [31:0]  SLOT2_BASE_BLK = 32'd672,
+    parameter [31:0]  SLOT3_BASE_BLK = 32'd1312,
+    parameter [31:0]  SLOT4_BASE_BLK = 32'd1472,
+    parameter [31:0]  SLOT5_BASE_BLK = 32'd1632,
+    parameter [31:0]  SLOT6_BASE_BLK = 32'd1792,
+    parameter [31:0]  SLOT7_BASE_BLK = 32'd1920,
+    // Phase 4. CACHE_MASK[c] = 1 -> client c goes through the shared cache
+    // directory (nd_storage_cache.v): its image may be ANY size, the region
+    // holds only the working set. 0 -> DIRECT: the client gets one fixed
+    // staging line and every block request fetches from the card. Tape and
+    // floppy are DIRECT (the card is quick enough and they would only spend
+    // region); the disc classes are CACHED. Nothing is ever preloaded.
+    parameter [7:0]   CACHE_MASK     = 8'b00000000,
+    // First region block of the per-client DIRECT staging lines (one each).
+    parameter [31:0]  STAGE_BASE_BLK = 32'd0
+) (
+    input  wire clk_stor,
+    input  wire rst_stor_n,
+    input  wire clk_cpu,
+    input  wire rst_cpu_n,
+
+    // ---- mem port (clk_stor; SDRAM device region / nds_mem_model) ----
+    output reg         mem_start,   // 1-cycle pulse, only when mem_busy=0
+    output reg         mem_we,
+    output reg  [19:0] mem_addr,    // {blk_abs[10:0], word[8:0]}
+    output reg  [31:0] mem_wdata,
+    input  wire [31:0] mem_rdata,   // valid at mem_done, then held
+    input  wire        mem_busy,
+    input  wire        mem_done,    // 1-cycle pulse
+
+    // ---- mount handoff (clk_stor; nd_storage_mount in step 4) ----
+    output reg         mnt_start,   // 1-cycle pulse per granted open
+    output wire [2:0]  mnt_client,  // which client is being opened
+    input  wire        mnt_done,    // 1-cycle pulse: mount finished
+    input  wire        mnt_err,     // valid with mnt_done
+    input  wire        mnt_nocard,  // valid with mnt_done: the open failed
+                                    // because there is no card, not because
+                                    // the file is missing
+
+    // ---- per-client geometry / open status from mount (clk_stor) ----
+    // quasi-static: stable whenever open_ok_stor[c] is high
+    input  wire [N_CLIENTS-1:0]    open_ok_stor,
+    input  wire [N_CLIENTS-1:0]    open_err_stor,
+    input  wire [N_CLIENTS*32-1:0] size_bytes_stor,
+    input  wire [N_CLIENTS*16-1:0] n_blocks,      // ceil(size/2048) per client
+    input  wire [N_CLIENTS*32-1:0] first_sector,  // file first SD sector
+
+    // ---- FAT-walk geometry (clk_stor; runtime chain walking, no
+    // contiguity requirement - docs/nd-storage-design.md section 2.2) ----
+    input  wire [N_CLIENTS*28-1:0] first_cluster, // file first FAT cluster
+    input  wire [7:0]              fat_spc,       // sectors/cluster (power of 2)
+    input  wire [31:0]             fat0_sector,   // first FAT sector (volume)
+    input  wire                    fat_is_fat32,  // 1 = FAT32, 0 = FAT16
+
+    // ---- sd_writer command port (clk_stor; wired by the top, step 3) ----
+    output reg         sdw_start,
+    output reg  [31:0] sdw_sector,
+    input  wire        sdw_busy,
+    //! DEBUG (24-AUG-2026) stage-timer taps: is the card being read, and is a
+    //! cache lookup outstanding. Used to find where a disc operation's time goes.
+    output wire        dbg_sd_busy,
+    output wire        dbg_cache_pend,
+    input  wire        sdw_done,
+    input  wire        sdw_err,
+    input  wire [8:0]  sdw_rd_addr,  // sd_writer byte fetch (2-clk registered)
+    output reg  [7:0]  sdw_rd_data,
+    // sd_writer is a sector READ/WRITE engine: rd_mode 1 = CMD17/CMD18. The
+    // cache fill path uses it, so no new SD protocol logic exists anywhere.
+    output reg         sdw_rd_mode,
+    output reg  [8:0]  sdw_burst_len,
+    // Fill-path diagnostic seam - see the assignments near s_rx_byte. Pure
+    // observation; leave unconnected in any build that does not probe it.
+    output wire        dbg_rx_stb,
+    output wire [7:0]  dbg_rx_raw,
+    output wire [7:0]  dbg_rx_byte,
+    // Live engine state, for the Tang capture ring. Three probe generations
+    // (09-AUG-2026) reported an empty ring and each time the honest reading
+    // was "the instrument may be dead", not "the card delivered nothing".
+    // Watching the state machine itself settles which states an operation
+    // actually visits instead of inferring it from a byte strobe.
+    output wire [4:0]  dbg_state,
+    // The card sector the engine is about to read. A HELD value, unlike the
+    // byte strobe, so the Tang ring can sample it across the clk_stor ->
+    // clk2x boundary the same way it samples dbg_state.
+    output wire [31:0] dbg_lba,
+    // The word being written into the region during W_MEM. Held across the
+    // W_MEM/W_MEM_WAIT pair, so the Tang ring samples it reliably across the
+    // clk_stor -> clk2x boundary - the property that separated every probe
+    // that worked from every one that did not.
+    output wire [15:0] dbg_wdata,
+    // What the REGION RETURNS on a read. Sampled at R_PUSH_HI, where the
+    // engine pushes mem_rdata[31:16] to the client, so the value is valid.
+    output wire [15:0] dbg_rdata,
+    // The word handed to the GRANTED CLIENT'S buffer, and its write enable.
+    // This is the last unmeasured signal in the read chain: the region read is
+    // proven good and the adapter is proven to forward zeros, so the loss is
+    // here or in the adapter. clk_cpu is HALF of clk2x, so unlike the
+    // clk_stor-domain strobes this write enable is two clk2x cycles wide and
+    // is observable by the capture ring.
+    output wire [15:0] dbg_bufw,
+    output wire        dbg_bufwe,
+    // The MOUNT's first_sector for the granted client. Block 0 of a file must
+    // be fetched from exactly this sector, so comparing it against dbg_lba
+    // settles whether the resolve is right without needing to know the card's
+    // layout. 10-AUG-2026: client 6 reads real data from a small file and
+    // zeros from the 75 MB one, with no error raised - a silent wrong-address
+    // read is the shape of that, and this is the address it should have used.
+    output wire [15:0] dbg_fsec,
+    output wire        dbg_past_eof,
+    output wire [2:0]  dbg_grant,
+
+    input  wire        sdw_rx_we,    // 1-cycle pulse per received byte
+    input  wire [8:0]  sdw_rx_addr,  // byte 0..511 of the current sector
+    input  wire [7:0]  sdw_rx_data,
+
+    // ---- cache directory (clk_stor; nd_storage_cache.v) ----
+    output reg         cache_lookup_req,
+    output reg  [2:0]  cache_lookup_client,
+    output reg  [15:0] cache_lookup_block,
+    input  wire        cache_lookup_done,
+    input  wire        cache_lookup_hit,
+    input  wire [2:0]  cache_lookup_way,
+    input  wire [10:0] cache_lookup_line,
+    output reg         cache_alloc_req,
+    output reg  [2:0]  cache_alloc_client,
+    output reg  [15:0] cache_alloc_block,
+    output reg  [2:0]  cache_alloc_way,
+    input  wire        cache_alloc_done,
+
+    // ---- status ----
+    output reg eng_wd_err,  // sticky until the next grant: watchdog fired
+
+    // ---- client ports (clk_cpu, flattened per spec section 4) ----
+    input  wire [N_CLIENTS-1:0]    open_req,
+    output wire [N_CLIENTS-1:0]    open_ok,
+    output wire [N_CLIENTS-1:0]    open_err,
+    output wire [N_CLIENTS*32-1:0] size_bytes,
+    input  wire [N_CLIENTS-1:0]    req,
+    input  wire [N_CLIENTS-1:0]    wr,
+    input  wire [N_CLIENTS*16-1:0] block,
+    output wire [N_CLIENTS-1:0]    busy,
+    output wire [N_CLIENTS-1:0]    done,
+    output wire [N_CLIENTS-1:0]    err,
+    // WHY it failed - valid with done when err=1 (nd_storage_status.vh).
+    // One bit of err could never tell "no card" from "file not on the
+    // card" from "block past the end of the image".
+    output wire [N_CLIENTS*4-1:0]  err_code,
+    output wire [N_CLIENTS*10-1:0] buf_addr,
+    output wire [N_CLIENTS*16-1:0] buf_wdata,
+    output wire [N_CLIENTS-1:0]    buf_we,
+    input  wire [N_CLIENTS*16-1:0] buf_rdata
+);
+
+  // ------------------------------------------------------------- slot map
+  function [31:0] slot_base;
+    input [2:0] c;
+    begin
+      case (c)
+        3'd0:    slot_base = SLOT0_BASE_BLK;
+        3'd1:    slot_base = SLOT1_BASE_BLK;
+        3'd2:    slot_base = SLOT2_BASE_BLK;
+        3'd3:    slot_base = SLOT3_BASE_BLK;
+        3'd4:    slot_base = SLOT4_BASE_BLK;
+        3'd5:    slot_base = SLOT5_BASE_BLK;
+        3'd6:    slot_base = SLOT6_BASE_BLK;
+        default: slot_base = SLOT7_BASE_BLK;
+      endcase
+    end
+  endfunction
+
+  // ------------------------------------------------------------- engine FSM
+  localparam [3:0] E_IDLE     = 4'd0;
+  localparam [3:0] E_GRANT    = 4'd1;
+  localparam [3:0] E_OPEN     = 4'd2;
+  localparam [3:0] R_MEM      = 4'd3;
+  localparam [3:0] R_WAIT     = 4'd4;
+  localparam [3:0] R_PUSH_HI  = 4'd5;
+  localparam [3:0] R_PUSH_LO  = 4'd6;
+  localparam [3:0] W_PULL     = 4'd7;
+  localparam [3:0] W_SEC_GO   = 4'd8;
+  localparam [3:0] W_SEC_WAIT = 4'd9;
+  localparam [3:0] W_MEM      = 4'd10;
+  localparam [3:0] W_MEM_WAIT = 4'd11;
+  localparam [3:0] E_DONE     = 4'd12;
+  // Phase-4 cache states.
+  localparam [4:0] C_LOOK     = 5'd13;  // tag lookup
+  localparam [4:0] C_SEC_GO   = 5'd14;  // card read of one sector of the line
+  localparam [4:0] C_SEC_WAIT = 5'd15;
+  localparam [4:0] C_ALLOC    = 5'd16;  // publish the filled line
+  // FAT-chain resolve states (per card sector; memo makes in-cluster free)
+  localparam [4:0] F_RES      = 5'd17;  // pick start point (memo or chain head)
+  localparam [4:0] F_STEP     = 5'd18;  // at target? publish : hop
+  localparam [4:0] F_FAT_GO   = 5'd19;  // CMD17 of the FAT sector of cur cluster
+  localparam [4:0] F_FAT_WAIT = 5'd20;  // capture the 2/4 entry bytes in-stream
+
+  reg [4:0]           s_state;
+  reg                 s_filling;    // this op is a cache line fill
+  reg                 s_need_alloc; // publish the tag when the line is written
+  reg [2:0]           s_cache_way;
+  reg [2:0]           s_grant;                     // granted client
+  reg [2:0]           s_ptr;                       // round-robin pointer
+  reg [N_CLIENTS-1:0] s_pend_open;
+  reg [N_CLIENTS-1:0] s_pend_blk;
+  reg                 s_op_wr    [0:N_CLIENTS-1];  // latched with the request
+  reg [15:0]          s_op_block [0:N_CLIENTS-1];
+  reg [10:0]          s_blk_abs;                   // slot base + block
+  reg [8:0]           s_wcnt;                      // SDRAM word m, 0..511
+  reg [9:0]           s_pull_cnt;                  // client word k, 0..1023
+  reg [1:0]           s_sec;                       // sector within block
+  reg                 s_phase;                     // per-state sub-phase
+  reg                 s_err_c;                     // op error, done_tgl payload
+  reg [3:0]           s_err_code;                  // WHY (nd_storage_status.vh)
+  reg [31:0]          s_rdata_lat;                 // mem word being pushed
+  reg [15:0]          s_stage_hi;                  // even pull word (high half)
+
+  // ---- FAT-walk state (docs/nd-storage-design.md section 2.2) ----
+  reg [N_CLIENTS-1:0] s_m_val;                     // per-client memo valid
+  reg [19:0]          s_m_idx [0:N_CLIENTS-1];     // memo: cluster idx in file
+  reg [27:0]          s_m_clu [0:N_CLIENTS-1];     // memo: FAT cluster number
+  reg [19:0]          s_cur_idx;                   // walk position
+  reg [27:0]          s_cur_clu;
+  reg [31:0]          s_res_lba;                   // resolved card sector
+  reg                 s_res_valid;                 // s_res_lba is for THIS sector
+  reg                 s_ret_wr;                    // resolve return: 1 = W_SEC_GO
+  reg                 s_res_skip;                  // past-EOF: skip the CMD24
+  reg [31:0]          s_fat_acc;                   // FAT entry byte assembly
+  reg [31:0]          s_data_start;                // volume data region, granted client
+  reg [2:0]           s_l2c;                       // log2(fat_spc)
+  reg [17:0]          s_hops;                      // corrupt-chain cap (see fatchk)
+
+  // log2 of the sectors-per-cluster one-hot (power of two by FAT rules)
+  function [2:0] l2spc;
+    input [7:0] v;
+    begin
+      casez (v)
+        8'b1???????: l2spc = 3'd7;
+        8'b01??????: l2spc = 3'd6;
+        8'b001?????: l2spc = 3'd5;
+        8'b0001????: l2spc = 3'd4;
+        8'b00001???: l2spc = 3'd3;
+        8'b000001??: l2spc = 3'd2;
+        8'b0000001?: l2spc = 3'd1;
+        default:     l2spc = 3'd0;
+      endcase
+    end
+  endfunction
+
+  // Target of the resolve: the card sector currently being fetched/written,
+  // expressed as (cluster index within the file, sector within that cluster).
+  wire [17:0] s_fsec    = {s_op_block[s_grant], 2'b00} + {16'd0, s_sec};
+  wire [19:0] s_tgt_idx = {2'd0, s_fsec} >> s_l2c;
+  wire [7:0]  s_within  = s_fsec[7:0] & (fat_spc - 8'd1);
+  // FAT sector + in-sector byte offset of the current cluster's entry
+  wire [31:0] s_fat_sec = fat0_sector + (fat_is_fat32 ? {7'd0, s_cur_clu[27:7]}
+                                                      : {12'd0, s_cur_clu[27:8]});
+  // In-sector chain following (24-AUG-2026): the entry value being completed
+  // THIS cycle - its last byte is on sdw_rx_data, the rest already in the
+  // accumulator - and whether the cluster it names lives later in this same
+  // FAT sector, which is what makes a bufferless multi-hop pass possible.
+  reg         s_insec;                       // this pass already advanced
+  wire [31:0] s_nxt32 = {sdw_rx_data, s_fat_acc[23:0]};
+  wire [15:0] s_nxt16 = {sdw_rx_data, s_fat_acc[7:0]};
+  wire [27:0] s_nxt_clu = fat_is_fat32 ? s_nxt32[27:0] : {12'd0, s_nxt16};
+  // same 512-byte FAT sector? FAT32 packs 128 entries (clu[27:7]), FAT16 256
+  wire        s_nxt_same_sec = fat_is_fat32
+                             ? (s_nxt_clu[27:7] == s_cur_clu[27:7])
+                             : (s_nxt_clu[27:8] == s_cur_clu[27:8]);
+  wire [8:0]  s_nxt_off = fat_is_fat32 ? {s_nxt_clu[6:0], 2'b00}
+                                       : {s_nxt_clu[7:0], 1'b0};
+  // only follow FORWARD within the pass - an earlier offset has already
+  // streamed past and would need another read anyway
+  wire        s_nxt_later = (s_nxt_off > sdw_rx_addr);
+
+  wire [8:0]  s_ent_off = fat_is_fat32 ? {s_cur_clu[6:0], 2'b00}
+                                       : {s_cur_clu[7:0], 1'b0};
+  wire [27:0] s_fclu_g  = first_cluster[28*s_grant +: 28];
+  // Sectors the FILE actually has. A block's tail sectors can lie past the
+  // end of the FAT chain (e.g. a 3001-byte file: 6 sectors, but its second
+  // 2048-byte block spans file sectors 4..7). Reads of those must serve
+  // ZEROS (the s_past_eof byte gate already guarantees that - any fetched
+  // sector's bytes are zeroed); writes of those are DROPPED: the old
+  // contiguity arithmetic wrote them into whatever followed on the card,
+  // which on a 1-sector-per-cluster volume is the NEXT FILE.
+  wire [22:0] s_file_secs = size_bytes_stor[32*s_grant+9 +: 23]
+                            + {22'd0, |size_bytes_stor[32*s_grant +: 9]};
+  wire        s_past_file = {5'd0, s_fsec} >= s_file_secs;
+
+  assign mnt_client = s_grant;
+
+  // ------------------------------------------------------------- word bridge
+  // stor -> cpu: toggles + stable data (design section 4.4)
+  reg [15:0]          s_bridge_rd_data;  // stable one clk_stor before the flip
+  reg                 s_rd_have_tgl;
+  reg                 s_wr_want_tgl;
+  reg [N_CLIENTS-1:0] s_done_tgl;
+
+  // cpu -> stor answers, per client (only the granted client flips)
+  wire [N_CLIENTS-1:0]    fe_open_tgl;
+  wire [N_CLIENTS-1:0]    fe_req_tgl;
+  wire [N_CLIENTS-1:0]    fe_ack_tgl;
+  wire [N_CLIENTS-1:0]    fe_have_tgl;
+  wire [N_CLIENTS-1:0]    fe_wr_lat;
+  wire [N_CLIENTS*16-1:0] fe_block_lat;
+  wire [N_CLIENTS*16-1:0] fe_wrdata;
+
+  // synchronized pulses / levels
+  wire [N_CLIENTS-1:0] s_open_pulse;      // clk_stor
+  wire [N_CLIENTS-1:0] s_req_pulse;       // clk_stor
+  wire [N_CLIENTS-1:0] s_ack_pulse_v;     // clk_stor, per client
+  wire [N_CLIENTS-1:0] s_wr_have_pulse_v; // clk_stor, per client
+  wire [N_CLIENTS-1:0] c_done_pulse;      // clk_cpu
+  wire                 c_rd_have_pulse;   // clk_cpu
+  wire                 c_wr_want_pulse;   // clk_cpu
+  wire [2:0]           c_grant_sync;      // clk_cpu
+  wire                 c_err_sync;        // clk_cpu
+  wire [3:0]           c_err_code_sync;   // clk_cpu, rides with c_err_sync
+  wire [N_CLIENTS-1:0] c_open_ok_sync;    // clk_cpu
+  wire [N_CLIENTS-1:0] c_open_err_sync;   // clk_cpu
+
+  // pulse mux by the (stable-during-op) grant: each toggle has its own
+  // synchronizer, so a grant change can never manufacture an edge
+  wire        s_ack_pulse     = s_ack_pulse_v[s_grant];
+  wire        s_wr_have_pulse = s_wr_have_pulse_v[s_grant];
+  wire [15:0] s_wr_data_sel   = fe_wrdata[16*s_grant +: 16];
+
+  nds_sync_pulse u_sync_rhave (
+      .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+      .tgl_src(s_rd_have_tgl), .pulse_dst(c_rd_have_pulse)
+  );
+  nds_sync_pulse u_sync_want (
+      .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+      .tgl_src(s_wr_want_tgl), .pulse_dst(c_wr_want_pulse)
+  );
+  nds_sync_level #(.WIDTH(3)) u_sync_grant (
+      .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+      .d_src(s_grant), .q_dst(c_grant_sync)
+  );
+  nds_sync_level #(.WIDTH(1)) u_sync_err (
+      .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+      .d_src(s_err_c), .q_dst(c_err_sync)
+  );
+  // Same shape as the err level above: the code is settled long before the
+  // done toggle is sent, and the front-end samples it only on the done
+  // pulse, so this is the ordinary data-with-handshake crossing.
+  nds_sync_level #(.WIDTH(4)) u_sync_errcode (
+      .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+      .d_src(s_err_code), .q_dst(c_err_code_sync)
+  );
+  nds_sync_level #(.WIDTH(N_CLIENTS)) u_sync_ok (
+      .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+      .d_src(open_ok_stor), .q_dst(c_open_ok_sync)
+  );
+  nds_sync_level #(.WIDTH(N_CLIENTS)) u_sync_oerr (
+      .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+      .d_src(open_err_stor), .q_dst(c_open_err_sync)
+  );
+  // "there is no card" as a LEVEL the clk_cpu front-end can read. Without
+  // it, the front-end's local refusal below could only ever say NOTOPEN,
+  // so an empty card slot reported "the file is not on the card" for every
+  // client at once - the single most misleading answer available, and
+  // exactly the kind of confusion the reason codes exist to remove.
+  // mnt_nocard is held by nd_storage_mount.v from its M_FAIL/M_OK verdict,
+  // so it is stable except around a mount, and the front-end reads it only
+  // when it is about to refuse.
+  wire c_nocard_sync;
+  nds_sync_level #(.WIDTH(1)) u_sync_nocard (
+      .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+      .d_src(mnt_nocard), .q_dst(c_nocard_sync)
+  );
+
+  assign open_ok  = c_open_ok_sync;
+  assign open_err = c_open_err_sync;
+
+  // ------------------------------------------------------------- arbiter scan
+  // first pending client at ptr+1, ptr+2, ... ptr (mod N_CLIENTS)
+  reg       s_scan_v;
+  reg [2:0] s_scan_id;
+  reg [3:0] s_scan_t;
+  integer k;
+  always @(*) begin
+    s_scan_v  = 1'b0;
+    s_scan_id = 3'd0;
+    s_scan_t  = 4'd0;
+    for (k = 1; k <= N_CLIENTS; k = k + 1) begin
+      s_scan_t = {1'b0, s_ptr} + k[3:0];
+      if (s_scan_t >= N_CLIENTS[3:0]) s_scan_t = s_scan_t - N_CLIENTS[3:0];
+      if (!s_scan_v && (s_pend_open[s_scan_t[2:0]] || s_pend_blk[s_scan_t[2:0]])) begin
+        s_scan_v  = 1'b1;
+        s_scan_id = s_scan_t[2:0];
+      end
+    end
+  end
+
+  wire [31:0] s_slot_base_g = slot_base(s_grant);
+
+  // ------------------------------------------------------------- watchdog
+  reg [4:0]  s_state_q;
+  reg [31:0] s_wd;
+  always @(posedge clk_stor) begin
+    if (!rst_stor_n) begin
+      s_state_q <= E_IDLE;
+      s_wd      <= 32'd0;
+    end else begin
+      s_state_q <= s_state;
+      if (s_state != s_state_q || s_state == E_IDLE) s_wd <= 32'd0;
+      else s_wd <= s_wd + 32'd1;
+    end
+  end
+  wire s_wd_hit = (s_wd >= WD_MAX);
+
+  // ------------------------------------------------------------- staging BRAM
+  // 512 x 32, write side fed by W_PULL, read side shared between the
+  // sd_writer byte fetch (W_SEC phase) and the W_MEM writeback
+  reg [31:0] s_staging [0:511];
+  reg [31:0] s_stg_rdata;
+  reg [1:0]  s_sdw_lane;
+
+  // Card bytes arrive one at a time during a fill; pack four into a word and
+  // write it once, so the staging BRAM needs no byte enables. Byte 4m of a
+  // word is dq[31:24] - the same order the write path already uses to feed
+  // sd_writer, so a block written and then re-read comes back identical.
+  reg [23:0] s_rx_acc;
+  wire       s_rx_active    = (s_state == C_SEC_WAIT);
+  wire       s_rx_word_done = s_rx_active && sdw_rx_we && (sdw_rx_addr[1:0] == 2'd3);
+
+  // Bytes past end-of-file read as ZERO. A fetch pulls whole 2048-byte
+  // blocks off the card, so the last block of a file that is not a multiple
+  // of 2048 also drags in whatever follows it inside the same cluster. v1
+  // zero-padded that tail (its preload packer stopped at the file size), and
+  // clients are entitled to the same answer - a 3001-byte TAPE.BPUN must not
+  // start returning cluster slack at byte 3001 just because the region
+  // became a cache.
+  wire [31:0] s_fill_byte_off = {5'd0, s_op_block[s_grant], 11'd0}
+                                + {21'd0, s_sec, 9'd0}
+                                + {23'd0, sdw_rx_addr};
+  wire        s_past_eof      = s_fill_byte_off >= size_bytes_stor[32*s_grant +: 32];
+  wire [7:0]  s_rx_byte       = s_past_eof ? 8'd0 : sdw_rx_data;
+
+  // ---- diagnostic seam (09-AUG-2026) -------------------------------------
+  // The silicon zero-read has been narrowed to the FILL: the SDRAM region
+  // reads back zeros (63/63 D0000 on a hardware probe), so the staging ->
+  // region write carried nothing, so staging itself was filled with zeros.
+  // Two ways that happens, and they need telling apart:
+  //   - the card genuinely delivered zeros    -> dbg_rx_raw is 0
+  //   - the s_past_eof gate zeroed real bytes -> dbg_rx_raw is NOT 0 while
+  //     dbg_rx_byte is 0, and dbg_past_eof is high
+  // Pure observation: no existing signal is altered, and with the seam
+  // unconnected these are optimised away.
+  // EVERY received card byte, in EVERY state - NOT gated on s_rx_active, so
+  // FAT-chain bytes (F_FAT_WAIT) and any future path are recorded too, not
+  // just the sector fill. This is a superset of the old gated version.
+  //
+  // NOTE, so the next reader does not repeat a wrong turn taken 09-AUG-2026:
+  // the gate was NOT the reason the Tang probe came back empty. It is easy to
+  // assume s_rx_active == (s_state == C_SEC_WAIT) only covers CACHED clients,
+  // because C_SEC_GO/C_SEC_WAIT sit under the C_LOOK cache-fill arm. They do
+  // not. A DIRECT client (CACHE_MASK bit clear) jumps straight to C_SEC_GO
+  // from E_GRANT, so it passes through exactly the same two states. Both
+  // gated and ungated versions see a direct read.
+  assign dbg_state    = s_state;
+  assign dbg_lba      = sdw_sector;
+  assign dbg_wdata    = mem_wdata[15:0];
+  assign dbg_rdata    = mem_rdata[31:16];
+  assign dbg_bufw     = buf_wdata[16*c_grant_sync +: 16];
+  assign dbg_bufwe    = buf_we[c_grant_sync];
+  // HIGH half. The low half proved first_sector and the fetched sector agree,
+  // but they agree by construction (the LBA derives from first_sector), so the
+  // low compare cannot see a wrong high half. A first_sector 64K sectors off
+  // would read blank card space and produce exactly the observed symptom:
+  // right-looking low bits, clean completion, no error, all zeros.
+  assign dbg_fsec     = first_sector[32*s_grant + 16 +: 16];
+  assign dbg_rx_stb   = sdw_rx_we;
+  assign dbg_rx_raw   = sdw_rx_data;
+  assign dbg_rx_byte  = s_rx_byte;
+  assign dbg_past_eof = s_past_eof;
+  assign dbg_grant    = s_grant;
+
+  wire       s_stg_we    = ((s_state == W_PULL) && s_phase && s_wr_have_pulse
+                            && s_pull_cnt[0]) || s_rx_word_done;
+  wire [8:0] s_stg_waddr = s_rx_word_done ? {s_sec, sdw_rx_addr[8:2]}
+                                          : s_pull_cnt[9:1];
+  wire [31:0] s_stg_wdata = s_rx_word_done ? {s_rx_acc, s_rx_byte}
+                                           : {s_stage_hi, s_wr_data_sel};
+  wire [8:0] s_stg_raddr = (s_state == W_MEM || s_state == W_MEM_WAIT)
+                           ? s_wcnt
+                           : {s_sec, sdw_rd_addr[8:2]};
+
+  always @(posedge clk_stor) begin
+    if (s_rx_active && sdw_rx_we) s_rx_acc <= {s_rx_acc[15:0], s_rx_byte};
+    if (s_stg_we) s_staging[s_stg_waddr] <= s_stg_wdata;
+    // stage 1: word + byte lane
+    s_stg_rdata <= s_staging[s_stg_raddr];
+    s_sdw_lane  <= sdw_rd_addr[1:0];
+    // stage 2: byte mux (byte 4m of SDRAM word m is dq[31:24])
+    case (s_sdw_lane)
+      2'd0: sdw_rd_data <= s_stg_rdata[31:24];
+      2'd1: sdw_rd_data <= s_stg_rdata[23:16];
+      2'd2: sdw_rd_data <= s_stg_rdata[15:8];
+      2'd3: sdw_rd_data <= s_stg_rdata[7:0];
+    endcase
+  end
+
+  // ------------------------------------------------------------- engine
+  integer i;
+  always @(posedge clk_stor) begin
+    if (!rst_stor_n) begin
+      s_state          <= E_IDLE;
+      s_m_val          <= {N_CLIENTS{1'b0}};
+      s_res_valid      <= 1'b0;
+      s_res_skip       <= 1'b0;
+      s_ret_wr         <= 1'b0;
+      s_hops           <= 18'd0;
+      s_cur_idx        <= 20'd0;
+      s_cur_clu        <= 28'd0;
+      s_res_lba        <= 32'd0;
+      s_fat_acc        <= 32'd0;
+      s_data_start     <= 32'd0;
+      s_l2c            <= 3'd0;
+      s_insec          <= 1'b0;
+      s_grant          <= 3'd0;
+      // client 0 scanned first. The truncation is SAFE here and only here:
+      // at N_CLIENTS==8, N_CLIENTS[2:0] is 3'b000 and 0-1 wraps to 7, which
+      // still makes client 0 the next one scanned. Do not copy this pattern -
+      // the same truncation in nd_storage_mount's range guard would break
+      // mounting outright, which is why that one compares at full width.
+      s_ptr            <= N_CLIENTS[2:0] - 3'd1;
+      s_pend_open      <= {N_CLIENTS{1'b0}};
+      s_pend_blk       <= {N_CLIENTS{1'b0}};
+      s_blk_abs        <= 11'd0;
+      s_wcnt           <= 9'd0;
+      s_pull_cnt       <= 10'd0;
+      s_sec            <= 2'd0;
+      s_phase          <= 1'b0;
+      s_err_c          <= 1'b0;
+      s_err_code       <= `NDS_ERR_NONE;
+      s_rdata_lat      <= 32'd0;
+      s_stage_hi       <= 16'd0;
+      s_bridge_rd_data <= 16'd0;
+      s_rd_have_tgl    <= 1'b0;
+      s_wr_want_tgl    <= 1'b0;
+      s_done_tgl       <= {N_CLIENTS{1'b0}};
+      mem_start        <= 1'b0;
+      mem_we           <= 1'b0;
+      mem_addr         <= 20'd0;
+      mem_wdata        <= 32'd0;
+      mnt_start        <= 1'b0;
+      sdw_start        <= 1'b0;
+      sdw_sector       <= 32'd0;
+      sdw_rd_mode      <= 1'b0;
+      sdw_burst_len    <= 9'd1;
+      s_filling        <= 1'b0;
+      s_need_alloc     <= 1'b0;
+      s_cache_way      <= 3'd0;
+      cache_lookup_req <= 1'b0;
+      cache_alloc_req  <= 1'b0;
+      eng_wd_err       <= 1'b0;
+      for (i = 0; i < N_CLIENTS; i = i + 1) begin
+        s_op_wr[i]    <= 1'b0;
+        s_op_block[i] <= 16'd0;
+      end
+    end else begin
+      mem_start        <= 1'b0;
+      mnt_start        <= 1'b0;
+      sdw_start        <= 1'b0;
+      cache_lookup_req <= 1'b0;
+      cache_alloc_req  <= 1'b0;
+
+      // pending latches: set on the synced request toggles, cleared at op
+      // end (a client is busy until done, so set and clear never collide)
+      for (i = 0; i < N_CLIENTS; i = i + 1) begin
+        if (s_open_pulse[i]) s_pend_open[i] <= 1'b1;
+        if (s_req_pulse[i]) begin
+          s_pend_blk[i] <= 1'b1;
+          s_op_wr[i]    <= fe_wr_lat[i];
+          s_op_block[i] <= fe_block_lat[16*i +: 16];
+        end
+      end
+
+      case (s_state)
+        E_IDLE: begin
+          s_phase <= 1'b0;
+          if (s_scan_v) begin
+            s_grant <= s_scan_id;
+            s_state <= E_GRANT;
+          end
+        end
+
+        E_GRANT: begin
+          s_wcnt       <= 9'd0;
+          s_pull_cnt   <= 10'd0;
+          s_sec        <= 2'd0;
+          s_phase      <= 1'b0;
+          eng_wd_err   <= 1'b0;
+          s_filling    <= 1'b0;
+          s_need_alloc <= 1'b0;
+          s_res_valid  <= 1'b0;
+          s_res_skip   <= 1'b0;
+          s_hops       <= 18'd0;
+          s_l2c        <= l2spc(fat_spc);
+          // data region start of the volume, derived per client:
+          // first_sector = data_start + (first_cluster-2)*spc
+          s_data_start <= first_sector[32*s_grant +: 32]
+                          - ({4'd0, first_cluster[28*s_grant +: 28] - 28'd2}
+                             << l2spc(fat_spc));
+          s_err_code <= `NDS_ERR_NONE;   // cleared on EVERY start, so a
+                                         // stale code can never survive into
+                                         // a successful operation
+          if (s_pend_open[s_grant]) begin
+            s_err_c <= 1'b0;
+            s_state <= E_OPEN;
+          end else if (s_op_block[s_grant] >= n_blocks[16*s_grant +: 16]) begin
+            // out of range: done+err with ZERO mem/SD traffic
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_RANGE;
+            s_state <= E_DONE;
+          end else begin
+            s_err_c <= 1'b0;
+            // Phase 4. The v1 line here was
+            //     s_blk_abs <= s_slot_base_g + s_op_block[s_grant];
+            // a 1:1 map of image block onto region block, which is exactly
+            // why an image could never be larger than its slot. The region
+            // is now a CACHE, so where a block LIVES is a lookup.
+            if (CACHE_MASK[s_grant]) begin
+              s_state <= C_LOOK;
+            end else begin
+              // DIRECT: ONE SHARED staging line. Per-client lines would
+              // need N blocks reserved and would collide with POOL_BASE_BLK
+              // (the pool starts right after the single line); sharing is
+              // safe because the arbiter grants one client at a time and a
+              // DIRECT op fetches AND serves inside its own grant, so the
+              // line never has to survive past it.
+              s_blk_abs <= STAGE_BASE_BLK[10:0];
+              if (s_op_wr[s_grant]) begin
+                s_state <= W_PULL;
+              end else begin
+                s_filling <= 1'b1;
+                s_state   <= C_SEC_GO;
+              end
+            end
+          end
+        end
+
+        // ---- cache: where does this block live? --------------------------
+        C_LOOK: begin
+          if (!s_phase) begin
+            cache_lookup_req    <= 1'b1;
+            cache_lookup_client <= s_grant;
+            cache_lookup_block  <= s_op_block[s_grant];
+            s_phase             <= 1'b1;
+          end else if (cache_lookup_done) begin
+            s_blk_abs   <= cache_lookup_line;
+            s_cache_way <= cache_lookup_way;
+            s_phase     <= 1'b0;
+            if (s_op_wr[s_grant]) begin
+              // Write-allocate: the block is written to the card and to the
+              // region either way; on a miss the tag is published after, so
+              // a line is never advertised before it holds the data.
+              s_need_alloc <= !cache_lookup_hit;
+              s_state      <= W_PULL;
+            end else if (cache_lookup_hit) begin
+              s_state <= R_MEM;              // resident: no card traffic
+            end else begin
+              s_filling    <= 1'b1;
+              s_need_alloc <= 1'b1;
+              s_state      <= C_SEC_GO;
+            end
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_phase    <= 1'b0;
+            s_state    <= E_DONE;
+          end
+        end
+
+        // ---- cache fill: 4 card sectors -> staging -----------------------
+        // The card sector comes from the FAT-chain resolve (F_RES...), never
+        // from contiguity arithmetic - fragmented files are simply correct.
+        C_SEC_GO: begin
+          if (!s_res_valid) begin
+            s_ret_wr <= 1'b0;
+            s_state  <= F_RES;
+          end else if (!sdw_busy) begin
+            sdw_start     <= 1'b1;
+            sdw_rd_mode   <= 1'b1;
+            sdw_burst_len <= 9'd1;
+            sdw_sector    <= s_res_lba;
+            s_res_valid   <= 1'b0;
+            s_state       <= C_SEC_WAIT;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        C_SEC_WAIT: begin
+          if (sdw_err) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_CARDIO;
+            s_state <= E_DONE;
+          end else if (sdw_done) begin
+            if (s_sec == 2'd3) begin
+              s_wcnt  <= 9'd0;
+              s_phase <= 1'b0;
+              s_state <= W_MEM;        // staging -> region, shared with write
+            end else begin
+              s_sec   <= s_sec + 2'd1;
+              s_state <= C_SEC_GO;
+            end
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        // ---- cache: publish the line -------------------------------------
+        C_ALLOC: begin
+          if (!s_phase) begin
+            cache_alloc_req    <= 1'b1;
+            cache_alloc_client <= s_grant;
+            cache_alloc_block  <= s_op_block[s_grant];
+            cache_alloc_way    <= s_cache_way;
+            s_phase            <= 1'b1;
+          end else if (cache_alloc_done) begin
+            s_phase      <= 1'b0;
+            s_need_alloc <= 1'b0;
+            if (s_filling) begin
+              s_wcnt    <= 9'd0;
+              s_filling <= 1'b0;
+              s_state   <= R_MEM;      // now serve the client from the line
+            end else begin
+              s_state <= E_DONE;
+            end
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_phase    <= 1'b0;
+            s_state    <= E_DONE;
+          end
+        end
+
+        // ---- open: hand to the mount FSM --------------------------------
+        E_OPEN: begin
+          if (!s_phase) begin
+            mnt_start <= 1'b1;
+            s_phase   <= 1'b1;
+            s_m_val[s_grant] <= 1'b0;  // remount: old memo cluster is invalid
+          end else if (mnt_done) begin
+            s_err_c    <= mnt_err;
+            // An open can fail two ways the operator must be able to tell
+            // apart: there is no card at all, or the card is fine and the
+            // file this client wants is not on it.
+            s_err_code <= !mnt_err  ? `NDS_ERR_NONE
+                        : mnt_nocard ? `NDS_ERR_NOCARD
+                                     : `NDS_ERR_NOTOPEN;
+            s_phase <= 1'b0;
+            s_state <= E_DONE;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_phase    <= 1'b0;
+            s_state    <= E_DONE;
+          end
+        end
+
+        // ---- block read: SDRAM word -> two client words ------------------
+        R_MEM: begin
+          if (!mem_busy) begin
+            mem_start <= 1'b1;
+            mem_we    <= 1'b0;
+            mem_addr  <= {s_blk_abs, s_wcnt};
+            s_state   <= R_WAIT;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        R_WAIT: begin
+          if (mem_done) begin
+            s_rdata_lat      <= mem_rdata;
+            s_bridge_rd_data <= mem_rdata[31:16];  // client word 2m first
+            s_phase          <= 1'b0;
+            s_state          <= R_PUSH_HI;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        R_PUSH_HI: begin
+          if (!s_phase) begin
+            // data was set one clk_stor earlier - flip now
+            s_rd_have_tgl <= ~s_rd_have_tgl;
+            s_phase       <= 1'b1;
+          end else if (s_ack_pulse) begin
+            s_bridge_rd_data <= s_rdata_lat[15:0];  // client word 2m+1
+            s_phase          <= 1'b0;
+            s_state          <= R_PUSH_LO;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_phase    <= 1'b0;
+            s_state    <= E_DONE;
+          end
+        end
+
+        R_PUSH_LO: begin
+          if (!s_phase) begin
+            s_rd_have_tgl <= ~s_rd_have_tgl;
+            s_phase       <= 1'b1;
+          end else if (s_ack_pulse) begin
+            s_phase <= 1'b0;
+            if (s_wcnt == 9'd511) s_state <= E_DONE;
+            else begin
+              s_wcnt  <= s_wcnt + 9'd1;
+              s_state <= R_MEM;
+            end
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_phase    <= 1'b0;
+            s_state    <= E_DONE;
+          end
+        end
+
+        // ---- block write phase 1: pull 1024 words into staging ----------
+        W_PULL: begin
+          if (!s_phase) begin
+            s_wr_want_tgl <= ~s_wr_want_tgl;
+            s_phase       <= 1'b1;
+          end else if (s_wr_have_pulse) begin
+            s_phase <= 1'b0;
+            if (!s_pull_cnt[0]) s_stage_hi <= s_wr_data_sel;  // even word: high half
+            // odd word: staging write via s_stg_we (this cycle)
+            if (s_pull_cnt == 10'd1023) s_state <= W_SEC_GO;
+            else s_pull_cnt <= s_pull_cnt + 10'd1;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_phase    <= 1'b0;
+            s_state    <= E_DONE;
+          end
+        end
+
+        // ---- block write phase 2: 4 CMD24 sectors (card FIRST) ----------
+        // Card sector via the FAT-chain resolve, as in C_SEC_GO.
+        W_SEC_GO: begin
+          if (!s_res_valid) begin
+            s_ret_wr <= 1'b1;
+            s_state  <= F_RES;
+          end else if (s_res_skip) begin
+            // past-EOF sector: dropped, advance as if the card write finished
+            s_res_valid <= 1'b0;
+            s_res_skip  <= 1'b0;
+            if (s_sec == 2'd3) begin
+              s_wcnt  <= 9'd0;
+              s_phase <= 1'b0;
+              s_state <= W_MEM;
+            end else begin
+              s_sec   <= s_sec + 2'd1;
+              s_state <= W_SEC_GO;
+            end
+          end else if (!sdw_busy) begin
+            sdw_start   <= 1'b1;
+            sdw_rd_mode <= 1'b0;
+            sdw_burst_len <= 9'd1;
+            sdw_sector <= s_res_lba;
+            s_res_valid <= 1'b0;
+            s_state    <= W_SEC_WAIT;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        W_SEC_WAIT: begin
+          if (sdw_err) begin
+            s_err_c    <= 1'b1;   // card failed: SDRAM copy stays untouched
+            s_err_code <= `NDS_ERR_CARDIO;
+            s_state <= E_DONE;
+          end else if (sdw_done) begin
+            if (s_sec == 2'd3) begin
+              s_wcnt  <= 9'd0;
+              s_phase <= 1'b0;
+              s_state <= W_MEM;
+            end else begin
+              s_sec   <= s_sec + 2'd1;
+              s_state <= W_SEC_GO;
+            end
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        // ---- block write phase 3: staging -> SDRAM (then done) ----------
+        W_MEM: begin
+          if (!s_phase) begin
+            s_phase <= 1'b1;   // one cycle for the registered staging read
+          end else if (!mem_busy) begin
+            mem_start <= 1'b1;
+            mem_we    <= 1'b1;
+            mem_addr  <= {s_blk_abs, s_wcnt};
+            mem_wdata <= s_stg_rdata;
+            s_phase   <= 1'b0;
+            s_state   <= W_MEM_WAIT;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_phase    <= 1'b0;
+            s_state    <= E_DONE;
+          end
+        end
+
+        W_MEM_WAIT: begin
+          if (mem_done) begin
+            if (s_wcnt == 9'd511) begin
+              // Region copy complete. A miss still has to publish its tag; a
+              // fill then goes on to serve the client from the line it just
+              // wrote. A DIRECT fill has no tag to publish.
+              if (s_need_alloc)   s_state <= C_ALLOC;
+              else if (s_filling) begin
+                s_wcnt    <= 9'd0;
+                s_filling <= 1'b0;
+                s_state   <= R_MEM;
+              end else            s_state <= E_DONE;
+            end
+            else begin
+              s_wcnt  <= s_wcnt + 9'd1;
+              s_state <= W_MEM;
+            end
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        // ---- completion --------------------------------------------------
+        // ---- FAT-chain resolve (docs/nd-storage-design.md section 2.2) -----------
+        F_RES: begin
+          if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end else if (s_past_file) begin
+            // Past the end of the file: no chain to walk. Reads fetch the
+            // data-region start sector (bytes zeroed by s_past_eof); writes
+            // skip the card entirely.
+            s_res_lba   <= s_data_start;
+            s_res_skip  <= s_ret_wr;
+            s_res_valid <= 1'b1;
+            s_state     <= s_ret_wr ? W_SEC_GO : C_SEC_GO;
+          end else if (s_m_val[s_grant] && s_m_idx[s_grant] <= s_tgt_idx) begin
+            s_cur_idx <= s_m_idx[s_grant];   // resume from the memo
+            s_cur_clu <= s_m_clu[s_grant];
+            s_state   <= F_STEP;
+          end else begin
+            s_cur_idx <= 20'd0;              // backward seek: chain head
+            s_cur_clu <= s_fclu_g;
+            s_state   <= F_STEP;
+          end
+        end
+
+        F_STEP: begin
+          if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end else if (s_cur_idx == s_tgt_idx) begin
+            s_m_val[s_grant] <= 1'b1;        // memoize the landing point
+            s_m_idx[s_grant] <= s_cur_idx;
+            s_m_clu[s_grant] <= s_cur_clu;
+            s_res_lba <= s_data_start
+                         + ({4'd0, s_cur_clu - 28'd2} << s_l2c)
+                         + {24'd0, s_within};
+            s_res_valid <= 1'b1;
+`ifdef ND_STORAGE_FATWALK_DEBUG
+            $display("[FATWALK] g=%0d blk=%0d sec=%0d fsec=%0d tgt=%0d clu=%0d l2c=%0d within=%0d dstart=%0d lba=%0d",
+                     s_grant, s_op_block[s_grant], s_sec, s_fsec, s_tgt_idx,
+                     s_cur_clu, s_l2c, s_within, s_data_start,
+                     s_data_start + ({4'd0, s_cur_clu - 28'd2} << s_l2c)
+                     + {24'd0, s_within});
+`endif
+            s_state     <= s_ret_wr ? W_SEC_GO : C_SEC_GO;
+          end else if (&s_hops) begin
+            // corrupt/circular chain: the watchdog resets on every state
+            // change, so the loop needs its own cap (same idea as fatchk's
+            // HOP_CAP). Fail the op honestly.
+            s_m_val[s_grant] <= 1'b0;
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_FATCHAIN;
+            s_state    <= E_DONE;
+          end else begin
+            s_state <= F_FAT_GO;
+          end
+        end
+
+        F_FAT_GO: begin
+          if (!sdw_busy) begin
+            sdw_start     <= 1'b1;
+            sdw_rd_mode   <= 1'b1;
+            sdw_burst_len <= 9'd1;
+            sdw_sector    <= s_fat_sec;
+            s_fat_acc     <= 32'd0;
+            s_insec       <= 1'b0;
+            s_state       <= F_FAT_WAIT;
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        F_FAT_WAIT: begin
+          // Capture the entry's bytes as the sector streams by - no FAT sector
+          // buffer anywhere (LUT/BSRAM budget).
+          //
+          // IN-SECTOR CHAIN FOLLOWING (24-AUG-2026). The original design took
+          // ONE hop per card read, on the assumption that access is sequential
+          // and the per-client memo makes the steady state 0..1 hops
+          // (docs/nd-storage-design.md section 2.2). SINTRAN's demand paging is RANDOM,
+          // so nearly every access is a backward seek that restarts at the
+          // chain head - hundreds of hops, each its own CMD17. Measured on
+          // silicon: 351 ms of the 362 ms a disc operation costs is SD read
+          // time, ~200x the wire rate.
+          //
+          // The fix needs no buffer. FAT32 packs 128 entries per 512-byte
+          // sector, and for a contiguous run the next cluster's entry lies
+          // LATER IN THE SAME SECTOR. So when an entry completes mid-stream,
+          // advance the walk immediately: s_ent_off is combinational from
+          // s_cur_clu, so the capture retargets itself and the same pass keeps
+          // following the chain. One card read can now cover up to a whole
+          // sector's worth of hops instead of one.
+          //
+          // Escape hatch: -DND_STORAGE_FAT_ONEHOP restores one hop per read.
+          if (sdw_rx_we) begin
+            if (sdw_rx_addr == s_ent_off)
+              s_fat_acc[7:0]   <= sdw_rx_data;
+            if (sdw_rx_addr == s_ent_off + 9'd1)
+              s_fat_acc[15:8]  <= sdw_rx_data;
+            if (fat_is_fat32 && sdw_rx_addr == s_ent_off + 9'd2)
+              s_fat_acc[23:16] <= sdw_rx_data;
+            if (fat_is_fat32 && sdw_rx_addr == s_ent_off + 9'd3)
+              s_fat_acc[31:24] <= sdw_rx_data;
+`ifndef ND_STORAGE_FAT_ONEHOP
+            // The entry completes on its last byte; that byte is on sdw_rx_data
+            // this cycle, so form the value here rather than a cycle later.
+            if (fat_is_fat32 ? (sdw_rx_addr == s_ent_off + 9'd3)
+                             : (sdw_rx_addr == s_ent_off + 9'd1)) begin
+              if (!(fat_is_fat32
+                     ? (s_nxt32[27:0] >= 28'hFFFFFF7 || s_nxt32[27:0] < 28'd2)
+                     : (s_nxt16       >= 16'hFFF7    || s_nxt16       < 16'd2))
+                  && (s_cur_idx != s_tgt_idx)
+                  && s_nxt_same_sec && s_nxt_later) begin
+                s_cur_clu <= fat_is_fat32 ? s_nxt32[27:0] : {12'd0, s_nxt16};
+                s_cur_idx <= s_cur_idx + 20'd1;
+                s_hops    <= s_hops + 18'd1;
+                s_fat_acc <= 32'd0;
+                s_insec   <= 1'b1;   // this pass already advanced
+              end
+            end
+`endif
+          end
+          if (sdw_err) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_CARDIO;
+            s_state    <= E_DONE;
+          end else if (sdw_done && s_insec) begin
+            // This pass already followed the chain in-sector; the walk state
+            // is current, so just re-evaluate (F_STEP either finishes or reads
+            // the next FAT sector).
+            s_insec <= 1'b0;
+            s_state <= F_STEP;
+          end else if (sdw_done) begin
+            // FAT16 EOC: masked >= FFF7; FAT32: bits[27:0] >= 0FFFFF7 with
+            // the top nibble ignored (same shapes as nd_storage_fatchk.v).
+            if (fat_is_fat32
+                ? (s_fat_acc[27:0] >= 28'h FFFFFF7 || s_fat_acc[27:0] < 28'd2)
+                : (s_fat_acc[15:0] >= 16'h FFF7    || s_fat_acc[15:0] < 16'd2)) begin
+              s_m_val[s_grant] <= 1'b0;  // chain ended before the target
+              s_err_c    <= 1'b1;
+              s_err_code <= `NDS_ERR_FATCHAIN;
+              s_state    <= E_DONE;
+            end else begin
+              s_cur_clu <= fat_is_fat32 ? s_fat_acc[27:0]
+                                        : {12'd0, s_fat_acc[15:0]};
+              s_cur_idx <= s_cur_idx + 20'd1;
+              s_hops    <= s_hops + 18'd1;
+              s_state   <= F_STEP;
+            end
+          end else if (s_wd_hit) begin
+            s_err_c    <= 1'b1;
+            s_err_code <= `NDS_ERR_TIMEOUT;
+            eng_wd_err <= 1'b1;
+            s_state    <= E_DONE;
+          end
+        end
+
+        E_DONE: begin
+          if (!s_phase) begin
+            s_phase <= 1'b1;   // err level settles >= 2 clk_stor before flip
+          end else begin
+            s_done_tgl[s_grant]  <= ~s_done_tgl[s_grant];
+            s_pend_open[s_grant] <= 1'b0;
+            s_pend_blk[s_grant]  <= 1'b0;
+            s_ptr                <= s_grant;  // advance past the winner
+            s_phase              <= 1'b0;
+            s_state              <= E_IDLE;
+          end
+        end
+
+        default: s_state <= E_IDLE;
+      endcase
+    end
+  end
+
+  // ------------------------------------------------------------- front-ends
+  genvar gc;
+  generate
+    for (gc = 0; gc < N_CLIENTS; gc = gc + 1) begin : g_fe
+
+      // request toggles into clk_stor
+      nds_sync_pulse u_sync_open (
+          .clk_dst(clk_stor), .rst_dst_n(rst_stor_n),
+          .tgl_src(fe_open_tgl[gc]), .pulse_dst(s_open_pulse[gc])
+      );
+      nds_sync_pulse u_sync_req (
+          .clk_dst(clk_stor), .rst_dst_n(rst_stor_n),
+          .tgl_src(fe_req_tgl[gc]), .pulse_dst(s_req_pulse[gc])
+      );
+      // bridge answers into clk_stor (one synchronizer per toggle: a
+      // grant change can never manufacture an edge)
+      nds_sync_pulse u_sync_ack (
+          .clk_dst(clk_stor), .rst_dst_n(rst_stor_n),
+          .tgl_src(fe_ack_tgl[gc]), .pulse_dst(s_ack_pulse_v[gc])
+      );
+      nds_sync_pulse u_sync_whave (
+          .clk_dst(clk_stor), .rst_dst_n(rst_stor_n),
+          .tgl_src(fe_have_tgl[gc]), .pulse_dst(s_wr_have_pulse_v[gc])
+      );
+      // completion into clk_cpu
+      nds_sync_pulse u_sync_done (
+          .clk_dst(clk_cpu), .rst_dst_n(rst_cpu_n),
+          .tgl_src(s_done_tgl[gc]), .pulse_dst(c_done_pulse[gc])
+      );
+
+      reg        r_busy;
+      reg        r_open_tgl;
+      reg        r_req_tgl;
+      reg        r_ack_tgl;
+      reg        r_have_tgl;
+      reg        r_wr;
+      reg [15:0] r_block;
+      reg [9:0]  r_cnt;
+      reg [15:0] r_wrdata;
+      reg [1:0]  r_wrphase;
+      reg        r_err;
+      reg [3:0]  r_err_code;
+      reg        r_done;
+      reg [9:0]  r_buf_addr;
+      reg [15:0] r_buf_wdata;
+      reg        r_buf_we;
+      reg        r_ok_q;
+      reg [31:0] r_size;
+
+      always @(posedge clk_cpu) begin
+        if (!rst_cpu_n) begin
+          r_busy      <= 1'b0;
+          r_open_tgl  <= 1'b0;
+          r_req_tgl   <= 1'b0;
+          r_ack_tgl   <= 1'b0;
+          r_have_tgl  <= 1'b0;
+          r_wr        <= 1'b0;
+          r_block     <= 16'd0;
+          r_cnt       <= 10'd0;
+          r_wrdata    <= 16'd0;
+          r_wrphase   <= 2'd0;
+          r_err       <= 1'b0;
+          r_err_code  <= `NDS_ERR_NONE;
+          r_done      <= 1'b0;
+          r_buf_addr  <= 10'd0;
+          r_buf_wdata <= 16'd0;
+          r_buf_we    <= 1'b0;
+          r_ok_q      <= 1'b0;
+          r_size      <= 32'd0;
+        end else begin
+          r_done   <= 1'b0;
+          r_buf_we <= 1'b0;
+
+          // size_bytes is stable long before open_ok rises (mount rule)
+          r_ok_q <= c_open_ok_sync[gc];
+          if (c_open_ok_sync[gc] && !r_ok_q)
+            r_size <= size_bytes_stor[32*gc +: 32];
+
+          // A request while BUSY is still ignored - that is the client
+          // breaking the contract, and it already has busy to look at.
+          //
+          // A request without open_ok is NOT ignored any more. It used to
+          // fall off the end of this chain: r_busy never rose, no toggle was
+          // sent to the engine, and done NEVER PULSED - so a controller that
+          // waits for done (ND_WINCHESTER's E_DISK_RD has no timeout) waited
+          // for a completion that could not arrive, and the guest saw a card
+          // stuck ACTIVE forever. An unmounted client is a perfectly ordinary
+          // condition (no SD card, or the file is not on it); it must be
+          // ANSWERED, with an error and a reason, not left hanging.
+          if (open_req[gc] && !r_busy) begin
+            r_busy     <= 1'b1;
+            r_open_tgl <= ~r_open_tgl;
+          end else if (req[gc] && !r_busy && c_open_ok_sync[gc]) begin
+            r_busy    <= 1'b1;
+            r_wr      <= wr[gc];
+            r_block   <= block[16*gc +: 16];
+            r_req_tgl <= ~r_req_tgl;
+          end else if (req[gc] && !r_busy) begin
+            // not mounted: complete locally, next cycle, with the reason.
+            // No engine round trip - there is nothing for the engine to do.
+            // NOCARD and NOTOPEN are different problems for whoever has to
+            // fix them ("put a card in" vs "put the file on the card"), so
+            // they must not collapse into one answer here either.
+            r_err      <= 1'b1;
+            r_err_code <= c_nocard_sync ? `NDS_ERR_NOCARD
+                                        : `NDS_ERR_NOTOPEN;
+            r_done     <= 1'b1;
+          end
+
+          // read stream: block data into the client's buffer
+          if (r_busy && !r_wr && c_rd_have_pulse && (c_grant_sync == gc[2:0])) begin
+            r_buf_addr  <= r_cnt;
+            r_buf_wdata <= s_bridge_rd_data;  // stable while the flip crosses
+            r_buf_we    <= 1'b1;
+            r_cnt       <= r_cnt + 10'd1;
+            r_ack_tgl   <= ~r_ack_tgl;
+          end
+
+          // write stream: present the address (cycle A), give a registered
+          // BRAM one cycle to fetch (cycle B: addr committed at the end of
+          // A is clocked by the BRAM at the end of B), sample and answer on
+          // cycle C - correct for registered BRAMs and for the floppy's
+          // combinational dbuf_rdata alike (the address is held, so a
+          // combinational read is simply valid early)
+          if (r_busy && r_wr && c_wr_want_pulse && (c_grant_sync == gc[2:0])) begin
+            r_buf_addr <= r_cnt;               // cycle A
+            r_wrphase  <= 2'd1;
+          end else if (r_wrphase == 2'd1) begin
+            r_wrphase  <= 2'd2;                // cycle B: BRAM read commits
+          end else if (r_wrphase == 2'd2) begin
+            r_wrdata   <= buf_rdata[16*gc +: 16];  // cycle C
+            r_have_tgl <= ~r_have_tgl;
+            r_cnt      <= r_cnt + 10'd1;
+            r_wrphase  <= 2'd0;
+          end
+
+          // completion: err rides the done_tgl flip as a settled level
+          if (c_done_pulse[gc]) begin
+            r_err      <= c_err_sync;
+            r_err_code <= c_err_code_sync;
+            r_done     <= 1'b1;
+            r_busy    <= 1'b0;
+            r_cnt     <= 10'd0;
+            r_wrphase <= 2'd0;
+          end
+        end
+      end
+
+      assign fe_open_tgl[gc]           = r_open_tgl;
+      assign fe_req_tgl[gc]            = r_req_tgl;
+      assign fe_ack_tgl[gc]            = r_ack_tgl;
+      assign fe_have_tgl[gc]           = r_have_tgl;
+      assign fe_wr_lat[gc]             = r_wr;
+      assign fe_block_lat[16*gc +: 16] = r_block;
+      assign fe_wrdata[16*gc +: 16]    = r_wrdata;
+
+      assign busy[gc]                = r_busy;
+      assign done[gc]                = r_done;
+      assign err[gc]                 = r_err;
+      assign err_code[4*gc +: 4]     = r_err_code;
+      assign buf_addr[10*gc +: 10]   = r_buf_addr;
+      assign buf_wdata[16*gc +: 16]  = r_buf_wdata;
+      assign buf_we[gc]              = r_buf_we;
+      assign size_bytes[32*gc +: 32] = r_size;
+    end
+  endgenerate
+
+  assign dbg_sd_busy    = sdw_busy;
+  assign dbg_cache_pend = cache_lookup_req;
+
+endmodule
+```
+
+</details>

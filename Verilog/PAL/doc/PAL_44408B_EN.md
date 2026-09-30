@@ -19,6 +19,16 @@ Source: `Verilog/PAL/PAL_44408B_EN.v`
 
 ![PAL_44408B_EN symbol](PAL_44408B_EN.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CMDDEC.PAL_44408B_VEXFIX`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![PAL_44408B_EN schematic](PAL_44408B_EN.svg)](PAL_44408B_EN.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 PALASM CODE CONVERTED TO VERILOG
@@ -63,3 +73,140 @@ Ronny Hansen
 | output | `1` | `OPCLCS` | Q3_n - Command 36.2 (LCS) |
 | output | `1` | `RWCS_n` *(active low)* | Q4_n - Command 36.1 (RWCS) |
 | output | `1` | `RT_n` *(active low)* | Q5_n |
+
+## Verilog source
+
+[`Verilog/PAL/PAL_44408B_EN.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/PAL/PAL_44408B_EN.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of PAL_44408B_EN (125 lines)</summary>
+
+```verilog
+/**********************************************************************************************************
+** ND120 PALASM CODE CONVERTED TO VERILOG                                                                **
+**                                                                                                       **
+** Component PAL 44408B (VEXFIX) - clock-enable wrapper                                                  **
+**                                                                                                       **
+** USE_ENABLE=0 (default): instantiates the original PAL_44408B untouched                                **
+**   (posedge CK registered outputs).                                                                    **
+** USE_ENABLE=1: structural copy of PAL_44408B with the registered                                       **
+**   equations captured on `posedge sysclk + if (EN)` (P2 clock-domain                                   **
+**   conversion, docs/plan-fix-unconstrained-clocks.md - EN is CYC_36's                                  **
+**   CLK_EN pulse aligned with the CLK rise). Equations are line-for-line                                **
+**   identical to PAL_44408B.v; only the flop trigger changes.                                           **
+**                                                                                                       **
+** The original PAL_44408B.v is generated from PALASM and is never                                       **
+** modified - keep the equations here in sync with it.                                                   **
+**                                                                                                       **
+** Last reviewed: 10-JUL-2026                                                                            **
+** Ronny Hansen                                                                                          **
+***********************************************************************************************************/
+
+module PAL_44408B_EN #(
+    parameter integer USE_ENABLE = 0
+) (
+    input sysclk,  //! FPGA system clock (used only when USE_ENABLE=1)
+    input EN,      //! Clock enable    (used only when USE_ENABLE=1)
+
+    input CK,   //! Clock signal (used only when USE_ENABLE=0)
+    input OE_n, //! OUTPUT ENABLE (active-low) for Q0-Q3
+
+    input C4,     //! I0 - CSCOMM4 - CSBIT# 36 - Command bit 4
+    input C3,     //! I1 - CSCOMM3 - CSBIT# 35 - Command bit 3
+    input C2,     //! I2 - CSCOMM2 - CSBIT# 34 - Command bit 2
+    input C1,     //! I3 - CSCOMM1 - CSBIT# 33 - Command bit 1
+    input C0,     //! I4 - CSCOMM0 - CSBIT# 32 - Command bit 0
+    input M1,     //! I5 - CSMIS1   - CSBIT #43 - ALU MIS1 SIGNAL (also used for sub-commands for CSCOMM)
+    input M0,     //! I6 - CSMIS0   - CSBIT #42 - ALU MIS0 SIGNAL (also used for sub-commands for CSCOMM)
+                  //! I7 - (not connected)
+    input LCS_n,  //! B0 - Load Control Store (negated)
+    // B0_n - (not connected)
+    input IDB2,   //! B1_n - IDB2
+
+    // Q0_n - (not connected)
+    output LDEXM_n,  //! Q1_n - Command 21.3
+    output VEX,      //! Q2_n - Violation Exception
+    output OPCLCS,   //! Q3_n - Command 36.2 (LCS)
+    output RWCS_n,   //! Q4_n - Command 36.1 (RWCS)
+
+    // Pin in 444608 (VXFIX) but not in 44408B
+    output RT_n  //! Q5_n
+
+);
+
+  generate
+    if (USE_ENABLE == 1) begin : gen_enable
+      /* verilator lint_off UNUSEDSIGNAL */
+      wire unused_clk = CK;
+      /* verilator lint_on UNUSEDSIGNAL */
+
+      // Inverted input signals
+      wire LCS = ~LCS_n;
+
+      // Internal signals for outputs
+      reg RWCS_int = 1'b0, OPCLCS_n_int = 1'b0, VEX_n_int = 1'b0, LDEXM_int = 1'b0;
+
+      // Sequential logic - equations identical to PAL_44408B.v,
+      // captured on the enable instead of posedge CK.
+      always @(posedge sysclk) begin
+        if (EN) begin
+          // Logic for LDEXM
+          LDEXM_int <= C4 & ~C3 & ~C2 & ~C1 & C0 & M1 & M0 & LCS_n;  // COMMAND 21.3 LDEXM (validated RH) (Load examine mode in MAC function.)
+
+            // VEX Logic
+          if ((LDEXM_int && ~IDB2) || (~LDEXM_int && VEX_n_int) || LCS)
+          begin
+            VEX_n_int <= 1'b1; // Set /VEX to 1
+          end else begin
+            VEX_n_int <= 1'b0; // Default: Set /VEX to 0
+          end
+
+          // Logic for OPCLCS
+          OPCLCS_n_int <= ~C4 | ~C3 | ~C2 | ~C1 | C0 | ~M1 | M0 | LCS;  // COMMAND 36.2 LCS (validated RH) - Load control store from PROM. and perform a Master Clear
+
+          // Logic for RWCS
+          RWCS_int <= C4 & C3 & C2 & C1 & ~C0 & ~M1 & M0 & LCS_n;  // COMMAND 36.1 RWCS(validated RH) - Read/write control store as addressed by ADCS command
+
+        end
+      end
+
+      // Tri-state control for outputs
+      // High-impedance state when OE_n is high (active-low)
+
+      assign RWCS_n = OE_n ? 1'b0 : ~RWCS_int;
+      assign OPCLCS = OE_n ? 1'b0 : ~OPCLCS_n_int;
+      assign VEX = OE_n ? 1'b0 : ~VEX_n_int;
+      assign LDEXM_n = OE_n ? 1'b0 : ~LDEXM_int;
+
+
+      // Unknown signal in this PAL, set high
+      assign RT_n = 1'b1;
+    end else begin : gen_orig
+      /* verilator lint_off UNUSEDSIGNAL */
+      wire unused_sys = sysclk & EN;
+      /* verilator lint_on UNUSEDSIGNAL */
+      PAL_44408B PAL (
+          .CK(CK),
+          .OE_n(OE_n),
+          .C4(C4),
+          .C3(C3),
+          .C2(C2),
+          .C1(C1),
+          .C0(C0),
+          .M1(M1),
+          .M0(M0),
+          .LCS_n(LCS_n),
+          .IDB2(IDB2),
+          .LDEXM_n(LDEXM_n),
+          .VEX(VEX),
+          .OPCLCS(OPCLCS),
+          .RWCS_n(RWCS_n),
+          .RT_n(RT_n)
+      );
+    end
+  endgenerate
+
+endmodule
+```
+
+</details>

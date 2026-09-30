@@ -19,9 +19,283 @@ Source: `Verilog/Terminals/rtl/term_panel_rom.v`
 
 ![term_panel_rom symbol](term_panel_rom.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Nexys 4 DDR build, instance `TERMINAL.g_panel.PANEL.ROM`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![term_panel_rom schematic](term_panel_rom.svg)](term_panel_rom.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Ports
 
 | Direction | Width | Name | Description |
 |---|---|---|---|
 | input | `[8:0]` | `addr` | row * 80 + column |
 | output | `[7:0]` | `data` |  |
+
+## Verilog source
+
+[`Verilog/Terminals/rtl/term_panel_rom.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Terminals/rtl/term_panel_rom.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of term_panel_rom (252 lines)</summary>
+
+```verilog
+//============================================================================
+//! Static text of the ND-120 operator panel - GENERATED FILE, DO NOT EDIT.
+//!
+//! Regenerate with:  python3 font/make_panel.py   (from Verilog/Terminals/)
+//! Edit the layout in that script, not here.
+//!
+//! Part of the board-independent terminal core (Verilog/Terminals/).
+//!
+//! Holds ONLY what never changes - the silkscreen labels, the octal ruler and
+//! the caption. Every cell that shows a value reads 0x00 here, and term_panel.v
+//! substitutes the live character. So the geometry exists once, and the RTL and
+//! the ROM cannot disagree about where a field sits.
+//!
+//! Layout and legends are taken from the photographed folio panel, not from
+//! memory: Pictures/ronny/20230618_193546.jpg for the fascia and LCD, and
+//! active-levels.png for the octal ruler.
+//============================================================================
+
+`default_nettype none
+
+module term_panel_rom (
+    input  wire [8:0] addr,   //! row * 80 + column
+    output reg  [7:0] data
+);
+
+  //! Column origins, exported so term_panel.v uses the SAME numbers the ROM
+  //! was built with. Changing a column means re-running make_panel.py, which
+  //! rewrites both halves together.
+  localparam integer COL_UTIL_BAR       = 1;
+  localparam integer UTIL_BAR_W         = 11;
+  localparam integer COL_HIT_BAR        = 14;
+  localparam integer HIT_BAR_W          = 10;
+  localparam integer COL_RING_VALUE     = 35;
+  localparam integer COL_INT_VALUE      = 43;
+  localparam integer COL_PAGE_VALUE     = 53;
+  localparam integer COL_UPTIME_VALUE   = 4;
+  localparam integer COL_LEVELS         = 24;
+  localparam integer LEVEL_CELL_W       = 2;
+  localparam integer COL_HDD_R          = 60;
+  localparam integer COL_HDD_W          = 62;
+  localparam integer COL_FLP_R          = 65;
+  localparam integer COL_FLP_W          = 67;
+  localparam integer COL_LEGEND         = 72;
+  localparam integer COL_MIPS_VALUE     = 63;
+  localparam integer COL_CPU_RED        = 64;
+  localparam integer COL_CPU_GREEN      = 66;
+  localparam integer PANEL_COLS         = 80;
+  localparam integer PANEL_ROWS         = 5;
+
+  always @(*) begin
+    case (addr)
+      9'd1  : data = 8'h55;  // r0 c1  U
+      9'd2  : data = 8'h54;  // r0 c2  T
+      9'd3  : data = 8'h49;  // r0 c3  I
+      9'd4  : data = 8'h4C;  // r0 c4  L
+      9'd5  : data = 8'h49;  // r0 c5  I
+      9'd6  : data = 8'h5A;  // r0 c6  Z
+      9'd7  : data = 8'h41;  // r0 c7  A
+      9'd8  : data = 8'h54;  // r0 c8  T
+      9'd9  : data = 8'h49;  // r0 c9  I
+      9'd10 : data = 8'h4F;  // r0 c10 O
+      9'd11 : data = 8'h4E;  // r0 c11 N
+      9'd14 : data = 8'h43;  // r0 c14 C
+      9'd15 : data = 8'h41;  // r0 c15 A
+      9'd16 : data = 8'h43;  // r0 c16 C
+      9'd17 : data = 8'h48;  // r0 c17 H
+      9'd18 : data = 8'h45;  // r0 c18 E
+      9'd20 : data = 8'h48;  // r0 c20 H
+      9'd21 : data = 8'h49;  // r0 c21 I
+      9'd22 : data = 8'h54;  // r0 c22 T
+      9'd24 : data = 8'h52;  // r0 c24 R
+      9'd25 : data = 8'h41;  // r0 c25 A
+      9'd26 : data = 8'h54;  // r0 c26 T
+      9'd27 : data = 8'h45;  // r0 c27 E
+      9'd30 : data = 8'h50;  // r0 c30 P
+      9'd31 : data = 8'h52;  // r0 c31 R
+      9'd32 : data = 8'h4F;  // r0 c32 O
+      9'd33 : data = 8'h54;  // r0 c33 T
+      9'd34 : data = 8'h45;  // r0 c34 E
+      9'd35 : data = 8'h43;  // r0 c35 C
+      9'd36 : data = 8'h54;  // r0 c36 T
+      9'd38 : data = 8'h52;  // r0 c38 R
+      9'd39 : data = 8'h49;  // r0 c39 I
+      9'd40 : data = 8'h4E;  // r0 c40 N
+      9'd41 : data = 8'h47;  // r0 c41 G
+      9'd43 : data = 8'h49;  // r0 c43 I
+      9'd44 : data = 8'h4E;  // r0 c44 N
+      9'd45 : data = 8'h54;  // r0 c45 T
+      9'd46 : data = 8'h45;  // r0 c46 E
+      9'd47 : data = 8'h52;  // r0 c47 R
+      9'd48 : data = 8'h52;  // r0 c48 R
+      9'd49 : data = 8'h55;  // r0 c49 U
+      9'd50 : data = 8'h50;  // r0 c50 P
+      9'd51 : data = 8'h54;  // r0 c51 T
+      9'd53 : data = 8'h50;  // r0 c53 P
+      9'd54 : data = 8'h41;  // r0 c54 A
+      9'd55 : data = 8'h47;  // r0 c55 G
+      9'd56 : data = 8'h49;  // r0 c56 I
+      9'd57 : data = 8'h4E;  // r0 c57 N
+      9'd58 : data = 8'h47;  // r0 c58 G
+      9'd60 : data = 8'h48;  // r0 c60 H
+      9'd61 : data = 8'h44;  // r0 c61 D
+      9'd62 : data = 8'h44;  // r0 c62 D
+      9'd65 : data = 8'h46;  // r0 c65 F
+      9'd66 : data = 8'h4C;  // r0 c66 L
+      9'd67 : data = 8'h4F;  // r0 c67 O
+      9'd68 : data = 8'h50;  // r0 c68 P
+      9'd69 : data = 8'h50;  // r0 c69 P
+      9'd70 : data = 8'h59;  // r0 c70 Y
+      9'd81 : data = 8'h00;  // r1 c1  dynamic
+      9'd82 : data = 8'h00;  // r1 c2  dynamic
+      9'd83 : data = 8'h00;  // r1 c3  dynamic
+      9'd84 : data = 8'h00;  // r1 c4  dynamic
+      9'd85 : data = 8'h00;  // r1 c5  dynamic
+      9'd86 : data = 8'h00;  // r1 c6  dynamic
+      9'd87 : data = 8'h00;  // r1 c7  dynamic
+      9'd88 : data = 8'h00;  // r1 c8  dynamic
+      9'd89 : data = 8'h00;  // r1 c9  dynamic
+      9'd90 : data = 8'h00;  // r1 c10 dynamic
+      9'd91 : data = 8'h00;  // r1 c11 dynamic
+      9'd94 : data = 8'h00;  // r1 c14 dynamic
+      9'd95 : data = 8'h00;  // r1 c15 dynamic
+      9'd96 : data = 8'h00;  // r1 c16 dynamic
+      9'd97 : data = 8'h00;  // r1 c17 dynamic
+      9'd98 : data = 8'h00;  // r1 c18 dynamic
+      9'd99 : data = 8'h00;  // r1 c19 dynamic
+      9'd100: data = 8'h00;  // r1 c20 dynamic
+      9'd101: data = 8'h00;  // r1 c21 dynamic
+      9'd102: data = 8'h00;  // r1 c22 dynamic
+      9'd103: data = 8'h00;  // r1 c23 dynamic
+      9'd115: data = 8'h00;  // r1 c35 dynamic
+      9'd123: data = 8'h00;  // r1 c43 dynamic
+      9'd124: data = 8'h00;  // r1 c44 dynamic
+      9'd125: data = 8'h00;  // r1 c45 dynamic
+      9'd133: data = 8'h00;  // r1 c53 dynamic
+      9'd134: data = 8'h00;  // r1 c54 dynamic
+      9'd135: data = 8'h00;  // r1 c55 dynamic
+      9'd140: data = 8'h00;  // r1 c60 dynamic
+      9'd142: data = 8'h00;  // r1 c62 dynamic
+      9'd145: data = 8'h00;  // r1 c65 dynamic
+      9'd147: data = 8'h00;  // r1 c67 dynamic
+      9'd152: data = 8'h00;  // r1 c72 dynamic
+      9'd153: data = 8'h00;  // r1 c73 dynamic
+      9'd154: data = 8'h00;  // r1 c74 dynamic
+      9'd155: data = 8'h00;  // r1 c75 dynamic
+      9'd156: data = 8'h00;  // r1 c76 dynamic
+      9'd157: data = 8'h00;  // r1 c77 dynamic
+      9'd158: data = 8'h00;  // r1 c78 dynamic
+      9'd161: data = 8'h55;  // r2 c1  U
+      9'd162: data = 8'h50;  // r2 c2  P
+      9'd163: data = 8'h3A;  // r2 c3  :
+      9'd164: data = 8'h00;  // r2 c4  dynamic
+      9'd165: data = 8'h00;  // r2 c5  dynamic
+      9'd166: data = 8'h00;  // r2 c6  dynamic
+      9'd167: data = 8'h00;  // r2 c7  dynamic
+      9'd168: data = 8'h00;  // r2 c8  dynamic
+      9'd169: data = 8'h00;  // r2 c9  dynamic
+      9'd170: data = 8'h00;  // r2 c10 dynamic
+      9'd171: data = 8'h00;  // r2 c11 dynamic
+      9'd184: data = 8'h00;  // r2 c24 dynamic
+      9'd185: data = 8'h00;  // r2 c25 dynamic
+      9'd186: data = 8'h00;  // r2 c26 dynamic
+      9'd187: data = 8'h00;  // r2 c27 dynamic
+      9'd188: data = 8'h00;  // r2 c28 dynamic
+      9'd189: data = 8'h00;  // r2 c29 dynamic
+      9'd190: data = 8'h00;  // r2 c30 dynamic
+      9'd191: data = 8'h00;  // r2 c31 dynamic
+      9'd192: data = 8'h00;  // r2 c32 dynamic
+      9'd193: data = 8'h00;  // r2 c33 dynamic
+      9'd194: data = 8'h00;  // r2 c34 dynamic
+      9'd195: data = 8'h00;  // r2 c35 dynamic
+      9'd196: data = 8'h00;  // r2 c36 dynamic
+      9'd197: data = 8'h00;  // r2 c37 dynamic
+      9'd198: data = 8'h00;  // r2 c38 dynamic
+      9'd199: data = 8'h00;  // r2 c39 dynamic
+      9'd200: data = 8'h00;  // r2 c40 dynamic
+      9'd201: data = 8'h00;  // r2 c41 dynamic
+      9'd202: data = 8'h00;  // r2 c42 dynamic
+      9'd203: data = 8'h00;  // r2 c43 dynamic
+      9'd204: data = 8'h00;  // r2 c44 dynamic
+      9'd205: data = 8'h00;  // r2 c45 dynamic
+      9'd206: data = 8'h00;  // r2 c46 dynamic
+      9'd207: data = 8'h00;  // r2 c47 dynamic
+      9'd208: data = 8'h00;  // r2 c48 dynamic
+      9'd209: data = 8'h00;  // r2 c49 dynamic
+      9'd210: data = 8'h00;  // r2 c50 dynamic
+      9'd211: data = 8'h00;  // r2 c51 dynamic
+      9'd212: data = 8'h00;  // r2 c52 dynamic
+      9'd213: data = 8'h00;  // r2 c53 dynamic
+      9'd214: data = 8'h00;  // r2 c54 dynamic
+      9'd215: data = 8'h00;  // r2 c55 dynamic
+      9'd218: data = 8'h4D;  // r2 c58 M
+      9'd219: data = 8'h49;  // r2 c59 I
+      9'd220: data = 8'h50;  // r2 c60 P
+      9'd221: data = 8'h53;  // r2 c61 S
+      9'd223: data = 8'h00;  // r2 c63 dynamic
+      9'd224: data = 8'h00;  // r2 c64 dynamic
+      9'd225: data = 8'h00;  // r2 c65 dynamic
+      9'd226: data = 8'h00;  // r2 c66 dynamic
+      9'd227: data = 8'h00;  // r2 c67 dynamic
+      9'd232: data = 8'h00;  // r2 c72 dynamic
+      9'd233: data = 8'h00;  // r2 c73 dynamic
+      9'd234: data = 8'h00;  // r2 c74 dynamic
+      9'd235: data = 8'h00;  // r2 c75 dynamic
+      9'd236: data = 8'h00;  // r2 c76 dynamic
+      9'd237: data = 8'h00;  // r2 c77 dynamic
+      9'd238: data = 8'h00;  // r2 c78 dynamic
+      9'd264: data = 8'h31;  // r3 c24 1
+      9'd265: data = 8'h35;  // r3 c25 5
+      9'd266: data = 8'h31;  // r3 c26 1
+      9'd267: data = 8'h34;  // r3 c27 4
+      9'd268: data = 8'h31;  // r3 c28 1
+      9'd269: data = 8'h33;  // r3 c29 3
+      9'd270: data = 8'h31;  // r3 c30 1
+      9'd271: data = 8'h32;  // r3 c31 2
+      9'd272: data = 8'h31;  // r3 c32 1
+      9'd273: data = 8'h31;  // r3 c33 1
+      9'd274: data = 8'h31;  // r3 c34 1
+      9'd275: data = 8'h30;  // r3 c35 0
+      9'd277: data = 8'h39;  // r3 c37 9
+      9'd279: data = 8'h38;  // r3 c39 8
+      9'd281: data = 8'h37;  // r3 c41 7
+      9'd283: data = 8'h36;  // r3 c43 6
+      9'd285: data = 8'h35;  // r3 c45 5
+      9'd287: data = 8'h34;  // r3 c47 4
+      9'd289: data = 8'h33;  // r3 c49 3
+      9'd291: data = 8'h32;  // r3 c51 2
+      9'd293: data = 8'h31;  // r3 c53 1
+      9'd295: data = 8'h30;  // r3 c55 0
+      9'd300: data = 8'h43;  // r3 c60 C
+      9'd301: data = 8'h50;  // r3 c61 P
+      9'd302: data = 8'h55;  // r3 c62 U
+      9'd304: data = 8'h52;  // r3 c64 R
+      9'd306: data = 8'h47;  // r3 c66 G
+      9'd354: data = 8'h41;  // r4 c34 A
+      9'd355: data = 8'h43;  // r4 c35 C
+      9'd356: data = 8'h54;  // r4 c36 T
+      9'd357: data = 8'h49;  // r4 c37 I
+      9'd358: data = 8'h56;  // r4 c38 V
+      9'd359: data = 8'h45;  // r4 c39 E
+      9'd361: data = 8'h4C;  // r4 c41 L
+      9'd362: data = 8'h45;  // r4 c42 E
+      9'd363: data = 8'h56;  // r4 c43 V
+      9'd364: data = 8'h45;  // r4 c44 E
+      9'd365: data = 8'h4C;  // r4 c45 L
+      default: data = 8'h20;   // space
+    endcase
+  end
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

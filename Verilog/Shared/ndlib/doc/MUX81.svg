@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="545.0" height="764.5" viewBox="-80.0 -80.0 545.0 764.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="545.0" height="764.5" fill="#ffffff" /><a href="../../logisim/doc/Multiplexer_8.md"><title>PLEXERS_1 (Multiplexer_8) - open its page</title><g transform="translate(240,382)" id="cell_PLEXERS_1"><text x="15" y="-4" class="nodelabel cell_PLEXERS_1">Multiplexer_8</text><rect width="30" height="180" class="cell_PLEXERS_1" /><g transform="translate(0,10)" id="port_PLEXERS_1~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_1~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_1~muxIn_2"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_2</text></g><g transform="translate(0,70)" id="port_PLEXERS_1~muxIn_3"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_3</text></g><g transform="translate(0,90)" id="port_PLEXERS_1~muxIn_4"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_4</text></g><g transform="translate(0,110)" id="port_PLEXERS_1~muxIn_5"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_5</text></g><g transform="translate(0,130)" id="port_PLEXERS_1~muxIn_6"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_6</text></g><g transform="translate(0,150)" id="port_PLEXERS_1~muxIn_7"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_7</text></g><g transform="translate(0,170)" id="port_PLEXERS_1~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_1~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_1">muxOut</text></g></g></a>
+<g transform="translate(12,442.5)" id="cell_A"><text x="15" y="-4" class="nodelabel cell_A">A</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A" /><g /></g>
+<g transform="translate(12,507.5)" id="cell_B"><text x="15" y="-4" class="nodelabel cell_B">B</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B" /><g /></g>
+<g transform="translate(12,572.5)" id="cell_C"><text x="15" y="-4" class="nodelabel cell_C">C</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_C" /><g /></g>
+<g transform="translate(77,22)" id="cell_D0"><text x="15" y="-4" class="nodelabel cell_D0">D0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D0" /><g /></g>
+<g transform="translate(77,87)" id="cell_D1"><text x="15" y="-4" class="nodelabel cell_D1">D1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D1" /><g /></g>
+<g transform="translate(77,152)" id="cell_D2"><text x="15" y="-4" class="nodelabel cell_D2">D2</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D2" /><g /></g>
+<g transform="translate(77,217)" id="cell_D3"><text x="15" y="-4" class="nodelabel cell_D3">D3</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D3" /><g /></g>
+<g transform="translate(77,282)" id="cell_D4"><text x="15" y="-4" class="nodelabel cell_D4">D4</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D4" /><g /></g>
+<g transform="translate(77,347)" id="cell_D5"><text x="15" y="-4" class="nodelabel cell_D5">D5</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D5" /><g /></g>
+<g transform="translate(77,412)" id="cell_D6"><text x="15" y="-4" class="nodelabel cell_D6">D6</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D6" /><g /></g>
+<g transform="translate(77,477)" id="cell_D7"><text x="15" y="-4" class="nodelabel cell_D7">D7</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D7" /><g /></g>
+<g transform="translate(343,382.5)" id="cell_Z"><text x="15" y="-4" class="nodelabel cell_Z">Z</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_Z" /><g /></g>
+<g transform="translate(87,532)" id="cell_$join$,2,3,4,"><rect width="5" height="60" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g></g>
+<line x1="105" x2="187" y1="32" y2="32" class="net_5"><title>D0</title></line>
+<line x1="187" x2="187" y1="32" y2="392.5" class="net_5"><title>D0</title></line>
+<line x1="187" x2="240" y1="392.5" y2="392.5" class="net_5"><title>D0</title></line>
+<line x1="105" x2="177" y1="97" y2="97" class="net_6"><title>D1</title></line>
+<line x1="177" x2="177" y1="97" y2="412.5" class="net_6"><title>D1</title></line>
+<line x1="177" x2="240" y1="412.5" y2="412.5" class="net_6"><title>D1</title></line>
+<line x1="105" x2="167" y1="162" y2="162" class="net_7"><title>D2</title></line>
+<line x1="167" x2="167" y1="162" y2="432.5" class="net_7"><title>D2</title></line>
+<line x1="167" x2="240" y1="432.5" y2="432.5" class="net_7"><title>D2</title></line>
+<line x1="105" x2="157" y1="227" y2="227" class="net_8"><title>D3</title></line>
+<line x1="157" x2="157" y1="227" y2="452.5" class="net_8"><title>D3</title></line>
+<line x1="157" x2="240" y1="452.5" y2="452.5" class="net_8"><title>D3</title></line>
+<line x1="105" x2="147" y1="292" y2="292" class="net_9"><title>D4</title></line>
+<line x1="147" x2="147" y1="292" y2="472.5" class="net_9"><title>D4</title></line>
+<line x1="147" x2="240" y1="472.5" y2="472.5" class="net_9"><title>D4</title></line>
+<line x1="105" x2="137" y1="357" y2="357" class="net_10"><title>D5</title></line>
+<line x1="137" x2="137" y1="357" y2="492.5" class="net_10"><title>D5</title></line>
+<line x1="137" x2="240" y1="492.5" y2="492.5" class="net_10"><title>D5</title></line>
+<line x1="105" x2="127" y1="422" y2="422" class="net_11"><title>D6</title></line>
+<line x1="127" x2="127" y1="422" y2="512.5" class="net_11"><title>D6</title></line>
+<line x1="127" x2="240" y1="512.5" y2="512.5" class="net_11"><title>D6</title></line>
+<line x1="105" x2="117" y1="487" y2="487" class="net_12"><title>D7</title></line>
+<line x1="117" x2="117" y1="487" y2="532.5" class="net_12"><title>D7</title></line>
+<line x1="117" x2="240" y1="532.5" y2="532.5" class="net_12"><title>D7</title></line>
+<line x1="93" x2="240" y1="552.5" y2="552.5" class="net_2,3,4"><title>s_selector</title></line>
+<line x1="271" x2="343" y1="392.5" y2="392.5" class="net_13"><title>Z</title></line>
+<line x1="40" x2="62" y1="452.5" y2="452.5" class="net_2"><title>A</title></line>
+<line x1="62" x2="62" y1="452.5" y2="542.5" class="net_2"><title>A</title></line>
+<line x1="62" x2="87" y1="542.5" y2="542.5" class="net_2"><title>A</title></line>
+<line x1="40" x2="52" y1="517.5" y2="517.5" class="net_3"><title>B</title></line>
+<line x1="52" x2="52" y1="517.5" y2="562.5" class="net_3"><title>B</title></line>
+<line x1="52" x2="87" y1="562.5" y2="562.5" class="net_3"><title>B</title></line>
+<line x1="40" x2="87" y1="582.5" y2="582.5" class="net_4"><title>C</title></line>
+<text x="140.0" y="489.5" class="netlabel">D5</text>
+<text x="130.0" y="509.5" class="netlabel">D6</text>
+<text x="120.0" y="529.5" class="netlabel">D7</text>
+<text x="274.0" y="389.5" class="netlabel">Z</text>
+<text x="65.0" y="539.5" class="netlabel">A</text>
+<text x="96.0" y="549.5" class="netlabel">s_selector</text>
+<text x="55.0" y="559.5" class="netlabel">B</text>
+<text x="43.0" y="579.5" class="netlabel">C</text>
+<text x="108.0" y="29.0" class="netlabel">D0</text>
+<text x="108.0" y="94.0" class="netlabel">D1</text>
+<text x="170.0" y="429.5" class="netlabel">D2</text>
+<text x="160.0" y="449.5" class="netlabel">D3</text>
+<text x="150.0" y="469.5" class="netlabel">D4</text>
+</svg>

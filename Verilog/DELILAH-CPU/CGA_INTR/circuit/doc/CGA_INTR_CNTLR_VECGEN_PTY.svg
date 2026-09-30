@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="496.0" height="409.5" viewBox="-80.0 -80.0 496.0 409.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="496.0" height="409.5" fill="#ffffff" /><a href="CGA_INTR_CNTLR_VECGEN_PTY_PTYENC.md"><title>PTYENC_HI (CGA_INTR_CNTLR_VECGEN_PTY_PTYENC) - open its page</title><g transform="translate(197,22)" id="cell_PTYENC_HI"><text x="15" y="-4" class="nodelabel cell_PTYENC_HI">CGA_INTR_CNTLR_VECGEN_PTY_PTYENC</text><rect width="30" height="40" class="cell_PTYENC_HI" /><g transform="translate(0,10)" id="port_PTYENC_HI~RN"><text x="-3" y="-4" class="inputPortLabel cell_PTYENC_HI">RN</text></g><g transform="translate(30,10)" id="port_PTYENC_HI~DET"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PTYENC_HI">DET</text></g><g transform="translate(30,30)" id="port_PTYENC_HI~V_2_0"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PTYENC_HI">V_2_0</text></g></g></a>
+<a href="CGA_INTR_CNTLR_VECGEN_PTY_PTYENC.md"><title>PTYENC_LO (CGA_INTR_CNTLR_VECGEN_PTY_PTYENC) - open its page</title><g transform="translate(197,152)" id="cell_PTYENC_LO"><text x="15" y="-4" class="nodelabel cell_PTYENC_LO">CGA_INTR_CNTLR_VECGEN_PTY_PTYENC</text><rect width="30" height="40" class="cell_PTYENC_LO" /><g transform="translate(0,10)" id="port_PTYENC_LO~RN"><text x="-3" y="-4" class="inputPortLabel cell_PTYENC_LO">RN</text></g><g transform="translate(30,10)" id="port_PTYENC_LO~DET"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PTYENC_LO">DET</text></g><g transform="translate(30,30)" id="port_PTYENC_LO~V_2_0"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PTYENC_LO">V_2_0</text></g></g></a>
+<g transform="translate(12,32.5)" id="cell_MIREQ_15_0_N"><text x="15" y="-4" class="nodelabel cell_MIREQ_15_0_N">MIREQ_15_0_N</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MIREQ_15_0_N" /><g /></g>
+<g transform="translate(294,22.5)" id="cell_HIDET"><text x="15" y="-4" class="nodelabel cell_HIDET">HIDET</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_HIDET" /><g /></g>
+<g transform="translate(294,87.5)" id="cell_HIVEC"><text x="15" y="-4" class="nodelabel cell_HIVEC">HIVEC</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_HIVEC" /><g /></g>
+<g transform="translate(294,152.5)" id="cell_LODET"><text x="15" y="-4" class="nodelabel cell_LODET">LODET</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_LODET" /><g /></g>
+<g transform="translate(294,217.5)" id="cell_LOVEC"><text x="15" y="-4" class="nodelabel cell_LOVEC">LOVEC</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_LOVEC" /><g /></g>
+<g transform="translate(119,22)" id="cell_$split$,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">8:15</text></g><g transform="translate(4,30)"><text x="5" y="-4">0:7</text></g></g>
+<line x1="124" x2="197" y1="32.5" y2="32.5" class="net_10,11,12,13,14,15,16,17"><title>MIREQ_15_0_N[15:8]</title></line>
+<line x1="124" x2="159" y1="52.5" y2="52.5" class="net_2,3,4,5,6,7,8,9"><title>MIREQ_15_0_N[7:0]</title></line>
+<line x1="159" x2="159" y1="52.5" y2="162.5" class="net_2,3,4,5,6,7,8,9"><title>MIREQ_15_0_N[7:0]</title></line>
+<line x1="159" x2="197" y1="162.5" y2="162.5" class="net_2,3,4,5,6,7,8,9"><title>MIREQ_15_0_N[7:0]</title></line>
+<line x1="228" x2="294" y1="32.5" y2="32.5" class="net_18"><title>HIDET</title></line>
+<line x1="228" x2="269" y1="52.5" y2="52.5" class="net_19,20,21"><title>HIVEC</title></line>
+<line x1="269" x2="269" y1="52.5" y2="97.5" class="net_19,20,21"><title>HIVEC</title></line>
+<line x1="269" x2="294" y1="97.5" y2="97.5" class="net_19,20,21"><title>HIVEC</title></line>
+<line x1="228" x2="294" y1="162.5" y2="162.5" class="net_22"><title>LODET</title></line>
+<line x1="228" x2="269" y1="182.5" y2="182.5" class="net_23,24,25"><title>LOVEC</title></line>
+<line x1="269" x2="269" y1="182.5" y2="227.5" class="net_23,24,25"><title>LOVEC</title></line>
+<line x1="269" x2="294" y1="227.5" y2="227.5" class="net_23,24,25"><title>LOVEC</title></line>
+<line x1="40" x2="119" y1="42.5" y2="42.5" class="net_2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17"><title>MIREQ_15_0_N</title></line>
+<text x="127.0" y="29.5" class="netlabel">MIREQ_15_0_N[15:8]</text>
+<text x="231.0" y="29.5" class="netlabel">HIDET</text>
+<text x="231.0" y="49.5" class="netlabel">HIVEC</text>
+<text x="162.0" y="159.5" class="netlabel">MIREQ_15_0_N[7:0]</text>
+<text x="43.0" y="39.5" class="netlabel">MIREQ_15_0_N</text>
+<text x="231.0" y="159.5" class="netlabel">LODET</text>
+<text x="231.0" y="179.5" class="netlabel">LOVEC</text>
+</svg>

@@ -19,6 +19,16 @@ Source: `Verilog/Shared/logisim/J_K_FLIPFLOP.v`
 
 ![J_K_FLIPFLOP symbol](J_K_FLIPFLOP.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.IO.DCD.DGA.POW.A616`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![J_K_FLIPFLOP schematic](J_K_FLIPFLOP.svg)](J_K_FLIPFLOP.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 SHARED CODE
@@ -44,3 +54,62 @@ Ronny Hansen
 | input | `1` | `tick` |  |
 | output | `1` | `q` |  |
 | output | `1` | `qBar` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/J_K_FLIPFLOP.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/J_K_FLIPFLOP.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of J_K_FLIPFLOP (47 lines)</summary>
+
+```verilog
+/**************************************************************************
+** ND120 SHARED CODE                                                     **
+** J-K FLIP-FLOP                                                         **
+**                                                                       **
+**                                                                       **
+** Last reviewed: 11-NOV-2024                                            **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module J_K_FLIPFLOP #(
+    parameter integer InvertClockEnable = 1
+) (
+    input  clock,
+    input  j,
+    input  k,
+    input  preset,
+    input  reset,
+    input  tick,
+    output q,
+    output qBar
+);
+
+  reg s_currentState;
+
+  // Output logic
+  assign q = s_currentState;
+  assign qBar = ~s_currentState;
+
+  // Clock inversion based on parameter
+  wire s_clock = (InvertClockEnable == 0) ? clock : ~clock;
+
+  // State transition logic
+  wire s_nextState = (~s_currentState & j) | (s_currentState & ~k);
+
+  // State update logic
+  //always @(posedge reset or posedge preset or posedge s_clock) begin (Vivado doesnt like ASYNC RESET )
+  always @(posedge s_clock) begin
+    if (preset)  // priority to pre-set
+      s_currentState <= 1'b1;
+    else if (reset) s_currentState <= 1'b0;
+    else if (tick) s_currentState <= s_nextState;
+  end
+
+  // Initial state for simulation
+  initial s_currentState = 0;
+
+endmodule
+```
+
+</details>

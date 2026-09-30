@@ -19,6 +19,16 @@ Source: `Verilog/Shared/ndlib/MUX21LP.v`
 
 ![MUX21LP symbol](MUX21LP.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.ALU.AARG0_MUX`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![MUX21LP schematic](MUX21LP.svg)](MUX21LP.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Component : MUX21LP  (2-to-1 Multiplexer NEGATED)
@@ -31,3 +41,40 @@ Component : MUX21LP  (2-to-1 Multiplexer NEGATED)
 | input | `1` | `B` | Input B |
 | input | `1` | `S` | Select input |
 | output | `1` | `ZN` | Negated Output |
+
+## Verilog source
+
+[`Verilog/Shared/ndlib/MUX21LP.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/ndlib/MUX21LP.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of MUX21LP (25 lines)</summary>
+
+```verilog
+/******************************************************************************
+ **                                                                          **
+ ** Component : MUX21LP  (2-to-1 Multiplexer NEGATED)                                                     **
+ **                                                                          **
+ *****************************************************************************/
+
+module MUX21LP( 
+   input A,    // Input A
+   input B,    // Input B
+   input S,    // Select input
+   output ZN   // Negated Output
+   );
+
+   wire wire_plexer_out;
+   assign ZN = ~wire_plexer_out;
+
+   Multiplexer_2   PLEXERS_1 (
+                              .muxIn_0(A),
+                              .muxIn_1(B),
+                              .muxOut(wire_plexer_out),
+                              .sel(S)
+   );
+
+
+endmodule
+```
+
+</details>

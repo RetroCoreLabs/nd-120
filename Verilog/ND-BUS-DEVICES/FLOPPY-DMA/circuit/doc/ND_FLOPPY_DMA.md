@@ -19,6 +19,16 @@ Source: `Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v`
 
 ![ND_FLOPPY_DMA symbol](ND_FLOPPY_DMA.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.gen_floppy.FLOPPY_1560`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![ND_FLOPPY_DMA schematic](ND_FLOPPY_DMA.svg)](ND_FLOPPY_DMA.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Parameters
 
 | Parameter | Default |
@@ -27,3 +37,860 @@ Source: `Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v`
 | `IDENT_CODE` | `16'o000021` |
 | `INT_LEVEL` | `4'd11` |
 | `DELAY_TICKS` | `16'd300` |
+
+## Verilog source
+
+[`Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/ND-BUS-DEVICES/FLOPPY-DMA/circuit/ND_FLOPPY_DMA.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of ND_FLOPPY_DMA (845 lines)</summary>
+
+```verilog
+`include "nd_storage_status.vh"
+/**************************************************************************
+** ND-100 FLOPPY DISK CONTROLLER, DMA INTERFACE (3112 / "new controller")**
+**                                                                       **
+** Register core, register semantics per the ND-11.021.01 controller     **
+** manual (3106/3112). Full verified layout, both status words and the   **
+** octal error table: docs/floppy-3112-register-spec-ND-11.021.md.       **
+**                                                                       **
+** IMPORTANT - TWO distinct status words (the manual is explicit; the    **
+** nd100x C model and earlier revisions of this file conflated them):    **
+**   HARDWARE STATUS WORD (§3.7) - what IOX +2 AND +4 return (§3.1 Note  **
+**     1: reading either gives the same result). b1 RFT/intEnabled,      **
+**     b2 deviceActive, b3 readyForTransfer, b4 OR-of-errors, b6 streamer**
+**     active, b7 hardError, b14 streamer interface, b15 dualDensity = 1 **
+**     ALWAYS (SINTRAN detects the 3112 by this bit). NO error code.     **
+**   STATUS WORD 1 (§3.4) - written back to command block CB+6 only.     **
+**     b4 OR-of-errors, b5 deleted, b6 retry, b7 hardError, b8 unused,   **
+**     b9-14 error code, b15 unused. The numeric error code lives ONLY   **
+**     here, never in the IOX register.                                  **
+**                                                                       **
+** IOX 1560+0 R  read data (no documented idle constant; returns 1)     **
+**         +2 R  read hardware status word (§3.7)                        **
+**         +3 W  control word: b1 enableInterrupt, b2 activateAutoload,  **
+**               b3 testMode, b4 deviceClear, b5 enableStreamer,         **
+**               b8 executeCommand                                       **
+**         +4 R  read hardware status word (same as +2, §3.1 Note 1)     **
+**         +5 W  load pointer HIGH (command block address bits 16-23)    **
+**         +7 W  load pointer LOW  (command block address bits 0-15)     **
+** STATUS WORD 2 (§3.5.2.2, the format word: b1 bytes/sector, b2 double  **
+**   sided, b3 double density, b9 selected unit) is delivered in memory  **
+**   at CB+7, NOT at an IOX register.                                    **
+**                                                                       **
+** Command block, 12 words in ND memory at the pointer (DMA-fetched):    **
+**   w0 command word: b0-5 function, b6-7 drive, b8-9 format,            **
+**      b10 doubleSided, b11 doubleDensity                               **
+**   w1 disk address (logical sector), w2 memAddr high (b23-16),         **
+**   w3 memAddr low, w4 options (b15 = 1 word-count / 0 sector-count,    **
+**      b7-0 = count HIGH byte -> 24-bit count),                         **
+**   w5 word/sector count, w6 status1 (written back), w7 status2         **
+**   (written back), w8/w9 last memory address (written back),           **
+**   w10/w11 remaining words (written back)                              **
+**                                                                       **
+** Functions implemented (enough for boot + basic driver use):           **
+**   0x00 READ DATA:  disk -> ND memory by DMA                           **
+**   0x01 WRITE DATA: ND memory -> disk by DMA                           **
+**   0x22 READ FORMAT: media format (disk_media_fmt) into status 2       **
+**   0x38 IDENTIFY / others: no-op completion (status writeback only),   **
+**        mirroring the C model's TODO stubs                             **
+**                                                                       **
+** Completion mirrors the C model's ReadEnd: after the E_WBACK status    **
+** writeback (still busy/not-ready, like the C model's first write) and  **
+** the completion delay, a FINAL DMA write re-writes CB+6 with the       **
+** completed status (READY = 1, BUSY = 0) - a driver waiting on FSTA1    **
+** in memory sees the controller go ready.                               **
+**   BOOT MODE (control b2, used by '1560&'): the microcode mass boot    **
+**        is the BPUN loader pointed at the device - per byte it writes  **
+**        the control word (bit 2 = activate), polls status +2 for the   **
+**        ready bit, and reads the next boot-stream WORD from +0 (the    **
+**        diskette stores one stream byte per 16-bit word, low byte).    **
+**        The controller serves the boot stream from its buffer,         **
+**        refilling a 512-word chunk from the image whenever the         **
+**        pointer crosses a chunk boundary. Reading +0 clears ready;     **
+**        the next activate re-arms it. Device clear or a real           **
+**        executeCommand leaves boot mode. Verified empirically: the     **
+**        'DMA the block to memory 0' interpretation was WRONG (the      **
+**        CPU never jumped; the microcode wants to read the stream).     **
+**                                                                       **
+** All memory traffic goes through the ND_DMA_MASTER client port         **
+** (dma_*): the command-block fetch, the sector data both directions,    **
+** and the status writeback - one word per bus allocation, exactly like  **
+** the real controller.                                                  **
+**                                                                       **
+** Sector geometry per format (deviceFloppyDMA.c): 0 = 512, 1 = 256,     **
+** 2 = 128, 3 = 1024 bytes per sector; 8 sectors per track model.        **
+** Disk backend: same style as the PIO core - the backend moves one      **
+** sector between the image and the internal buffer. A WRITE commits     **
+** only the words loaded for the final (partial) sector, never a full    **
+** sector of stale buffer.                                               **
+**                                                                       **
+** Robustness: DISK_TIMEOUT (default 0 = off) arms a watchdog on the     **
+** backend so selecting an absent drive (adapter stays silent) completes **
+** with DRIVE_NOT_READY instead of wedging. Error codes follow the       **
+** deviceFloppyDMA.h octal table (oct 20 not-ready, 41 CB-fetch bus      **
+** error, 43 data bus error), not invented values.                      **
+**                                                                       **
+** Ident code 021 (octal), interrupt level 11; interrupt on completion   **
+** when enableInterrupt is set; IDENT clears pending + enable.           **
+**                                                                       **
+** Last reviewed: 13-JUL-2026                                            **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module ND_FLOPPY_DMA #(
+    parameter [15:0] BASE_ADDR    = 16'o001560,
+    parameter [15:0] IDENT_CODE   = 16'o000021,
+    parameter [3:0]  INT_LEVEL    = 4'd11,
+    parameter [15:0] DELAY_TICKS  = 16'd300, // nd100x IODELAY_FLOPPY
+    // C2: watchdog on the disk backend. The adapter answers ONLY its own
+    // drive (silence for any other unit), so selecting an absent drive
+    // would wait on disk_done forever. When non-zero, a backend that does
+    // not raise disk_done within this many sysclk ticks aborts the command
+    // with DRIVE_NOT_READY (oct 20) instead of wedging. 0 = disabled (the
+    // pre-fix behaviour); set it above the real backend's worst-case
+    // per-sector latency (SD read/write) before enabling on hardware.
+    parameter [15:0] DISK_TIMEOUT = 16'd0
+) (
+    input wire sysclk,
+    input wire sys_rst_n,
+
+    // Device bus (from ND_BUS_SLAVE) - IOX slave side
+    input  wire [15:0] iox_addr,
+    input  wire        iox_wr,
+    input  wire [15:0] iox_wdata,
+    input  wire        iox_rd,
+    output reg  [15:0] iox_rdata,
+    output wire        iox_sel,         // 1 = this core owns the captured IOX address
+    output wire [3:0]  int_pending,
+    input  wire        ident_strobe,
+    input  wire [3:0]  ident_level,
+    input  wire        ident_grant_in,
+    output wire        ident_grant_out,
+    output wire        ident_hit,
+    output wire [15:0] ident_code,
+
+    // DMA master client port (to ND_DMA_MASTER) - bus master side
+    output reg         dma_req,
+    output reg         dma_wr,
+    output reg  [23:0] dma_addr,
+    output reg  [15:0] dma_wdata,
+    input  wire [15:0] dma_rdata,
+    input  wire        dma_ack,
+    input  wire        dma_err,
+    input  wire        dma_busy,
+
+    // Disk image backend (one sector per request, same style as the PIO)
+    output reg         disk_req,
+    output reg         disk_wr,        // 0 = image -> buffer, 1 = buffer -> image
+    output wire [15:0] disk_lsect,     // logical sector (disk address word)
+    output wire [1:0]  disk_format,
+    output wire [1:0]  disk_drive,
+    output wire [10:0] disk_wordcount, // words per sector
+    input  wire        disk_done,
+    input  wire        disk_err_in,
+    // WHY the backend failed (nd_storage_status.vh), valid with disk_done
+    // when disk_err_in. Mapped below onto codes from THIS controller's own
+    // error enum (deviceFloppyDMA.h / nd_floppy_dma.h) - never a new one.
+    input  wire [3:0]  disk_err_code,
+    // Media format of the mounted image, derived from the image size by
+    // the backend exactly like deviceFloppyDMA.c ExecuteFloppyGo/READ
+    // FORMAT: {doubleDensity, doubleSided, bytesPerSector[1:0]}.
+    // Size 315392 (8-inch) -> 4'b0000; size >= 1261568 (5.25" 1.2MB)
+    // -> 4'b1111. Tie to 4'b1111 if unknown.
+    input  wire [3:0]  disk_media_fmt,
+    input  wire [9:0]  dbuf_addr,
+    input  wire [15:0] dbuf_wdata,
+    input  wire        dbuf_we,
+    output reg  [15:0] dbuf_rdata
+);
+
+  // ---- registers ----
+  reg        s_int_enabled;   // RSR1 b1
+  reg        s_active;        // status b2
+  reg        s_rft;           // status b3
+  reg        s_hard_err;      // status b7
+  reg [5:0]  s_err_code;      // Status Word 1 b9-14 (ND-11.021 §3.4/§3.9)
+
+  // ==== BACKEND FAILURE -> ERROR CODE =====================================
+  //
+  // WHERE THESE CODES COME FROM: this controller does not report failures
+  // as individual status BITS the way the SMD and Winchester cards do. It
+  // reports a 6-bit NUMBER in STATUS WORD 1 bits 9-14 (ND-11.021.01 sec
+  // 3.4/3.9, tabulated in docs/floppy-3112-register-spec-ND-11.021.md),
+  // written back to the command block at CB+6 - never to an IOX register.
+  // The legal values are exactly the enum in
+  // Verilog/ND-BUS-DEVICES/portable/include/nd_floppy_dma.h, which is the
+  // same table nd100x's deviceFloppyDMA.h uses:
+  //
+  //     0       FLOPPY_ERR_OK               transfer ok
+  //     5       FLOPPY_ERR_CRC              CRC error - the media fault code
+  //     oct 16  FLOPPY_ERR_WRITE_PROTECTED  write-protected diskette
+  //     oct 20  FLOPPY_ERR_DRIVE_NOT_READY  drive not attached / not ready
+  //     oct 41  ND-100 BUS ERROR COMMAND FETCH   (set at the CB fetch)
+  //     oct 43  ND-100 BUS ERROR DATA TRANSFER   (set in the DMA path)
+  //     oct 50  FLOPPY_ERR_NO_BOOTSTRAP     no bootstrap on the diskette
+  //     oct 71  FLOPPY_ERR_RAM_ERROR        controller RAM error
+  //
+  // NOTHING outside that table may be produced here. This function chooses
+  // AMONG those values, it never adds one, and the storage stack's reason
+  // code itself never reaches the guest. That rule is stated in
+  // Verilog/SD-FAT/circuit/nd_storage_status.vh: the SD-FAT stack is
+  // clean-room and may carry a reason code, a reproduced ND card may not.
+  //
+  // WHERE THE REASON CODE COMES FROM: nd_storage_engine.v tags the failure
+  // where it happens, and it travels engine -> nd_storage ->
+  // nd_storage_floppy_adapter -> disk_err_code here.
+  //
+  // FULL MAPPING - all nine codes of nd_storage_status.vh:
+  //
+  //   NDS_ERR_NOCARD    oct 20  no SD card in the slot. From the guest's
+  //                             side there is no diskette in the drive,
+  //                             which is what DRIVE_NOT_READY reports.
+  //   NDS_ERR_NOTOPEN   oct 20  FLOPPY1.IMG/FLOPPY2.IMG is not on the card
+  //                             (or its mount failed): again, no diskette.
+  //   NDS_ERR_TIMEOUT   oct 20  the backend never answered. This card has
+  //                             no timeout code of its own, and the
+  //                             existing DISK_TIMEOUT watchdog in this file
+  //                             already reports oct 20 - kept identical.
+  //   NDS_ERR_RANGE     oct 20  a sector past the end of the image. There
+  //                             is no seek-error or address-mismatch code
+  //                             in this card's table, so it falls back to
+  //                             the general not-ready value rather than
+  //                             borrow a code that means something else.
+  //   NDS_ERR_WRPROT    oct 16  the write path is not built in.
+  //   NDS_ERR_WRALIGN   oct 16  a partial/unaligned write was refused. Both
+  //                             are "this diskette cannot be written",
+  //                             which is exactly WRITE_PROTECTED, and it
+  //                             correctly tells the driver the MEDIUM is
+  //                             fine - retrying the read will work.
+  //   NDS_ERR_CARDIO    5       the card answered but the data cannot be
+  //   NDS_ERR_FATCHAIN  5       trusted (CMD17/CMD24 failure, CRC, card
+  //                             stopped mid-block, broken/circular FAT
+  //                             chain). nd_floppy_dma.h documents CRC
+  //                             verbatim as "used for a media fault".
+  //   NDS_ERR_NONE              never reaches this function (no error).
+  //
+  // The BOOT autoload path is NOT routed through here: a backend failure
+  // during '1560&' must stay oct 50 NO_BOOTSTRAP + hard error + leave boot
+  // mode, matching both authorities (nd_floppy_dma.c boot_fail() and
+  // nd100x deviceFloppyDMA.c ExecuteAutoload). See E_DISK_RD below.
+  //
+  // WHY THIS EXISTS: before it, every backend failure reported the single
+  // value oct 20, so a diagnostic could not tell a missing diskette from a
+  // broken one, nor a refused write from a dead drive.
+  // ========================================================================
+  function [5:0] flp_err_code;
+    input [3:0] code;
+    begin
+      case (code)
+        // oct 20 DRIVE_NOT_READY - no medium, or no answer at all
+        `NDS_ERR_NOCARD,
+        `NDS_ERR_NOTOPEN,
+        `NDS_ERR_TIMEOUT,
+        `NDS_ERR_RANGE:   flp_err_code = 6'o20;
+        // oct 16 WRITE_PROTECTED - the transfer was refused, medium is fine
+        `NDS_ERR_WRPROT,
+        `NDS_ERR_WRALIGN: flp_err_code = 6'o16;
+        // 5 CRC - this card's media-fault code (CARDIO, FATCHAIN)
+        default:          flp_err_code = 6'd5;
+      endcase
+    end
+  endfunction
+  reg [7:0]  s_ptr_hi;        // command block address b23-16
+  reg [15:0] s_ptr_lo;        // command block address b15-0
+  reg        s_test_mode;
+
+  // ND-11.021 defines TWO distinct status words - see
+  // docs/floppy-3112-register-spec-ND-11.021.md:
+  //
+  // (a) HARDWARE STATUS WORD (§3.7): returned by IOX +2 AND IOX +4 (§3.1
+  //     Note 1 - "reading either status gives the same result"). bit 15 =
+  //     Dual density controller (the always-1 bit SINTRAN uses to detect the
+  //     3112 DMA controller); bit 4 = OR of errors; bit 7 = hard error.
+  //     It carries NO numeric error code.
+  wire s_or_err = (s_err_code != 6'd0) | s_hard_err;
+  wire [15:0] s_hwstat = {1'b1,          // b15 dual density controller
+                          1'b0,          // b14 streamer interface
+                          6'b0,          // b13-8 (b11 reserved)
+                          s_hard_err,    // b7  hard error - DMA transfer
+                          1'b0,          // b6  streamer active
+                          1'b0,          // b5  not used
+                          s_or_err,      // b4  OR of errors
+                          s_rft,         // b3  device ready for transfer
+                          s_active,      // b2  device active
+                          s_int_enabled, // b1  RFT / interrupt enabled
+                          1'b0};         // b0  not used
+  //
+  // (b) STATUS WORD 1 (§3.4): written back into the command block at CB+6.
+  //     bit 8 not used, bits 9-14 = error code from controller, bit 15 not
+  //     used. This is the ONLY place the numeric error code appears.
+  wire [15:0] s_sw1 = {1'b0,             // b15 not used
+                       s_err_code,       // b14-9 error code from controller
+                       1'b0,             // b8  not used
+                       s_hard_err,       // b7  hard error
+                       1'b0,             // b6  retry on controller
+                       1'b0,             // b5  deleted record
+                       s_or_err,         // b4  OR of errors
+                       s_rft,            // b3  device ready for transfer
+                       s_active,         // b2  device active
+                       s_int_enabled,    // b1  RFT / interrupt enabled
+                       1'b0};            // b0  not used
+
+  // command block fields (fetched by DMA)
+  reg [15:0] s_cb[0:5];       // w0-w5 (w6-w11 are write-back only)
+  wire [5:0] s_func     = s_cb[0][5:0];
+  wire [1:0] s_cb_drive = s_cb[0][7:6];
+  wire [1:0] s_cb_fmt   = s_cb[0][9:8];
+  wire [15:0] s_disk_addr = s_cb[1];
+  wire [23:0] s_mem_addr0 = {s_cb[2][7:0], s_cb[3]};
+  wire [15:0] s_count     = s_cb[5];
+
+  // STATUS 2 (format word): a real latched register, NOT an echo of the
+  // command-word format bits. Loaded at command decode with the selected
+  // unit in bits 8-9 (deviceFloppyDMA.c line 371); READ FORMAT (0x22)
+  // additionally loads the media format bits 0-3 from disk_media_fmt
+  // (deviceFloppyDMA.c lines 528-540).
+  reg [15:0] s_status2;
+
+  // geometry: bytes per sector by format -> words per sector
+  wire [10:0] s_words_per_sector = (s_cb_fmt == 2'd0) ? 11'd256 :
+                                   (s_cb_fmt == 2'd1) ? 11'd128 :
+                                   (s_cb_fmt == 2'd2) ? 11'd64  : 11'd512;
+
+  // C1: command block word 4 (OPWCH) - transfer length control.
+  //   b15 = 1 -> word count, 0 -> sector count (deviceFloppyDMA.c:298-300).
+  //   b7-0  = count HIGH byte -> the count is 24-bit (line 301).
+  // Total words to move: the 24-bit count directly in word-count mode, or
+  // count * words-per-sector in sector-count mode (line 346-348). SINTRAN's
+  // BFDIS driver issues sector-count transfers, so this path must exist.
+  wire        s_is_wc = s_cb[4][15];
+  wire [23:0] s_wc24  = {s_cb[4][7:0], s_cb[5]};
+  wire [31:0] s_wtr   = s_is_wc ? {8'd0, s_wc24}
+                                : ({8'd0, s_wc24} * {21'd0, s_words_per_sector});
+
+  // ---- internal sector buffer (single synchronous-read BSRAM block) ----
+  // Async-read arrays do NOT map to Gowin BSRAM (BSRAM-BUDGET.md Part 2), so
+  // the buffer is a simple dual-port RAM: one muxed write port, one registered
+  // read port (address muxed by engine state - see the RAM port block below
+  // the register declarations). Writes were already synchronous; dbuf_rdata is
+  // driven from the registered read there.
+  reg [15:0] s_buffer[0:1023];
+
+  // ---- address decode ----
+  wire s_addressed = (iox_addr[15:3] == BASE_ADDR[15:3]);
+  assign iox_sel = s_addressed;   // slave gates its BDRY response on this
+  wire [2:0] s_reg = iox_addr[2:0];
+  wire s_wr_here = iox_wr && s_addressed;
+
+  // ---- interrupt / ident (standard pattern) ----
+  wire s_pending = s_int_enabled && s_rft;
+  assign int_pending = {(INT_LEVEL == 4'd13) && s_pending,
+                        (INT_LEVEL == 4'd12) && s_pending,
+                        (INT_LEVEL == 4'd11) && s_pending,
+                        (INT_LEVEL == 4'd10) && s_pending};
+  wire s_ident_answer = ident_strobe && ident_grant_in &&
+                        (ident_level == INT_LEVEL) && s_pending;
+  assign ident_hit       = s_ident_answer;
+  assign ident_code      = s_ident_answer ? IDENT_CODE : 16'd0;
+  assign ident_grant_out = ident_grant_in && !s_ident_answer;
+
+  // ---- IOX read mux ----
+  always @(*) begin
+    iox_rdata = 16'd0;
+    if (iox_rd && s_addressed) begin
+      case (s_reg)
+        // +0 outside boot mode: the C model returns the constant 0x0001
+        3'd0: iox_rdata = s_boot_active ? s_buf_dout : 16'd1;
+        // §3.1 Note 1 + §3.7: +2 and +4 both return the hardware status word
+        3'd2: iox_rdata = s_hwstat;
+        3'd4: iox_rdata = s_hwstat;
+        default: iox_rdata = 16'd0;
+      endcase
+    end
+  end
+
+  // ---- command engine ----
+  localparam E_IDLE     = 4'd0;
+  localparam E_CB_FETCH = 4'd1;   // DMA-read command block words 0-5
+  localparam E_DISK_RD  = 4'd2;   // backend: image sector -> buffer
+  localparam E_MEM_WR   = 4'd3;   // DMA-write buffer -> ND memory
+  localparam E_MEM_RD   = 4'd4;   // DMA-read ND memory -> buffer
+  localparam E_DISK_WR  = 4'd5;   // backend: buffer -> image sector
+  localparam E_WBACK    = 4'd6;   // DMA-write status words 6-11
+  localparam E_DELAY    = 4'd7;   // completion delay -> interrupt
+  localparam E_FINAL    = 4'd8;   // re-write CB+6 with completed status
+                                  // (READY=1, BUSY=0) - C model ReadEnd
+
+  reg [3:0]  s_eng;
+  reg [2:0]  s_cb_idx;      // command-block word index during fetch
+  reg [31:0] s_words_left;  // total transfer words remaining (C1: 24-bit
+                            // count x words/sector can exceed 16 bits)
+  reg [15:0] s_disk_to;     // C2: backend watchdog countdown
+  reg [10:0] s_sec_idx;     // word index within the current sector
+  reg [15:0] s_lsect;       // current logical sector
+  reg [23:0] s_mem_ptr;     // current ND memory address
+  reg [2:0]  s_wb_idx;      // writeback word index (0-5 -> w6-w11)
+  reg [15:0] s_delay_cnt;
+  reg        s_dma_wait;    // a dma_req is outstanding
+  reg        s_autoload;    // a boot-chunk fetch is in flight
+  reg        s_boot_active; // boot byte-server engaged
+  reg [9:0]  s_bootptr;     // word index into the current boot chunk
+  reg        s_final_wb;    // command block present: E_DELAY -> E_FINAL
+
+  assign disk_lsect     = s_lsect;
+  assign disk_format    = s_cb_fmt;
+  assign disk_drive     = s_cb_drive;
+  // C3: a WRITE commits exactly the words loaded for this sector (s_chunk_q),
+  // NOT a full sector - otherwise a partial-sector tail leaks stale buffer
+  // (previous sector or reset garbage) onto the disk. A READ fills the full
+  // sector into the buffer (harmless; only s_chunk_q words reach memory).
+  assign disk_wordcount = disk_wr ? s_chunk_q : s_words_per_sector;
+
+  // words in the CURRENT sector transfer - latched at sector start
+  // (computing it from the live word counter would shrink it mid-sector)
+  reg [10:0] s_chunk_q;
+
+  // one-clock req pulse toward the DMA master; response by dma_ack
+  task automatic dma_issue(input wr, input [23:0] a, input [15:0] d);
+    begin
+      dma_req    <= 1'b1;
+      dma_wr     <= wr;
+      dma_addr   <= a;
+      dma_wdata  <= d;
+      s_dma_wait <= 1'b1;
+    end
+  endtask
+
+  // ---- sector-buffer RAM ports (synchronous, BSRAM-inferable) -------------
+  // WRITE port: backend fill (dbuf_we) or the E_MEM_RD DMA commit, muxed - the
+  // two are mutually exclusive engine phases. READ port: one registered read
+  // whose address follows the active consumer - E_MEM_WR walks the sector for
+  // the DMA-out, E_DISK_WR serves the backend readout (dbuf_addr), otherwise
+  // the boot-stream pointer. s_buf_valid marks s_buf_dout as current for the
+  // address requested THIS cycle (s_buf_dout holds s_buffer[s_buf_raddr_q]);
+  // consumers that need the freshest word gate on it, adding the one cycle of
+  // read latency. The floppy adapter's F_PULL present/settle/sample walk
+  // already tolerates the registered readout (nd_storage_floppy_adapter.v).
+  wire        s_memrd_commit = (s_eng == E_MEM_RD) && s_dma_wait &&
+                               dma_ack && !dma_err;
+  wire        s_buf_we    = dbuf_we | s_memrd_commit;
+  wire [ 9:0] s_buf_waddr = dbuf_we ? dbuf_addr : s_sec_idx[9:0];
+  wire [15:0] s_buf_wdata = dbuf_we ? dbuf_wdata : dma_rdata;
+  wire [ 9:0] s_buf_raddr = (s_eng == E_MEM_WR)  ? s_sec_idx[9:0] :
+                            (s_eng == E_DISK_WR) ? dbuf_addr      :
+                                                   s_bootptr;
+  reg  [15:0] s_buf_dout;
+  reg  [ 9:0] s_buf_raddr_q;
+  wire        s_buf_valid = (s_buf_raddr_q == s_buf_raddr);
+
+  always @(posedge sysclk) begin
+    if (s_buf_we) s_buffer[s_buf_waddr] <= s_buf_wdata;
+    s_buf_dout    <= s_buffer[s_buf_raddr];
+    s_buf_raddr_q <= s_buf_raddr;
+  end
+
+  always @(*) dbuf_rdata = s_buf_dout;
+
+  always @(posedge sysclk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+      s_int_enabled <= 1'b0;
+      s_active      <= 1'b0;
+      s_rft         <= 1'b1;
+      s_hard_err    <= 1'b0;
+      s_err_code    <= 6'd0;
+      s_ptr_hi      <= 8'd0;
+      s_ptr_lo      <= 16'd0;
+      s_test_mode   <= 1'b0;
+      s_eng         <= E_IDLE;
+      s_cb_idx      <= 3'd0;
+      s_words_left  <= 32'd0;
+      s_disk_to     <= 16'd0;
+      s_sec_idx     <= 11'd0;
+      s_lsect       <= 16'd0;
+      s_mem_ptr     <= 24'd0;
+      s_wb_idx      <= 3'd0;
+      s_delay_cnt   <= 16'd0;
+      s_chunk_q     <= 11'd0;
+      s_dma_wait    <= 1'b0;
+      s_autoload    <= 1'b0;
+      s_boot_active <= 1'b0;
+      s_bootptr     <= 10'd0;
+      s_final_wb    <= 1'b0;
+      s_status2     <= 16'd0;
+      dma_req       <= 1'b0;
+      dma_wr        <= 1'b0;
+      dma_addr      <= 24'd0;
+      dma_wdata     <= 16'd0;
+      disk_req      <= 1'b0;
+      disk_wr       <= 1'b0;
+    end else begin
+      dma_req  <= 1'b0;
+      disk_req <= 1'b0;
+
+      // backend fill (dbuf_we) into the sector buffer is handled by the
+      // synchronous RAM write port above (s_buf_we mux)
+
+      // boot stream readout: +0 read consumes the word, clears ready
+      if (s_boot_active && iox_rd && s_addressed && (s_reg == 3'd0)) begin
+        s_bootptr <= s_bootptr + 10'd1;
+        s_rft     <= 1'b0;
+      end
+
+      // ---- IOX register writes ----
+      if (s_wr_here) begin
+        case (s_reg)
+          3'd3: begin  // control word
+            s_int_enabled <= iox_wdata[1];
+            s_test_mode   <= iox_wdata[3];
+            if (iox_wdata[4]) begin  // device clear
+              s_rft         <= 1'b1;
+              s_active      <= 1'b0;
+              s_hard_err    <= 1'b0;
+              s_err_code    <= 6'd0;
+              s_boot_active <= 1'b0;
+              s_eng         <= E_IDLE;
+              s_dma_wait    <= 1'b0;
+            end
+            // autoload has PRIORITY over execute when both bits are set
+            // (C model if/else order in FloppyDMA_Write)
+            if (iox_wdata[2] && s_eng == E_IDLE) begin
+              // BOOT MODE activate: arm the next boot-stream word
+              if (!s_boot_active) begin
+                // first activate: fetch chunk 0 into the buffer
+                s_boot_active <= 1'b1;
+                s_bootptr     <= 10'd0;
+                s_active      <= 1'b1;
+                s_rft         <= 1'b0;
+                s_hard_err    <= 1'b0;
+                s_err_code    <= 6'd0;
+                s_autoload    <= 1'b1;
+                s_cb[0]       <= 16'h0300;  // format 3 (1024 B/sector)
+                s_lsect       <= 16'd0;
+                s_chunk_q     <= 11'd512;
+                disk_req      <= 1'b1;
+                disk_wr       <= 1'b0;
+                s_disk_to     <= DISK_TIMEOUT;
+                s_eng         <= E_DISK_RD;
+              end else if (s_bootptr == 10'd512) begin
+                // chunk exhausted: fetch the next one (re-assert the
+                // boot geometry - a normal command may have changed
+                // the format field in between)
+                s_bootptr  <= 10'd0;
+                s_active   <= 1'b1;
+                s_rft      <= 1'b0;
+                s_autoload <= 1'b1;
+                s_cb[0]    <= 16'h0300;
+                s_lsect    <= s_lsect + 16'd1;
+                s_chunk_q  <= 11'd512;
+                disk_req   <= 1'b1;
+                disk_wr    <= 1'b0;
+                s_disk_to  <= DISK_TIMEOUT;
+                s_eng      <= E_DISK_RD;
+              end else begin
+                s_rft <= 1'b1;  // next word already buffered
+              end
+            end else if (iox_wdata[8] && s_eng == E_IDLE) begin  // execute
+              s_boot_active <= 1'b0;
+              s_active   <= 1'b1;
+              s_rft      <= 1'b0;
+              s_hard_err <= 1'b0;
+              s_err_code <= 6'd0;
+              s_autoload <= 1'b0;
+              s_cb_idx   <= 3'd0;
+              s_eng      <= E_CB_FETCH;
+            end
+          end
+          3'd5: s_ptr_hi <= iox_wdata[7:0];
+          3'd7: s_ptr_lo <= iox_wdata;
+          default: ;
+        endcase
+      end
+
+      // ---- engine ----
+      case (s_eng)
+        E_IDLE: ;
+
+        // fetch command block words 0-5 by DMA
+        E_CB_FETCH: begin
+          if (!s_dma_wait && !dma_busy && s_cb_idx < 3'd6) begin
+            dma_issue(1'b0, {s_ptr_hi, s_ptr_lo} + {21'd0, s_cb_idx}, 16'd0);
+          end else if (s_dma_wait && dma_ack) begin
+            s_dma_wait <= 1'b0;
+            if (dma_err) begin
+              // ND-100 BUS ERROR COMMAND FETCH = oct 41 (deviceFloppyDMA.h);
+              // a genuine memory-contact failure -> also flag hard error b7
+              s_hard_err <= 1'b1;
+              s_err_code <= 6'o41;
+              s_eng      <= E_WBACK;
+              s_wb_idx   <= 3'd0;
+            end else begin
+              s_cb[s_cb_idx[2:0]] <= dma_rdata;
+              s_cb_idx <= s_cb_idx + 3'd1;  // idx 6 = decode cycle below
+            end
+          end
+          // decode once the last word has landed (registered s_cb ready
+          // the cycle after the final ack)
+          if (s_cb_idx == 3'd6) begin
+            s_lsect      <= s_disk_addr;
+            s_mem_ptr    <= s_mem_addr0;
+            s_words_left <= s_wtr;   // C1: word- or sector-count transfer
+            // status 2: selected unit in bits 8-9 (C model command setup);
+            // READ FORMAT loads the media format bits on top - the 8-inch
+            // format (all-zero descriptor) is a plain assignment in the C
+            // model, so the unit bits are cleared for that case too
+            if (s_func == 6'h22)
+              s_status2 <= (disk_media_fmt == 4'b0000) ? 16'd0 :
+                           ({6'd0, s_cb_drive, 8'd0} | {12'd0, disk_media_fmt});
+            else
+              s_status2 <= {6'd0, s_cb_drive, 8'd0};
+            s_chunk_q    <= (s_wtr > {21'd0, s_words_per_sector}) ?
+                            s_words_per_sector : s_wtr[10:0];
+            s_sec_idx    <= 11'd0;
+            if (s_func == 6'h00 && s_wtr != 32'd0) begin
+              disk_req  <= 1'b1;
+              disk_wr   <= 1'b0;
+              s_disk_to <= DISK_TIMEOUT;
+              s_eng     <= E_DISK_RD;
+            end else if (s_func == 6'h01 && s_wtr != 32'd0) begin
+              s_eng <= E_MEM_RD;
+            end else begin
+              // IDENTIFY and the other functions: complete with clean
+              // status (the C model's stubs do the same)
+              s_eng    <= E_WBACK;
+              s_wb_idx <= 3'd0;
+            end
+          end
+        end
+
+        // wait for the backend to fill the buffer with one sector
+        E_DISK_RD: begin
+          if (disk_done) begin
+            if (disk_err_in) begin
+              if (s_autoload) begin
+                // BOOT autoload backend failure = boot_fail(). Match BOTH
+                // authorities: the portable core nd_floppy_dma.c boot_fail()
+                // (lines 603-617) and nd100x deviceFloppyDMA.c ExecuteAutoload
+                // set NO_BOOTSTRAP (oct 50, deviceFloppyDMA.h
+                // FLOPPY_ERR_NO_BOOTSTRAP) + hard error, and LEAVE boot mode
+                // (boot_active := false). Releasing RFT in E_DELAY frees the
+                // microcode's forever-poll on +2 instead of hanging silently;
+                // clearing s_boot_active makes a later +0 read return the idle
+                // constant 1 again (not stale buffer) and lets a fresh activate
+                // re-enter boot cleanly. A normal (non-boot) read keeps oct 20.
+                s_err_code    <= 6'o50;
+                s_hard_err    <= 1'b1;
+                s_boot_active <= 1'b0;
+                s_autoload    <= 1'b0;
+                s_delay_cnt   <= DELAY_TICKS;
+                s_final_wb    <= 1'b0;  // boot path: no command block
+                s_eng         <= E_DELAY;
+              end else begin
+                // backend not-ready / read failure. deviceFloppyDMA.c sets
+                // only the code and always DRIVE_NOT_READY; here the reason
+                // picks it, and a missing medium still lands on oct 20.
+                s_err_code <= flp_err_code(disk_err_code);
+                s_eng      <= E_WBACK;
+                s_wb_idx   <= 3'd0;
+              end
+            end else if (s_autoload) begin
+              // boot chunk buffered: serve it via +0 reads
+              s_autoload <= 1'b0;
+              s_active   <= 1'b0;
+              s_rft      <= 1'b1;
+              s_eng      <= E_IDLE;
+            end else begin
+              s_sec_idx <= 11'd0;
+              s_eng     <= E_MEM_WR;
+            end
+          end else if (DISK_TIMEOUT != 16'd0) begin
+            // C2 watchdog: backend never answered -> no wedge
+            if (s_disk_to == 16'd1) begin
+              if (s_autoload) begin
+                // BOOT autoload timed out = boot_fail() (same authorities as
+                // the disk_err_in branch above): NO_BOOTSTRAP (oct 50) + hard
+                // error, leave boot mode, RFT released in E_DELAY. A normal
+                // read keeps DRIVE_NOT_READY (oct 20).
+                s_err_code    <= 6'o50;
+                s_hard_err    <= 1'b1;
+                s_boot_active <= 1'b0;
+                s_autoload    <= 1'b0;
+                s_delay_cnt   <= DELAY_TICKS;
+                s_final_wb    <= 1'b0;
+                s_eng         <= E_DELAY;
+              end else begin
+                s_err_code <= 6'o20;  // DRIVE_NOT_READY, no wedge
+                s_eng      <= E_WBACK;
+                s_wb_idx   <= 3'd0;
+              end
+            end else if (s_disk_to != 16'd0) begin
+              s_disk_to <= s_disk_to - 16'd1;
+            end
+          end
+        end
+
+        // DMA-write the buffered sector words to ND memory
+        E_MEM_WR: begin
+          if (!s_dma_wait && !dma_busy && s_buf_valid) begin
+            // s_buf_dout is the registered read of s_buffer[s_sec_idx]
+            dma_issue(1'b1, s_mem_ptr, s_buf_dout);
+          end else if (s_dma_wait && dma_ack) begin
+            s_dma_wait <= 1'b0;
+            if (dma_err) begin
+              // ND-100 BUS ERROR DATA TRANSFER = oct 43 (deviceFloppyDMA.h)
+              s_hard_err <= 1'b1;
+              s_err_code <= 6'o43;
+              s_eng      <= E_WBACK;
+              s_wb_idx   <= 3'd0;
+            end else begin
+            s_mem_ptr    <= s_mem_ptr + 24'd1;
+            s_words_left <= s_words_left - 32'd1;
+            if (s_sec_idx + 11'd1 >= s_chunk_q || s_words_left == 32'd1) begin
+              if (s_words_left == 32'd1) begin
+                if (s_autoload) begin
+                  s_delay_cnt <= DELAY_TICKS;
+                  s_final_wb  <= 1'b0;  // boot path: no command block
+                  s_eng       <= E_DELAY;
+                end else begin
+                  s_eng    <= E_WBACK;
+                  s_wb_idx <= 3'd0;
+                end
+              end else begin
+                s_lsect   <= s_lsect + 16'd1;
+                s_chunk_q <= ((s_words_left - 32'd1) > {21'd0, s_words_per_sector}) ?
+                             s_words_per_sector : s_words_left[10:0] - 11'd1;
+                disk_req  <= 1'b1;
+                disk_wr   <= 1'b0;
+                s_disk_to <= DISK_TIMEOUT;
+                s_eng     <= E_DISK_RD;
+              end
+            end else begin
+              s_sec_idx <= s_sec_idx + 11'd1;
+            end
+            end
+          end
+        end
+
+        // DMA-read ND memory words into the buffer (write function)
+        E_MEM_RD: begin
+          if (!s_dma_wait && !dma_busy) begin
+            dma_issue(1'b0, s_mem_ptr, 16'd0);
+          end else if (s_dma_wait && dma_ack) begin
+            s_dma_wait <= 1'b0;
+            if (dma_err) begin
+              // ND-100 BUS ERROR DATA TRANSFER = oct 43 (deviceFloppyDMA.h)
+              s_hard_err <= 1'b1;
+              s_err_code <= 6'o43;
+              s_eng      <= E_WBACK;
+              s_wb_idx   <= 3'd0;
+            end else begin
+            // dma_rdata -> s_buffer[s_sec_idx] is committed by the synchronous
+            // RAM write port above (s_memrd_commit qualifier)
+            s_mem_ptr    <= s_mem_ptr + 24'd1;
+            s_words_left <= s_words_left - 32'd1;
+            if (s_sec_idx + 11'd1 >= s_chunk_q || s_words_left == 32'd1) begin
+              disk_req  <= 1'b1;
+              disk_wr   <= 1'b1;
+              s_disk_to <= DISK_TIMEOUT;
+              s_eng     <= E_DISK_WR;
+            end else begin
+              s_sec_idx <= s_sec_idx + 11'd1;
+            end
+            end
+          end
+        end
+
+        // wait for the backend to write the buffer to the image
+        E_DISK_WR: begin
+          if (disk_done) begin
+            if (disk_err_in) begin
+              // write failure: code only, like C, but the reason chooses it
+              // (a refused unaligned write is WRITE_PROTECTED, not a dead drive)
+              s_err_code <= flp_err_code(disk_err_code);
+              s_eng      <= E_WBACK;
+              s_wb_idx   <= 3'd0;
+            end else if (s_words_left == 32'd0) begin
+              s_eng    <= E_WBACK;
+              s_wb_idx <= 3'd0;
+            end else begin
+              s_lsect   <= s_lsect + 16'd1;
+              s_sec_idx <= 11'd0;
+              s_chunk_q <= (s_words_left > {21'd0, s_words_per_sector}) ?
+                           s_words_per_sector : s_words_left[10:0];
+              s_eng     <= E_MEM_RD;
+            end
+          end else if (DISK_TIMEOUT != 16'd0) begin
+            // C2 watchdog on the write backend
+            if (s_disk_to == 16'd1) begin
+              s_err_code <= 6'o20;
+              s_eng      <= E_WBACK;
+              s_wb_idx   <= 3'd0;
+            end else if (s_disk_to != 16'd0) begin
+              s_disk_to <= s_disk_to - 16'd1;
+            end
+          end
+        end
+
+        // DMA-write status words w6-w11 back into the command block
+        E_WBACK: begin
+          if (!s_dma_wait && !dma_busy) begin
+            case (s_wb_idx)
+              3'd0: dma_issue(1'b1, {s_ptr_hi, s_ptr_lo} + 24'd6, s_sw1);
+              3'd1: dma_issue(1'b1, {s_ptr_hi, s_ptr_lo} + 24'd7, s_status2);
+              3'd2: dma_issue(1'b1, {s_ptr_hi, s_ptr_lo} + 24'd8,
+                              {8'd0, s_mem_ptr[23:16]});
+              3'd3: dma_issue(1'b1, {s_ptr_hi, s_ptr_lo} + 24'd9,
+                              s_mem_ptr[15:0]);
+              3'd4: dma_issue(1'b1, {s_ptr_hi, s_ptr_lo} + 24'd10, 16'd0);
+              default: dma_issue(1'b1, {s_ptr_hi, s_ptr_lo} + 24'd11,
+                                 s_words_left[15:0]);
+            endcase
+          end else if (s_dma_wait && dma_ack) begin
+            s_dma_wait <= 1'b0;
+            if (s_wb_idx == 3'd5) begin
+              s_delay_cnt <= DELAY_TICKS;
+              s_final_wb  <= 1'b1;  // re-write CB+6 after the delay
+              s_eng       <= E_DELAY;
+            end
+            s_wb_idx <= s_wb_idx + 3'd1;
+          end
+        end
+
+        // completion delay, then ready + interrupt condition; a normal
+        // command (s_final_wb) goes on to re-write CB+6 with the
+        // completed status, like the C model's ReadEnd
+        E_DELAY: begin
+          if (s_delay_cnt != 16'd0) s_delay_cnt <= s_delay_cnt - 16'd1;
+          else begin
+            s_active <= 1'b0;
+            s_rft    <= 1'b1;
+            s_eng    <= s_final_wb ? E_FINAL : E_IDLE;
+          end
+        end
+
+        // final status re-write (C model ReadEnd): one DMA write of
+        // CB+6 with s_sw1 now evaluating READY=1 (b3), BUSY=0 (b2 clear)
+        E_FINAL: begin
+          if (!s_dma_wait && !dma_busy) begin
+            dma_issue(1'b1, {s_ptr_hi, s_ptr_lo} + 24'd6, s_sw1);
+          end else if (s_dma_wait && dma_ack) begin
+            s_dma_wait <= 1'b0;
+            s_final_wb <= 1'b0;
+            s_eng      <= E_IDLE;
+          end
+        end
+
+        default: s_eng <= E_IDLE;
+      endcase
+
+      // IDENT answered: clear the enable bit (standard rule)
+      if (s_ident_answer) begin
+        s_int_enabled <= 1'b0;
+      end
+    end
+  end
+
+endmodule
+```
+
+</details>

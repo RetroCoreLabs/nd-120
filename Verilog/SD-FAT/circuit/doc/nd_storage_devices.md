@@ -19,6 +19,16 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_devices.v`
 
 ![nd_storage_devices symbol](nd_storage_devices.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `TAPE_SDFAT_SOURCE`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd_storage_devices schematic](nd_storage_devices.svg)](nd_storage_devices.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 nd_storage_devices - board-agnostic BOOT.BPUN byte source for the
@@ -56,3 +66,702 @@ Ronny Hansen
 | `INCLUDE_SMD` | `0` |
 | `INCLUDE_WD` | `0` |
 | `USE_4BIT` | `0` |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/nd_storage_devices.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/nd_storage_devices.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd_storage_devices (687 lines)</summary>
+
+```verilog
+/****************************************************************************
+** nd_storage_devices - board-agnostic BOOT.BPUN byte source for the     **
+** ND_TAPE_400 paper-tape device, backed by the SD-FAT storage stack.      **
+**                                                                         **
+** Packages, in one reusable block for BOTH the Verilator sim and the      **
+** Tang hardware top:                                                      **
+**   nd_storage             (SD-FAT mount + reader + engine; client 0 =    **
+**                           BOOT.BPUN, preloaded into the SDRAM region)   **
+**   nd_storage_tape_adapter(serves that file to ND_TAPE_400's byte source **
+**                           port, big-endian, read-only)                  **
+**   a mount->open sequencer(pulses the adapter's open_start ONCE after    **
+**                           the mount reports OK)                         **
+**                                                                         **
+** The instantiating top supplies the physical backends:                   **
+**   - SD pads  (sim: sd_card_model.v with IMAGE=nd_boot_card.img;         **
+**               Tang: the real SD card)                                   **
+**   - SDRAM device port mem_* (sim: nds_mem_model.v; Tang: the SDRAM      **
+**     bridge, same contract as nds_mem_model.v / MEM_RAM_49_SDRAM.v)      **
+**   - the byte source port wires straight to ND_TAPE_400 (byte_req /      **
+**     byte_valid / byte_data / source_rewind, pin-for-pin).               **
+**                                                                         **
+** Two clocks (as nd_storage requires): clk_stor (SD/SDRAM domain) and     **
+** clk_cpu (the ND-120 bus/client domain). sd_status is 2-FF synchronized  **
+** into clk_cpu before it gates the one-shot open.                         **
+**                                                                         **
+** Only client 0 is used; clients 1-7 are tied idle. Tape is DIRECT (not  **
+** in CACHE_MASK): the card is quick enough and nothing is preloaded.     **
+** only BOOT.BPUN is preloaded (the boot card carries no other files).     **
+**                                                                         **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module nd_storage_devices #(
+    parameter SIMULATE       = 0,  // 1 = short SD init (Verilator), 0 = real card
+    parameter INCLUDE_TAPE   = 1,  // 1 = serve BOOT.BPUN to ND_TAPE_400 (client 0)
+    parameter INCLUDE_FLOPPY = 0,  // 1 = also serve FLOPPY1.IMG to the DMA floppy
+    parameter INCLUDE_SMD    = 0,  // 1 = also serve SMD0.IMG to ND_SMD (client 3)
+    parameter INCLUDE_WD     = 0,  // 1 = also serve WD0.IMG to ND_WINCHESTER (client 6)
+    // SD 4-bit data bus. Off by default: it needs DAT1-3 pinned and wired at
+    // the board top, so a board that only brings out DAT0 stays correct.
+    parameter USE_4BIT       = 0,
+    // client-0 (tape) file name on the card. Default BOOT.BPUN (the boot tape);
+    // a tb can point it at another 8.3 name on a shared test image.
+    parameter [52*8-1:0] BOOT_NAME = "BOOT.BPUN",
+    parameter [7:0]      BOOT_LEN  = 8'd9
+) (
+    input  wire clk_stor,
+    input  wire rst_stor_n,
+    input  wire clk_cpu,
+    input  wire rst_cpu_n,
+
+    // ND_TAPE_400 byte source port (pin-for-pin)
+    input  wire       byte_req,
+    output wire       byte_valid,
+    output wire [7:0] byte_data,
+    input  wire       source_rewind,
+
+    // Sticky tape diagnostic. The ND-400 reader has no status register in
+    // which "no SD card" could be expressed, so it stays silent to the guest
+    // exactly as before and publishes the reason HERE instead - for a
+    // testbench, a probe or a board LED, never for ND logic. Without this,
+    // a missing card and the end of the tape are the same observation.
+    output wire       TDISK_FAULT,
+    output wire [3:0] TDISK_ERR_CODE,
+
+    // ND_FLOPPY_DMA disk-image backend seam (client 1 = FLOPPY1.IMG). Present
+    // regardless; driven only when INCLUDE_FLOPPY=1, tied idle otherwise. Wired
+    // pin-for-pin to ND120_CORE's FDISK_*/FDBUF_* (nd_storage_floppy_adapter).
+    input  wire        FDISK_REQ,
+    input  wire        FDISK_WR,
+    input  wire [15:0] FDISK_LSECT,
+    input  wire [ 1:0] FDISK_FORMAT,
+    input  wire [ 1:0] FDISK_DRIVE,
+    input  wire [10:0] FDISK_WORDCOUNT,
+    output wire        FDISK_DONE,
+    output wire        FDISK_ERR,
+    output wire [ 3:0] FDISK_ERR_CODE,
+    output wire [ 3:0] FDISK_MEDIA_FMT,
+    output wire [ 9:0] FDBUF_ADDR,
+    output wire [15:0] FDBUF_WDATA,
+    output wire        FDBUF_WE,
+    input  wire [15:0] FDBUF_RDATA,
+
+    // ND_SMD disk-image backend seam (client 3 = SMD0.IMG). Present
+    // regardless; driven only when INCLUDE_SMD=1, tied idle otherwise. Wired
+    // pin-for-pin to ND120_CORE's SDISK_*/SDBUF_* (nd_storage_disc_adapter).
+    input  wire        SDISK_START,
+    input  wire        SDISK_REQ,
+    input  wire        SDISK_WR,
+    input  wire [15:0] SDISK_BLKADDR1,
+    input  wire [15:0] SDISK_BLKADDR2,
+    input  wire [ 2:0] SDISK_UNIT,
+    input  wire [10:0] SDISK_WORDCOUNT,
+    output wire        SDISK_DONE,
+    output wire        SDISK_ERR,
+    output wire [ 3:0] SDISK_ERR_CODE,
+    output wire [ 9:0] SDBUF_ADDR,
+    output wire [15:0] SDBUF_WDATA,
+    output wire        SDBUF_WE,
+    input  wire [15:0] SDBUF_RDATA,
+
+    // ND_WINCHESTER disk-image backend seam (client 6 = WD0.IMG). Present
+    // regardless; driven only when INCLUDE_WD=1, tied idle otherwise. Wired
+    // pin-for-pin to ND120_CORE's WDISK_*/WDBUF_*. Winchester images are
+    // WDn.IMG, NEVER SMDn.IMG.
+    input  wire        WDISK_START,
+    input  wire        WDISK_REQ,
+    input  wire        WDISK_WR,
+    input  wire [15:0] WDISK_BLKADDR1,
+    input  wire [15:0] WDISK_BLKADDR2,
+    input  wire [ 2:0] WDISK_UNIT,
+    input  wire [10:0] WDISK_WORDCOUNT,
+    output wire        WDISK_DONE,
+    output wire        WDISK_ERR,
+    output wire [ 3:0] WDISK_ERR_CODE,
+    output wire [ 9:0] WDBUF_ADDR,
+    output wire [15:0] WDBUF_WDATA,
+    output wire        WDBUF_WE,
+    input  wire [15:0] WDBUF_RDATA,
+
+    // SD pads (single tristate resolved at the top)
+    output wire       sd_clk_o,
+    input  wire       sd_cmd_i,
+    output wire       sd_cmd_o,
+    output wire       sd_cmd_oe,
+    input  wire       sd_dat0_i,
+    output wire       sd_dat0_o,
+    output wire       sd_dat0_oe,
+    // DAT1-3: 4-bit data bus (USE_4BIT). Released when not in 4-bit mode.
+    //! DEBUG stage-timer taps (24-AUG-2026)
+    output wire       dbg_sd_busy,
+    output wire       dbg_cache_pend,
+    input  wire       sd_dat1_i,
+    output wire       sd_dat1_o,
+    output wire       sd_dat1_oe,
+    input  wire       sd_dat2_i,
+    output wire       sd_dat2_o,
+    output wire       sd_dat2_oe,
+    input  wire       sd_dat3_i,
+    output wire       sd_dat3_o,
+    output wire       sd_dat3_oe,
+
+    // SDRAM device port (clk_stor domain) - same contract as nds_mem_model.v
+    output wire        mem_start,
+    output wire        mem_we,
+    output wire [19:0] mem_addr,
+    output wire [31:0] mem_wdata,
+    input  wire [31:0] mem_rdata,
+    input  wire        mem_busy,
+    input  wire        mem_done,
+
+    // Fill-path diagnostic seam from nd_storage. Pure observation.
+    output wire [4:0]  DBG_STATE,
+    output wire [31:0] DBG_LBA,
+    output wire [15:0] DBG_WDATA,
+    output wire [15:0] DBG_RDATA,
+    output wire [15:0] DBG_BUFW,
+    output wire        DBG_BUFWE,
+    output wire [15:0] DBG_FSEC,
+    output wire        DBG_RX_STB,
+    output wire [7:0]  DBG_RX_RAW,
+    output wire [7:0]  DBG_RX_BYTE,
+    output wire        DBG_PAST_EOF,
+    output wire [2:0]  DBG_GRANT,
+
+    // status passthrough (board LEDs / debug)
+    output wire [1:0]  sd_status
+);
+
+  // MUST match nd_storage's N_CLIENTS. It is a mirror of that default, not a
+  // choice: a mismatch connects the client vectors at the wrong width and
+  // Verilog pads or truncates silently. Went 7 -> 8 on 04-AUG-2026 when
+  // SMD3.IMG was replaced by WD0/WD1.IMG (the Winchester).
+  localparam N = 8;  // nd_storage's fixed client count
+
+  // ---- flattened client-port buses; only client 0 is driven/used ----
+  wire [N-1:0]    open_req_w, open_ok_w, open_err_w, req_w, wr_w;
+  wire [N-1:0]    busy_w, done_w, err_w, buf_we_w;
+  wire [N*4-1:0]  err_code_w;   // WHY each client failed (nd_storage_status.vh)
+  wire [N*32-1:0] size_bytes_w;
+  wire [N*16-1:0] block_w, buf_wdata_w, buf_rdata_w;
+  wire [N*10-1:0] buf_addr_w;
+
+  // client 0 <-> tape adapter
+  wire        a_open_ok, a_open_err;
+  wire        a_open_req, a_req, a_wr, a_busy, a_done, a_err;
+  wire [31:0] a_size_bytes;
+  wire [15:0] a_block, a_buf_wdata, a_buf_rdata;
+  wire [9:0]  a_buf_addr;
+  wire        a_buf_we;
+
+  // client 1 <-> floppy adapter (driven in the INCLUDE_FLOPPY generate below,
+  // tied idle otherwise)
+  wire        f_open_req, f_req, f_wr;
+  wire [15:0] f_block, f_buf_rdata;
+
+  // client 3 <-> SMD adapter (driven in the INCLUDE_SMD generate below,
+  // tied idle otherwise)
+  wire        m_open_req, m_req, m_wr;
+  wire [15:0] m_block, m_buf_rdata;
+
+  // client 6 <-> Winchester adapter (WD0.IMG). Driven in the INCLUDE_WD
+  // generate below, tied idle otherwise.
+  wire        w_open_req, w_req, w_wr;
+  wire [15:0] w_block, w_buf_rdata;
+
+  // ---- client port fan-out -------------------------------------------------
+  // ONE CONTIGUOUS BLOCK PER CLIENT, indexed by a named constant. Adding a
+  // client means adding one block; a missing line is a VISIBLE gap in that
+  // block, not an invisible zero somewhere else in the file.
+  //
+  // This replaced five hand-written flat concatenations, one per bus, each
+  // carrying its own bit-counting arithmetic - e.g.
+  //
+  //   assign buf_rdata_w = {{((N-4)*16){1'b0}}, m_buf_rdata, 16'd0,
+  //                         f_buf_rdata, a_buf_rdata};
+  //
+  // Adding a client meant editing all five expressions and getting five
+  // separate bit counts right, and NOTHING checked that you had. On
+  // 10-AUG-2026 exactly one of them - buf_rdata_w - was left in its older
+  // (N-4) form when the Winchester client was added, so clients 4..7 were
+  // tied to zero and w_buf_rdata reached nothing. Only WRITES read that bus
+  // (reads travel the other way on buf_wdata/buf_we), and only reads had ever
+  // been exercised, so every Winchester write silently staged 16'd0 for every
+  // word while the DMA fetched the payload correctly and the controller's own
+  // buffer held it correctly. Zeros went to the SD card with no error raised
+  // anywhere. On the Tang, SINTRAN mass-loaded off the disc, started, and
+  // died with "DISC TRANSFER ERROR IN SEGMENT HANDLING" the moment the
+  // swapper wrote - after overwriting the image's master block with zeros.
+  //
+  // Gated by SD-FAT/sim/nd_storage_clientbus_tb.v (test-nds-clientbus).
+  localparam integer CL_TAPE   = 0;
+  localparam integer CL_FLOPPY = 1;
+  localparam integer CL_SMD    = 3;
+  localparam integer CL_WD     = 6;
+
+  // client 0 - tape (read-only: a_buf_rdata is tied 0 in the adapter itself)
+  assign open_req_w [CL_TAPE]            = a_open_req;
+  assign req_w      [CL_TAPE]            = a_req;
+  assign wr_w       [CL_TAPE]            = a_wr;
+  assign block_w    [16*CL_TAPE   +: 16] = a_block;
+  assign buf_rdata_w[16*CL_TAPE   +: 16] = a_buf_rdata;
+
+  // client 1 - floppy
+  assign open_req_w [CL_FLOPPY]          = f_open_req;
+  assign req_w      [CL_FLOPPY]          = f_req;
+  assign wr_w       [CL_FLOPPY]          = f_wr;
+  assign block_w    [16*CL_FLOPPY +: 16] = f_block;
+  assign buf_rdata_w[16*CL_FLOPPY +: 16] = f_buf_rdata;
+
+  // client 3 - SMD disc
+  assign open_req_w [CL_SMD]             = m_open_req;
+  assign req_w      [CL_SMD]             = m_req;
+  assign wr_w       [CL_SMD]             = m_wr;
+  assign block_w    [16*CL_SMD    +: 16] = m_block;
+  assign buf_rdata_w[16*CL_SMD    +: 16] = m_buf_rdata;
+
+  // client 6 - Winchester disc
+  assign open_req_w [CL_WD]              = w_open_req;
+  assign req_w      [CL_WD]              = w_req;
+  assign wr_w       [CL_WD]              = w_wr;
+  assign block_w    [16*CL_WD     +: 16] = w_block;
+  assign buf_rdata_w[16*CL_WD     +: 16] = w_buf_rdata;
+
+  // clients 2, 4, 5, 7 - no adapter exists. Driven explicitly rather than
+  // left undriven: an undriven net is z, not 0, and would propagate x.
+  genvar ci;
+  generate
+    for (ci = 0; ci < N; ci = ci + 1) begin : gen_idle_clients
+      if ((ci != CL_TAPE) && (ci != CL_FLOPPY) &&
+          (ci != CL_SMD)  && (ci != CL_WD)) begin : gen_idle
+        assign open_req_w [ci]           = 1'b0;
+        assign req_w      [ci]           = 1'b0;
+        assign wr_w       [ci]           = 1'b0;
+        assign block_w    [16*ci +: 16]  = 16'd0;
+        assign buf_rdata_w[16*ci +: 16]  = 16'd0;
+      end
+    end
+  endgenerate
+
+  assign a_open_ok    = open_ok_w[0];
+  assign a_open_err   = open_err_w[0];
+  assign a_size_bytes = size_bytes_w[31:0];
+  assign a_busy       = busy_w[0];
+  assign a_done       = done_w[0];
+  assign a_err        = err_w[0];
+  assign a_buf_addr   = buf_addr_w[9:0];
+  assign a_buf_wdata  = buf_wdata_w[15:0];
+  assign a_buf_we     = buf_we_w[0];
+
+  // ---- the tape adapter (client 0 -> ND_TAPE_400 byte source), OPTIONAL ----
+  // Floppy-only builds (INCLUDE_TAPE=0) drop the tape entirely; the floppy
+  // (client 1) then triggers the mount on its own. When both are in, the tape
+  // open triggers the mount and the floppy open (held, below) follows.
+  generate
+    if (INCLUDE_TAPE) begin : gen_tape
+      // one-shot open sequencer (clk_cpu). Do NOT gate on sd_status==OK: that
+      // deadlocks (no open -> no mount -> status never updates). The mount IS
+      // the card bring-up (CMD0/CMD8/ACMD41, FAT scan, preload); pulse open once
+      // after reset and check status afterwards, as every proven tb does.
+      reg s_opened, s_open_pulse;
+      always @(posedge clk_cpu or negedge rst_cpu_n)
+        if (!rst_cpu_n) begin s_opened <= 1'b0; s_open_pulse <= 1'b0; end
+        else begin
+          s_open_pulse <= 1'b0;
+          if (!s_opened) begin s_open_pulse <= 1'b1; s_opened <= 1'b1; end
+        end
+
+      nd_storage_tape_adapter u_tape_adapter (
+          .clk_cpu      (clk_cpu),
+          .rst_n        (rst_cpu_n),
+          .byte_req     (byte_req),
+          .byte_valid   (byte_valid),
+          .byte_data    (byte_data),
+          .source_rewind(source_rewind),
+          .open_start   (s_open_pulse),
+          .c_open_req   (a_open_req),
+          .c_open_ok    (a_open_ok),
+          .c_open_err   (a_open_err),
+          .c_size_bytes (a_size_bytes),
+          .c_req        (a_req),
+          .c_wr         (a_wr),
+          .c_block      (a_block),
+          .c_busy       (a_busy),
+          .c_done       (a_done),
+          .c_err        (a_err),
+          .c_err_code   (err_code_w[3:0]),
+          .fault        (TDISK_FAULT),
+          .fault_code   (TDISK_ERR_CODE),
+          .c_buf_addr   (a_buf_addr),
+          .c_buf_wdata  (a_buf_wdata),
+          .c_buf_we     (a_buf_we),
+          .c_buf_rdata  (a_buf_rdata)
+      );
+    end else begin : gen_no_tape
+      // tape excluded: client 0 idle, byte source outputs quiet
+      assign a_open_req  = 1'b0;
+      assign a_req       = 1'b0;
+      assign a_wr        = 1'b0;
+      assign a_block     = 16'd0;
+      assign a_buf_rdata = 16'd0;
+      assign byte_valid  = 1'b0;
+      assign byte_data   = 8'd0;
+      assign TDISK_FAULT    = 1'b0;
+      assign TDISK_ERR_CODE = 4'd0;
+    end
+  endgenerate
+
+  // ---- the floppy adapter (client 1 -> ND_FLOPPY_DMA disk-image backend) ----
+  generate
+    if (INCLUDE_FLOPPY) begin : gen_floppy
+      // Open FLOPPY1.IMG (client 1). The tape (client 0) and floppy open
+      // requests both fire at reset, but nd_storage services only ONE client's
+      // open per mount and the adapters only PULSE c_open_req (they do not hold
+      // it), so a single floppy pulse coincident with the tape's is lost. HOLD
+      // open_start high (the adapter re-pulses c_open_req every cycle) until the
+      // client reports open - nd_storage picks it up once it is idle after the
+      // tape-triggered mount. No deadlock: the tape open still triggers the mount.
+      reg s_fopened;
+      always @(posedge clk_cpu or negedge rst_cpu_n)
+        if (!rst_cpu_n) s_fopened <= 1'b0;
+        else if (open_ok_w[1]) s_fopened <= 1'b1;
+      wire s_fopen_pulse = !s_fopened;
+
+      // media format from the FLOPPY1.IMG size, matching the C reference
+      // (simDevices/NDBus.cpp / deviceFloppyDMA.c READ FORMAT): 315392 B =
+      // 8-inch 512 B/sector -> 0x0; else the 1.2 MB 1024 B/sector double-
+      // sided/double-density descriptor -> 0xF. Only READ FORMAT reads it;
+      // the 1560& boot forces format 3, so this does not gate boot.
+      wire [31:0] f_size = size_bytes_w[63:32];
+      assign FDISK_MEDIA_FMT = (f_size == 32'd315392) ? 4'h0 : 4'hF;
+
+      nd_storage_floppy_adapter #(.DRIVE(2'd0)) u_floppy_adapter (
+          .clk_cpu       (clk_cpu),
+          .rst_n         (rst_cpu_n),
+          .disk_req      (FDISK_REQ),
+          .disk_wr       (FDISK_WR),
+          .disk_lsect    (FDISK_LSECT),
+          .disk_format   (FDISK_FORMAT),
+          .disk_drive    (FDISK_DRIVE),
+          .disk_wordcount(FDISK_WORDCOUNT),
+          .disk_done     (FDISK_DONE),
+          .disk_err      (FDISK_ERR),
+          .disk_err_code (FDISK_ERR_CODE),
+          .dbuf_addr     (FDBUF_ADDR),
+          .dbuf_wdata    (FDBUF_WDATA),
+          .dbuf_we       (FDBUF_WE),
+          .dbuf_rdata    (FDBUF_RDATA),
+          .open_start    (s_fopen_pulse),
+          .c_open_req    (f_open_req),
+          .c_open_ok     (open_ok_w[1]),
+          .c_open_err    (open_err_w[1]),
+          .c_size_bytes  (f_size),
+          .c_req         (f_req),
+          .c_wr          (f_wr),
+          .c_block       (f_block),
+          .c_busy        (busy_w[1]),
+          .c_done        (done_w[1]),
+          .c_err         (err_w[1]),
+          .c_err_code    (err_code_w[7:4]),
+          .c_buf_addr    (buf_addr_w[19:10]),
+          .c_buf_wdata   (buf_wdata_w[31:16]),
+          .c_buf_we      (buf_we_w[1]),
+          .c_buf_rdata   (f_buf_rdata)
+      );
+    end else begin : gen_no_floppy
+      // floppy excluded: client 1 idle, backend seam driven to safe defaults
+      assign f_open_req      = 1'b0;
+      assign f_req           = 1'b0;
+      assign f_wr            = 1'b0;
+      assign f_block         = 16'd0;
+      assign f_buf_rdata     = 16'd0;
+      assign FDISK_DONE      = 1'b0;
+      assign FDISK_ERR       = 1'b0;
+      assign FDISK_ERR_CODE  = 4'd0;
+      assign FDISK_MEDIA_FMT = 4'd0;
+      assign FDBUF_ADDR      = 10'd0;
+      assign FDBUF_WDATA     = 16'd0;
+      assign FDBUF_WE        = 1'b0;
+    end
+  endgenerate
+
+  // ---- the SMD adapter (client 3 -> ND_SMD disk-image backend) ----
+  generate
+    if (INCLUDE_SMD) begin : gen_smd
+      // Open SMD0.IMG (client 3). Same held-open mechanism as the floppy:
+      // hold open_start (the adapter re-pulses c_open_req every cycle) until
+      // the client reports open - nd_storage serves one open per mount, so a
+      // pulse coincident with another client's open would be lost.
+      reg s_mopened;
+      always @(posedge clk_cpu or negedge rst_cpu_n)
+        if (!rst_cpu_n) s_mopened <= 1'b0;
+        else if (open_ok_w[3]) s_mopened <= 1'b1;
+      wire s_mopen_pulse = !s_mopened;
+
+      nd_storage_disc_adapter #(.UNIT(3'd0)) u_smd_adapter (
+          .clk_cpu       (clk_cpu),
+          .rst_n         (rst_cpu_n),
+          .disk_start    (SDISK_START),
+          .disk_req      (SDISK_REQ),
+          .disk_wr       (SDISK_WR),
+          .disk_blkaddr1 (SDISK_BLKADDR1),
+          .disk_blkaddr2 (SDISK_BLKADDR2),
+          .disk_unit     (SDISK_UNIT),
+          .disk_wordcount(SDISK_WORDCOUNT),
+          .disk_done     (SDISK_DONE),
+          .disk_err      (SDISK_ERR),
+          .disk_err_code (SDISK_ERR_CODE),
+          .dbuf_addr     (SDBUF_ADDR),
+          .dbuf_wdata    (SDBUF_WDATA),
+          .dbuf_we       (SDBUF_WE),
+          .dbuf_rdata    (SDBUF_RDATA),
+          .open_start    (s_mopen_pulse),
+          .c_open_req    (m_open_req),
+          .c_open_ok     (open_ok_w[3]),
+          .c_open_err    (open_err_w[3]),
+          .c_size_bytes  (size_bytes_w[127:96]),
+          .c_req         (m_req),
+          .c_wr          (m_wr),
+          .c_block       (m_block),
+          .c_busy        (busy_w[3]),
+          .c_done        (done_w[3]),
+          .c_err         (err_w[3]),
+          .c_err_code    (err_code_w[15:12]),
+          .c_buf_addr    (buf_addr_w[39:30]),
+          .c_buf_wdata   (buf_wdata_w[63:48]),
+          .c_buf_we      (buf_we_w[3]),
+          .c_buf_rdata   (m_buf_rdata)
+      );
+    end else begin : gen_no_smd
+      // SMD excluded: client 3 idle, backend seam driven to safe defaults
+      assign m_open_req  = 1'b0;
+      assign m_req       = 1'b0;
+      assign m_wr        = 1'b0;
+      assign m_block     = 16'd0;
+      assign m_buf_rdata = 16'd0;
+      assign SDISK_DONE  = 1'b0;
+      assign SDISK_ERR   = 1'b0;
+      assign SDISK_ERR_CODE = 4'd0;
+      assign SDBUF_ADDR  = 10'd0;
+      assign SDBUF_WDATA = 16'd0;
+      assign SDBUF_WE    = 1'b0;
+    end
+  endgenerate
+
+  // ---- the Winchester adapter (client 6 -> ND_WINCHESTER disk-image backend)
+  // The SAME nd_storage_disc_adapter, with Winchester geometry. That adapter
+  // has nothing SMD-specific in it: its CHS->LBA is driven entirely by
+  // GEO_HEADS/GEO_SPT and its one hard assumption - a 1024-byte sector - is
+  // equally true of this card (ND-11.015.01 sec 2.1). Proven by
+  // ND-BUS-DEVICES/WINCHESTER/sim/nd_winchester_adapter_tb.v, which also
+  // covers a cylinder near the top of the platter.
+  generate
+    if (INCLUDE_WD) begin : gen_wd
+      // Open WD0.IMG (client 6), same held-open mechanism as the others.
+      reg s_wopened;
+      always @(posedge clk_cpu or negedge rst_cpu_n)
+        if (!rst_cpu_n) s_wopened <= 1'b0;
+        else if (open_ok_w[6]) s_wopened <= 1'b1;
+      wire s_wopen_pulse = !s_wopened;
+
+      nd_storage_disc_adapter #(
+          .UNIT     (3'd0),
+          .GEO_HEADS(16'd8),   // Micropolis 1325 / DISC-74-1
+          .GEO_SPT  (16'd9)
+      ) u_wd_adapter (
+          .clk_cpu       (clk_cpu),
+          .rst_n         (rst_cpu_n),
+          .disk_start    (WDISK_START),
+          .disk_req      (WDISK_REQ),
+          .disk_wr       (WDISK_WR),
+          .disk_blkaddr1 (WDISK_BLKADDR1),
+          .disk_blkaddr2 (WDISK_BLKADDR2),
+          .disk_unit     (WDISK_UNIT),
+          .disk_wordcount(WDISK_WORDCOUNT),
+          .disk_done     (WDISK_DONE),
+          .disk_err      (WDISK_ERR),
+          .disk_err_code (WDISK_ERR_CODE),
+          .dbuf_addr     (WDBUF_ADDR),
+          .dbuf_wdata    (WDBUF_WDATA),
+          .dbuf_we       (WDBUF_WE),
+          .dbuf_rdata    (WDBUF_RDATA),
+          .open_start    (s_wopen_pulse),
+          .c_open_req    (w_open_req),
+          .c_open_ok     (open_ok_w[6]),
+          .c_open_err    (open_err_w[6]),
+          .c_size_bytes  (size_bytes_w[223:192]),
+          .c_req         (w_req),
+          .c_wr          (w_wr),
+          .c_block       (w_block),
+          .c_busy        (busy_w[6]),
+          .c_done        (done_w[6]),
+          .c_err         (err_w[6]),
+          .c_err_code    (err_code_w[27:24]),
+          .c_buf_addr    (buf_addr_w[69:60]),
+          .c_buf_wdata   (buf_wdata_w[111:96]),
+          .c_buf_we      (buf_we_w[6]),
+          .c_buf_rdata   (w_buf_rdata)
+      );
+    end else begin : gen_no_wd
+      // Winchester excluded: client 6 idle, backend seam driven to safe defaults
+      assign w_open_req  = 1'b0;
+      assign w_req       = 1'b0;
+      assign w_wr        = 1'b0;
+      assign w_block     = 16'd0;
+      assign w_buf_rdata = 16'd0;
+      assign WDISK_DONE  = 1'b0;
+      assign WDISK_ERR   = 1'b0;
+      assign WDISK_ERR_CODE = 4'd0;
+      assign WDBUF_ADDR  = 10'd0;
+      assign WDBUF_WDATA = 16'd0;
+      assign WDBUF_WE    = 1'b0;
+    end
+  endgenerate
+
+  // ---- the SD-FAT storage engine, BOOT.BPUN as client 0 ----
+  nd_storage #(
+      .SIMULATE    (SIMULATE),
+      // preload the served clients: client 0 (BOOT.BPUN) when tape is in,
+      // client 1 (FLOPPY1.IMG) when floppy is in, client 3 (SMD0.IMG) when
+      // the SMD is in - staged reads/writes from/to the region
+      // Phase 4: CACHE_MASK replaces PRELOAD_MASK. Nothing is preloaded any
+      // more, so every included client simply opens. Tape and floppy stay
+      // DIRECT (bit 0) - the card is quick enough for them and caching them
+      // would only spend region. The disc classes are CACHED, which is what
+      // lets a 75 MB image be served at all. Flipping the floppy to cached
+      // later is one bit here.
+      // ND_STORAGE_DISCS_UNCACHED: force the disc classes DIRECT.
+      //
+      // DIAGNOSTIC LEVER, added 09-AUG-2026. On silicon the Winchester read
+      // returns ZEROS with a perfectly clean status (060011, error-OR bit
+      // clear) while block 0 of WD0.IMG demonstrably holds data - measured
+      // with an 11-instruction program deposited through OPCOM, so no
+      // driver, no FSI and no SINTRAN are involved. The same RTL chain
+      // PASSES in simulation (WINCHESTER/sim test-wd-storage, and again
+      // against a real SDRAM model). The one structural difference between
+      // the client that works on silicon and the one that does not is this
+      // mask: the tape (client 0) is DIRECT and loads fine off the same
+      // card, the Winchester (client 6) is CACHED and comes back empty.
+      //
+      // Defining this makes every disc client DIRECT - each request fetches
+      // through the shared staging line inside its own grant, so image size
+      // is still unbounded, it is just slower (no reuse across requests).
+      // If the read then returns real data, the fault is in the Phase-4
+      // cache path on hardware, not in the controller or the FAT stack.
+`ifdef ND_STORAGE_DISCS_UNCACHED
+      .USE_4BIT   (USE_4BIT),
+      .CACHE_MASK (8'b00000000),
+`else
+      .USE_4BIT   (USE_4BIT),
+      .CACHE_MASK ((INCLUDE_SMD ? 8'b00111000 : 8'b00000000) |
+                   (INCLUDE_WD  ? 8'b11000000 : 8'b00000000)),
+`endif
+      .FILE0_NAME  (BOOT_NAME), .FILE0_LEN(BOOT_LEN),
+      // ND_STORAGE_WD_BADNAME: CONTROL EXPERIMENT, 09-AUG-2026. Points the
+      // Winchester client at a filename that cannot be on the card, so the
+      // mount MUST fail. The whole silicon zero-read diagnosis rests on
+      // "the status came back clean, therefore the file mounted and the read
+      // really happened" - and that error plumbing has only ever been proven
+      // in simulation. If this build ALSO reports a clean 060011 instead of
+      // b7 disk fault, the instrument is lying and the mount may have been
+      // failing silently all along.
+`ifdef ND_STORAGE_WD_BADNAME
+      .FILE6_NAME  ("ZZNOSUCH.IMG"), .FILE6_LEN(8'd12),
+`endif
+      // ND_STORAGE_WD_USE_BOOTTAP: DISCRIMINATOR, 09-AUG-2026. Points the
+      // Winchester client at BOOT.TAP - the SMALL file the tape client
+      // demonstrably reads correctly off this very card (400$ loads the File
+      // System Investigator from it). Everything else stays identical.
+      //
+      // If the Winchester then returns REAL DATA, the fault depends on the
+      // FILE - size or position on the card - and WD0.IMG at 75 MB is 4600x
+      // larger than anything the simulation testbenches ever exercised
+      // (WD_BYTES = 16384). If it STILL returns zeros, the fault is in the
+      // Winchester client path itself and is independent of the file.
+`ifdef ND_STORAGE_WD_USE_BOOTTAP
+      .FILE6_NAME  ("BOOT.TAP"), .FILE6_LEN(8'd8),
+`endif
+      // No slot remap any more. Slots used to bound the image size, and this
+      // wrapper enlarged SMD0's to squeeze a bigger file in; with the cache
+      // the image size is unbounded by the region, so the remap is dead and
+      // its overlap hazard (the enlarged slot 3 covered clients 6 and 7)
+      // goes with it.
+      .STAGE_BASE_BLK(32'd0), .POOL_BASE_BLK(32'd1)
+  ) u_nd_storage (
+      .clk_stor  (clk_stor),
+      .rst_stor_n(rst_stor_n),
+      .clk_cpu   (clk_cpu),
+      .rst_cpu_n (rst_cpu_n),
+      .sd_clk_o  (sd_clk_o),
+      .sd_cmd_i  (sd_cmd_i),
+      .sd_cmd_o  (sd_cmd_o),
+      .sd_cmd_oe (sd_cmd_oe),
+      .sd_dat0_i (sd_dat0_i),
+      .sd_dat0_o (sd_dat0_o),
+      .sd_dat0_oe(sd_dat0_oe),
+      .dbg_sd_busy   (dbg_sd_busy),
+      .dbg_cache_pend(dbg_cache_pend),
+      .sd_dat1_i (sd_dat1_i),
+      .sd_dat1_o (sd_dat1_o),
+      .sd_dat1_oe(sd_dat1_oe),
+      .sd_dat2_i (sd_dat2_i),
+      .sd_dat2_o (sd_dat2_o),
+      .sd_dat2_oe(sd_dat2_oe),
+      .sd_dat3_i (sd_dat3_i),
+      .sd_dat3_o (sd_dat3_o),
+      .sd_dat3_oe(sd_dat3_oe),
+      .mem_start (mem_start),
+      .mem_we    (mem_we),
+      .mem_addr  (mem_addr),
+      .mem_wdata (mem_wdata),
+      .mem_rdata (mem_rdata),
+      .mem_busy  (mem_busy),
+      .mem_done  (mem_done),
+      .open_req  (open_req_w),
+      .open_ok   (open_ok_w),
+      .open_err  (open_err_w),
+      .size_bytes(size_bytes_w),
+      .req       (req_w),
+      .wr        (wr_w),
+      .block     (block_w),
+      .busy      (busy_w),
+      .done      (done_w),
+      .err       (err_w),
+      .err_code  (err_code_w),
+      .dbg_state   (DBG_STATE),
+      .dbg_lba     (DBG_LBA),
+      .dbg_wdata   (DBG_WDATA),
+      .dbg_rdata   (DBG_RDATA),
+      .dbg_bufw    (DBG_BUFW),
+      .dbg_bufwe   (DBG_BUFWE),
+      .dbg_fsec    (DBG_FSEC),
+      .dbg_rx_stb  (DBG_RX_STB),
+      .dbg_rx_raw  (DBG_RX_RAW),
+      .dbg_rx_byte (DBG_RX_BYTE),
+      .dbg_past_eof(DBG_PAST_EOF),
+      .dbg_grant   (DBG_GRANT),
+      .buf_addr  (buf_addr_w),
+      .buf_wdata (buf_wdata_w),
+      .buf_we    (buf_we_w),
+      .buf_rdata (buf_rdata_w),
+      .sd_status (sd_status),
+      .card_type (),
+      .fs_type   ()
+  );
+
+endmodule
+```
+
+</details>

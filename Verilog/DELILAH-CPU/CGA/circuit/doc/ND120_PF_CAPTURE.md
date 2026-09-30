@@ -14,6 +14,16 @@ Source: `Verilog/DELILAH-CPU/CGA/circuit/ND120_PF_CAPTURE.v`
 
 ![ND120_PF_CAPTURE symbol](ND120_PF_CAPTURE.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![ND120_PF_CAPTURE schematic](ND120_PF_CAPTURE.svg)](ND120_PF_CAPTURE.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 - FIRST PAGE-FAULT FREEZE REGISTER
@@ -66,3 +76,507 @@ Ronny Hansen
 | `MATCH_PAGE` | `6'o60` |
 | `MATCH_ANY` | `0` |
 | `MATCH_LA_19_10` | `10'o760` |
+
+## Verilog source
+
+[`Verilog/DELILAH-CPU/CGA/circuit/ND120_PF_CAPTURE.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/DELILAH-CPU/CGA/circuit/ND120_PF_CAPTURE.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of ND120_PF_CAPTURE (492 lines)</summary>
+
+```verilog
+/*****************************************************************************
+** ND120 - FIRST PAGE-FAULT FREEZE REGISTER                                 **
+**                                                                          **
+** WHAT THIS IS FOR                                                         **
+**   On the Tang, SINTRAN halts in ERRFATAL reporting IIC 3 (page fault).    **
+**   Nobody knows whether that page fault is REAL. This block captures the   **
+**   inputs to the trap logic at the exact TCLK edge that latched the        **
+**   vector, then LOCKS, so the evidence survives the rest of the boot and   **
+**   can be read out afterwards.                                            **
+**                                                                          **
+**   It answers one question with no inference:                             **
+**     PT valid, permission bits genuinely clear   -> a REAL page fault      **
+**     PT all zero while the page-table RAM is                              **
+**       mid-read                                  -> SPURIOUS              **
+**     PT valid and GRANTING                       -> something other than   **
+**                                                    PGF raised the trap    **
+**                                                                          **
+** WHY A FREEZE REGISTER AND NOT A TRACE BUFFER                             **
+**   The event is one-shot and self-announcing: the machine halts moments    **
+**   after it. One frozen sample of the right cycle is worth more than a     **
+**   rolling window that may not be centred on it, and it costs ~80 flip-    **
+**   flops instead of BSRAM this design has none to spare.                   **
+**                                                                          **
+** THE TIMING SUBTLETY THAT DECIDES WHETHER THIS BLOCK IS USEFUL AT ALL     **
+**   TVEC_3_0 is REGISTERED on TCLK. So by the time TVEC reads "page fault", **
+**   the inputs that caused it have already moved on. Sampling the inputs    **
+**   at the same moment TVEC is observed would capture the WRONG CYCLE and   **
+**   produce a confident, wrong answer.                                     **
+**   Therefore: the inputs are snapshotted on EVERY capturing edge into a    **
+**   one-deep "previous edge" register, and when TVEC then shows a page      **
+**   fault, it is that PREVIOUS snapshot which is frozen. The testbench      **
+**   CGA_PF_CAPTURE_tb.v exists specifically to prove this lands on the      **
+**   right cycle - do not trust the block without it.                       **
+**                                                                          **
+** LATCH MODE vs FF MODE                                                    **
+**   In FPGA_FF_MODE the vector flip-flops are clocked by sysclk qualified   **
+**   with a TCLK_EN pulse. In the default build they are clocked by TCLK     **
+**   directly. This block follows whichever is in use, so the captured       **
+**   cycle means the same thing in both.                                     **
+**                                                                          **
+** Verilog/DELILAH-CPU/CGA/circuit/ND120_PF_CAPTURE.v                       **
+** 21-AUG-2026                                                              **
+** Ronny Hansen                                                             **
+*****************************************************************************/
+`default_nettype none
+
+// EVERY state register below carries an explicit power-up value. `clear` is
+// tied to 0 in the real instantiation, so nothing else ever initialises them,
+// and an undefined power-up `captured` or `armed` means the block reports a
+// frozen fault the instant the FPGA configures. Measured 21-AUG-2026: the
+// board dumped a "captured" word with all-zero contents before the CPU had
+// even booted, and the dumper then held the console TX pin permanently.
+
+module ND120_PF_CAPTURE #(
+    parameter integer CNTW = 24,           //! cycle-counter width
+    parameter integer PF_VECTOR = 1,       //! TVEC value that means "page fault"
+    parameter integer ROT_LOG2 = 12,       //! slice period 2^N sysclk (rotates only once captured)
+    parameter integer ARM_LOG2 = 30,       //! ignore faults for the first 2^N sysclk
+    //! Only freeze a fault whose logical page matches.
+    //!
+    //! WARNING ON THE ENCODING (established 21-AUG-2026, two independent ways):
+    //! LA[19:16] is the page-table RAM INDEX, and its TOP TWO BITS are the
+    //! COMPLEMENTS of their PCR source bits (CGA_MAC_LA1025.v:219-359, via the
+    //! schematic's dedicated PCR_14_13_10_9_N bus). The microcode un-inverts
+    //! them for software: TRA PGS XORs 0o1400 ("% 16 PT MODUS / INVERT 2 BITS",
+    //! WCS 001001). So the SOFTWARE table number is  raw XOR 0o1400 :
+    //!     raw LA[19:10] = 0o1360  <->  software PNUMB = 0o760
+    //! SINTRAN's WNDN5 (ND-500 window) is the SOFTWARE value 0o760, which is
+    //! RAW 0o1360. Match on the RAW value here. Decoding the raw index as if
+    //! it were the software table is what produced a spurious "page table 13 /
+    //! X5DPT" reading - do not repeat it.
+    //! Start the readout rotation this many sysclk after arming EVEN IF
+    //! nothing was captured, so the CENSUS can still be read out. Without
+    //! this a run that captures nothing produces no dump at all - measured
+    //! 21-AUG-2026: the machine halted, the census had the answer, and it was
+    //! unreachable because rotation waited on a capture that never happened.
+    parameter integer CENSUS_LOG2 = 29,
+    //! Match only the PAGE field (PNUMB[5:0]) and ignore the page-table
+    //! field. The fatal branch needs page 60 octal; both candidate tables
+    //! (7 = DPIT and 13 = X5DPT) carry that same page number, so matching the
+    //! page alone catches the fault and lets the hardware REPORT which table
+    //! it really was - instead of assuming one.
+    parameter integer MATCH_PAGE_ONLY = 1,
+    parameter [5:0]   MATCH_PAGE = 6'o60,
+    parameter integer MATCH_ANY = 0,
+    parameter [9:0]   MATCH_LA_19_10 = 10'o760,
+    //! 23-AUG-2026, the zero-read question: freeze on the first ARMED
+    //! committed access (VACC high at the capturing edge) to the matched page
+    //! whose PT permit bits are ALL CLEAR - i.e. the first access that MUST
+    //! page-fault - instead of on the fault vector. The frozen TVEC and the
+    //! census then say whether the trap actually followed:
+    //!   freeze fires, census/last_la never show a fault there -> the trap
+    //!     path failed in vivo (timing/qualifier);
+    //!   freeze NEVER fires although the CPU executed zeros from that page ->
+    //!     the entry was GRANTING, the zeros came from a legally-mapped wrong
+    //!     physical page (map-RAM contents);
+    //!   freeze fires and the fault follows -> that access traps fine, look
+    //!     elsewhere.
+    parameter integer MATCH_ON_NOPERM_ACCESS = 0,
+    parameter integer HAS_PTRAM_STROBES = 0  //! 1 only when the page-table RAM
+                                             //! strobes are really connected.
+                                             //! Reported in the readout so an
+                                             //! unrouted 0 can never be read as
+                                             //! "the RAM was not driving".
+) (
+    input wire sysclk,
+    input wire clear,      //! clears the freeze so a second run can capture again
+
+    input wire tclk,       //! trap clock - the vector register's clock
+    input wire tclk_en,    //! FPGA_FF_MODE enable pulse; tie 0 in latch mode
+
+    // ---- the signals in question, as seen by CGA_TRAP -----------------------
+    input wire [ 6:0] pt_15_9,    //! page-table entry bits 15..9; [6]=WPM [5]=RPM [4]=FPM
+    input wire        vacc,       //! MMU-translated access in progress (active high)
+    input wire [13:0] la_23_10,   //! logical address - PGS is a copy of la[21:10]
+    input wire [ 3:0] tvec_3_0,   //! the latched trap vector
+    input wire        pviol,
+    input wire        restr,
+    input wire        ptram_cs_n, //! page-table RAM chip select  (active low)
+    input wire        ptram_oe_n, //! page-table RAM output enable (active low)
+    input wire        epgs,       //! EPGS asserted = the microcode is READING PGS
+
+    // ---- frozen evidence ----------------------------------------------------
+    output reg        captured = 1'b0,   //! 1 = a page fault has been frozen
+    output reg [ 6:0] c_pt_15_9 = 7'd0,
+    output reg        c_vacc = 1'b0,
+    output reg [13:0] c_la_23_10 = 14'd0,
+    output reg [ 3:0] c_tvec_3_0 = 4'd0,
+    output reg        c_pviol = 1'b0,
+    output reg        c_restr = 1'b0,
+    output reg        c_ptram_cs_n = 1'b1,
+    output reg        c_ptram_oe_n = 1'b1,
+    output reg [ 6:0] c_pt_prev = 7'd0,   //! PT one capturing edge BEFORE the fault
+    output reg [ 6:0] c_pt_next = 7'd0,   //! PT one capturing edge AFTER  the fault
+    output reg        c_next_valid = 1'b0,
+    //! CENSUS - these keep updating and are NOT frozen. They answer "did any
+    //! page fault happen at all, and where", which a targeted freeze alone
+    //! cannot: a silent run is ambiguous between "no such fault" and "the
+    //! trigger missed it".
+    output reg [ 7:0] n_faults = 8'd0,     //! page-fault vector transitions since arming
+    output reg [13:0] last_la  = 14'd0,    //! LA of the most recent one, ANY address
+    //! PHASE 4b - the decisive pair. pgs_shadow mirrors the real PGS register's
+    //! rule ("load LA_21_10 whenever VACC is high"), and c_pgs_at_read freezes
+    //! it at the first EPGS after the fault. If c_pgs_at_read differs from
+    //! c_la_23_10 then PGS WAS OVERWRITTEN between the fault and the handler
+    //! reading it - which is the whole question.
+    //! LA one capturing edge BEFORE the fault. THE DECISIVE PAIR: the
+    //! page-table RAM is a synchronous BRAM, so PT_15_9 at the trap edge
+    //! belongs to the address presented ONE CYCLE EARLIER. If c_la_prev
+    //! differs from c_la_23_10, the entry the trap judged and the address it
+    //! reported belong to DIFFERENT ACCESSES.
+    output reg [13:0] c_la_prev = 14'd0,
+    //! PGS value AT the first handler read (EPGS) after the freeze - the
+    //! Phase-4b overwrite detector. In the readout word since 23-AUG-2026:
+    //! low 10 bits at frozen[56:47], high 4 bits at frozen[75:72]; valid
+    //! only when frozen[46] (c_pgs_valid) is set.
+    output reg [13:0] c_pgs_at_read = 14'd0,
+    output reg        c_pgs_valid   = 1'b0,
+    output reg [CNTW-1:0] c_cycle = {CNTW{1'b0}},
+    output wire       ptram_strobes_valid, //! 0 = the two RAM bits mean NOTHING
+
+    //! ---- READOUT ----------------------------------------------------------
+    //! The frozen evidence is 56 bits but the only wire out of the CGA is 16
+    //! bits wide (XMIC_DBG_15_0). The machine HALTS moments after the fault, so
+    //! there is unlimited time: the word is emitted as four 14-bit slices with
+    //! a 2-bit slice index in the top bits, rotating slowly enough for the
+    //! console dump to catch each one.
+    //!   readout[15:14] = slice index 0..3
+    //!   readout[13:0]  = that slice of the frozen word
+    output wire [15:0] readout_15_0,
+
+    //! ---- LIVE EVENT PULSES (23-AUG, Phase 1b ordering) ---------------------
+    //! One sysclk pulse per matching event, NOT gated by `captured`, so a ring
+    //! outside this module can record EVERY occurrence and place it in time
+    //! against the page-table write stream.
+    //!   evt_noperm = a committed access at the matched page whose entry grants
+    //!                nothing (PT[6:4] == 000)
+    //!   evt_fault  = a page-fault vector latched for the matched page
+    output wire       evt_noperm,
+    output wire       evt_fault,
+
+    //! ---- ANY-ADDRESS FAULT STREAM (23-AUG, run 11) -------------------------
+    //! One pulse per page-fault vector transition at ANY address, with the
+    //! snapshot that produced it. A ring outside this module records the
+    //! stream and the trigger stops it at the ERRFATAL printer, so the last
+    //! records ARE the fault that halts the machine.
+    output wire       evt_any,
+    output wire [9:0] evt_any_la_19_10,
+    output wire [6:0] evt_any_pt_15_9
+);
+
+  assign ptram_strobes_valid = (HAS_PTRAM_STROBES != 0);
+
+  // ---- ARMING ---------------------------------------------------------------
+  // Do NOT freeze anything until the machine is actually running.
+  //
+  // Measured 21-AUG-2026: without this the block froze during reset / the WCS
+  // microcode load, the top's dump triggered at power-up, and `dump_fin`
+  // latched the TX pin away from the console PERMANENTLY - so the boot command
+  // could never be typed and the real fault could never happen. Twice.
+  //
+  // 2^30 sysclk is roughly 40 s at 27 MHz, which is past the microcode load and
+  // long before the fault we are hunting (25+ minutes in).
+  reg [ARM_LOG2-1:0] arm_cnt = {ARM_LOG2{1'b0}};
+  reg                armed = 1'b0;
+  always @(posedge sysclk) begin
+    if (clear) begin
+      arm_cnt <= {ARM_LOG2{1'b0}};
+      armed   <= 1'b0;
+    end else if (!armed) begin
+      arm_cnt <= arm_cnt + 1'b1;
+      if (arm_cnt == {ARM_LOG2{1'b1}}) armed <= 1'b1;
+    end
+  end
+
+  // ---- census release: let the readout rotate even with no capture --------
+  reg [CENSUS_LOG2-1:0] census_cnt = {CENSUS_LOG2{1'b0}};
+  reg                   census_ready = 1'b0;
+  always @(posedge sysclk) begin
+    if (clear) begin
+      census_cnt   <= {CENSUS_LOG2{1'b0}};
+      census_ready <= 1'b0;
+    end else if (armed && !census_ready) begin
+      census_cnt <= census_cnt + 1'b1;
+      if (census_cnt == {CENSUS_LOG2{1'b1}}) census_ready <= 1'b1;
+    end
+  end
+
+  // ---- free-running cycle counter, so the event can be placed in the boot --
+  reg [CNTW-1:0] cycle = {CNTW{1'b0}};
+  always @(posedge sysclk) begin
+    if (clear) cycle <= {CNTW{1'b0}};
+    else cycle <= cycle + 1'b1;
+  end
+
+  // ---- the capturing edge --------------------------------------------------
+  // Default build: the vector register is clocked by TCLK itself, so the
+  // capturing moment is a TCLK rising edge.
+  // FPGA_FF_MODE: it is a sysclk edge qualified by TCLK_EN.
+  reg tclk_d = 1'b0;
+  always @(posedge sysclk) tclk_d <= tclk;
+  wire tclk_rise = tclk & ~tclk_d;
+
+`ifdef FPGA_FF_MODE
+  wire capture_edge = tclk_en;
+`else
+  wire capture_edge = tclk_rise;
+`endif
+
+  // ---- one-deep snapshot of the inputs AT that edge ------------------------
+  // This is the whole point: TVEC is observed one edge later than the inputs
+  // that produced it.
+  reg [ 6:0] pre_pt = 7'd0;
+  reg        pre_vacc = 1'b0;
+  reg [13:0] pre_la = 14'd0;
+  reg        pre_pviol = 1'b0;
+  reg        pre_restr = 1'b0;
+  reg        pre_cs_n = 1'b1;
+  reg        pre_oe_n = 1'b1;
+  reg [CNTW-1:0] pre_cycle = {CNTW{1'b0}};
+  reg        pre_valid = 1'b0;  // a snapshot exists (guards the very first edge)
+  reg [ 6:0] prev_pt = 7'd0;    // PT at the edge BEFORE the snapshot
+
+  always @(posedge sysclk) begin
+    if (clear) begin
+      pre_valid <= 1'b0;
+    end else if (capture_edge) begin
+      prev_pt   <= pre_pt;          // one edge older than the snapshot
+      prev_la   <= pre_la;
+      pre_pt    <= pt_15_9;
+      pre_vacc  <= vacc;
+      pre_la    <= la_23_10;
+      pre_pviol <= pviol;
+      pre_restr <= restr;
+      pre_cs_n  <= ptram_cs_n;
+      pre_oe_n  <= ptram_oe_n;
+      pre_cycle <= cycle;
+      pre_valid <= 1'b1;
+    end
+  end
+
+  // ---- PGS SHADOW: same rule as the real PGS register --------------------
+  // CGA_IDBCTL_PGSREG loads LA_21_10 on every cycle VACC is high (VACCN is the
+  // load enable, D tied back to Q so it holds when VACC is low). Mirror that
+  // here so the probe sees what the handler will see, WITHOUT touching
+  // CGA_IDBCTL.
+  reg [13:0] prev_la = 14'd0;
+  reg [13:0] pgs_shadow = 14'd0;
+  always @(posedge sysclk) begin
+    if (clear) begin
+      c_pgs_valid   <= 1'b0;
+      c_pgs_at_read <= 14'd0;
+      pgs_shadow    <= 14'd0;
+    end else begin
+      if (vacc) pgs_shadow <= la_23_10;   // the real PGS rule: load while VACC high
+      if (epgs && captured && !c_pgs_valid) begin
+        c_pgs_valid   <= 1'b1;            // did the handler read PGS at all
+        c_pgs_at_read <= pgs_shadow;      // what it actually saw
+      end
+    end
+  end
+
+  // ---- CENSUS: count every page-fault vector transition, any address ------
+  // Independent of the targeted freeze. A run that captures nothing but
+  // reports n_faults>0 tells us the faults happened at OTHER addresses; a run
+  // reporting n_faults==0 tells us the trap logic never saw one at all.
+  reg  pf_any_d = 1'b0;
+  wire pf_any   = pf_level;
+  always @(posedge sysclk) begin
+    if (clear) begin
+      pf_any_d <= 1'b0;
+      n_faults <= 8'd0;
+      last_la  <= 14'd0;
+    end else begin
+      pf_any_d <= pf_any;
+      if (armed && pf_any && !pf_any_d && pre_valid) begin
+        if (n_faults != 8'hFF) n_faults <= n_faults + 1'b1;   // saturate
+        last_la <= pre_la;
+      end
+    end
+  end
+
+  // ---- freeze on the FIRST page-fault vector, then lock --------------------
+  // TRIGGER ON THE TRANSITION INTO THE PAGE-FAULT VECTOR, NOT THE LEVEL.
+  //
+  // TVEC is registered and HOLDS its value between capturing edges. Triggering
+  // on the level meant that if the arm window expired while TVEC was already
+  // sitting at 1 from an earlier fault, the block froze whatever snapshot was
+  // current - an unrelated later cycle. Measured on silicon 21-AUG-2026: the
+  // captured word said PVIOL=1 with VACC=0, which is physically impossible
+  // (every protect term is ANDed with VACC), and that inconsistency is what
+  // exposed it. Only a fresh 0->1 transition is a new fault.
+  reg  pf_hit_d = 1'b0;
+  wire pf_level = (tvec_3_0 == PF_VECTOR[3:0]);
+
+  // LA_23_10 is LA[23:10]; SINTRAN's PNUMB is LA[19:10] = the low 10 bits.
+  wire [9:0] la_pnumb  = pre_la[9:0];
+  wire       la_match  = (MATCH_ANY != 0)
+                       || ((MATCH_PAGE_ONLY != 0) ? (la_pnumb[5:0] == MATCH_PAGE)
+                                                  : (la_pnumb == MATCH_LA_19_10));
+
+  // Edge-detect the CONJUNCTION (fault vector AND address match), not the
+  // vector alone. TVEC HOLDS between capturing edges, so with back-to-back
+  // faults it can already be sitting at the page-fault value when the
+  // interesting address finally appears - and a vector-only edge detector
+  // then never fires. Measured 21-AUG-2026: a targeted run saw the ERRFATAL
+  // halt on the console with ZERO captures, and this is one of the two
+  // explanations that had to be separated.
+  wire pf_hit = pf_level & la_match;
+  always @(posedge sysclk) pf_hit_d <= pf_hit;
+  wire pf_now = pf_hit & ~pf_hit_d;
+
+  // ---- 23-AUG: the no-permit committed-access trigger (see parameter note).
+  // Uses the SNAPSHOT (pre_*) values so the frozen record and the trigger
+  // judge the same capturing edge. Edge-detected like pf_now so a condition
+  // that persists across edges freezes only once.
+  reg  acc_hit_d = 1'b0;
+  wire acc_hit = pre_valid & pre_vacc & la_match & (pre_pt[6:4] == 3'b000);
+  always @(posedge sysclk) acc_hit_d <= acc_hit;
+  wire acc_now = acc_hit & ~acc_hit_d;
+
+  wire freeze_now = (MATCH_ON_NOPERM_ACCESS != 0) ? acc_now : pf_now;
+
+  // Live pulses out (see the port comment): the ring in the FPGA top uses these
+  // to order accesses against page-table writes. Unconditional on `captured`.
+  assign evt_noperm = acc_now;
+  assign evt_fault  = pf_now;
+
+  // Any-address fault stream (see the port comment). pre_* is the snapshot the
+  // fault was judged on, so the address and the entry match the vector.
+  assign evt_any          = pf_any & ~pf_any_d & pre_valid;
+  assign evt_any_la_19_10 = pre_la[9:0];
+  assign evt_any_pt_15_9  = pre_pt;
+
+  always @(posedge sysclk) begin
+    if (clear) begin
+      captured     <= 1'b0;
+      c_pt_15_9    <= 7'd0;
+      c_vacc       <= 1'b0;
+      c_la_23_10   <= 14'd0;
+      c_tvec_3_0   <= 4'd0;
+      c_pviol      <= 1'b0;
+      c_restr      <= 1'b0;
+      c_ptram_cs_n <= 1'b1;
+      c_ptram_oe_n <= 1'b1;
+      c_cycle      <= {CNTW{1'b0}};
+      c_pt_prev    <= 7'd0;
+      c_pt_next    <= 7'd0;
+      c_next_valid <= 1'b0;
+    end else if (armed && !captured && freeze_now && pre_valid) begin
+      // freeze the snapshot taken AT the capturing edge, not the inputs now
+      captured     <= 1'b1;
+      c_pt_15_9    <= pre_pt;
+      c_vacc       <= pre_vacc;
+      c_la_23_10   <= pre_la;
+      c_tvec_3_0   <= tvec_3_0;
+      c_pviol      <= pre_pviol;
+      c_restr      <= pre_restr;
+      c_ptram_cs_n <= pre_cs_n;
+      c_ptram_oe_n <= pre_oe_n;
+      c_cycle      <= pre_cycle;
+      c_pt_prev    <= prev_pt;
+      c_la_prev    <= prev_la;
+    end else if (captured && !c_next_valid && capture_edge) begin
+      // THE DISCRIMINATOR. One capturing edge after the freeze, sample PT
+      // again. If it was zero at the faulting edge but is non-zero now, the
+      // page-table entry simply ARRIVED LATE and the trap decoded an idle bus.
+      // If it is still zero, the entry really is unmapped and the fault is
+      // real. This needs no signal that is not already inside the CGA, which
+      // is why it replaced routing the page-table RAM strobes up through four
+      // levels of hierarchy.
+      c_pt_next    <= pt_15_9;
+      c_next_valid <= 1'b1;
+    end
+    // no else: once captured, it holds until `clear`. That lock is the point -
+    // the FIRST fault is the interesting one; later ones are consequences.
+  end
+
+  // ---- the frozen word, assembled once so the layout is stated in ONE place
+  // and the reader cannot drift from the writer.
+  //   [ 6: 0] PT_15_9        [21: 8] LA_23_10     [26] PVIOL   [30] captured
+  //   [    7] VACC           [25:22] TVEC_3_0     [27] RESTR   [31] strobes_valid
+  //   [28] ptram CS_n  [29] ptram OE_n            [55:32] cycle counter
+  wire [103:0] frozen = {
+    2'd0,                   // [103:102] pad
+    census_ready,           // [101]
+    armed,                  // [100]  <- WITHOUT this, n_faults==0 is ambiguous
+                            //          between "no fault" and "never armed"
+
+    last_la,                // [99:86]
+    n_faults,               // [85:78]
+    2'd0,                   // [77:76] pad
+    c_pgs_at_read[13:10],   // [75:72]  <- 23-AUG: PGS at the handler's read,
+    c_next_valid,           // [71]        high bits (low bits at [56:47]);
+    c_pt_next,              // [70:64]     valid only when [46] c_pgs_valid=1
+    c_pt_prev,              // [63:57]
+    c_pgs_at_read[9:0],     // [56:47]  <- 23-AUG: PGS at the handler's read, low bits
+    c_pgs_valid,            // [46]
+    c_la_prev,              // [45:32]  <- pairs with c_pt_prev
+    ptram_strobes_valid,    // [31]
+    captured,               // [30]
+    c_ptram_oe_n,           // [29]
+    c_ptram_cs_n,           // [28]
+    c_restr,                // [27]
+    c_pviol,                // [26]
+    c_tvec_3_0,             // [25:22]
+    c_la_23_10,             // [21:8]
+    c_vacc,                 // [7]
+    c_pt_15_9               // [6:0]
+  };
+
+  reg [ROT_LOG2-1:0] rot = {ROT_LOG2{1'b0}};
+  reg [2:0]          slice_idx = 3'd0;
+  always @(posedge sysclk) begin
+    // ROTATE ONLY AFTER A FAULT IS FROZEN. The board's ring samples this
+    // window over time; if it rotates before the capture, the ring mixes
+    // PRE- and POST-capture slices and the reconstructed word is a blend of
+    // two states. Measured on silicon 21-AUG-2026: a dump decoded to
+    // captured=0 AND c_next_valid=1, which the RTL cannot produce. Holding
+    // slice 0 until `captured` means every slice above 0 comes from the
+    // frozen, immutable word.
+    if (clear || !(captured || census_ready)) begin
+      rot       <= {ROT_LOG2{1'b0}};
+      slice_idx <= 3'd0;
+    end else begin
+      rot <= rot + 1'b1;
+      if (rot == {ROT_LOG2{1'b1}})
+        slice_idx <= (slice_idx == 3'd7) ? 3'd0 : slice_idx + 1'b1;
+    end
+  end
+
+  // 6 slices x 13 bits = 78 bits, which covers the 78-bit word. The index is
+  // 3 bits so a reader can always tell which slice it is looking at.
+  reg [12:0] slice_data;
+  always @(*) begin
+    case (slice_idx)
+      3'd0: slice_data = frozen[12:0];
+      3'd1: slice_data = frozen[25:13];
+      3'd2: slice_data = frozen[38:26];
+      3'd3: slice_data = frozen[51:39];
+      3'd4: slice_data = frozen[64:52];
+      3'd5: slice_data = frozen[77:65];
+      3'd6: slice_data = frozen[90:78];
+      default: slice_data = frozen[103:91];
+    endcase
+  end
+
+  assign readout_15_0 = {slice_idx, slice_data};
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

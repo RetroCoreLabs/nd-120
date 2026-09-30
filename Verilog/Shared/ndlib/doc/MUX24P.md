@@ -19,6 +19,16 @@ Source: `Verilog/Shared/ndlib/MUX24P.v`
 
 ![MUX24P symbol](MUX24P.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.WRF.RBLOCK.B_REG_3.MUX_15_12`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![MUX24P schematic](MUX24P.svg)](MUX24P.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Ports
 
 | Direction | Width | Name | Description |
@@ -27,3 +37,52 @@ Source: `Verilog/Shared/ndlib/MUX24P.v`
 | input | `1` | `D00` |  |
 | input | `1` | `D10` |  |
 | output | `1` | `Z0` |  |
+
+## Verilog source
+
+[`Verilog/Shared/ndlib/MUX24P.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/ndlib/MUX24P.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of MUX24P (37 lines)</summary>
+
+```verilog
+module MUX24P(
+    input A,
+    input D00, D01, D02, D03,
+    input D10, D11, D12, D13,
+    output Z0, Z1, Z2, Z3
+);
+
+    // Instantiating four 2-to-1 multiplexers
+    Multiplexer_2 PLEXER_1 (
+        .muxIn_0(D00),
+        .muxIn_1(D10),
+        .muxOut(Z0),
+        .sel(A)
+    );
+
+    Multiplexer_2 PLEXER_2 (
+        .muxIn_0(D01),
+        .muxIn_1(D11),
+        .muxOut(Z1),
+        .sel(A)
+    );
+
+    Multiplexer_2 PLEXER_3 (
+        .muxIn_0(D02),
+        .muxIn_1(D12),
+        .muxOut(Z2),
+        .sel(A)
+    );
+
+    Multiplexer_2 PLEXER_4 (
+        .muxIn_0(D03),
+        .muxIn_1(D13),
+        .muxOut(Z3),
+        .sel(A)
+    );
+
+endmodule
+```
+
+</details>

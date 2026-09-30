@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="474.0" height="409.0" viewBox="-80.0 -80.0 474.0 409.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="474.0" height="409.0" fill="#ffffff" /><g transform="translate(77,27)" id="cell_$and$A02.v:30$10621"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$A02.v:30$10621" /><g /><g /><g /></g>
+<g transform="translate(77,157)" id="cell_$and$A02.v:30$10622"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$A02.v:30$10622" /><g /><g /><g /></g>
+<g transform="translate(207,37)" id="cell_$not$A02.v:30$10624"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$A02.v:30$10624" /><circle cx="23" cy="10" r="3" class="cell_$not$A02.v:30$10624" /><g /><g /></g>
+<g transform="translate(142,34.5)" id="cell_$or$A02.v:30$10623"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$A02.v:30$10623" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$A02.v:30$10623" /><g /><g /><g /></g>
+<g transform="translate(12,22)" id="cell_A"><text x="15" y="-4" class="nodelabel cell_A">A</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A" /><g /></g>
+<g transform="translate(12,87)" id="cell_B"><text x="15" y="-4" class="nodelabel cell_B">B</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B" /><g /></g>
+<g transform="translate(12,152)" id="cell_C"><text x="15" y="-4" class="nodelabel cell_C">C</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_C" /><g /></g>
+<g transform="translate(12,217)" id="cell_D"><text x="15" y="-4" class="nodelabel cell_D">D</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D" /><g /></g>
+<g transform="translate(272,37)" id="cell_Z"><text x="15" y="-4" class="nodelabel cell_Z">Z</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_Z" /><g /></g>
+<line x1="40" x2="77" y1="32" y2="32" class="net_2"><title>A</title></line>
+<line x1="40" x2="52" y1="97" y2="97" class="net_3"><title>B</title></line>
+<line x1="52" x2="52" y1="97" y2="47" class="net_3"><title>B</title></line>
+<line x1="52" x2="77" y1="47" y2="47" class="net_3"><title>B</title></line>
+<line x1="40" x2="77" y1="162" y2="162" class="net_4"><title>C</title></line>
+<line x1="40" x2="52" y1="227" y2="227" class="net_5"><title>D</title></line>
+<line x1="52" x2="52" y1="227" y2="177" class="net_5"><title>D</title></line>
+<line x1="52" x2="77" y1="177" y2="177" class="net_5"><title>D</title></line>
+<line x1="172" x2="207" y1="47" y2="47" class="net_9" />
+<line x1="107" x2="145" y1="39.5" y2="39.5" class="net_7" />
+<line x1="107" x2="117" y1="169.5" y2="169.5" class="net_8" />
+<line x1="117" x2="117" y1="169.5" y2="54.5" class="net_8" />
+<line x1="117" x2="145" y1="54.5" y2="54.5" class="net_8" />
+<line x1="232" x2="272" y1="47" y2="47" class="net_6"><title>Z</title></line>
+<text x="43.0" y="29.0" class="netlabel">A</text>
+<text x="55.0" y="44.0" class="netlabel">B</text>
+<text x="43.0" y="159.0" class="netlabel">C</text>
+<text x="55.0" y="174.0" class="netlabel">D</text>
+<text x="235.0" y="44.0" class="netlabel">Z</text>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="565.0" height="349.0" viewBox="-80.0 -80.0 565.0 349.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="565.0" height="349.0" fill="#ffffff" /><g transform="translate(178,77)" id="cell_$procdff$38437"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$38437" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$38437" /><g /><g /><g /><g /></g>
+<g transform="translate(298,117)" id="cell_$procdff$38438"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$38438" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$38438" /><g /><g /><g /><g /></g>
+<g transform="translate(243,57)" id="cell_$procmux$30264"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$30264" /><g /><g /><g /><g /></g>
+<g transform="translate(108.33333333333333,67)" id="cell_$procmux$30267"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$30267" /><g /><g /><g /><g /></g>
+<g transform="translate(101,137)" id="cell_clk_dst"><text x="15" y="-4" class="nodelabel cell_clk_dst">clk_dst</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_clk_dst" /><g /></g>
+<g transform="translate(12,157)" id="cell_rst_dst_n"><text x="15" y="-4" class="nodelabel cell_rst_dst_n">rst_dst_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_rst_dst_n" /><g /></g>
+<g transform="translate(12,87)" id="cell_d_src"><text x="15" y="-4" class="nodelabel cell_d_src">d_src</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_d_src" /><g /></g>
+<g transform="translate(363,117)" id="cell_q_dst"><text x="15" y="-4" class="nodelabel cell_q_dst">q_dst</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_q_dst" /><g /></g>
+<g transform="translate(12,22)" id="cell_000"><text x="15" y="-4" class="nodelabel cell_000">000</text><rect width="30" height="20" class="cell_000" /><g /></g>
+<line x1="129" x2="153" y1="147" y2="147" class="net_2"><title>clk_dst</title></line>
+<line x1="153" x2="153" y1="147" y2="107" class="net_2"><title>clk_dst</title></line>
+<circle cx="153" cy="147" r="2" style="fill:#000" class="net_2" />
+<line x1="153" x2="178" y1="107" y2="107" class="net_2"><title>clk_dst</title></line>
+<line x1="129" x2="298" y1="147" y2="147" class="net_2"><title>clk_dst</title></line>
+<line x1="128.33333333333331" x2="178" y1="87" y2="87" class="net_10,11,12" />
+<line x1="263" x2="273" y1="77" y2="77" class="net_16,17,18" />
+<line x1="273" x2="273" y1="77" y2="127" class="net_16,17,18" />
+<line x1="273" x2="298" y1="127" y2="127" class="net_16,17,18" />
+<line x1="42" x2="218" y1="32" y2="32" class="net_19,20,21" />
+<line x1="218" x2="218" y1="32" y2="67" class="net_19,20,21" />
+<line x1="218" x2="243" y1="67" y2="67" class="net_19,20,21" />
+<line x1="42" x2="76" y1="32" y2="32" class="net_19,20,21" />
+<line x1="76" x2="76" y1="32" y2="77" class="net_19,20,21" />
+<circle cx="76" cy="32" r="2" style="fill:#000" class="net_19,20,21" />
+<line x1="76" x2="108.33333333333333" y1="77" y2="77" class="net_19,20,21" />
+<line x1="208" x2="243" y1="87" y2="87" class="net_13,14,15"><title>s_meta</title></line>
+<line x1="40" x2="253" y1="167" y2="167" class="net_3"><title>rst_dst_n</title></line>
+<line x1="253" x2="253" y1="167" y2="92" class="net_3"><title>rst_dst_n</title></line>
+<line x1="40" x2="76" y1="167" y2="167" class="net_3"><title>rst_dst_n</title></line>
+<line x1="76" x2="76" y1="167" y2="117" class="net_3"><title>rst_dst_n</title></line>
+<line x1="76" x2="118.33333333333333" y1="117" y2="117" class="net_3"><title>rst_dst_n</title></line>
+<circle cx="76" cy="167" r="2" style="fill:#000" class="net_3" />
+<line x1="118.33333333333333" x2="118.33333333333333" y1="117" y2="102" class="net_3"><title>rst_dst_n</title></line>
+<line x1="40" x2="108.33333333333333" y1="97" y2="97" class="net_4,5,6"><title>d_src</title></line>
+<line x1="328" x2="363" y1="127" y2="127" class="net_7,8,9"><title>q_dst</title></line>
+<text x="211.0" y="84.0" class="netlabel">s_meta</text>
+<text x="132.0" y="144.0" class="netlabel">clk_dst</text>
+<text x="43.0" y="164.0" class="netlabel">rst_dst_n</text>
+<text x="43.0" y="94.0" class="netlabel">d_src</text>
+<text x="331.0" y="124.0" class="netlabel">q_dst</text>
+</svg>

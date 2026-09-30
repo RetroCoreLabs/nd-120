@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="666.0" height="486.5" viewBox="-80.0 -80.0 666.0 486.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="666.0" height="486.5" fill="#ffffff" /><g transform="translate(399,22)" id="cell_$not$SCAN_WITH_SET_N_EN.v:62$10450"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$SCAN_WITH_SET_N_EN.v:62$10450" /><circle cx="23" cy="10" r="3" class="cell_$not$SCAN_WITH_SET_N_EN.v:62$10450" /><g /><g /></g>
+<g transform="translate(280,86.5)" id="cell_$procdff$37124"><text x="15" y="-4" class="nodelabel cell_$procdff$37124">$adff</text><rect width="30" height="60" class="cell_$procdff$37124" /><g transform="translate(0,10)" id="port_$procdff$37124~ARST"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37124">ARST</text></g><g transform="translate(0,30)" id="port_$procdff$37124~CLK"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37124">CLK</text></g><g transform="translate(0,50)" id="port_$procdff$37124~D"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37124">D</text></g><g transform="translate(30,10)" id="port_$procdff$37124~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_$procdff$37124">Q</text></g></g>
+<g transform="translate(192.66666666666666,169.5)" id="cell_$procmux$10911"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$10911" /><g /><g /><g /><g /></g>
+<g transform="translate(122.33333333333333,179.5)" id="cell_$ternary$SCAN_WITH_SET_N_EN.v:59$10449"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$SCAN_WITH_SET_N_EN.v:59$10449" /><g /><g /><g /><g /></g>
+<g transform="translate(184,107)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(119,294.5)" id="cell_EN"><text x="15" y="-4" class="nodelabel cell_EN">EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EN" /><g /></g>
+<g transform="translate(12,22)" id="cell_CLK"><text x="15" y="-4" class="nodelabel cell_CLK">CLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLK" /><g /></g>
+<g transform="translate(54,134.5)" id="cell_D"><text x="15" y="-4" class="nodelabel cell_D">D</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D" /><g /></g>
+<g transform="translate(184,42)" id="cell_S_n"><text x="15" y="-4" class="nodelabel cell_S_n">S_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_S_n" /><g /></g>
+<g transform="translate(54,264.5)" id="cell_TE"><text x="15" y="-4" class="nodelabel cell_TE">TE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TE" /><g /></g>
+<g transform="translate(54,199.5)" id="cell_TI"><text x="15" y="-4" class="nodelabel cell_TI">TI</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TI" /><g /></g>
+<g transform="translate(464,87)" id="cell_Q"><text x="15" y="-4" class="nodelabel cell_Q">Q</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_Q" /><g /></g>
+<g transform="translate(464,22)" id="cell_QN"><text x="15" y="-4" class="nodelabel cell_QN">QN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QN" /><g /></g>
+<line x1="311" x2="374" y1="97" y2="97" class="net_9"><title>Q</title></line>
+<line x1="374" x2="374" y1="97" y2="32" class="net_9"><title>Q</title></line>
+<circle cx="374" cy="97" r="2" style="fill:#000" class="net_9" />
+<line x1="374" x2="399" y1="32" y2="32" class="net_9"><title>Q</title></line>
+<line x1="311" x2="374" y1="97" y2="97" class="net_9"><title>Q</title></line>
+<line x1="374" x2="374" y1="97" y2="159.5" class="net_9"><title>Q</title></line>
+<line x1="374" x2="159" y1="159.5" y2="159.5" class="net_9"><title>Q</title></line>
+<line x1="159" x2="159" y1="159.5" y2="179.5" class="net_9"><title>Q</title></line>
+<line x1="159" x2="192.66666666666666" y1="179.5" y2="179.5" class="net_9"><title>Q</title></line>
+<line x1="311" x2="464" y1="97" y2="97" class="net_9"><title>Q</title></line>
+<line x1="212" x2="230" y1="52" y2="52" class="net_6"><title>S_n</title></line>
+<line x1="230" x2="230" y1="52" y2="97" class="net_6"><title>S_n</title></line>
+<line x1="230" x2="280" y1="97" y2="97" class="net_6"><title>S_n</title></line>
+<line x1="212" x2="280" y1="117" y2="117" class="net_2"><title>sysclk</title></line>
+<line x1="212.66666666666666" x2="230" y1="189.5" y2="189.5" class="net_11" />
+<line x1="230" x2="230" y1="189.5" y2="137" class="net_11" />
+<line x1="230" x2="280" y1="137" y2="137" class="net_11" />
+<line x1="142.33333333333331" x2="192.66666666666666" y1="199.5" y2="199.5" class="net_12" />
+<line x1="147" x2="202.66666666666666" y1="304.5" y2="304.5" class="net_3"><title>EN</title></line>
+<line x1="202.66666666666666" x2="202.66666666666666" y1="304.5" y2="204.5" class="net_3"><title>EN</title></line>
+<line x1="82" x2="94" y1="144.5" y2="144.5" class="net_5"><title>D</title></line>
+<line x1="94" x2="94" y1="144.5" y2="189.5" class="net_5"><title>D</title></line>
+<line x1="94" x2="122.33333333333333" y1="189.5" y2="189.5" class="net_5"><title>D</title></line>
+<line x1="82" x2="122.33333333333333" y1="209.5" y2="209.5" class="net_8"><title>TI</title></line>
+<line x1="82" x2="132.33333333333331" y1="274.5" y2="274.5" class="net_7"><title>TE</title></line>
+<line x1="132.33333333333331" x2="132.33333333333331" y1="274.5" y2="214.5" class="net_7"><title>TE</title></line>
+<line x1="424" x2="464" y1="32" y2="32" class="net_10"><title>QN</title></line>
+<text x="427.0" y="29.0" class="netlabel">QN</text>
+<text x="215.0" y="114.0" class="netlabel">sysclk</text>
+<text x="150.0" y="301.5" class="netlabel">EN</text>
+<text x="97.0" y="186.5" class="netlabel">D</text>
+<text x="233.0" y="94.0" class="netlabel">S_n</text>
+<text x="85.0" y="271.5" class="netlabel">TE</text>
+<text x="85.0" y="206.5" class="netlabel">TI</text>
+<text x="162.0" y="156.5" class="netlabel">Q</text>
+</svg>

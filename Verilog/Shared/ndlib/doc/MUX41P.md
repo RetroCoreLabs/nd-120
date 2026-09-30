@@ -19,6 +19,16 @@ Source: `Verilog/Shared/ndlib/MUX41P.v`
 
 ![MUX41P symbol](MUX41P.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.MIC.M_LAA_3`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![MUX41P schematic](MUX41P.svg)](MUX41P.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Component : MUX41P
@@ -34,3 +44,41 @@ Component : MUX41P
 | input | `1` | `D2` |  |
 | input | `1` | `D3` |  |
 | output | `1` | `Z` |  |
+
+## Verilog source
+
+[`Verilog/Shared/ndlib/MUX41P.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/ndlib/MUX41P.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of MUX41P (26 lines)</summary>
+
+```verilog
+
+/******************************************************************************
+ **                                                                          **
+ ** Component : MUX41P                                                       **
+ **                                                                          **
+ *****************************************************************************/
+
+module MUX41P(A, B, D0, D1, D2, D3, Z);
+
+   // Inputs
+   input A, B, D0, D1, D2, D3;
+
+   // Output
+   output Z;
+
+   // 4-to-1 Multiplexer
+   Multiplexer_4 PLEXER (
+      .muxIn_0(D0),
+      .muxIn_1(D1),
+      .muxIn_2(D2),
+      .muxIn_3(D3),
+      .muxOut(Z),
+      .sel({B, A})
+   );
+
+endmodule
+```
+
+</details>

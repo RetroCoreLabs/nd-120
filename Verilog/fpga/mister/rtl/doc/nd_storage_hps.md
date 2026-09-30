@@ -19,6 +19,16 @@ Source: `Verilog/fpga/mister/rtl/nd_storage_hps.v`
 
 ![nd_storage_hps symbol](nd_storage_hps.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the MiSTer build, instance `STORAGE.u_hps`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd_storage_hps schematic](nd_storage_hps.svg)](nd_storage_hps.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Parameters
 
 | Parameter | Default |
@@ -30,8 +40,8 @@ Source: `Verilog/fpga/mister/rtl/nd_storage_hps.v`
 
 | Direction | Width | Name | Description |
 |---|---|---|---|
-| input | `1` | `clk_cpu` |  |
-| input | `1` | `rst_cpu_n` *(active low)* |  |
+| input | `1` | `clk_cpu` | 20 MHz, the ND-120 CPU/bus/device domain (from pll_cpu.outclk_0) |
+| input | `1` | `rst_cpu_n` *(active low)* | Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n) |
 | input | `[N_CLIENTS-1:0]` | `open_req` |  |
 | output | `[N_CLIENTS-1:0]` | `open_ok` |  |
 | output | `[N_CLIENTS-1:0]` | `open_err` |  |
@@ -47,8 +57,8 @@ Source: `Verilog/fpga/mister/rtl/nd_storage_hps.v`
 | output | `[N_CLIENTS*16-1:0]` | `buf_wdata` |  |
 | output | `[N_CLIENTS-1:0]` | `buf_we` |  |
 | input | `[N_CLIENTS*16-1:0]` | `buf_rdata` |  |
-| input | `1` | `clk_sys` |  |
-| input | `1` | `rst_sys_n` *(active low)* |  |
+| input | `1` | `clk_sys` | pixel clock, 40.000 MHz for 800x600@60 (same net as nd120_console_mister.clk) |
+| input | `1` | `rst_sys_n` *(active low)* | async reset, active low, in the pixel domain (same net as nd120_console_mister.rst_n) |
 | input | `[N_CLIENTS-1:0]` | `img_mounted` |  |
 | input | `1` | `img_readonly` |  |
 | input | `[63:0]` | `img_size` |  |
@@ -62,3 +72,564 @@ Source: `Verilog/fpga/mister/rtl/nd_storage_hps.v`
 | output | `[15:0]` | `sd_buff_din` |  |
 | input | `1` | `sd_buff_wr` |  |
 | output | `[N_CLIENTS-1:0]` | `mounted` |  |
+
+## Verilog source
+
+[`Verilog/fpga/mister/rtl/nd_storage_hps.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/mister/rtl/nd_storage_hps.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd_storage_hps (549 lines)</summary>
+
+```verilog
+`include "nd_storage_status.vh"
+/****************************************************************************
+** nd_storage_hps - the ND-120 storage client bus served by the MiSTer HPS  **
+**                                                                         **
+** WHAT THIS IS                                                            **
+**                                                                         **
+** The MiSTer replacement for nd_storage (Verilog/SD-FAT/circuit/          **
+** nd_storage.v). It presents the SAME flattened client port - spec         **
+** Verilog/docs/nd-storage-interface-spec.md section 4: one request moves  **
+** ONE 2048-byte block (1024 ND words) by file-relative 16-bit block       **
+** number, and the backend masters the client's own buffer through         **
+** buf_addr / buf_wdata / buf_we (reads) and buf_rdata (writes) - so the   **
+** controller-facing adapters (nd_storage_floppy_adapter,                  **
+** nd_storage_disc_adapter, nd_storage_tape_adapter) are reused unchanged. **
+** On the other side there is no SD card, no SPI, no FAT: the images are   **
+** FILES the user mounts from the MiSTer OSD, and the HPS (the ARM side)   **
+** serves them through hps_io's block interface. One client = one OSD      **
+** mount slot ("S<n>" line in CONF_STR) = one file.                        **
+**                                                                         **
+** THE HPS BLOCK INTERFACE, AS IT REALLY BEHAVES (read from the official   **
+** docs, Main_MiSTer/user_io.cpp and sys/hps_io.sv on 01-SEP-2026; the     **
+** rules below are what the design is built on, not guesses):             **
+**   - The ARM POLLS. It never sees sd_rd change; it reads a status word,  **
+**     picks ONE slot with a request pending (rotating round-robin),       **
+**     samples that slot's sd_lba in the same transaction, and later runs  **
+**     ONE data transaction with sd_ack[slot] high for its whole length.   **
+**     So: hold sd_rd/sd_wr until sd_ack RISES, then drop it (the official **
+**     sys/sd_card.sv does exactly this); the FALLING edge of sd_ack means **
+**     "block done". sd_lba and sd_blk_cnt must be stable from request to  **
+**     ack.                                                                **
+**   - sd_blk_cnt = 3 with BLKSZ = 2 (512-byte blocks) makes one 2048-byte **
+**     transaction, one ack, sd_buff_addr running 0..1023 words in WIDE    **
+**     (16-bit) mode. Exactly one client block.                            **
+**   - Data arrives at the HPS SPI rate, many clk_sys cycles per word:     **
+**     sd_buff_wr pulses one cycle per word, sd_buff_addr increments two   **
+**     cycles after it. For WRITES the core must present sd_buff_din =     **
+**     buffer[sd_buff_addr] from address 0 the moment ack rises; the ARM   **
+**     reads it on its own strobe and bumps the address.                   **
+**   - The buffer bus (sd_buff_addr/dout/wr) is BROADCAST to every slot.   **
+**     This module only ever has ONE transaction in flight, so it        **
+**     qualifies by "the slot I asked for" rather than by a per-slot ack.  **
+**   - A read on an UNMOUNTED slot is still acked and returns zeros. The   **
+**     only way to know there is no image is the mount pulse: img_mounted  **
+**     [n] pulses a few cycles, img_size / img_readonly are valid during   **
+**     it (the size is sent first), and an UNMOUNT is the same pulse with  **
+**     img_size == 0. So a request on an unmounted slot never reaches the  **
+**     HPS here: it completes at once with err + NDS_ERR_NOTOPEN, per the  **
+**     rule in nd_storage_status.vh (never done-without-error on a fault,  **
+**     never done-never).                                                  **
+**   - Writes go to the file immediately (O_SYNC on the ARM). A write past **
+**     the end of the file is trimmed and the image cannot grow, so a      **
+**     write whose block does not lie entirely inside the file is refused  **
+**     here with NDS_ERR_RANGE. Read-only is only REPORTED by the HPS      **
+**     (img_readonly); enforcing it is our job: NDS_ERR_WRPROT.            **
+**                                                                         **
+** CLOCKS. The client port is the CPU domain (clk_cpu, 20 MHz on this      **
+** board); hps_io is clk_sys (40 MHz, and it must be >= 20 MHz per the     **
+** MiSTer maintainer). They are two PLL outputs and are treated as         **
+** asynchronous. Each block goes through a staging buffer of this module's **
+** own - rbuf for reads (written on clk_sys by the HPS stream, read on     **
+** clk_cpu into the client), wbuf for writes (filled on clk_cpu from the   **
+** client, read on clk_sys by the HPS) - and one 4-phase go/done handshake **
+** carries the request across. Two simple-dual-port 1024x16 RAMs rather   **
+** than one true-dual-port RAM: one write port each is what every tool     **
+** infers without argument. The mount records cross the other way on a    **
+** per-slot toggle: the clk_sys side latches mounted/size/readonly on the  **
+** img_mounted pulse and flips the toggle; the clk_cpu side copies the     **
+** (long since stable) record when it sees the toggle change.              **
+**                                                                         **
+** BYTE ORDER. ND image words are big-endian bytes: word w = {byte 2w,     **
+** byte 2w+1} (nd_storage_disc_adapter.v, and the nd_storage engine packs  **
+** them that way, so one image file works in Verilator, on the Tang/Nexys  **
+** card and here). hps_io in WIDE mode hands over the file as 16-bit       **
+** little-endian words, {byte 2w+1, byte 2w}. BYTE_SWAP = 1 swaps once in  **
+** each direction. It is a parameter because the HPS word order is taken   **
+** from reading the framework, not from a measurement on this board; the   **
+** Phase-4 byte-order check on real hardware is the proof, and if it says  **
+** otherwise this is the one line to flip.                                 **
+**                                                                         **
+** Port shapes: everything per-slot is FLATTENED (slot n in bits           **
+** [n*W +: W]) because this is plain Verilog; nd120.sv unpacks into the    **
+** SystemVerilog arrays hps_io wants. sd_buff_din is ONE value: only one   **
+** transaction is ever in flight, so every hps_io slot can be fed the same **
+** word.                                                                   **
+**                                                                         **
+** Ronny Hansen, 01-SEP-2026                                                **
+*****************************************************************************/
+
+module nd_storage_hps #(
+    parameter integer N_CLIENTS = 5,   // = hps_io VDNUM; slot n = client n
+    parameter integer BYTE_SWAP = 1    // 1: HPS little-endian <-> ND big-endian
+) (
+    // ---- client ports (clk_cpu domain, flattened; spec section 4) ----
+    input  wire                    clk_cpu,  //! 20 MHz, the ND-120 CPU/bus/device domain (from pll_cpu.outclk_0)
+    input  wire                    rst_cpu_n,  //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
+    input  wire [N_CLIENTS-1:0]    open_req,
+    output wire [N_CLIENTS-1:0]    open_ok,
+    output wire [N_CLIENTS-1:0]    open_err,
+    output wire [N_CLIENTS*32-1:0] size_bytes,
+    input  wire [N_CLIENTS-1:0]    req,
+    input  wire [N_CLIENTS-1:0]    wr,
+    input  wire [N_CLIENTS*16-1:0] block,
+    output wire [N_CLIENTS-1:0]    busy,
+    output reg  [N_CLIENTS-1:0]    done,
+    output reg  [N_CLIENTS-1:0]    err,
+    output wire [N_CLIENTS*4-1:0]  err_code,
+    output wire [N_CLIENTS*10-1:0] buf_addr,
+    output wire [N_CLIENTS*16-1:0] buf_wdata,
+    output wire [N_CLIENTS-1:0]    buf_we,
+    input  wire [N_CLIENTS*16-1:0] buf_rdata,
+
+    // ---- hps_io block interface (clk_sys domain) ----
+    input  wire                    clk_sys,  //! pixel clock, 40.000 MHz for 800x600@60 (same net as nd120_console_mister.clk)
+    input  wire                    rst_sys_n,  //! async reset, active low, in the pixel domain (same net as nd120_console_mister.rst_n)
+    input  wire [N_CLIENTS-1:0]    img_mounted,
+    input  wire                    img_readonly,
+    input  wire [63:0]             img_size,
+    output wire [N_CLIENTS*32-1:0] sd_lba,
+    output wire [N_CLIENTS*6-1:0]  sd_blk_cnt,
+    output reg  [N_CLIENTS-1:0]    sd_rd,
+    output reg  [N_CLIENTS-1:0]    sd_wr,
+    input  wire [N_CLIENTS-1:0]    sd_ack,
+    input  wire [12:0]             sd_buff_addr,
+    input  wire [15:0]             sd_buff_dout,
+    output wire [15:0]             sd_buff_din,
+    input  wire                    sd_buff_wr,
+
+    // ---- diagnostics (clk_cpu domain): which slots hold a file ----
+    output wire [N_CLIENTS-1:0]    mounted
+);
+
+  localparam integer N = N_CLIENTS;
+
+  // one client block = 4 HPS blocks of 512 bytes, sent as ONE transaction
+  localparam [5:0] BLK_CNT_M1 = 6'd3;
+
+  function [15:0] swap16(input [15:0] w);
+    swap16 = (BYTE_SWAP != 0) ? {w[7:0], w[15:8]} : w;
+  endfunction
+
+  // =======================================================================
+  // clk_sys side: mount records + the HPS transaction
+  // =======================================================================
+
+  // ---- mount records, latched on the rising edge of img_mounted[n] ------
+  // hps_io holds img_mounted for the rest of its SPI transaction (several
+  // clk_sys cycles), so it is edge-detected. img_size was loaded by the
+  // PREVIOUS transaction and is stable here; img_readonly rides in the
+  // same word as the mount bit.
+  reg [N-1:0]  m_mounted;
+  reg [N-1:0]  m_ro;
+  reg [N*32-1:0] m_size;
+  reg [N-1:0]  m_tgl;          // flips once per mount/unmount event
+  reg [N-1:0]  img_mounted_d;
+
+  integer n;
+  always @(posedge clk_sys or negedge rst_sys_n) begin
+    if (!rst_sys_n) begin
+      m_mounted     <= {N{1'b0}};
+      m_ro          <= {N{1'b0}};
+      m_size        <= {(N*32){1'b0}};
+      m_tgl         <= {N{1'b0}};
+      img_mounted_d <= {N{1'b0}};
+    end else begin
+      img_mounted_d <= img_mounted;
+      for (n = 0; n < N; n = n + 1) begin
+        if (img_mounted[n] && !img_mounted_d[n]) begin
+          m_mounted[n]         <= |img_size;          // size 0 = unmount
+          m_ro[n]              <= img_readonly;
+          m_size[n*32 +: 32]   <= img_size[31:0];
+          m_tgl[n]             <= ~m_tgl[n];
+        end
+      end
+    end
+  end
+
+  // ---- request fields, written by the clk_cpu side, stable while t_go ---
+  reg        t_go;             // clk_cpu: request handed to the HPS side
+  reg        t_wr;
+  reg [31:0] t_lba;
+  reg [N-1:0] t_sel;           // one-hot slot
+
+  // go -> clk_sys, done -> clk_cpu, 4-phase
+  reg [1:0] go_s;              // clk_sys copy of t_go
+  reg       h_done;            // clk_sys: transaction finished
+  reg [1:0] hd_s;              // clk_cpu copy of h_done
+
+  // hps_io wants a per-slot array; every slot carries the same request,
+  // only the selected slot's sd_rd/sd_wr bit is raised.
+  genvar gs;
+  generate
+    for (gs = 0; gs < N; gs = gs + 1) begin : g_lba
+      assign sd_lba[gs*32 +: 32]   = t_lba;
+      assign sd_blk_cnt[gs*6 +: 6] = BLK_CNT_M1;
+    end
+  endgenerate
+
+  // ---- the two staging buffers ------------------------------------------
+  reg [15:0] rbuf[0:1023];     // HPS -> client: written on clk_sys
+  reg [15:0] wbuf[0:1023];     // client -> HPS: written on clk_cpu
+  reg [15:0] wbuf_q;           // clk_sys registered read of wbuf
+  reg [15:0] rbuf_q;           // clk_cpu registered read of rbuf
+
+  wire ack_sel = |(sd_ack & t_sel);
+
+  // read direction: every word the HPS strobes lands in rbuf. Only the
+  // low 10 address bits matter (1024 words); hps_io's counter saturates and
+  // never wraps, so a longer transaction than asked for cannot alias.
+  always @(posedge clk_sys) begin
+    if (ack_sel && sd_buff_wr && !t_wr) rbuf[sd_buff_addr[9:0]] <= swap16(sd_buff_dout);
+    wbuf_q <= wbuf[sd_buff_addr[9:0]];
+  end
+  // write direction: the ARM reads sd_buff_din on its own strobe, many
+  // clk_sys cycles apart, so the one-cycle registered read above is ready
+  // long before each strobe - including the first, at address 0.
+  assign sd_buff_din = swap16(wbuf_q);
+
+  // ---- HPS transaction FSM ----------------------------------------------
+  localparam [1:0] H_IDLE = 2'd0,   // wait for go
+                   H_REQ  = 2'd1,   // sd_rd/sd_wr raised, wait ack rising
+                   H_XFER = 2'd2,   // ack high: the stream runs
+                   H_DONE = 2'd3;   // tell the client side; wait go low
+
+  reg [1:0] h_state;
+  reg       ack_sel_d;
+
+  always @(posedge clk_sys or negedge rst_sys_n) begin
+    if (!rst_sys_n) begin
+      go_s      <= 2'b00;
+      h_state   <= H_IDLE;
+      h_done    <= 1'b0;
+      sd_rd     <= {N{1'b0}};
+      sd_wr     <= {N{1'b0}};
+      ack_sel_d <= 1'b0;
+    end else begin
+      go_s      <= {go_s[0], t_go};
+      ack_sel_d <= ack_sel;
+
+      case (h_state)
+        H_IDLE: begin
+          if (go_s[1]) begin
+            // t_wr / t_lba / t_sel have been stable since before t_go rose
+            if (t_wr) sd_wr <= t_sel;
+            else      sd_rd <= t_sel;
+            h_state <= H_REQ;
+          end
+        end
+
+        H_REQ: begin
+          // the request is held until the ARM has picked it up (ack rises),
+          // then dropped so the next poll does not run it a second time
+          if (ack_sel) begin
+            sd_rd   <= {N{1'b0}};
+            sd_wr   <= {N{1'b0}};
+            h_state <= H_XFER;
+          end
+        end
+
+        H_XFER: begin
+          // the data moves in the always block above; the falling edge of
+          // ack is the end of the transaction
+          if (!ack_sel && ack_sel_d) begin
+            h_done  <= 1'b1;
+            h_state <= H_DONE;
+          end
+        end
+
+        H_DONE: begin
+          if (!go_s[1]) begin
+            h_done  <= 1'b0;
+            h_state <= H_IDLE;
+          end
+        end
+      endcase
+    end
+  end
+
+  // =======================================================================
+  // clk_cpu side: mount copy, arbiter, client streaming
+  // =======================================================================
+
+  // ---- mount records copied over on the toggle ---------------------------
+  reg [N-1:0]   tgl_s1, tgl_s2, tgl_seen;
+  reg [N-1:0]   c_mounted;
+  reg [N-1:0]   c_ro;
+  reg [N*32-1:0] c_size;
+  reg [N-1:0]   c_open_seen;    // an open_req was issued (for open_err)
+
+  always @(posedge clk_cpu or negedge rst_cpu_n) begin
+    if (!rst_cpu_n) begin
+      tgl_s1      <= {N{1'b0}};
+      tgl_s2      <= {N{1'b0}};
+      tgl_seen    <= {N{1'b0}};
+      c_mounted   <= {N{1'b0}};
+      c_ro        <= {N{1'b0}};
+      c_size      <= {(N*32){1'b0}};
+      c_open_seen <= {N{1'b0}};
+    end else begin
+      tgl_s1 <= m_tgl;
+      tgl_s2 <= tgl_s1;
+      for (n = 0; n < N; n = n + 1) begin
+        if (tgl_s2[n] != tgl_seen[n]) begin
+          // the record was written >= 2 clk_sys cycles before the toggle
+          // reached here and only changes on the next mount event, so a
+          // plain copy across the domains is safe
+          tgl_seen[n]        <= tgl_s2[n];
+          c_mounted[n]       <= m_mounted[n];
+          c_ro[n]            <= m_ro[n];
+          c_size[n*32 +: 32] <= m_size[n*32 +: 32];
+        end
+        if (open_req[n]) c_open_seen[n] <= 1'b1;
+      end
+    end
+  end
+
+  // open semantics (spec: open_req pulse -> open_ok / open_err LEVELS).
+  // There is nothing to "open": the file is whatever the OSD mounted. So
+  // open_ok simply reports the mount, and open_err reports "you asked and
+  // there is no file", which clears itself the moment one is mounted.
+  assign open_ok    = c_mounted;
+  assign open_err   = c_open_seen & ~c_mounted;
+  assign size_bytes = c_size;
+  assign mounted    = c_mounted;
+
+  // ---- per-client request latch + round-robin arbiter --------------------
+  reg [N-1:0]    pend;
+  reg [N-1:0]    pend_wr;
+  reg [N*16-1:0] pend_blk;
+  reg [N*4-1:0]  code_q;         // err_code per client, valid with done
+
+  assign err_code = code_q;
+
+  localparam integer SW = (N <= 2) ? 1 : (N <= 4) ? 2 : (N <= 8) ? 3 : 4;
+  reg [SW-1:0] rr;               // next slot to look at first
+  reg [SW-1:0] g;                // granted client
+  reg          g_act;            // a grant is being processed
+
+  // the pick: first pending client at or after rr, wrapping
+  reg [SW-1:0] pick;
+  reg          pick_ok;
+  integer k, m;
+  always @(*) begin
+    pick    = {SW{1'b0}};
+    pick_ok = 1'b0;
+    m       = 0;
+    for (k = N - 1; k >= 0; k = k - 1) begin
+      m = k + {{(32-SW){1'b0}}, rr};
+      if (m >= N) m = m - N;
+      if (pend[m]) begin
+        pick    = m[SW-1:0];
+        pick_ok = 1'b1;
+      end
+    end
+  end
+
+  assign busy = pend;
+
+  // ---- client-side FSM ---------------------------------------------------
+  localparam [2:0] C_IDLE   = 3'd0,  // pick a pending client, check it
+                   C_PULL   = 3'd1,  // write: client buffer -> wbuf
+                   C_GO     = 3'd2,  // hand to the HPS side, wait h_done
+                   C_STREAM = 3'd3,  // read: rbuf -> client buffer
+                   C_DONE   = 3'd4;  // pulse done (+err)
+
+  reg [2:0]  c_state;
+  reg        g_wr;
+  reg [15:0] g_blk;
+  reg [10:0] idx;                // word walk, 0..1024
+  reg        g_err;
+  reg [3:0]  g_code;
+
+  // the granted client's block-end check, 32-bit bytes
+  wire [31:0] g_size    = c_size[g*32 +: 32];
+  wire [31:0] blk_start = {5'd0, g_blk, 11'd0};        // block * 2048
+  wire [31:0] blk_end   = blk_start + 32'd2048;
+
+  // buffer mastering, one client at a time (all others parked at 0 so the
+  // per-controller OR in the aggregators stays clean)
+  reg [9:0]  o_addr;
+  reg        o_we;
+  reg [15:0] o_wdata;            // registered with o_we: same-cycle pair
+  wire [15:0] g_rdata = buf_rdata[g*16 +: 16];
+
+  genvar gc;
+  generate
+    for (gc = 0; gc < N; gc = gc + 1) begin : g_bus
+      assign buf_addr [gc*10 +: 10] = (g_act && (g == gc)) ? o_addr : 10'd0;
+      assign buf_wdata[gc*16 +: 16] = (g_act && (g == gc)) ? o_wdata : 16'd0;
+      assign buf_we   [gc]          = (g_act && (g == gc)) ? o_we    : 1'b0;
+    end
+  endgenerate
+
+  // rbuf registered read for the STREAM walk: address idx this cycle, word
+  // out next cycle, written to the client at address idx-1
+  //
+  // wbuf write for the PULL walk. o_addr <= idx is registered, so the
+  // client SEES address idx one cycle later, and its buffer read is itself
+  // registered (every adapter: nd_storage_floppy_adapter's c_buf_rdata <=
+  // s_blkbuf[c_buf_addr]; the disc adapter passes the controller's
+  // registered dbuf_rdata straight through), so the word for address idx
+  // is on buf_rdata TWO cycles after idx was set. Hence wbuf[idx-2].
+  always @(posedge clk_cpu) begin
+    rbuf_q <= rbuf[idx[9:0]];
+    if ((c_state == C_PULL) && (idx >= 11'd2)) wbuf[idx[9:0] - 10'd2] <= g_rdata;
+  end
+
+  always @(posedge clk_cpu or negedge rst_cpu_n) begin
+    if (!rst_cpu_n) begin
+      pend     <= {N{1'b0}};
+      pend_wr  <= {N{1'b0}};
+      pend_blk <= {(N*16){1'b0}};
+      code_q   <= {(N*4){1'b0}};
+      done     <= {N{1'b0}};
+      err      <= {N{1'b0}};
+      rr       <= {SW{1'b0}};
+      g        <= {SW{1'b0}};
+      g_act    <= 1'b0;
+      g_wr     <= 1'b0;
+      g_blk    <= 16'd0;
+      idx      <= 11'd0;
+      g_err    <= 1'b0;
+      g_code   <= `NDS_ERR_NONE;
+      o_addr   <= 10'd0;
+      o_we     <= 1'b0;
+      o_wdata  <= 16'd0;
+      t_go     <= 1'b0;
+      t_wr     <= 1'b0;
+      t_lba    <= 32'd0;
+      t_sel    <= {N{1'b0}};
+      hd_s     <= 2'b00;
+      c_state  <= C_IDLE;
+    end else begin
+      done <= {N{1'b0}};
+      err  <= {N{1'b0}};
+      o_we <= 1'b0;
+      hd_s <= {hd_s[0], h_done};
+
+      // latch requests (spec: a req while busy may be ignored - it is)
+      for (n = 0; n < N; n = n + 1) begin
+        if (req[n] && !pend[n]) begin
+          pend[n]              <= 1'b1;
+          pend_wr[n]           <= wr[n];
+          pend_blk[n*16 +: 16] <= block[n*16 +: 16];
+        end
+      end
+
+      case (c_state)
+        C_IDLE: begin
+          if (pick_ok) begin
+            g      <= pick;
+            g_act  <= 1'b1;
+            g_wr   <= pend_wr[pick];
+            g_blk  <= pend_blk[pick*16 +: 16];
+            idx    <= 11'd0;
+            g_err  <= 1'b0;
+            g_code <= `NDS_ERR_NONE;
+            // advance the scan past the winner: no starvation
+            rr     <= ({{(32-SW){1'b0}}, pick} == N - 1) ? {SW{1'b0}} : pick + 1'b1;
+            c_state <= C_GO;   // provisional; the checks below override
+            // the three refusals, each with its reason
+            if (!c_mounted[pick]) begin
+              g_err <= 1'b1; g_code <= `NDS_ERR_NOTOPEN; c_state <= C_DONE;
+            end else if (pend_wr[pick] && c_ro[pick]) begin
+              g_err <= 1'b1; g_code <= `NDS_ERR_WRPROT;  c_state <= C_DONE;
+            end else if (pend_wr[pick]) begin
+              c_state <= C_PULL;  // range check follows in C_PULL's first cycle
+            end
+          end
+        end
+
+        // ---- write: walk the client buffer into wbuf, 1 word/cycle ------
+        // (the range check sits here so g_* are registered when it runs)
+        C_PULL: begin
+          if ((idx == 11'd0) && (blk_end > g_size)) begin
+            // a write must lie entirely inside the file: the HPS trims a
+            // write past EOF and the image cannot grow through the core
+            g_err <= 1'b1; g_code <= `NDS_ERR_RANGE; c_state <= C_DONE;
+          end else begin
+            if (idx < 11'd1024) o_addr <= idx[9:0];
+            idx    <= idx + 11'd1;
+            if (idx == 11'd1025) begin
+              // the word for address 1023 landed this cycle (see the wbuf
+              // write above); now hand the block to the HPS side
+              t_wr    <= 1'b1;
+              t_lba   <= {14'd0, g_blk, 2'b00};   // block * 4 HPS blocks
+              t_sel   <= {{(N-1){1'b0}}, 1'b1} << g;
+              t_go    <= 1'b1;
+              c_state <= C_GO;
+            end
+          end
+        end
+
+        // ---- reads arrive here straight from C_IDLE ----------------------
+        C_GO: begin
+          if (!t_go && !g_wr) begin
+            if (blk_start >= g_size) begin
+              // the block starts past the end of the file
+              g_err <= 1'b1; g_code <= `NDS_ERR_RANGE; c_state <= C_DONE;
+            end else begin
+              t_wr  <= 1'b0;
+              t_lba <= {14'd0, g_blk, 2'b00};
+              t_sel <= {{(N-1){1'b0}}, 1'b1} << g;
+              t_go  <= 1'b1;
+            end
+          end else if (hd_s[1]) begin
+            // the HPS side is finished: release the handshake
+            t_go <= 1'b0;
+            idx  <= 11'd0;
+            if (g_wr) c_state <= C_DONE;
+            else      c_state <= C_STREAM;
+          end
+        end
+
+        // ---- read: walk rbuf into the client buffer, 1 word/cycle --------
+        C_STREAM: begin
+          // rbuf_q holds word idx-1 this cycle (registered read above);
+          // address, data and strobe are registered TOGETHER so the client
+          // sees them in the same cycle (the strobe alone registered, with
+          // the data taken live, delivered word k+1 at address k - caught by
+          // nd_storage_hps_tb test 3)
+          idx <= idx + 11'd1;
+          if (idx != 11'd0) begin
+            o_addr  <= idx[9:0] - 10'd1;
+            o_wdata <= rbuf_q;
+            o_we    <= 1'b1;
+          end
+          if (idx == 11'd1024) c_state <= C_DONE;
+        end
+
+        C_DONE: begin
+          // wait for the HPS side to have dropped h_done before the next
+          // request can raise go again (4-phase discipline)
+          if (!hd_s[1]) begin
+            done[g]            <= 1'b1;
+            err[g]             <= g_err;
+            code_q[g*4 +: 4]   <= g_err ? g_code : `NDS_ERR_NONE;
+            pend[g]            <= 1'b0;
+            g_act              <= 1'b0;
+            o_addr             <= 10'd0;
+            c_state            <= C_IDLE;
+          end
+        end
+
+        default: c_state <= C_IDLE;
+      endcase
+    end
+  end
+
+endmodule
+```
+
+</details>

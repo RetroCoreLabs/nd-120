@@ -14,6 +14,16 @@ Source: `Verilog/fpga/nexys4ddr/nd120_errfa_wdiox_ring.v`
 
 ![nd120_errfa_wdiox_ring symbol](nd120_errfa_wdiox_ring.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd120_errfa_wdiox_ring schematic](nd120_errfa_wdiox_ring.svg)](nd120_errfa_wdiox_ring.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 Nexys 4 DDR - Winchester IOX ring for the ERRFA evidence probe
@@ -56,3 +66,221 @@ Ronny Hansen
 | input | `[15:0]` | `iox_rdata` |  |
 | input | `1` | `contx` | console TX (arming matcher) |
 | output | `1` | `txd` | idle high, wire-AND onto the console |
+
+## Verilog source
+
+[`Verilog/fpga/nexys4ddr/nd120_errfa_wdiox_ring.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/nexys4ddr/nd120_errfa_wdiox_ring.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd120_errfa_wdiox_ring (206 lines)</summary>
+
+```verilog
+/**************************************************************************
+** ND120 Nexys 4 DDR - Winchester IOX ring for the ERRFA evidence probe **
+**                                                                       **
+** Captures the last 48 IOX accesses to the Winchester card (IOX        **
+** 500-507): direction, register, and the data word (write data for a   **
+** write, the card's answer for a read, sampled at the end of the       **
+** strobe). Freezes when the console TX line spells "ERRFA" (SINTRAN's  **
+** own crash announcement - the same arming rule as the RAM-side probe) **
+** and then prints the ring ONCE as                                     **
+**   W R4 060005 W5 000105 ... <CR><LF>                                 **
+** (oldest first, R=read W=write, register digit, data in octal) on its **
+** own 9600-baud TX, wire-ANDed onto the console by the top. The print  **
+** starts ~2.2 s after the match - after the RAM probe's P line         **
+** (~0.5-1.5 s) and the first EF line (~2.0 s), before the second EF    **
+** line (~4.1 s).                                                       **
+**                                                                       **
+** Purpose (24-AUG-2026): the SINTRAN `&` boot dies in the Winchester   **
+** driver with varying verdicts whose shared signature is device state  **
+** inconsistent within one driver pass. This ring shows the actual      **
+** register traffic - interleaved GO words, device clears, status       **
+** answers - at the moment of death.                                    **
+**                                                                       **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module nd120_errfa_wdiox_ring #(
+    parameter integer BAUD_DIV = 1736,        // clk / 9600
+    parameter integer WWAIT    = 36700000     // ~2.2 s at 16.67 MHz
+) (
+    input wire        clk,
+    input wire        rst_n,
+
+    input wire [15:0] iox_addr,
+    input wire        iox_rd,
+    input wire        iox_wr,
+    input wire [15:0] iox_wdata,
+    input wire [15:0] iox_rdata,
+
+    input wire        contx,      // console TX (arming matcher)
+    output wire       txd         // idle high, wire-AND onto the console
+);
+
+  // ---- capture: one entry per IOX strobe to 500-507, on the strobe's
+  // falling edge with the values seen while it was high ----
+  wire w_sel = (iox_addr[15:3] == 13'o0050);   // 0o500-0o507
+  wire w_stb = w_sel & (iox_rd | iox_wr);
+  reg  w_stb_d;
+  reg  w_dir_q;                                // 1 = write
+  reg  [2:0] w_reg_q;
+  reg  [15:0] w_data_q;
+
+  reg [24:0] ring[0:47];   // {dt_log2[4:0], dir, reg[2:0], data[15:0]}
+  reg [31:0] dt_cnt;       // cycles since the previous recorded entry
+  reg [5:0]  wp;
+  reg        frozen;
+
+  // ---- "ERRFA" matcher (same rule as the RAM probe) ----
+  reg [11:0] rxbaud;
+  reg [ 3:0] rxbit;
+  reg [ 7:0] rxsh;
+  reg [39:0] rxtxt;
+  reg        armed;
+
+  // ---- printer ----
+  // line = "W " + 48 x "Dr dddddd tt " (13 chars) + CR LF = 628 chars
+  // tt = floor(log2(cycles since previous entry)) in octal (24-25 = 1-2 s)
+  reg        sending, done;
+  reg [25:0] wwait;
+  reg [ 9:0] pchar;
+  reg [ 3:0] pbit;
+  reg [11:0] pbaud;
+  reg        ptxd;
+
+  // floor(log2(x)) in 5 bits: 0..31. At 16.67 MHz: 24 = ~1 s, 25 = ~2 s.
+  function [4:0] dt_log2(input [31:0] x);
+    integer k;
+    begin
+      dt_log2 = 5'd0;
+      for (k = 31; k >= 0; k = k - 1)
+        if (x[k] && dt_log2 == 5'd0) dt_log2 = k[4:0];
+    end
+  endfunction
+
+  function [7:0] octdig(input [15:0] w, input [2:0] d);
+    case (d)
+      3'd0: octdig = 8'h30 + {7'b0, w[15]};
+      3'd1: octdig = 8'h30 + {5'b0, w[14:12]};
+      3'd2: octdig = 8'h30 + {5'b0, w[11:9]};
+      3'd3: octdig = 8'h30 + {5'b0, w[8:6]};
+      3'd4: octdig = 8'h30 + {5'b0, w[5:3]};
+      default: octdig = 8'h30 + {5'b0, w[2:0]};
+    endcase
+  endfunction
+
+  wire [9:0] prel   = pchar - 10'd2;
+  wire [9:0] pg10   = prel / 10'd13;      // entry 0..47
+  wire [9:0] pd10   = prel % 10'd13;      // char within entry
+  wire [5:0] pidx   = wp + pg10[5:0];     // oldest first (6-bit wrap is NOT
+                                          // mod 48 - handled below)
+  // 48 is not a power of two: wrap by subtraction
+  wire [5:0] pslot  = (pidx >= 6'd48) ? (pidx - 6'd48) : pidx;
+  wire [24:0] pent  = ring[pslot];
+
+  reg [7:0] pch;
+  always @(*) begin
+    if (pchar == 10'd0) pch = "W";
+    else if (pchar == 10'd1) pch = " ";
+    else if (pchar == 10'd626) pch = 8'h0D;
+    else if (pchar == 10'd627) pch = 8'h0A;
+    else if (pd10 == 10'd0) pch = pent[19] ? "W" : "R";
+    else if (pd10 == 10'd1) pch = 8'h30 + {5'b0, pent[18:16]};
+    else if (pd10 == 10'd2) pch = " ";
+    else if (pd10 == 10'd9) pch = " ";
+    else if (pd10 == 10'd10) pch = 8'h30 + {6'b0, pent[24:23]};  // dt hi
+    else if (pd10 == 10'd11) pch = 8'h30 + {5'b0, pent[22:20]};  // dt lo
+    else if (pd10 == 10'd12) pch = " ";
+    else pch = octdig(pent[15:0], pd10[2:0] - 3'd3);
+  end
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      w_stb_d <= 1'b0;
+      wp      <= 6'd0;
+      dt_cnt  <= 32'd0;
+      frozen  <= 1'b0;
+      rxbaud  <= 12'd0;
+      rxbit   <= 4'd0;
+      rxsh    <= 8'd0;
+      rxtxt   <= 40'd0;
+      armed   <= 1'b0;
+      sending <= 1'b0;
+      done    <= 1'b0;
+      wwait   <= 26'd0;
+      pchar   <= 10'd0;
+      pbit    <= 4'd0;
+      pbaud   <= 12'd0;
+      ptxd    <= 1'b1;
+    end else begin
+      w_stb_d <= w_stb;
+      if (dt_cnt != 32'hFFFFFFFF) dt_cnt <= dt_cnt + 32'd1;
+      if (w_stb) begin
+        w_dir_q  <= iox_wr;
+        w_reg_q  <= iox_addr[2:0];
+        w_data_q <= iox_wr ? iox_wdata : iox_rdata;
+      end
+      if (w_stb_d && !w_stb && !frozen) begin
+        ring[wp] <= {dt_log2(dt_cnt), w_dir_q, w_reg_q, w_data_q};
+        wp <= (wp == 6'd47) ? 6'd0 : wp + 6'd1;
+        dt_cnt <= 32'd0;
+      end
+
+      // matcher
+      if (rxbit == 4'd0) begin
+        if (!contx) begin
+          rxbit  <= 4'd1;
+          rxbaud <= BAUD_DIV[11:0] + BAUD_DIV[11:0] / 12'd2 - 12'd1;
+        end
+      end else if (rxbaud != 12'd0) begin
+        rxbaud <= rxbaud - 12'd1;
+      end else if (rxbit <= 4'd8) begin
+        rxsh   <= {contx, rxsh[7:1]};
+        rxbit  <= rxbit + 4'd1;
+        rxbaud <= BAUD_DIV[11:0] - 12'd1;
+      end else begin
+        rxbit <= 4'd0;
+        rxtxt <= {rxtxt[31:0], rxsh};
+        if ({rxtxt[31:0], rxsh} == {"E", "R", "R", "F", "A"}) begin
+          armed  <= 1'b1;
+          frozen <= 1'b1;
+        end
+      end
+
+      // wait, then print once
+      if (armed && !sending && !done) begin
+        wwait <= wwait + 26'd1;
+        if (wwait == WWAIT[25:0]) begin
+          sending <= 1'b1;
+          pchar   <= 10'd0;
+          pbit    <= 4'd0;
+          pbaud   <= 12'd0;
+        end
+      end
+      if (sending) begin
+        if (pbaud == BAUD_DIV[11:0] - 12'd1) begin
+          pbaud <= 12'd0;
+          if (pbit == 4'd9) begin
+            pbit <= 4'd0;
+            ptxd <= 1'b1;
+            if (pchar == 10'd627) begin
+              sending <= 1'b0;
+              done    <= 1'b1;
+            end else pchar <= pchar + 10'd1;
+          end else begin
+            pbit <= pbit + 4'd1;
+            if (pbit == 4'd0) ptxd <= 1'b0;
+            else if (pbit <= 4'd8) ptxd <= pch[pbit-1];
+            else ptxd <= 1'b1;
+          end
+        end else pbaud <= pbaud + 12'd1;
+      end
+    end
+  end
+
+  assign txd = ptxd;
+
+endmodule
+```
+
+</details>

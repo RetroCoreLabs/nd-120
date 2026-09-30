@@ -14,6 +14,14 @@ Source: `Verilog/ND-BUS-DEVICES/FLOPPY/circuit/ND_FLOPPY_PIO.v`
 
 ![ND_FLOPPY_PIO symbol](ND_FLOPPY_PIO.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Schematic not generated: netlistsvg failed: RangeError: Maximum call stack size exceeded.
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND-100 FLOPPY DISK CONTROLLER, PIO INTERFACE (3027 style)
@@ -89,3 +97,427 @@ Ronny Hansen
 | input | `[15:0]` | `dbuf_wdata` |  |
 | input | `1` | `dbuf_we` |  |
 | output | `[15:0]` | `dbuf_rdata` |  |
+
+## Verilog source
+
+[`Verilog/ND-BUS-DEVICES/FLOPPY/circuit/ND_FLOPPY_PIO.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/ND-BUS-DEVICES/FLOPPY/circuit/ND_FLOPPY_PIO.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of ND_FLOPPY_PIO (412 lines)</summary>
+
+```verilog
+/**************************************************************************
+** ND-100 FLOPPY DISK CONTROLLER, PIO INTERFACE (3027 style)             **
+**                                                                       **
+** Register core matching the C reference models:                        **
+**   Verilog/simDevices/NDDevices.cpp (class FloppyPIO)                  **
+**   nd100x src/devices/floppy/deviceFloppyPIO.c                         **
+** Register spec: ND-11.012.01 / ND-11.015.01                            **
+**                                                                       **
+** IOX 1560+0 R  read data buffer (word, auto-increment pointer)         **
+**         +1 W  write data buffer (word, auto-increment pointer)        **
+**         +2 R  read status register 1                                  **
+**         +3 W  write control word                                      **
+**         +4 R  read status register 2                                  **
+**         +5 W  write drive address (b0=1) / write difference (b0=0)    **
+**         +6 R  read test data (test mode)                              **
+**         +7 W  write sector (b0 n/a) / write test byte (test mode)     **
+**                                                                       **
+** Ident code 021 (octal), interrupt level 11.                           **
+** Commands (control word b8-15, highest set bit wins):                  **
+**   b8 format track, b9 write data, b10 write deleted data, b11 read    **
+**   ID, b12 read data, b13 seek, b14 recalibrate, b15 control reset     **
+** Completion after the disk backend finishes + DELAY_TICKS; raises      **
+** level-11 interrupt if enabled. IDENT clears pending + int enable.     **
+**                                                                       **
+** The 1024-word interface buffer lives here (BRAM). The disk image is   **
+** behind the disk_* backend port: the sim harness serves an image       **
+** file, hardware serves the SDRAM-cached image with SD write-through.   **
+**                                                                       **
+** NOT ported from the C models (ask before adding - documented hacks):  **
+**   - RSR1 read "magic" bits 9/10/11 derived from the buffer pointer    **
+**     (exists only to satisfy a diagnostic test program)                **
+**   - autoload's hardcoded 388-byte boot blob (real hardware reads      **
+**     track 0 sector 1; FLO-MON must be on the diskette)                **
+**   - deleted-sector shadow array (no room in the image format)        **
+**                                                                       **
+** Last reviewed: 11-JUL-2026                                            **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module ND_FLOPPY_PIO #(
+    parameter [15:0] BASE_ADDR   = 16'o001560,
+    parameter [15:0] IDENT_CODE  = 16'o000021,
+    parameter [3:0]  INT_LEVEL   = 4'd11,
+    parameter [15:0] DELAY_TICKS = 16'd3000  // C model: IODELAY_FLOPPY
+) (
+    input wire sysclk,
+    input wire sys_rst_n,
+
+    // Device bus (from ND_BUS_SLAVE)
+    input  wire [15:0] iox_addr,
+    input  wire        iox_wr,
+    input  wire [15:0] iox_wdata,
+    input  wire        iox_rd,
+    output reg  [15:0] iox_rdata,
+    output wire [3:0]  int_pending,
+    input  wire        ident_strobe,
+    input  wire [3:0]  ident_level,
+    input  wire        ident_grant_in,
+    output wire        ident_grant_out,
+    output wire        ident_hit,
+    output wire [15:0] ident_code,
+
+    // Disk image backend (sim: file image; hardware: SDRAM cache + SD)
+    output reg         disk_req,       // pulse: start operation
+    output reg  [2:0]  disk_op,        // command enum (0-7, see above)
+    output wire [6:0]  disk_sector,    // 1-based
+    output wire [6:0]  disk_track,     // 0-76
+    output wire [1:0]  disk_format,    // 0/1: 128Bx26  2: 256Bx15  3: 512Bx8
+    output wire [2:0]  disk_drive,     // selected unit
+    output wire [9:0]  disk_buf_start, // buffer pointer at command time
+    output wire [10:0] disk_wordcount, // words to transfer
+    input  wire        disk_done,      // pulse: operation finished
+    input  wire        disk_err_notrdy,   // with done: drive not ready
+    input  wire        disk_err_missing,  // with done: sector missing
+
+    // Backend port into the interface buffer
+    input  wire [9:0]  dbuf_addr,
+    input  wire [15:0] dbuf_wdata,
+    input  wire        dbuf_we,
+    output reg  [15:0] dbuf_rdata
+);
+
+  // Commands (control-word bit - 8)
+  localparam CMD_FORMAT    = 3'd0;
+  localparam CMD_WRITE     = 3'd1;
+  localparam CMD_WRITEDEL  = 3'd2;
+  localparam CMD_READID    = 3'd3;
+  localparam CMD_READ      = 3'd4;
+  localparam CMD_SEEK      = 3'd5;
+  localparam CMD_RECAL     = 3'd6;
+  localparam CMD_CTLRESET  = 3'd7;
+
+  // Interface buffer, 1024 x 16 (BRAM)
+  reg [15:0] s_buffer[0:1023];
+  reg [9:0]  s_bufptr;
+
+  // Status register 1 bits
+  reg s_int_enabled;   // b1
+  reg s_busy;          // b2
+  reg s_rft;           // b3 device ready for transfer
+  reg s_deleted;       // b5
+  reg s_rw_complete;   // b6
+  reg s_seek_complete; // b7
+  reg s_timeout;       // b8
+
+  // Status register 2 bits
+  reg s_not_ready;     // b8
+  reg s_write_prot;    // b9
+  reg s_missing;       // b11
+  reg s_crc_err;       // b12
+  reg s_overrun;       // b14
+
+  wire [15:0] s_rsr2 = {1'b0, s_overrun, 1'b0, s_crc_err, s_missing, 1'b0,
+                        s_write_prot, s_not_ready, 8'd0};
+  wire s_rsr2_or = (s_rsr2 != 16'd0);
+  wire [15:0] s_rsr1 = {7'd0, s_timeout, s_seek_complete, s_rw_complete,
+                        s_deleted, s_rsr2_or, s_rft, s_busy, s_int_enabled, 1'b0};
+
+  // Geometry / addressing
+  reg [1:0] s_format;        // formatSelect
+  reg [2:0] s_drive;         // selected unit
+  reg       s_drive_sel;     // a drive is selected
+  reg [6:0] s_track;
+  reg [6:0] s_sector;        // 1-based
+  reg       s_auto_incr;
+  reg       s_test_mode;
+  reg [7:0] s_test_byte;
+  reg       s_testmode_hi;   // test-data byte phase
+
+  wire [4:0] s_sect_per_track = (s_format == 2'd2) ? 5'd15 :
+                                (s_format == 2'd3) ? 5'd8  : 5'd26;
+  wire [10:0] s_words_per_sector = (s_format == 2'd2) ? 11'd128 :
+                                   (s_format == 2'd3) ? 11'd256 : 11'd64;
+
+  // Command engine
+  reg [2:0]  s_cmd;
+  reg        s_cmd_running;   // waiting for disk_done
+  reg        s_delay_running; // completion delay after disk_done
+  reg [15:0] s_delay_cnt;
+  reg [9:0]  s_cmd_buf_start;
+
+  assign disk_sector    = s_sector;
+  assign disk_track     = s_track;
+  assign disk_format    = s_format;
+  assign disk_drive     = s_drive;
+  assign disk_buf_start = s_cmd_buf_start;
+  assign disk_wordcount = s_words_per_sector;
+
+  // Address decode
+  wire s_addressed = (iox_addr[15:3] == BASE_ADDR[15:3]);
+  wire [2:0] s_reg = iox_addr[2:0];
+
+  // Interrupt: enabled AND ready (evaluated continuously)
+  wire s_pending = s_int_enabled && s_rft;
+  assign int_pending = {(INT_LEVEL == 4'd13) && s_pending,
+                        (INT_LEVEL == 4'd12) && s_pending,
+                        (INT_LEVEL == 4'd11) && s_pending,
+                        (INT_LEVEL == 4'd10) && s_pending};
+
+  wire s_ident_answer = ident_strobe && ident_grant_in &&
+                        (ident_level == INT_LEVEL) && s_pending;
+  assign ident_hit       = s_ident_answer;
+  assign ident_code      = s_ident_answer ? IDENT_CODE : 16'd0;
+  assign ident_grant_out = ident_grant_in && !s_ident_answer;
+
+  // Read mux (OR-bus: 0 when not addressed)
+  always @(*) begin
+    iox_rdata = 16'd0;
+    if (iox_rd && s_addressed) begin
+      case (s_reg)
+        3'd0: iox_rdata = s_buffer[s_bufptr];
+        3'd2: iox_rdata = s_rsr1;
+        3'd4: iox_rdata = s_rsr2;
+        3'd6: iox_rdata = 16'd0;  // test data handled in the clocked block
+        default: iox_rdata = 16'd0;
+      endcase
+    end
+  end
+
+  // Backend buffer port (read is combinational like the CPU-side mux)
+  always @(*) begin
+    dbuf_rdata = s_buffer[dbuf_addr];
+  end
+
+  // Command decode: highest set bit of the control-word high byte wins
+  function [2:0] cmd_decode(input [7:0] hi);
+    integer k;
+    begin
+      cmd_decode = 3'd0;
+      for (k = 0; k < 8; k = k + 1) begin
+        if (hi[k]) cmd_decode = k[2:0];
+      end
+    end
+  endfunction
+
+  wire s_wr_here = iox_wr && s_addressed;
+  wire [2:0] s_cmd_dec = cmd_decode(iox_wdata[15:8]);
+
+  always @(posedge sysclk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+      s_bufptr        <= 10'd0;
+      s_int_enabled   <= 1'b0;
+      s_busy          <= 1'b0;
+      s_rft           <= 1'b1;  // C model Reset(): ready for transfer
+      s_deleted       <= 1'b0;
+      s_rw_complete   <= 1'b0;
+      s_seek_complete <= 1'b0;
+      s_timeout       <= 1'b0;
+      s_not_ready     <= 1'b0;
+      s_write_prot    <= 1'b0;
+      s_missing       <= 1'b0;
+      s_crc_err       <= 1'b0;
+      s_overrun       <= 1'b0;
+      s_format        <= 2'd0;
+      s_drive         <= 3'd0;
+      s_drive_sel     <= 1'b0;
+      s_track         <= 7'd0;
+      s_sector        <= 7'd1;
+      s_auto_incr     <= 1'b0;
+      s_test_mode     <= 1'b0;
+      s_test_byte     <= 8'd0;
+      s_testmode_hi   <= 1'b0;
+      s_cmd           <= 3'd0;
+      s_cmd_running   <= 1'b0;
+      s_delay_running <= 1'b0;
+      s_delay_cnt     <= 16'd0;
+      s_cmd_buf_start <= 10'd0;
+      disk_req        <= 1'b0;
+      disk_op         <= 3'd0;
+    end else begin
+      disk_req <= 1'b0;
+
+      // Backend writes into the interface buffer (sector read fill)
+      if (dbuf_we) begin
+        s_buffer[dbuf_addr] <= dbuf_wdata;
+      end
+
+      // CPU data-buffer access: auto-increment pointer
+      if (iox_rd && s_addressed && (s_reg == 3'd0)) begin
+        s_bufptr <= s_bufptr + 10'd1;
+      end
+      if (s_wr_here && (s_reg == 3'd1)) begin
+        s_buffer[s_bufptr] <= iox_wdata;
+        s_bufptr <= s_bufptr + 10'd1;
+      end
+
+      // Control word
+      if (s_wr_here && (s_reg == 3'd3)) begin
+        s_int_enabled <= iox_wdata[1];
+        s_test_mode   <= iox_wdata[3];
+
+        if (iox_wdata[4]) begin  // device clear
+          s_drive_sel <= 1'b0;
+          s_bufptr    <= 10'd0;
+          s_rft       <= 1'b1;
+          s_not_ready <= 1'b0;
+          s_write_prot<= 1'b0;
+          s_missing   <= 1'b0;
+          s_crc_err   <= 1'b0;
+          s_overrun   <= 1'b0;
+        end
+        if (iox_wdata[5]) begin  // clear interface buffer address
+          s_bufptr <= 10'd0;
+          s_rft    <= 1'b1;
+        end
+
+        if (iox_wdata[15:8] != 8'd0) begin
+          // A command: clear errors and completion flags, go busy
+          s_busy          <= 1'b1;
+          s_rft           <= 1'b0;
+          s_rw_complete   <= 1'b0;
+          s_seek_complete <= 1'b0;
+          s_deleted       <= 1'b0;
+          s_not_ready     <= 1'b0;
+          s_write_prot    <= 1'b0;
+          s_missing       <= 1'b0;
+          s_crc_err       <= 1'b0;
+          s_overrun       <= 1'b0;
+          s_cmd           <= s_cmd_dec;
+          s_cmd_buf_start <= s_bufptr;
+
+          case (s_cmd_dec)
+            CMD_CTLRESET: begin
+              // No interrupt per documentation; just not busy
+              s_busy <= 1'b0;
+            end
+            CMD_RECAL: begin
+              s_track  <= 7'd0;
+              s_sector <= 7'd1;
+              s_delay_running <= 1'b1;
+              s_delay_cnt     <= DELAY_TICKS;
+            end
+            CMD_SEEK: begin
+              s_delay_running <= 1'b1;
+              s_delay_cnt     <= DELAY_TICKS;
+            end
+            CMD_READID: begin
+              // ID field: track / zero, sector / zero (see C model note:
+              // byte 3 hex 02 removed - FLOPPY-FU-1986F complains)
+              s_buffer[0] <= {1'b0, s_track, 8'd0};
+              s_buffer[1] <= {1'b0, s_sector, 8'd0};
+              s_bufptr    <= 10'd0;
+              s_cmd_buf_start <= 10'd0;
+              s_delay_running <= 1'b1;
+              s_delay_cnt     <= DELAY_TICKS;
+            end
+            default: begin
+              // READ / WRITE / WRITEDEL / FORMAT go to the disk backend
+              if ({2'b0, s_sector} > {2'b0, s_sect_per_track}) begin
+                s_missing <= 1'b1;
+                s_rft     <= 1'b1;
+                s_busy    <= 1'b0;
+              end else if (!s_drive_sel) begin
+                s_not_ready <= 1'b1;
+                s_busy      <= 1'b0;
+              end else begin
+                disk_req <= 1'b1;
+                disk_op  <= s_cmd_dec;
+                s_cmd_running <= 1'b1;
+              end
+            end
+          endcase
+        end
+      end
+
+      // Drive address / difference
+      if (s_wr_here && (s_reg == 3'd5)) begin
+        if (iox_wdata[0]) begin
+          // Write drive address
+          s_drive     <= iox_wdata[10:8];
+          s_drive_sel <= !iox_wdata[11];
+          s_format    <= iox_wdata[15:14];
+        end else begin
+          // Write difference: move head, clamp track to 0..76
+          if (iox_wdata[15]) begin
+            s_track <= (({1'b0, s_track} + {1'b0, iox_wdata[14:8]}) > 8'd76)
+                       ? 7'd76 : (s_track + iox_wdata[14:8]);
+          end else begin
+            s_track <= (s_track < iox_wdata[14:8]) ? 7'd0
+                       : (s_track - iox_wdata[14:8]);
+          end
+        end
+      end
+
+      // Sector / test byte
+      if (s_wr_here && (s_reg == 3'd7)) begin
+        if (s_test_mode) begin
+          s_test_byte <= iox_wdata[15:8];
+        end else begin
+          s_sector    <= iox_wdata[14:8];
+          s_auto_incr <= iox_wdata[15];
+        end
+      end
+
+      // Test-data read: shift the test byte into the buffer (C model)
+      if (iox_rd && s_addressed && (s_reg == 3'd6) && s_test_mode) begin
+        if (s_testmode_hi) begin
+          s_buffer[s_bufptr] <= {s_buffer[s_bufptr][15:8], s_test_byte};
+          s_bufptr      <= s_bufptr + 10'd1;
+          s_testmode_hi <= 1'b0;
+        end else begin
+          s_buffer[s_bufptr] <= {s_test_byte, s_buffer[s_bufptr][7:0]};
+          s_testmode_hi <= 1'b1;
+        end
+      end
+
+      // Disk backend finished: start the completion delay
+      if (s_cmd_running && disk_done) begin
+        s_cmd_running <= 1'b0;
+        if (disk_err_notrdy) begin
+          s_not_ready <= 1'b1;
+          s_busy      <= 1'b0;
+        end else if (disk_err_missing) begin
+          s_missing <= 1'b1;
+          s_busy    <= 1'b0;
+        end else begin
+          // Data commands advance the buffer pointer by one sector
+          if (s_cmd != CMD_FORMAT) begin
+            s_bufptr <= s_cmd_buf_start + s_words_per_sector[9:0];
+          end
+          s_delay_running <= 1'b1;
+          s_delay_cnt     <= DELAY_TICKS;
+        end
+      end
+
+      // Completion delay -> completion flags + interrupt condition
+      if (s_delay_running) begin
+        if (s_delay_cnt != 16'd0) begin
+          s_delay_cnt <= s_delay_cnt - 16'd1;
+        end else begin
+          s_delay_running <= 1'b0;
+          s_busy          <= 1'b0;
+          s_rft           <= 1'b1;
+          if (s_cmd == CMD_SEEK || s_cmd == CMD_RECAL) begin
+            s_seek_complete <= 1'b1;
+          end else begin
+            s_rw_complete <= 1'b1;
+            if (s_auto_incr && (s_sector <= {2'b0, s_sect_per_track})) begin
+              s_sector <= s_sector + 7'd1;
+            end
+          end
+        end
+      end
+
+      // IDENT answered: clear the enable bit (pending follows)
+      if (s_ident_answer) begin
+        s_int_enabled <= 1'b0;
+      end
+    end
+  end
+
+endmodule
+```
+
+</details>

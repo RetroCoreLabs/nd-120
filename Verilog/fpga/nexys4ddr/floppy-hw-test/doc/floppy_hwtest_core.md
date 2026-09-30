@@ -14,6 +14,16 @@ Source: `Verilog/fpga/nexys4ddr/floppy-hw-test/floppy_hwtest_core.v`
 
 ![floppy_hwtest_core symbol](floppy_hwtest_core.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![floppy_hwtest_core schematic](floppy_hwtest_core.svg)](floppy_hwtest_core.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 floppy_hwtest_core - the self-checking floppy DMA hardware test proper:
@@ -59,3 +69,508 @@ Ronny Hansen
 | output | `1` | `st_pass` | last round passed |
 | output | `1` | `st_timeout` | last round timed out |
 | output | `1` | `st_idle` | in the between-rounds gap |
+
+## Verilog source
+
+[`Verilog/fpga/nexys4ddr/floppy-hw-test/floppy_hwtest_core.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/nexys4ddr/floppy-hw-test/floppy_hwtest_core.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of floppy_hwtest_core (493 lines)</summary>
+
+```verilog
+/****************************************************************************
+** floppy_hwtest_core - the self-checking floppy DMA hardware test proper: **
+** ND_FLOPPY_DMA + ND_DMA_MASTER + block-RAM main memory answering the     **
+** ND-bus handshake + the CPU-fetch CONTENTION INJECTOR + the IOX driver   **
+** FSM + checksum + UART printer. Board-independent: floppy_hwtest_top     **
+** wires it to the real SD storage adapter on the Nexys 4 DDR; the         **
+** testbench (sim/floppy_hwtest_core_tb.v) wires it to a fake disk         **
+** backend. See the header of floppy_hwtest_top.v for the output format    **
+** and golden values.                                                      **
+**                                                                         **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+`default_nettype none
+
+module floppy_hwtest_core #(
+    // settle after mount and gap between rounds; the tb shortens both
+    parameter [27:0] SETTLE_TICKS = 28'd25_000_000,
+    parameter [27:0] GAP_TICKS    = 28'd50_000_000,
+    parameter integer UART_DIV    = 12_500_000 / 9600
+) (
+    input  wire clk_cpu,
+    input  wire rst_cpu_n,
+    input  wire mount_ok,            // floppy image mounted (open_ok)
+    input  wire [31:0] img_size,     // image size in bytes (media format)
+
+    // disk backend seam (the controller's disk_*/dbuf_* ports)
+    output wire        fd_req,
+    output wire        fd_wr,
+    output wire [15:0] fd_lsect,
+    output wire [ 1:0] fd_format,
+    output wire [ 1:0] fd_drive,
+    output wire [10:0] fd_wc,
+    input  wire        fd_done,
+    input  wire        fd_err,
+    input  wire [3:0]  fd_code,
+    input  wire [9:0]  fdb_addr,
+    input  wire [15:0] fdb_wdata,
+    input  wire        fdb_we,
+    output wire [15:0] fdb_rdata,
+
+    output wire uart_txd,
+    output wire st_pass,             // last round passed
+    output wire st_timeout,          // last round timed out
+    output wire st_idle              // in the between-rounds gap
+);
+
+  // media format from the image size, matching nd_storage_devices.v
+  wire [3:0] f_media = (img_size == 32'd315392) ? 4'h0 : 4'hF;
+
+  /*********************************************
+  *  The RTL under test: ND_FLOPPY_DMA and its *
+  *  ND_DMA_MASTER, wired as in ND120_CORE     *
+  **********************************************/
+  reg  [15:0] iox_addr = 16'd0, iox_wdata = 16'd0;
+  reg         iox_wr = 1'b0, iox_rd = 1'b0;
+  wire [15:0] iox_rdata;
+
+  wire        c_dma_req, c_dma_wr, c_dma_ack, c_dma_err, c_dma_busy;
+  wire [23:0] c_dma_addr;
+  wire [15:0] c_dma_wdata, c_dma_rdata;
+
+  ND_FLOPPY_DMA #(
+      .BASE_ADDR (16'o001560),
+      .IDENT_CODE(16'o000021),
+      .INT_LEVEL (4'd11)
+  ) u_floppy (
+      .sysclk(clk_cpu), .sys_rst_n(rst_cpu_n),
+      .iox_addr(iox_addr), .iox_wr(iox_wr), .iox_wdata(iox_wdata),
+      .iox_rd(iox_rd), .iox_rdata(iox_rdata), .iox_sel(),
+      .int_pending(),
+      .ident_strobe(1'b0), .ident_level(4'd0),
+      .ident_grant_in(1'b0), .ident_grant_out(), .ident_hit(),
+      .ident_code(),
+      .dma_req(c_dma_req), .dma_wr(c_dma_wr), .dma_addr(c_dma_addr),
+      .dma_wdata(c_dma_wdata), .dma_rdata(c_dma_rdata),
+      .dma_ack(c_dma_ack), .dma_err(c_dma_err), .dma_busy(c_dma_busy),
+      .disk_req(fd_req), .disk_wr(fd_wr), .disk_lsect(fd_lsect),
+      .disk_format(fd_format), .disk_drive(fd_drive),
+      .disk_wordcount(fd_wc), .disk_done(fd_done), .disk_err_in(fd_err),
+      .disk_err_code(fd_code), .disk_media_fmt(f_media),
+      .dbuf_addr(fdb_addr), .dbuf_wdata(fdb_wdata), .dbuf_we(fdb_we),
+      .dbuf_rdata(fdb_rdata)
+  );
+
+  wire        m_breq_n, m_bapr_n, m_binput_n, m_bdap_n;
+  wire [23:0] m_bd_out_n;
+  reg         bmem_n = 1'b1, grant_n = 1'b1, bdry_n = 1'b1;
+  reg  [23:0] slave_bd_n = 24'hFFFFFF;
+  wire [23:0] bd_bus_n = m_bd_out_n & slave_bd_n;
+
+  ND_DMA_MASTER #(
+      .TIMEOUT_TICKS(16'd8192)
+  ) u_master (
+      .sysclk(clk_cpu), .sys_rst_n(rst_cpu_n),
+      .dma_req(c_dma_req), .dma_wr(c_dma_wr), .dma_addr(c_dma_addr),
+      .dma_wdata(c_dma_wdata), .dma_rdata(c_dma_rdata),
+      .dma_ack(c_dma_ack), .dma_err(c_dma_err), .dma_busy(c_dma_busy),
+      .BREQ_n(m_breq_n),
+      .INGRANT_n(grant_n), .OUTGRANT_n(),
+      .BMEM_n(bmem_n),
+      .BD_23_0_n_OUT(m_bd_out_n), .BD_23_0_n_IN(bd_bus_n),
+      .BAPR_n(m_bapr_n), .BINPUT_n(m_binput_n), .BDAP_n(m_bdap_n),
+      .BDRY_n(bdry_n)
+  );
+
+  /*********************************************
+  *  Main memory: 16K x 16 block RAM answering *
+  *  the ND-bus handshake, with the measured   *
+  *  CPU-fetch FLICKER injected before every   *
+  *  read answer (two ticks of a rotating      *
+  *  instruction word on BD, then the data,    *
+  *  released at the BDRY edge).               *
+  **********************************************/
+  (* ram_style = "block" *) reg [15:0] mem[0:16383];
+
+  // port A: the bus slave
+  reg  [13:0] ma_addr = 14'd0;
+  reg  [15:0] ma_wdata = 16'd0;
+  reg         ma_we = 1'b0;
+  reg  [15:0] ma_q = 16'd0;
+  always @(posedge clk_cpu) begin
+    if (ma_we) mem[ma_addr] <= ma_wdata;
+    ma_q <= mem[ma_addr];
+  end
+
+  // port B: the driver FSM (command-block init, preseed, checksum)
+  reg  [13:0] mb_addr = 14'd0;
+  reg  [15:0] mb_wdata = 16'd0;
+  reg         mb_we = 1'b0;
+  reg  [15:0] mb_q = 16'd0;
+  always @(posedge clk_cpu) begin
+    if (mb_we) mem[mb_addr] <= mb_wdata;
+    mb_q <= mem[mb_addr];
+  end
+
+  // rotating fetch words - the values measured leaking from the CPU's
+  // polling loop on the failing system
+  reg [1:0]   flick_sel = 2'd0;
+  reg [15:0]  flick_word;
+  always @(*) begin
+    case (flick_sel)
+      2'd0: flick_word = 16'o165562;   // IOX 1562
+      2'd1: flick_word = 16'o004151;   // STA
+      2'd2: flick_word = 16'o044132;   // LDA
+      default: flick_word = 16'o156475; // SHA
+    endcase
+  end
+
+  localparam M_IDLE  = 3'd0;
+  localparam M_ARB   = 3'd1;
+  localparam M_WAITA = 3'd2;
+  localparam M_WAITD = 3'd3;
+  localparam M_FLICK = 3'd4;
+  localparam M_DATA  = 3'd5;
+  localparam M_REPLY = 3'd6;
+  localparam M_REL   = 3'd7;
+
+  reg [2:0] m_state = M_IDLE;
+  reg [3:0] m_cnt = 4'd0;
+  reg       m_write = 1'b0;
+
+  always @(posedge clk_cpu or negedge rst_cpu_n) begin
+    if (!rst_cpu_n) begin
+      m_state <= M_IDLE; bmem_n <= 1'b1; grant_n <= 1'b1; bdry_n <= 1'b1;
+      slave_bd_n <= 24'hFFFFFF; ma_we <= 1'b0; m_cnt <= 4'd0;
+      m_write <= 1'b0; flick_sel <= 2'd0;
+    end else begin
+      ma_we <= 1'b0;
+      case (m_state)
+        M_IDLE: begin
+          if (!m_breq_n) begin m_cnt <= 4'd2; m_state <= M_ARB; end
+        end
+        M_ARB: begin
+          if (m_cnt != 0) m_cnt <= m_cnt - 4'd1;
+          else begin bmem_n <= 1'b0; grant_n <= 1'b0; m_state <= M_WAITA; end
+        end
+        M_WAITA: begin
+          if (!m_bapr_n) begin
+            ma_addr <= ~bd_bus_n[13:0];
+            m_write <= !m_binput_n;
+            m_state <= M_WAITD;
+          end
+        end
+        M_WAITD: begin
+          if (!m_bdap_n) begin
+            if (m_write) begin
+              ma_wdata <= ~bd_bus_n[15:0];
+              ma_we    <= 1'b1;
+              bdry_n   <= 1'b0;
+              grant_n  <= 1'b1;
+              m_state  <= M_REPLY;
+            end else begin
+              // READ: first the contention flicker, then the data
+              slave_bd_n <= ~{8'd0, flick_word};
+              flick_sel  <= flick_sel + 2'd1;
+              m_cnt      <= 4'd1;      // 2 ticks of flicker
+              m_state    <= M_FLICK;
+            end
+          end
+        end
+        M_FLICK: begin
+          if (m_cnt != 0) m_cnt <= m_cnt - 4'd1;
+          else begin
+            slave_bd_n <= ~{8'd0, ma_q};   // real data (a zero word
+            m_cnt      <= 4'd5;            //  drives ~0 = FFFFFF = idle)
+            m_state    <= M_DATA;
+          end
+        end
+        M_DATA: begin
+          if (m_cnt != 0) m_cnt <= m_cnt - 4'd1;
+          else begin
+            slave_bd_n <= 24'hFFFFFF;      // release AT the BDRY edge
+            bdry_n     <= 1'b0;
+            grant_n    <= 1'b1;
+            m_state    <= M_REPLY;
+          end
+        end
+        M_REPLY: begin
+          if (m_bdap_n) begin
+            bdry_n  <= 1'b1;
+            bmem_n  <= 1'b1;
+            slave_bd_n <= 24'hFFFFFF;
+            m_state <= M_REL;
+          end
+        end
+        M_REL: m_state <= M_IDLE;
+        default: m_state <= M_IDLE;
+      endcase
+    end
+  end
+
+  /*********************************************
+  *  Driver FSM: emulates the CPU's IOX        *
+  *  accesses, preseeds/checks memory, prints  *
+  **********************************************/
+  localparam [13:0] CB_A   = 14'o3000;
+  localparam [13:0] TGT_A  = 14'o20000;
+  localparam [15:0] GOLDEN = 16'o125441;
+
+  function [15:0] cb_word(input [3:0] i);
+    case (i)
+      4'd0: cb_word = 16'o007400;     // READ, drive 0, format 3
+      4'd3: cb_word = {2'd0, TGT_A};  // memory address = 20000 (octal)
+      4'd4: cb_word = 16'o100000;     // bit 15: WORD-COUNT mode
+      4'd5: cb_word = 16'o002000;     // 1024 words
+      default: cb_word = 16'd0;
+    endcase
+  endfunction
+
+  localparam D_WAIT   = 4'd0;
+  localparam D_SEED   = 4'd1;
+  localparam D_CB     = 4'd2;
+  localparam D_IOX    = 4'd3;
+  localparam D_POLL   = 4'd4;
+  localparam D_POLLW  = 4'd5;
+  localparam D_RD1    = 4'd6;
+  localparam D_RD2    = 4'd7;
+  localparam D_CKS    = 4'd8;
+  localparam D_PRINT  = 4'd9;
+  localparam D_GAP    = 4'd10;
+
+  reg [3:0]  d_state = D_WAIT;
+  reg [27:0] d_delay = 28'd0;
+  reg [10:0] d_idx = 11'd0;
+  reg [1:0]  d_iox_step = 2'd0;
+  reg [25:0] d_tmo = 26'd0;
+  reg        d_timeout = 1'b0;
+  reg [1:0]  d_ph = 2'd0;
+  reg [15:0] v_s, v_e, v_f, v_b0, v_b1, v_b2, v_b3, v_c;
+  reg [15:0] d_sum = 16'd0;
+  reg        pr_go = 1'b0;
+  wire       pr_done;
+
+  always @(posedge clk_cpu or negedge rst_cpu_n) begin
+    if (!rst_cpu_n) begin
+      d_state <= D_WAIT; d_delay <= 28'd0; d_idx <= 11'd0;
+      d_iox_step <= 2'd0; d_tmo <= 26'd0; d_timeout <= 1'b0;
+      iox_wr <= 1'b0; iox_rd <= 1'b0; mb_we <= 1'b0; pr_go <= 1'b0;
+      d_ph <= 2'd0; d_sum <= 16'd0;
+      v_s <= 16'd0; v_e <= 16'd0; v_f <= 16'd0; v_c <= 16'd0;
+      v_b0 <= 16'd0; v_b1 <= 16'd0; v_b2 <= 16'd0; v_b3 <= 16'd0;
+    end else begin
+      iox_wr <= 1'b0; iox_rd <= 1'b0; mb_we <= 1'b0; pr_go <= 1'b0;
+      case (d_state)
+        // wait for the floppy mount plus a settle margin
+        D_WAIT: begin
+          if (mount_ok) d_delay <= d_delay + 28'd1;
+          if (d_delay >= SETTLE_TICKS) begin
+            d_idx <= 11'd0; d_state <= D_SEED;
+          end
+        end
+        // preseed the 1024-word target so a missing write is detectable
+        D_SEED: begin
+          mb_addr  <= TGT_A + d_idx[9:0];
+          mb_wdata <= 16'o052525;
+          mb_we    <= 1'b1;
+          d_idx    <= d_idx + 11'd1;
+          if (d_idx == 11'd1023) begin d_idx <= 11'd0; d_state <= D_CB; end
+        end
+        // write the 12-word command block at 3000 octal
+        D_CB: begin
+          mb_addr  <= CB_A + d_idx[3:0];
+          mb_wdata <= cb_word(d_idx[3:0]);
+          mb_we    <= 1'b1;
+          d_idx    <= d_idx + 11'd1;
+          if (d_idx == 11'd11) begin
+            d_idx <= 11'd0; d_iox_step <= 2'd0; d_state <= D_IOX;
+          end
+        end
+        // IOX kick: reg5 <= 0, reg7 <= 3000, reg3 <= 400 (octal)
+        D_IOX: begin
+          d_idx <= d_idx + 11'd1;
+          if (d_idx == 11'd8) begin        // one write every 8 ticks
+            d_idx <= 11'd0;
+            iox_wr <= 1'b1;
+            case (d_iox_step)
+              2'd0: begin iox_addr <= 16'o001565; iox_wdata <= 16'd0; end
+              2'd1: begin iox_addr <= 16'o001567; iox_wdata <= {2'd0, CB_A}; end
+              default: begin iox_addr <= 16'o001563; iox_wdata <= 16'o000400; end
+            endcase
+            if (d_iox_step == 2'd2) begin
+              d_tmo <= 26'd0; d_timeout <= 1'b0; d_state <= D_POLL;
+            end else d_iox_step <= d_iox_step + 2'd1;
+          end
+        end
+        // poll status word 1 (IOX 1562) for ready-for-transfer (bit 3)
+        D_POLL: begin
+          iox_addr <= 16'o001562;
+          iox_rd   <= 1'b1;
+          d_state  <= D_POLLW;
+        end
+        D_POLLW: begin
+          v_s   <= iox_rdata;            // iox_rdata is valid with iox_rd
+          d_tmo <= d_tmo + 26'd1;
+          if (iox_rdata[3]) begin
+            mb_addr <= CB_A + 14'd6; d_ph <= 2'd0; d_state <= D_RD1;
+          end else if (d_tmo >= 26'd62_000_000 - 26'd1) begin
+            d_timeout <= 1'b1;
+            mb_addr <= CB_A + 14'd6; d_ph <= 2'd0; d_state <= D_RD1;
+          end else if (d_tmo[5:0] == 6'd63) d_state <= D_POLL;
+        end
+        // collect E, F, B0..B3 (two-cycle BRAM reads)
+        D_RD1: begin d_ph <= 2'd1; d_state <= D_RD2; end
+        D_RD2: begin
+          case (d_idx[2:0])
+            3'd0: v_e  <= mb_q;
+            3'd1: v_f  <= mb_q;
+            3'd2: v_b0 <= mb_q;
+            3'd3: v_b1 <= mb_q;
+            3'd4: v_b2 <= mb_q;
+            default: v_b3 <= mb_q;
+          endcase
+          if (d_idx[2:0] == 3'd5) begin
+            d_idx <= 11'd0; d_sum <= 16'd0;
+            mb_addr <= TGT_A; d_state <= D_CKS; d_ph <= 2'd0;
+          end else begin
+            d_idx <= d_idx + 11'd1;
+            case (d_idx[2:0])
+              3'd0: mb_addr <= CB_A + 14'd7;
+              3'd1: mb_addr <= TGT_A;
+              3'd2: mb_addr <= TGT_A + 14'd1;
+              3'd3: mb_addr <= TGT_A + 14'd2;
+              default: mb_addr <= TGT_A + 14'd3;
+            endcase
+            d_state <= D_RD1;
+          end
+        end
+        // checksum all 1024 transferred words (pipelined 2-phase read)
+        D_CKS: begin
+          if (d_ph == 2'd0) d_ph <= 2'd1;
+          else begin
+            d_ph  <= 2'd0;
+            d_sum <= d_sum + mb_q;
+            d_idx <= d_idx + 11'd1;
+            mb_addr <= TGT_A + d_idx[9:0] + 14'd1;
+            if (d_idx == 11'd1023) begin
+              d_state <= D_PRINT;
+            end
+          end
+        end
+        D_PRINT: begin
+          v_c   <= d_sum;
+          pr_go <= 1'b1;
+          d_state <= D_GAP; d_delay <= 28'd0;
+        end
+        D_GAP: begin
+          if (pr_done) d_delay <= d_delay + 28'd1;
+          if (d_delay >= GAP_TICKS) begin
+            d_idx <= 11'd0; d_state <= D_SEED;
+          end
+        end
+        default: d_state <= D_WAIT;
+      endcase
+    end
+  end
+
+  wire pass = !d_timeout && (v_e[14:9] == 6'd0) &&
+              (v_b0 == 16'o000060) && (v_c == GOLDEN);
+
+  /*********************************************
+  *  UART printer, 9600 8N1                    *
+  *  S ssssss E eeeeee F ffffff B b0 b1 b2 b3  *
+  *  C cccccc P|F|T                            *
+  **********************************************/
+  wire       tx_busy;
+  reg  [7:0] tx_data = 8'd0;
+  reg        tx_valid = 1'b0;
+  uart_tx #(.DELAY_FRAMES(UART_DIV)) u_tx (
+      .clk(clk_cpu), .rst_n(rst_cpu_n),
+      .tx_data(tx_data), .tx_valid(tx_valid), .tx_busy(tx_busy),
+      .txd(uart_txd)
+  );
+
+  reg [2:0] pr_f = 3'd0;
+  reg [3:0] pr_p = 4'd0;    // 0 prefix, 1..6 digits, 7 trailing space
+  reg [1:0] pr_tail = 2'd0;
+  reg       pr_run = 1'b0, pr_end = 1'b0;
+  assign pr_done = !pr_run && !pr_go;
+
+  // field f = prefix char + 6 octal digits + trailing space
+  reg [15:0] pv;
+  always @(*) begin
+    case (pr_f)
+      3'd0: pv = v_s;  3'd1: pv = v_e;  3'd2: pv = v_f;
+      3'd3: pv = v_b0; 3'd4: pv = v_b1; 3'd5: pv = v_b2;
+      3'd6: pv = v_b3; default: pv = v_c;
+    endcase
+  end
+  reg [7:0] pfx;
+  always @(*) begin
+    case (pr_f)
+      3'd0: pfx = "S"; 3'd1: pfx = "E"; 3'd2: pfx = "F"; 3'd3: pfx = "B";
+      3'd7: pfx = "C"; default: pfx = " ";
+    endcase
+  end
+
+  reg [7:0] pr_ch;
+  always @(*) begin
+    if (pr_end) begin
+      case (pr_tail)
+        2'd0: pr_ch = d_timeout ? "T" : (pass ? "P" : "F");
+        2'd1: pr_ch = 8'h0D;
+        default: pr_ch = 8'h0A;
+      endcase
+    end else if (pr_p == 4'd0) pr_ch = pfx;
+    else if (pr_p == 4'd7) pr_ch = " ";
+    else begin
+      case (pr_p)
+        4'd1: pr_ch = 8'h30 + {5'd0, pv[15]};
+        4'd2: pr_ch = 8'h30 + {4'd0, pv[14:12]};
+        4'd3: pr_ch = 8'h30 + {4'd0, pv[11:9]};
+        4'd4: pr_ch = 8'h30 + {4'd0, pv[8:6]};
+        4'd5: pr_ch = 8'h30 + {4'd0, pv[5:3]};
+        default: pr_ch = 8'h30 + {4'd0, pv[2:0]};
+      endcase
+    end
+  end
+
+  always @(posedge clk_cpu or negedge rst_cpu_n) begin
+    if (!rst_cpu_n) begin
+      pr_run <= 1'b0; pr_end <= 1'b0; pr_f <= 3'd0; pr_p <= 4'd0;
+      pr_tail <= 2'd0; tx_valid <= 1'b0; tx_data <= 8'd0;
+    end else begin
+      tx_valid <= 1'b0;
+      if (pr_go && !pr_run) begin
+        pr_run <= 1'b1; pr_end <= 1'b0; pr_f <= 3'd0; pr_p <= 4'd0;
+        pr_tail <= 2'd0;
+      end else if (pr_run && !tx_busy && !tx_valid) begin
+        tx_data  <= pr_ch;
+        tx_valid <= 1'b1;
+        if (pr_end) begin
+          if (pr_tail == 2'd2) pr_run <= 1'b0;
+          else pr_tail <= pr_tail + 2'd1;
+        end else if (pr_p == 4'd7) begin
+          pr_p <= 4'd0;
+          if (pr_f == 3'd7) pr_end <= 1'b1;
+          else pr_f <= pr_f + 3'd1;
+        end else pr_p <= pr_p + 4'd1;
+      end
+    end
+  end
+
+  assign st_pass    = pass;
+  assign st_timeout = d_timeout;
+  assign st_idle    = (d_state == D_GAP);
+
+  /* verilator lint_off UNUSEDSIGNAL */
+  wire _core_unused = &{1'b0, bd_bus_n[23:16], c_dma_busy, ma_q, 1'b0};
+  /* verilator lint_on UNUSEDSIGNAL */
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

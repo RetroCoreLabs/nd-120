@@ -14,6 +14,16 @@ Source: `Verilog/fpga/mister/rtl/nd120_storage_probe.v`
 
 ![nd120_storage_probe symbol](nd120_storage_probe.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd120_storage_probe schematic](nd120_storage_probe.svg)](nd120_storage_probe.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 nd120_storage_probe.v - storage mount + Winchester activity, on the
@@ -59,3 +69,165 @@ DIAGNOSTIC SCAFFOLDING, compiled only when ND120_STORAGE_PROBE is defined.
 | output | `1` | `byte_valid` |  |
 | output | `[7:0]` | `byte_data` |  |
 | input | `1` | `byte_ready` |  |
+
+## Verilog source
+
+[`Verilog/fpga/mister/rtl/nd120_storage_probe.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/mister/rtl/nd120_storage_probe.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd120_storage_probe (150 lines)</summary>
+
+```verilog
+/*****************************************************************************
+ *  nd120_storage_probe.v - storage mount + Winchester activity, on the       *
+ *  console                                                                    *
+ *                                                                             *
+ *  WHY (02-SEP-2026). An automounted WD0 hangs on the first Winchester read   *
+ *  (R lamp stuck), while an OSD-mounted WD0 boots. Sim ruled out the RTL      *
+ *  reset CDC (test-storage-reset), so the difference is on the real ARM's     *
+ *  mount service, which only the board can show. This prints, once every two  *
+ *  seconds, exactly the two facts that separate the theories:                 *
+ *                                                                             *
+ *    STOR MNT=fwWt WDr=nnnnn WDd=nnnnn WDe=nnnnn                              *
+ *                                                                             *
+ *  MNT   the five per-slot MOUNTED flags as 0/1 (floppy0 floppy1 WD0 WD1      *
+ *        tape), so we see whether the automounted slot is actually open.      *
+ *  WDr   sticky count of WDISK_REQ rising edges  (a read/write was issued)    *
+ *  WDd   sticky count of WDISK_DONE rising edges (the backend completed one)  *
+ *  WDe   sticky count of WDISK_ERR pulses        (completed WITH an error)    *
+ *                                                                             *
+ *  If the read hangs: MNT shows whether WD0 mounted, and WDr > WDd with       *
+ *  WDe = 0 is a request that never completed - the stuck-read signature. If   *
+ *  instead WDd tracks WDr with WDe climbing, the reads complete but error.    *
+ *  Counts are OCTAL (this is an octal machine), 15-bit, 5 digits, saturating. *
+ *                                                                             *
+ *  It runs on clk_sys and samples the clk_cpu-domain seam through two flops - *
+ *  enough for a display (a torn count for one line is harmless), not a        *
+ *  synchroniser for control. It drives nothing but text, at a priority BELOW  *
+ *  the CPU's own console output (see the mux in nd120.sv), so it fills the    *
+ *  quiet the hang creates and never fights live output.                       *
+ *                                                                             *
+ *  DIAGNOSTIC SCAFFOLDING, compiled only when ND120_STORAGE_PROBE is defined. *
+ *****************************************************************************/
+`default_nettype none
+module nd120_storage_probe #(
+    parameter integer CLK_HZ = 40_000_000  //! clk_sys rate; the tick is ~2 s
+) (
+    input  wire       clk,        //! clk_sys
+    input  wire       rst_n,
+
+    input  wire [4:0] mounted,    //! per-slot MOUNTED (clk_cpu domain)
+    input  wire       wd_req,     //! WDISK_REQ  (clk_cpu)
+    input  wire       wd_done,    //! WDISK_DONE (clk_cpu)
+    input  wire       wd_err,     //! WDISK_ERR  (clk_cpu)
+
+    output reg        byte_valid,
+    output reg  [7:0] byte_data,
+    input  wire       byte_ready
+);
+  // ---- sample the clk_cpu seam through two flops ----------------------------
+  reg [4:0] s_mnt_m, s_mnt;
+  reg s_req_m, s_req, s_req_d;
+  reg s_dn_m,  s_dn,  s_dn_d;
+  reg s_er_m,  s_er,  s_er_d;
+  always @(posedge clk) begin
+    s_mnt_m <= mounted; s_mnt <= s_mnt_m;
+    s_req_m <= wd_req;  s_req <= s_req_m; s_req_d <= s_req;
+    s_dn_m  <= wd_done; s_dn  <= s_dn_m;  s_dn_d  <= s_dn;
+    s_er_m  <= wd_err;  s_er  <= s_er_m;  s_er_d  <= s_er;
+  end
+
+  // ---- sticky rising-edge counters, saturating at 15 bits -------------------
+  reg [14:0] c_req, c_dn, c_er;
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      c_req <= 0; c_dn <= 0; c_er <= 0;
+    end else begin
+      if (s_req & ~s_req_d & ~(&c_req)) c_req <= c_req + 1'b1;
+      if (s_dn  & ~s_dn_d  & ~(&c_dn )) c_dn  <= c_dn  + 1'b1;
+      if (s_er  & ~s_er_d  & ~(&c_er )) c_er  <= c_er  + 1'b1;
+    end
+  end
+
+  // ---- ~2-second tick -------------------------------------------------------
+  localparam integer TICK_MAX = (CLK_HZ * 2) - 1;
+  reg [26:0] r_tick;
+  reg        r_start;
+  always @(posedge clk) begin
+    if (!rst_n) begin r_tick <= 0; r_start <= 0; end
+    else begin
+      r_start <= 0;
+      if (r_tick == TICK_MAX[26:0]) begin r_tick <= 0; r_start <= 1; end
+      else r_tick <= r_tick + 1'b1;
+    end
+  end
+
+  // ---- one line, one character per accepted handshake -----------------------
+  localparam integer LEN = 38;
+  reg [4:0]  l_mnt;
+  reg [14:0] l_req, l_dn, l_er;
+  reg [5:0]  r_idx;   // 0..LEN-1 sending, LEN = idle
+  reg [7:0]  s_char;
+
+  function [7:0] oct(input [2:0] v); oct = 8'h30 + {5'b0, v}; endfunction
+  function [7:0] b01(input b);       b01 = b ? "1" : "0";     endfunction
+
+  always @(*) begin
+    case (r_idx)
+      6'd0:  s_char = "S";  6'd1:  s_char = "T";  6'd2:  s_char = "O";
+      6'd3:  s_char = "R";  6'd4:  s_char = " ";
+      6'd5:  s_char = "M";  6'd6:  s_char = "N";  6'd7:  s_char = "T";
+      6'd8:  s_char = "=";
+      6'd9:  s_char = b01(l_mnt[0]);   // floppy 0
+      6'd10: s_char = b01(l_mnt[1]);   // floppy 1
+      6'd11: s_char = b01(l_mnt[2]);   // WD0
+      6'd12: s_char = b01(l_mnt[3]);   // WD1
+      6'd13: s_char = b01(l_mnt[4]);   // tape
+      6'd14: s_char = " ";
+      6'd15: s_char = "W"; 6'd16: s_char = "D"; 6'd17: s_char = "r"; 6'd18: s_char = "=";
+      6'd19: s_char = oct({2'b0, l_req[14]});
+      6'd20: s_char = oct(l_req[13:11]);
+      6'd21: s_char = oct(l_req[10:8]);
+      6'd22: s_char = oct(l_req[7:5]);
+      6'd23: s_char = oct(l_req[4:2]);   // (last 2 bits dropped - 5 digits is plenty)
+      6'd24: s_char = " ";
+      6'd25: s_char = "d"; 6'd26: s_char = "=";
+      6'd27: s_char = oct({2'b0, l_dn[14]});
+      6'd28: s_char = oct(l_dn[13:11]);
+      6'd29: s_char = oct(l_dn[10:8]);
+      6'd30: s_char = oct(l_dn[7:5]);
+      6'd31: s_char = oct(l_dn[4:2]);
+      6'd32: s_char = " ";
+      6'd33: s_char = "e"; 6'd34: s_char = "=";
+      6'd35: s_char = oct({2'b0, l_er[14]});
+      6'd36: s_char = 8'h0D;
+      6'd37: s_char = 8'h0A;
+      default: s_char = " ";
+    endcase
+  end
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      byte_valid <= 0; byte_data <= 0; r_idx <= LEN;
+    end else begin
+      if (r_idx == LEN) begin
+        byte_valid <= 0;
+        if (r_start) begin
+          l_mnt <= s_mnt; l_req <= c_req; l_dn <= c_dn; l_er <= c_er;
+          r_idx <= 0;
+        end
+      end else begin
+        byte_valid <= 1;
+        byte_data  <= s_char;
+        if (byte_valid && byte_ready) begin
+          byte_valid <= 0;
+          r_idx <= r_idx + 1'b1;
+        end
+      end
+    end
+  end
+endmodule
+`default_nettype wire
+```
+
+</details>

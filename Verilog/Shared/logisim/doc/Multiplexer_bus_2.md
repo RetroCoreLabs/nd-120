@@ -19,6 +19,16 @@ Source: `Verilog/Shared/logisim/Multiplexer_bus_2.v`
 
 ![Multiplexer_bus_2 symbol](Multiplexer_bus_2.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.INTR.CNTLR.PLEXERS_1`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![Multiplexer_bus_2 schematic](Multiplexer_bus_2.svg)](Multiplexer_bus_2.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Component : Multiplexer_bus_2
@@ -31,3 +41,38 @@ Component : Multiplexer_bus_2
 | input | `[nrOfBits-1:0]` | `muxIn_1` |  |
 | input | `1` | `sel` |  |
 | output | `[nrOfBits-1:0]` | `muxOut` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/Multiplexer_bus_2.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/Multiplexer_bus_2.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of Multiplexer_bus_2 (23 lines)</summary>
+
+```verilog
+/******************************************************************************
+ **                                                                          **
+ ** Component : Multiplexer_bus_2                                            **
+ **                                                                          **
+ *****************************************************************************/
+
+module Multiplexer_bus_2( muxIn_0, muxIn_1, sel, muxOut );
+
+    // Parameters are declared here
+    parameter nrOfBits = 1;
+
+    // Inputs using the parameters in their declarations
+    input [nrOfBits-1:0] muxIn_0;
+    input [nrOfBits-1:0] muxIn_1;
+    input sel;
+
+    // Output using the parameters in its declaration
+    output [nrOfBits-1:0] muxOut;
+
+    // Logic for the 2-to-1 multiplexer bus
+    assign muxOut = (sel == 1'b0) ? muxIn_0 : muxIn_1;
+
+endmodule
+```
+
+</details>

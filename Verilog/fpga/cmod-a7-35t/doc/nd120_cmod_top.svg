@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="702.0" height="536.5" viewBox="-80.0 -80.0 702.0 536.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="702.0" height="536.5" fill="#ffffff" /><g transform="translate(328,36.5)" id="cell_$and$nd120_cmod_top.v:57$11"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$nd120_cmod_top.v:57$11" /><g /><g /><g /></g>
+<g transform="translate(328,147)" id="cell_$and$nd120_cmod_top.v:58$13"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$nd120_cmod_top.v:58$13" /><g /><g /><g /></g>
+<g transform="translate(328,212)" id="cell_$and$nd120_cmod_top.v:59$15"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$nd120_cmod_top.v:59$15" /><g /><g /><g /></g>
+<g transform="translate(155,46.5)" id="cell_$not$nd120_cmod_top.v:55$10"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$nd120_cmod_top.v:55$10" /><circle cx="23" cy="10" r="3" class="cell_$not$nd120_cmod_top.v:55$10" /><g /><g /></g>
+<g transform="translate(393,39)" id="cell_$not$nd120_cmod_top.v:57$12"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$nd120_cmod_top.v:57$12" /><circle cx="23" cy="10" r="3" class="cell_$not$nd120_cmod_top.v:57$12" /><g /><g /></g>
+<g transform="translate(393,149.5)" id="cell_$not$nd120_cmod_top.v:58$14"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$nd120_cmod_top.v:58$14" /><circle cx="23" cy="10" r="3" class="cell_$not$nd120_cmod_top.v:58$14" /><g /><g /></g>
+<g transform="translate(393,214.5)" id="cell_$not$nd120_cmod_top.v:59$16"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$nd120_cmod_top.v:59$16" /><circle cx="23" cy="10" r="3" class="cell_$not$nd120_cmod_top.v:59$16" /><g /><g /></g>
+<g transform="translate(258,46.5)" id="cell_$procdff$7383"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$7383" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$7383" /><g /><g /><g /><g /></g>
+<a href="../../../doc/ND120_TOP.md"><title>nd120 (ND120_TOP) - open its page</title><g transform="translate(155,111.5)" id="cell_nd120"><text x="15" y="-4" class="nodelabel cell_nd120">ND120_TOP</text><rect width="30" height="100" class="cell_nd120" /><g transform="translate(0,10)" id="port_nd120~btn1"><text x="-3" y="-4" class="inputPortLabel cell_nd120">btn1</text></g><g transform="translate(0,30)" id="port_nd120~btn2"><text x="-3" y="-4" class="inputPortLabel cell_nd120">btn2</text></g><g transform="translate(0,50)" id="port_nd120~btn3"><text x="-3" y="-4" class="inputPortLabel cell_nd120">btn3</text></g><g transform="translate(0,70)" id="port_nd120~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_nd120">sysclk</text></g><g transform="translate(0,90)" id="port_nd120~uartRx"><text x="-3" y="-4" class="inputPortLabel cell_nd120">uartRx</text></g><g transform="translate(30,10)" id="port_nd120~an"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_nd120">an</text></g><g transform="translate(30,30)" id="port_nd120~led"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_nd120">led</text></g><g transform="translate(30,50)" id="port_nd120~seg"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_nd120">seg</text></g><g transform="translate(30,70)" id="port_nd120~uartTx"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_nd120">uartTx</text></g></g></a>
+<g transform="translate(12,217)" id="cell_clk12"><text x="15" y="-4" class="nodelabel cell_clk12">clk12</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_clk12" /><g /></g>
+<g transform="translate(12,22)" id="cell_btn0"><text x="15" y="-4" class="nodelabel cell_btn0">btn0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_btn0" /><g /></g>
+<g transform="translate(12,87)" id="cell_btn1"><text x="15" y="-4" class="nodelabel cell_btn1">btn1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_btn1" /><g /></g>
+<g transform="translate(12,282)" id="cell_uart_txd_in"><text x="15" y="-4" class="nodelabel cell_uart_txd_in">uart_txd_in</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_uart_txd_in" /><g /></g>
+<g transform="translate(458,344.5)" id="cell_uart_rxd_out"><text x="15" y="-4" class="nodelabel cell_uart_rxd_out">uart_rxd_out</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_uart_rxd_out" /><g /></g>
+<g transform="translate(458,279.5)" id="cell_led"><text x="15" y="-4" class="nodelabel cell_led">led</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_led" /><g /></g>
+<g transform="translate(458,39)" id="cell_led0_r"><text x="15" y="-4" class="nodelabel cell_led0_r">led0_r</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_led0_r" /><g /></g>
+<g transform="translate(458,149.5)" id="cell_led0_g"><text x="15" y="-4" class="nodelabel cell_led0_g">led0_g</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_led0_g" /><g /></g>
+<g transform="translate(458,214.5)" id="cell_led0_b"><text x="15" y="-4" class="nodelabel cell_led0_b">led0_b</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_led0_b" /><g /></g>
+<g transform="translate(12,152)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(273.8,121.5)" id="cell_$split$,7,8,12,15,17,24,25,26,27,28,29,30,31,32,33,34,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">2</text></g><g transform="translate(4,30)"><text x="5" y="-4">3</text></g><g transform="translate(4,50)"><text x="5" y="-4">4</text></g><g transform="translate(4,70)"><text x="5" y="-4">0:1</text></g></g>
+<line x1="278.8" x2="298" y1="132" y2="132" class="net_12"><title>nd_led[2]</title></line>
+<line x1="298" x2="298" y1="132" y2="41.5" class="net_12"><title>nd_led[2]</title></line>
+<line x1="298" x2="328" y1="41.5" y2="41.5" class="net_12"><title>nd_led[2]</title></line>
+<line x1="288" x2="328" y1="56.5" y2="56.5" class="net_13"><title>pwm</title></line>
+<line x1="288" x2="318" y1="56.5" y2="56.5" class="net_13"><title>pwm</title></line>
+<line x1="318" x2="318" y1="56.5" y2="167" class="net_13"><title>pwm</title></line>
+<circle cx="318" cy="167" r="2" style="fill:#000" class="net_13" />
+<line x1="318" x2="328" y1="167" y2="167" class="net_13"><title>pwm</title></line>
+<line x1="288" x2="318" y1="56.5" y2="56.5" class="net_13"><title>pwm</title></line>
+<line x1="318" x2="318" y1="56.5" y2="232" class="net_13"><title>pwm</title></line>
+<line x1="318" x2="328" y1="232" y2="232" class="net_13"><title>pwm</title></line>
+<line x1="288" x2="318" y1="56.5" y2="56.5" class="net_13"><title>pwm</title></line>
+<line x1="318" x2="318" y1="56.5" y2="36.5" class="net_13"><title>pwm</title></line>
+<line x1="318" x2="108" y1="36.5" y2="36.5" class="net_13"><title>pwm</title></line>
+<line x1="108" x2="108" y1="36.5" y2="56.5" class="net_13"><title>pwm</title></line>
+<circle cx="318" cy="56.5" r="2" style="fill:#000" class="net_13" />
+<line x1="108" x2="155" y1="56.5" y2="56.5" class="net_13"><title>pwm</title></line>
+<line x1="278.8" x2="328" y1="152" y2="152" class="net_15"><title>nd_led[3]</title></line>
+<line x1="278.8" x2="308" y1="172" y2="172" class="net_17"><title>nd_led[4]</title></line>
+<line x1="308" x2="308" y1="172" y2="217" class="net_17"><title>nd_led[4]</title></line>
+<line x1="308" x2="328" y1="217" y2="217" class="net_17"><title>nd_led[4]</title></line>
+<line x1="358" x2="393" y1="49" y2="49" class="net_14" />
+<line x1="358" x2="393" y1="159.5" y2="159.5" class="net_16" />
+<line x1="358" x2="393" y1="224.5" y2="224.5" class="net_18" />
+<line x1="40" x2="233" y1="227" y2="227" class="net_2"><title>clk12</title></line>
+<line x1="233" x2="233" y1="227" y2="76.5" class="net_2"><title>clk12</title></line>
+<line x1="233" x2="258" y1="76.5" y2="76.5" class="net_2"><title>clk12</title></line>
+<line x1="40" x2="88" y1="227" y2="227" class="net_2"><title>clk12</title></line>
+<line x1="88" x2="88" y1="227" y2="182" class="net_2"><title>clk12</title></line>
+<circle cx="88" cy="227" r="2" style="fill:#000" class="net_2" />
+<line x1="88" x2="155" y1="182" y2="182" class="net_2"><title>clk12</title></line>
+<line x1="180" x2="258" y1="56.5" y2="56.5" class="net_19" />
+<line x1="40" x2="98" y1="32" y2="32" class="net_3"><title>btn0</title></line>
+<line x1="98" x2="98" y1="32" y2="122" class="net_3"><title>btn0</title></line>
+<line x1="98" x2="155" y1="122" y2="122" class="net_3"><title>btn0</title></line>
+<line x1="40" x2="88" y1="97" y2="97" class="net_4"><title>btn1</title></line>
+<line x1="88" x2="88" y1="97" y2="142" class="net_4"><title>btn1</title></line>
+<line x1="88" x2="155" y1="142" y2="142" class="net_4"><title>btn1</title></line>
+<line x1="42" x2="155" y1="162" y2="162" class="net_42" />
+<line x1="40" x2="98" y1="292" y2="292" class="net_5"><title>uart_txd_in</title></line>
+<line x1="98" x2="98" y1="292" y2="202" class="net_5"><title>uart_txd_in</title></line>
+<line x1="98" x2="155" y1="202" y2="202" class="net_5"><title>uart_txd_in</title></line>
+<line x1="186" x2="243" y1="182" y2="182" class="net_6"><title>uart_rxd_out</title></line>
+<line x1="243" x2="243" y1="182" y2="354.5" class="net_6"><title>uart_rxd_out</title></line>
+<line x1="243" x2="458" y1="354.5" y2="354.5" class="net_6"><title>uart_rxd_out</title></line>
+<line x1="278.8" x2="298" y1="192" y2="192" class="net_7,8"><title>led</title></line>
+<line x1="298" x2="298" y1="192" y2="289.5" class="net_7,8"><title>led</title></line>
+<line x1="298" x2="458" y1="289.5" y2="289.5" class="net_7,8"><title>led</title></line>
+<line x1="418" x2="458" y1="49" y2="49" class="net_9"><title>led0_r</title></line>
+<line x1="418" x2="458" y1="159.5" y2="159.5" class="net_10"><title>led0_g</title></line>
+<line x1="418" x2="458" y1="224.5" y2="224.5" class="net_11"><title>led0_b</title></line>
+<line x1="186" x2="273.8" y1="142" y2="142" class="net_7,8,12,15,17,24,25,26,27,28,29,30,31,32,33,34"><title>nd_led</title></line>
+<text x="421.0" y="156.5" class="netlabel">led0_g</text>
+<text x="421.0" y="221.5" class="netlabel">led0_b</text>
+<text x="301.0" y="38.5" class="netlabel">nd_led[2]</text>
+<text x="111.0" y="33.5" class="netlabel">pwm</text>
+<text x="281.8" y="149.0" class="netlabel">nd_led[3]</text>
+<text x="281.8" y="169.0" class="netlabel">nd_led[4]</text>
+<text x="43.0" y="224.0" class="netlabel">clk12</text>
+<text x="43.0" y="29.0" class="netlabel">btn0</text>
+<text x="91.0" y="139.0" class="netlabel">btn1</text>
+<text x="43.0" y="289.0" class="netlabel">uart_txd_in</text>
+<text x="246.0" y="351.5" class="netlabel">uart_rxd_out</text>
+<text x="301.0" y="286.5" class="netlabel">led</text>
+<text x="189.0" y="139.0" class="netlabel">nd_led</text>
+<text x="421.0" y="46.0" class="netlabel">led0_r</text>
+</svg>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="481.0" height="289.0" viewBox="-80.0 -80.0 481.0 289.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="481.0" height="289.0" fill="#ffffff" /><g transform="translate(82.66666666666667,27)" id="cell_$add$FullAdder.v:43$1"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$add$FullAdder.v:43$1" /><line x1="7.5" x2="17.5" y1="12.5" y2="12.5" class="cell_$add$FullAdder.v:43$1" /><line x1="12.5" x2="12.5" y1="7.5" y2="17.5" class="cell_$add$FullAdder.v:43$1" /><g /><g /><g /></g>
+<g transform="translate(154,34.5)" id="cell_$add$FullAdder.v:43$2"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$add$FullAdder.v:43$2" /><line x1="7.5" x2="17.5" y1="12.5" y2="12.5" class="cell_$add$FullAdder.v:43$2" /><line x1="12.5" x2="12.5" y1="7.5" y2="17.5" class="cell_$add$FullAdder.v:43$2" /><g /><g /><g /></g>
+<g transform="translate(77,97)" id="cell_carryIn"><text x="15" y="-4" class="nodelabel cell_carryIn">carryIn</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_carryIn" /><g /></g>
+<g transform="translate(261,27)" id="cell_carryOut"><text x="15" y="-4" class="nodelabel cell_carryOut">carryOut</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_carryOut" /><g /></g>
+<g transform="translate(12,22)" id="cell_dataA"><text x="15" y="-4" class="nodelabel cell_dataA">dataA</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_dataA" /><g /></g>
+<g transform="translate(12,87)" id="cell_dataB"><text x="15" y="-4" class="nodelabel cell_dataB">dataB</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_dataB" /><g /></g>
+<g transform="translate(261,92)" id="cell_result"><text x="15" y="-4" class="nodelabel cell_result">result</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_result" /><g /></g>
+<g transform="translate(214,26.5)" id="cell_$split$,6,3,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">1</text></g><g transform="translate(4,30)"><text x="5" y="-4">0</text></g></g>
+<line x1="40" x2="85.66666666666667" y1="32" y2="32" class="net_4"><title>dataA</title></line>
+<line x1="40" x2="52" y1="97" y2="97" class="net_5"><title>dataB</title></line>
+<line x1="52" x2="52" y1="97" y2="47" class="net_5"><title>dataB</title></line>
+<line x1="52" x2="85.66666666666667" y1="47" y2="47" class="net_5"><title>dataB</title></line>
+<line x1="107.66666666666667" x2="157" y1="39.5" y2="39.5" class="net_7,8" />
+<line x1="105" x2="129" y1="107" y2="107" class="net_2"><title>carryIn</title></line>
+<line x1="129" x2="129" y1="107" y2="54.5" class="net_2"><title>carryIn</title></line>
+<line x1="129" x2="157" y1="54.5" y2="54.5" class="net_2"><title>carryIn</title></line>
+<line x1="219" x2="261" y1="37" y2="37" class="net_3"><title>carryOut</title></line>
+<line x1="219" x2="236" y1="57" y2="57" class="net_6"><title>result</title></line>
+<line x1="236" x2="236" y1="57" y2="102" class="net_6"><title>result</title></line>
+<line x1="236" x2="261" y1="102" y2="102" class="net_6"><title>result</title></line>
+<line x1="179" x2="214" y1="47" y2="47" class="net_6,3" />
+<text x="132.0" y="51.5" class="netlabel">carryIn</text>
+<text x="222.0" y="34.0" class="netlabel">carryOut</text>
+<text x="43.0" y="29.0" class="netlabel">dataA</text>
+<text x="55.0" y="44.0" class="netlabel">dataB</text>
+<text x="239.0" y="99.0" class="netlabel">result</text>
+</svg>

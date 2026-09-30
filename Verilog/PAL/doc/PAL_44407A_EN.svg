@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="995.0" height="496.0" viewBox="-80.0 -80.0 995.0 496.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="995.0" height="496.0" fill="#ffffff" /><g transform="translate(142,69)" id="cell_$and$PAL_44407A_EN.v:70$9785"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$PAL_44407A_EN.v:70$9785" /><g /><g /><g /></g>
+<g transform="translate(207,76.5)" id="cell_$and$PAL_44407A_EN.v:70$9786"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$PAL_44407A_EN.v:70$9786" /><g /><g /><g /></g>
+<g transform="translate(272,84)" id="cell_$and$PAL_44407A_EN.v:70$9787"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$PAL_44407A_EN.v:70$9787" /><g /><g /><g /></g>
+<g transform="translate(337,91.5)" id="cell_$and$PAL_44407A_EN.v:70$9788"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$PAL_44407A_EN.v:70$9788" /><g /><g /><g /></g>
+<g transform="translate(402,99)" id="cell_$and$PAL_44407A_EN.v:70$9789"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$PAL_44407A_EN.v:70$9789" /><g /><g /><g /></g>
+<g transform="translate(77,119)" id="cell_$not$PAL_44407A_EN.v:56$9781"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$PAL_44407A_EN.v:56$9781" /><circle cx="23" cy="10" r="3" class="cell_$not$PAL_44407A_EN.v:56$9781" /><g /><g /></g>
+<g transform="translate(142,184)" id="cell_$not$PAL_44407A_EN.v:57$9782"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$PAL_44407A_EN.v:57$9782" /><circle cx="23" cy="10" r="3" class="cell_$not$PAL_44407A_EN.v:57$9782" /><g /><g /></g>
+<g transform="translate(272,211.5)" id="cell_$not$PAL_44407A_EN.v:58$9783"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$PAL_44407A_EN.v:58$9783" /><circle cx="23" cy="10" r="3" class="cell_$not$PAL_44407A_EN.v:58$9783" /><g /><g /></g>
+<g transform="translate(668,91.5)" id="cell_$not$PAL_44407A_EN.v:77$9790"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$PAL_44407A_EN.v:77$9790" /><circle cx="23" cy="10" r="3" class="cell_$not$PAL_44407A_EN.v:77$9790" /><g /><g /></g>
+<g transform="translate(668,296.5)" id="cell_$not$PAL_44407A_EN.v:81$9793"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$PAL_44407A_EN.v:81$9793" /><circle cx="23" cy="10" r="3" class="cell_$not$PAL_44407A_EN.v:81$9793" /><g /><g /></g>
+<g transform="translate(603,294)" id="cell_$or$PAL_44407A_EN.v:81$9792"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$PAL_44407A_EN.v:81$9792" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$PAL_44407A_EN.v:81$9792" /><g /><g /><g /></g>
+<g transform="translate(538,91.5)" id="cell_$procdff$37264"><rect width="30" height="40" x="0" y="0" class="cell_$procdff$37264" /><path d="M0,35 L5,30 L0,25" class="cell_$procdff$37264" /><g /><g /><g /><g /></g>
+<g transform="translate(475.6666666666667,81.5)" id="cell_$procmux$11185"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$11185" /><g /><g /><g /><g /></g>
+<g transform="translate(738,91.5)" id="cell_$ternary$PAL_44407A_EN.v:77$9791"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$PAL_44407A_EN.v:77$9791" /><g /><g /><g /><g /></g>
+<g transform="translate(738,156.5)" id="cell_$ternary$PAL_44407A_EN.v:81$9794"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$PAL_44407A_EN.v:81$9794" /><g /><g /><g /><g /></g>
+<g transform="translate(467,199)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(402,169)" id="cell_EN"><text x="15" y="-4" class="nodelabel cell_EN">EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EN" /><g /></g>
+<g transform="translate(12,22)" id="cell_CK"><text x="15" y="-4" class="nodelabel cell_CK">CK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CK" /><g /></g>
+<g transform="translate(668,241.5)" id="cell_OE_n"><text x="15" y="-4" class="nodelabel cell_OE_n">OE_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_OE_n" /><g /></g>
+<g transform="translate(337,161.5)" id="cell_IDBS0"><text x="15" y="-4" class="nodelabel cell_IDBS0">IDBS0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IDBS0" /><g /></g>
+<g transform="translate(207,211.5)" id="cell_IDBS1"><text x="15" y="-4" class="nodelabel cell_IDBS1">IDBS1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IDBS1" /><g /></g>
+<g transform="translate(207,146.5)" id="cell_IDBS2"><text x="15" y="-4" class="nodelabel cell_IDBS2">IDBS2</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IDBS2" /><g /></g>
+<g transform="translate(77,184)" id="cell_IDBS3"><text x="15" y="-4" class="nodelabel cell_IDBS3">IDBS3</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IDBS3" /><g /></g>
+<g transform="translate(12,119)" id="cell_IDBS4"><text x="15" y="-4" class="nodelabel cell_IDBS4">IDBS4</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IDBS4" /><g /></g>
+<g transform="translate(538,304)" id="cell_WRTRF"><text x="15" y="-4" class="nodelabel cell_WRTRF">WRTRF</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WRTRF" /><g /></g>
+<g transform="translate(77,64)" id="cell_LCS_n"><text x="15" y="-4" class="nodelabel cell_LCS_n">LCS_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LCS_n" /><g /></g>
+<g transform="translate(793,166.5)" id="cell_ERF_n"><text x="15" y="-4" class="nodelabel cell_ERF_n">ERF_n</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_ERF_n" /><g /></g>
+<g transform="translate(793,101.5)" id="cell_RRF_n"><text x="15" y="-4" class="nodelabel cell_RRF_n">RRF_n</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_RRF_n" /><g /></g>
+<g transform="translate(668,176.5)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<line x1="105" x2="142" y1="74" y2="74" class="net_12"><title>LCS_n</title></line>
+<line x1="102" x2="117" y1="129" y2="129" class="net_15"><title>gen_enable.IDBS4_n</title></line>
+<line x1="117" x2="117" y1="129" y2="89" class="net_15"><title>gen_enable.IDBS4_n</title></line>
+<line x1="117" x2="142" y1="89" y2="89" class="net_15"><title>gen_enable.IDBS4_n</title></line>
+<line x1="172" x2="207" y1="81.5" y2="81.5" class="net_16" />
+<line x1="167" x2="182" y1="194" y2="194" class="net_17"><title>gen_enable.IDBS3_n</title></line>
+<line x1="182" x2="182" y1="194" y2="96.5" class="net_17"><title>gen_enable.IDBS3_n</title></line>
+<line x1="182" x2="207" y1="96.5" y2="96.5" class="net_17"><title>gen_enable.IDBS3_n</title></line>
+<line x1="237" x2="272" y1="89" y2="89" class="net_18" />
+<line x1="235" x2="247" y1="156.5" y2="156.5" class="net_8"><title>IDBS2</title></line>
+<line x1="247" x2="247" y1="156.5" y2="104" class="net_8"><title>IDBS2</title></line>
+<line x1="247" x2="272" y1="104" y2="104" class="net_8"><title>IDBS2</title></line>
+<line x1="302" x2="337" y1="96.5" y2="96.5" class="net_19" />
+<line x1="297" x2="312" y1="221.5" y2="221.5" class="net_20"><title>gen_enable.IDBS1_n</title></line>
+<line x1="312" x2="312" y1="221.5" y2="111.5" class="net_20"><title>gen_enable.IDBS1_n</title></line>
+<line x1="312" x2="337" y1="111.5" y2="111.5" class="net_20"><title>gen_enable.IDBS1_n</title></line>
+<line x1="367" x2="402" y1="104" y2="104" class="net_21" />
+<line x1="365" x2="377" y1="171.5" y2="171.5" class="net_6"><title>IDBS0</title></line>
+<line x1="377" x2="377" y1="171.5" y2="119" class="net_6"><title>IDBS0</title></line>
+<line x1="377" x2="402" y1="119" y2="119" class="net_6"><title>IDBS0</title></line>
+<line x1="40" x2="77" y1="129" y2="129" class="net_10"><title>IDBS4</title></line>
+<line x1="105" x2="142" y1="194" y2="194" class="net_9"><title>IDBS3</title></line>
+<line x1="235" x2="272" y1="221.5" y2="221.5" class="net_7"><title>IDBS1</title></line>
+<line x1="568" x2="668" y1="101.5" y2="101.5" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<line x1="568" x2="578" y1="101.5" y2="101.5" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<line x1="578" x2="578" y1="101.5" y2="299" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<line x1="578" x2="606" y1="299" y2="299" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<line x1="568" x2="578" y1="101.5" y2="101.5" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<line x1="578" x2="578" y1="101.5" y2="71.5" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<line x1="578" x2="442" y1="71.5" y2="71.5" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<line x1="442" x2="442" y1="71.5" y2="91.5" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<circle cx="578" cy="101.5" r="2" style="fill:#000" class="net_23" />
+<line x1="442" x2="475.6666666666667" y1="91.5" y2="91.5" class="net_23"><title>gen_enable.RRF_reg</title></line>
+<line x1="633" x2="668" y1="306.5" y2="306.5" class="net_25" />
+<line x1="566" x2="606" y1="314" y2="314" class="net_11"><title>WRTRF</title></line>
+<line x1="495" x2="513" y1="209" y2="209" class="net_2"><title>sysclk</title></line>
+<line x1="513" x2="513" y1="209" y2="121.5" class="net_2"><title>sysclk</title></line>
+<line x1="513" x2="538" y1="121.5" y2="121.5" class="net_2"><title>sysclk</title></line>
+<line x1="495.6666666666667" x2="538" y1="101.5" y2="101.5" class="net_27" />
+<line x1="432" x2="475.6666666666667" y1="111.5" y2="111.5" class="net_22" />
+<line x1="430" x2="485.6666666666667" y1="179" y2="179" class="net_3"><title>EN</title></line>
+<line x1="485.6666666666667" x2="485.6666666666667" y1="179" y2="116.5" class="net_3"><title>EN</title></line>
+<line x1="693" x2="738" y1="101.5" y2="101.5" class="net_24" />
+<line x1="698" x2="708" y1="186.5" y2="186.5" class="net_28" />
+<line x1="708" x2="708" y1="186.5" y2="121.5" class="net_28" />
+<circle cx="708" cy="186.5" r="2" style="fill:#000" class="net_28" />
+<line x1="708" x2="738" y1="121.5" y2="121.5" class="net_28" />
+<line x1="698" x2="738" y1="186.5" y2="186.5" class="net_28" />
+<line x1="696" x2="718" y1="251.5" y2="251.5" class="net_5"><title>OE_n</title></line>
+<line x1="718" x2="718" y1="251.5" y2="146.5" class="net_5"><title>OE_n</title></line>
+<line x1="718" x2="748" y1="146.5" y2="146.5" class="net_5"><title>OE_n</title></line>
+<circle cx="718" cy="251.5" r="2" style="fill:#000" class="net_5" />
+<line x1="748" x2="748" y1="146.5" y2="126.5" class="net_5"><title>OE_n</title></line>
+<line x1="696" x2="748" y1="251.5" y2="251.5" class="net_5"><title>OE_n</title></line>
+<line x1="748" x2="748" y1="251.5" y2="191.5" class="net_5"><title>OE_n</title></line>
+<line x1="693" x2="728" y1="306.5" y2="306.5" class="net_26" />
+<line x1="728" x2="728" y1="306.5" y2="166.5" class="net_26" />
+<line x1="728" x2="738" y1="166.5" y2="166.5" class="net_26" />
+<line x1="758" x2="793" y1="176.5" y2="176.5" class="net_13"><title>ERF_n</title></line>
+<line x1="758" x2="793" y1="111.5" y2="111.5" class="net_14"><title>RRF_n</title></line>
+<text x="43.0" y="126.0" class="netlabel">IDBS4</text>
+<text x="569.0" y="311.0" class="netlabel">WRTRF</text>
+<text x="108.0" y="71.0" class="netlabel">LCS_n</text>
+<text x="761.0" y="173.5" class="netlabel">ERF_n</text>
+<text x="761.0" y="108.5" class="netlabel">RRF_n</text>
+<text x="120.0" y="86.0" class="netlabel">gen_enable.IDBS4_n</text>
+<text x="185.0" y="93.5" class="netlabel">gen_enable.IDBS3_n</text>
+<text x="516.0" y="118.5" class="netlabel">sysclk</text>
+<text x="315.0" y="108.5" class="netlabel">gen_enable.IDBS1_n</text>
+<text x="445.0" y="68.5" class="netlabel">gen_enable.RRF_reg</text>
+<text x="433.0" y="176.0" class="netlabel">EN</text>
+<text x="699.0" y="248.5" class="netlabel">OE_n</text>
+<text x="380.0" y="116.0" class="netlabel">IDBS0</text>
+<text x="238.0" y="218.5" class="netlabel">IDBS1</text>
+<text x="250.0" y="101.0" class="netlabel">IDBS2</text>
+<text x="108.0" y="191.0" class="netlabel">IDBS3</text>
+</svg>

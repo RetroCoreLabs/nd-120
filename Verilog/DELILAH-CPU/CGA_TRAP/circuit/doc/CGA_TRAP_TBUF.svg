@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="724.0" height="535.0" viewBox="-80.0 -80.0 724.0 535.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="724.0" height="535.0" fill="#ffffff" /><g transform="translate(255,64)" id="cell_$not$CGA_TRAP_TBUF.v:106$10288"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:106$10288" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:106$10288" /><g /><g /></g>
+<g transform="translate(77,129)" id="cell_$not$CGA_TRAP_TBUF.v:108$10290"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:108$10290" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:108$10290" /><g /><g /></g>
+<g transform="translate(427,22)" id="cell_$not$CGA_TRAP_TBUF.v:109$10291"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:109$10291" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:109$10291" /><g /><g /></g>
+<g transform="translate(89,171)" id="cell_$not$CGA_TRAP_TBUF.v:111$10292"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:111$10292" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:111$10292" /><g /><g /></g>
+<g transform="translate(154,236)" id="cell_$not$CGA_TRAP_TBUF.v:112$10293"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:112$10293" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:112$10293" /><g /><g /></g>
+<g transform="translate(89,278)" id="cell_$not$CGA_TRAP_TBUF.v:114$10294"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:114$10294" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:114$10294" /><g /><g /></g>
+<g transform="translate(154,278)" id="cell_$not$CGA_TRAP_TBUF.v:115$10295"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:115$10295" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:115$10295" /><g /><g /></g>
+<g transform="translate(445,64)" id="cell_$not$CGA_TRAP_TBUF.v:118$10297"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:118$10297" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:118$10297" /><g /><g /></g>
+<g transform="translate(77,22)" id="cell_$not$CGA_TRAP_TBUF.v:119$10298"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:119$10298" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:119$10298" /><g /><g /></g>
+<g transform="translate(249,22)" id="cell_$not$CGA_TRAP_TBUF.v:120$10299"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_TRAP_TBUF.v:120$10299" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_TRAP_TBUF.v:120$10299" /><g /><g /></g>
+<g transform="translate(184,64)" id="cell_FETCHN"><text x="15" y="-4" class="nodelabel cell_FETCHN">FETCHN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FETCHN" /><g /></g>
+<g transform="translate(12,64)" id="cell_INDN"><text x="15" y="-4" class="nodelabel cell_INDN">INDN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_INDN" /><g /></g>
+<g transform="translate(356,22)" id="cell_INTRQN"><text x="15" y="-4" class="nodelabel cell_INTRQN">INTRQN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_INTRQN" /><g /></g>
+<g transform="translate(12,22)" id="cell_PANN"><text x="15" y="-4" class="nodelabel cell_PANN">PANN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PANN" /><g /></g>
+<g transform="translate(12,171)" id="cell_PCR_1_0"><text x="15" y="-4" class="nodelabel cell_PCR_1_0">PCR_1_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PCR_1_0" /><g /></g>
+<g transform="translate(12,278)" id="cell_PT_15_9"><text x="15" y="-4" class="nodelabel cell_PT_15_9">PT_15_9</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PT_15_9" /><g /></g>
+<g transform="translate(184,22)" id="cell_VACCN"><text x="15" y="-4" class="nodelabel cell_VACCN">VACCN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_VACCN" /><g /></g>
+<g transform="translate(374,64)" id="cell_WRITEN"><text x="15" y="-4" class="nodelabel cell_WRITEN">WRITEN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WRITEN" /><g /></g>
+<g transform="translate(320,64)" id="cell_IFETCH"><text x="15" y="-4" class="nodelabel cell_IFETCH">IFETCH</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IFETCH" /><g /></g>
+<g transform="translate(320,129)" id="cell_IFETCHN"><text x="15" y="-4" class="nodelabel cell_IFETCHN">IFETCHN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IFETCHN" /><g /></g>
+<g transform="translate(142,129)" id="cell_IIND"><text x="15" y="-4" class="nodelabel cell_IIND">IIND</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IIND" /><g /></g>
+<g transform="translate(142,64)" id="cell_IINDN"><text x="15" y="-4" class="nodelabel cell_IINDN">IINDN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IINDN" /><g /></g>
+<g transform="translate(492,22)" id="cell_INTRQ"><text x="15" y="-4" class="nodelabel cell_INTRQ">INTRQ</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_INTRQ" /><g /></g>
+<g transform="translate(219,236)" id="cell_IPCR_1_0"><text x="15" y="-4" class="nodelabel cell_IPCR_1_0">IPCR_1_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IPCR_1_0" /><g /></g>
+<g transform="translate(219,171)" id="cell_IPCR_1_0_N"><text x="15" y="-4" class="nodelabel cell_IPCR_1_0_N">IPCR_1_0_N</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IPCR_1_0_N" /><g /></g>
+<g transform="translate(219,278)" id="cell_IPT_15_9"><text x="15" y="-4" class="nodelabel cell_IPT_15_9">IPT_15_9</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IPT_15_9" /><g /></g>
+<g transform="translate(219,343)" id="cell_IPT_15_9_N"><text x="15" y="-4" class="nodelabel cell_IPT_15_9_N">IPT_15_9_N</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IPT_15_9_N" /><g /></g>
+<g transform="translate(510,64)" id="cell_IWRITE"><text x="15" y="-4" class="nodelabel cell_IWRITE">IWRITE</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IWRITE" /><g /></g>
+<g transform="translate(510,129)" id="cell_IWRITEN"><text x="15" y="-4" class="nodelabel cell_IWRITEN">IWRITEN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IWRITEN" /><g /></g>
+<g transform="translate(142,22)" id="cell_PAN"><text x="15" y="-4" class="nodelabel cell_PAN">PAN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PAN" /><g /></g>
+<g transform="translate(314,22)" id="cell_VACC"><text x="15" y="-4" class="nodelabel cell_VACC">VACC</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_VACC" /><g /></g>
+<line x1="212" x2="255" y1="74" y2="74" class="net_2"><title>IFETCHN</title></line>
+<line x1="212" x2="230" y1="74" y2="74" class="net_2"><title>IFETCHN</title></line>
+<line x1="230" x2="230" y1="74" y2="139" class="net_2"><title>IFETCHN</title></line>
+<circle cx="230" cy="74" r="2" style="fill:#000" class="net_2" />
+<line x1="230" x2="320" y1="139" y2="139" class="net_2"><title>IFETCHN</title></line>
+<line x1="40" x2="52" y1="74" y2="74" class="net_3"><title>INDN</title></line>
+<line x1="52" x2="52" y1="74" y2="139" class="net_3"><title>INDN</title></line>
+<circle cx="52" cy="74" r="2" style="fill:#000" class="net_3" />
+<line x1="52" x2="77" y1="139" y2="139" class="net_3"><title>INDN</title></line>
+<line x1="40" x2="142" y1="74" y2="74" class="net_3"><title>INDN</title></line>
+<line x1="384" x2="427" y1="32" y2="32" class="net_4"><title>INTRQN</title></line>
+<line x1="40" x2="89" y1="181" y2="181" class="net_6,7"><title>PCR_1_0</title></line>
+<line x1="114" x2="129" y1="181" y2="181" class="net_22,23"><title>IPCR_1_0_N</title></line>
+<line x1="129" x2="129" y1="181" y2="246" class="net_22,23"><title>IPCR_1_0_N</title></line>
+<circle cx="129" cy="181" r="2" style="fill:#000" class="net_22,23" />
+<line x1="129" x2="154" y1="246" y2="246" class="net_22,23"><title>IPCR_1_0_N</title></line>
+<line x1="114" x2="219" y1="181" y2="181" class="net_22,23"><title>IPCR_1_0_N</title></line>
+<line x1="40" x2="89" y1="288" y2="288" class="net_8,9,10,11,12,13,14"><title>PT_15_9</title></line>
+<line x1="114" x2="154" y1="288" y2="288" class="net_31,32,33,34,35,36,37"><title>IPT_15_9_N</title></line>
+<line x1="114" x2="129" y1="288" y2="288" class="net_31,32,33,34,35,36,37"><title>IPT_15_9_N</title></line>
+<line x1="129" x2="129" y1="288" y2="353" class="net_31,32,33,34,35,36,37"><title>IPT_15_9_N</title></line>
+<circle cx="129" cy="288" r="2" style="fill:#000" class="net_31,32,33,34,35,36,37" />
+<line x1="129" x2="219" y1="353" y2="353" class="net_31,32,33,34,35,36,37"><title>IPT_15_9_N</title></line>
+<line x1="402" x2="445" y1="74" y2="74" class="net_16"><title>WRITEN</title></line>
+<line x1="402" x2="420" y1="74" y2="74" class="net_16"><title>WRITEN</title></line>
+<line x1="420" x2="420" y1="74" y2="139" class="net_16"><title>WRITEN</title></line>
+<circle cx="420" cy="74" r="2" style="fill:#000" class="net_16" />
+<line x1="420" x2="510" y1="139" y2="139" class="net_16"><title>WRITEN</title></line>
+<line x1="40" x2="77" y1="32" y2="32" class="net_5"><title>PANN</title></line>
+<line x1="212" x2="249" y1="32" y2="32" class="net_15"><title>VACCN</title></line>
+<line x1="280" x2="320" y1="74" y2="74" class="net_17"><title>IFETCH</title></line>
+<line x1="102" x2="142" y1="139" y2="139" class="net_18"><title>IIND</title></line>
+<line x1="452" x2="492" y1="32" y2="32" class="net_19"><title>INTRQ</title></line>
+<line x1="179" x2="219" y1="246" y2="246" class="net_20,21"><title>IPCR_1_0</title></line>
+<line x1="179" x2="219" y1="288" y2="288" class="net_24,25,26,27,28,29,30"><title>IPT_15_9</title></line>
+<line x1="470" x2="510" y1="74" y2="74" class="net_38"><title>IWRITE</title></line>
+<line x1="102" x2="142" y1="32" y2="32" class="net_39"><title>PAN</title></line>
+<line x1="274" x2="314" y1="32" y2="32" class="net_40"><title>VACC</title></line>
+<text x="215.0" y="29.0" class="netlabel">VACCN</text>
+<text x="423.0" y="136.0" class="netlabel">WRITEN</text>
+<text x="283.0" y="71.0" class="netlabel">IFETCH</text>
+<text x="105.0" y="136.0" class="netlabel">IIND</text>
+<text x="455.0" y="29.0" class="netlabel">INTRQ</text>
+<text x="233.0" y="136.0" class="netlabel">IFETCHN</text>
+<text x="182.0" y="243.0" class="netlabel">IPCR_1_0</text>
+<text x="117.0" y="178.0" class="netlabel">IPCR_1_0_N</text>
+<text x="182.0" y="285.0" class="netlabel">IPT_15_9</text>
+<text x="43.0" y="71.0" class="netlabel">INDN</text>
+<text x="132.0" y="350.0" class="netlabel">IPT_15_9_N</text>
+<text x="473.0" y="71.0" class="netlabel">IWRITE</text>
+<text x="105.0" y="29.0" class="netlabel">PAN</text>
+<text x="387.0" y="29.0" class="netlabel">INTRQN</text>
+<text x="277.0" y="29.0" class="netlabel">VACC</text>
+<text x="43.0" y="29.0" class="netlabel">PANN</text>
+<text x="43.0" y="178.0" class="netlabel">PCR_1_0</text>
+<text x="43.0" y="285.0" class="netlabel">PT_15_9</text>
+</svg>

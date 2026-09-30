@@ -19,6 +19,16 @@ Source: `Verilog/Shared/ndlib/MUX31LP.v`
 
 ![MUX31LP symbol](MUX31LP.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.ALU.ALU_SHIFT.RB0MUX`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![MUX31LP schematic](MUX31LP.svg)](MUX31LP.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Component : MUX31LP
@@ -33,3 +43,55 @@ Manually cleaned up from logisim generator that creates wires not used..
 | input | `1` | `D1` |  |
 | input | `1` | `D2` |  |
 | output | `1` | `ZN` |  |
+
+## Verilog source
+
+[`Verilog/Shared/ndlib/MUX31LP.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/ndlib/MUX31LP.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of MUX31LP (40 lines)</summary>
+
+```verilog
+/******************************************************************************
+ **                                                                          **
+ ** Component : MUX31LP                                                      **
+ **                                                                          **
+ ** Manually cleaned up from logisim generator that creates wires not used.. **
+ *****************************************************************************/
+
+module MUX31LP( input A,
+                input B,
+                input D0,
+                input D1,
+                input D2,
+                output ZN );
+
+   wire [1:0] s_select;
+   wire       s_d0;
+   wire       s_d1;
+   wire       s_d2;         
+
+   wire       s_muxout;   
+
+   assign s_select[0]   = A;
+   assign s_select[1]   = B;
+   assign s_d0          = D0;   
+   assign s_d1          = D1;
+   assign s_d2          = D2;
+
+   assign ZN = ~s_muxout;
+
+
+   Multiplexer_4   PLEXERS_1 (
+                              .muxIn_0(s_d0),
+                              .muxIn_1(s_d1),
+                              .muxIn_2(s_d2),
+                              .muxIn_3(s_d2),
+                              .muxOut(s_muxout),
+                              .sel(s_select[1:0]));
+
+
+endmodule
+```
+
+</details>

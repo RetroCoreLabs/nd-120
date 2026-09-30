@@ -19,6 +19,16 @@ Source: `Verilog/SD-FAT/circuit/sd_writer.v`
 
 ![sd_writer symbol](sd_writer.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `TAPE_SDFAT_SOURCE.u_nd_storage.u_writer`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![sd_writer schematic](sd_writer.svg)](sd_writer.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 SD sector read/write engine (single + multi-block, SD-native 1-bit)
@@ -89,3 +99,745 @@ Ronny Hansen
 | Parameter | Default |
 |---|---|
 | `CLKDIV` | `8'd1` |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/sd_writer.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/sd_writer.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of sd_writer (730 lines)</summary>
+
+```verilog
+/****************************************************************************
+** SD sector read/write engine (single + multi-block, SD-native 1-bit)    **
+**                                                                         **
+** Reads or writes sectors on an ALREADY-INITIALIZED card: the reader     **
+** (sd_reader.v) must have brought the card into the transfer state with  **
+** 512-byte block length before this module is used; the top level then   **
+** muxes the SD pins from the reader to this engine. Used for the ND-120  **
+** in-place file rewrite path (SD-FAT/README.md): data-sector writes plus **
+** the FAT/directory read-modify-writes of sd_fat_rewrite.v, and for the  **
+** CMD18/CMD25 burst speed path of the sd-fat-test menus 6/7.             **
+**                                                                         **
+** Protocol per SD Physical Layer Simplified Spec:                        **
+**   single read:  CMD17(sector) -> R1 -> DAT0: start(0)+4096 bits+CRC+end**
+**   single write: CMD24(sector) -> R1 -> Nwr gap -> DAT0: start(0)+4096  **
+**     data bits MSB-first + CRC16-CCITT + end(1) -> card CRC status      **
+**     token on DAT0 (start 0, "010" = accepted, end 1) -> card busy      **
+**     (DAT0 low) -> ready.                                               **
+**   burst read  (burst_len>1): CMD18 -> R1 -> blocks stream back-to-back **
+**     (each start+4096+CRC16+end) -> host stops with CMD12 (R1).         **
+**   burst write (burst_len>1): CMD55(RCA)+ACMD23(count) -> CMD25 -> R1   **
+**     -> per block: Nwr gap + start+4096+CRC16+end -> CRC status token   **
+**     -> busy release -> next block; burst ends with CMD12 (R1b + final  **
+**     busy). A "101"/"110" status mid-burst aborts via CMD12 and         **
+**     reports err (the caller retries).                                  **
+**                                                                         **
+** Per-block caller handshake: rd_addr/rd_data (write source) and         **
+** rx_we/rx_addr/rx_data (read sink) restart at byte 0 for every block;   **
+** block_next pulses one cycle between the blocks of a burst so the       **
+** caller advances its block context (never before block 0 - the first    **
+** block always uses the context that was valid at start). done fires     **
+** once, at burst end.                                                    **
+**                                                                         **
+** burst_len = 0 or 1 (or left unconnected) is EXACTLY the original       **
+** single-sector CMD17/CMD24 engine - nd_storage and the COPY/WRBLK1      **
+** paths use that interface unchanged.                                    **
+**                                                                         **
+** 4-bit bus mode (use_4bit=1, speed-plan rung c): every operation is     **
+** prefixed with CMD55(RCA)+ACMD6(arg 2) - the card may have been         **
+** re-initialized to 1-bit by the reader between operations, so the       **
+** switch is repeated per op (two 48-bit commands, negligible against a   **
+** sector). Data blocks then move as 1024 nibbles on DAT3..DAT0 (MSB      **
+** nibble first, DAT3 = bit 3): start nibble 0, data, 16 CRC clocks       **
+** where EACH line carries its own CRC16 over the serial bits that line   **
+** carried, end nibble F. The CRC status token and ALL busy signalling    **
+** stay on DAT0 alone (SD Physical Layer spec) - those states are shared  **
+** with the 1-bit path. use_4bit=0 (or unconnected: an x/z condition is   **
+** false) is the original 1-bit engine, bit-exact - nd_storage and the    **
+** Basys3 PMOD (DAT0-only wiring) keep working unchanged.                 **
+**                                                                         **
+** No tristates here (repo rule): the CMD/DAT drivers are exposed as      **
+** _o/_oe pairs and the single tristate lives at the board top level.     **
+** DAT1-3 are driven ONLY during the data phase of a 4-bit write (the     **
+** host never drives any DAT line during reads or status/busy).           **
+**                                                                         **
+** Burst-read block boundaries: the spec's N_AC minimum is 2 sdclk, so a  **
+** real card streams blocks nearly back-to-back. The start-bit hunt in    **
+** R_DWAIT is armed on the sdclk right after the previous end bit, and    **
+** as belt-and-braces the sdclk LOW phase is stretched a few clocks at    **
+** each boundary (host-side clock flow control, spec section 4.4 - the   **
+** card freezes while the clock is held) so no start bit can ever arrive  **
+** before the hunt is armed. A partial next block streamed by the card    **
+** before CMD12 lands is ignored by design (the FSM is in the command     **
+** states; the card releases DAT shortly after the CMD12 end bit).        **
+**                                                                         **
+** This file is ORIGINAL ND-120 project code (MIT, like the repository);  **
+** it is intentionally independent of the vendored GPL SD reader.         **
+**                                                                         **
+** Sector data is fetched through a registered read port (1-clk latency); **
+** the SD bit clock is at least two system clocks long, so the fetch      **
+** pipeline is satisfied even at CLKDIV=1 (16 clk between byte fetches).  **
+**                                                                         **
+** Last reviewed: 11-JUL-2026                                             **
+** Ronny Hansen                                                           **
+*****************************************************************************/
+
+module sd_writer #(
+    parameter [7:0]  CLKDIV       = 8'd1,         // sdclk = clk / (2*CLKDIV); 27 MHz / 2 = 13.5 MHz
+    parameter [31:0] BUSY_TIMEOUT = 32'd13_500_000 // sdclk cycles of busy before err (~1 s at 13.5 MHz)
+) (
+    input wire clk,
+    input wire rst_n,
+
+    // SD pins (muxed onto the card at the top level while writing)
+    output reg  sd_clk_o,
+    input  wire sd_cmd_i,
+    output reg  sd_cmd_o,
+    output reg  sd_cmd_oe,
+    input  wire sd_dat0_i,
+    output reg  sd_dat0_o,
+    output reg  sd_dat0_oe,
+
+    // DAT1-3 (4-bit bus mode only; unused/undriven when use_4bit=0)
+    input  wire sd_dat1_i,
+    output reg  sd_dat1_o,
+    output reg  sd_dat1_oe,
+    input  wire sd_dat2_i,
+    output reg  sd_dat2_o,
+    output reg  sd_dat2_oe,
+    input  wire sd_dat3_i,
+    output reg  sd_dat3_o,
+    output reg  sd_dat3_oe,
+
+    // 1 = 4-bit bus; 0/unconnected = original 1-bit
+    input  wire use_4bit,
+    // 1 = the card has NOT been re-initialised since the last successful
+    // ACMD6, so a negotiated 4-bit width still stands and this operation may
+    // skip the CMD55+ACMD6 prefix. Drive it low whenever anything else can
+    // re-init the card (a mount, a card swap): CMD0 returns the card to
+    // 1-bit and the width has to be negotiated again.
+    // UNCONNECTED IS SAFE: z reads as false, so every operation re-issues
+    // the prefix - exactly the behaviour before this input existed.
+    input  wire width_hold,
+
+    // command interface
+    input  wire        start,    // 1-cycle pulse; only when busy=0
+    input  wire        rd_mode,  // 0 = write sectors (CMD24/CMD25), 1 = read (CMD17/CMD18)
+    input  wire [31:0] sector,   // SDHC sector number (first sector of a burst)
+    output wire        busy,
+    output reg         done,     // 1-cycle pulse: transfer finished OK
+    output reg         err,      // 1-cycle pulse: timeout or CRC status rejected
+
+    // burst interface (leave unconnected / 0 / 1 for the single-sector path)
+    input  wire [8:0]  burst_len,  // blocks in the burst; >1 = CMD18/CMD25
+    input  wire [15:0] rca,        // card RCA for CMD55 (burst writes only)
+    output reg         block_next, // 1-cycle pulse between the blocks of a burst
+
+    // WRITE: sector data source (registered read port, 1-clk latency)
+    output reg [8:0]  rd_addr,   // byte 0..511 of the current block
+    input  wire [7:0] rd_data,
+
+    // READ: received bytes, streamed out as they arrive
+    output reg        rx_we,     // 1-cycle pulse per byte
+    output reg [8:0]  rx_addr,   // byte 0..511 of the current block
+    output reg [7:0]  rx_data
+);
+
+  function [6:0] crc7_step(input [6:0] c, input b);
+    crc7_step = {c[5:0], 1'b0} ^ (7'h09 & {7{c[6] ^ b}});
+  endfunction
+
+  function [15:0] crc16_step(input [15:0] c, input b);
+    crc16_step = {c[14:0], 1'b0} ^ (16'h1021 & {16{c[15] ^ b}});
+  endfunction
+
+  // ------------------------------------------------------------- bit clock
+  reg [7:0] divcnt;
+  wire tick = (divcnt == CLKDIV - 8'd1);  // one system-clock pulse per sdclk half-period
+  wire fall_tick = tick && sd_clk_o;      // next edge will be falling: change outputs
+  wire rise_tick = tick && !sd_clk_o;     // next edge will be rising: sample inputs
+  // at CLKDIV=1 tick is high every cycle and sdclk toggles every clk;
+  // fall_tick/rise_tick then alternate cycle by cycle - every state below
+  // acts on at most one of them per sdclk period, so no CLKDIV>=2
+  // assumption remains.
+
+  // ------------------------------------------------------------- FSM
+  localparam W_IDLE    = 5'd0;
+  localparam W_CMD     = 5'd1;   // shift out a 48-bit command
+  localparam W_R1WAIT  = 5'd2;   // wait for the response start bit
+  localparam W_R1      = 5'd3;   // skip the rest of the 48-bit R1
+  localparam W_GAP     = 5'd4;   // Nwr gap before a data block
+  localparam W_DSTART  = 5'd5;   // data start bit
+  localparam W_DATA    = 5'd6;   // 4096 data bits
+  localparam W_CRC     = 5'd7;   // 16 CRC bits
+  localparam W_DEND    = 5'd8;   // end bit, then release DAT0
+  localparam W_CSWAIT  = 5'd9;   // wait for the CRC status start bit
+  localparam W_CS      = 5'd10;  // 3 status bits + end bit
+  localparam W_BUSY    = 5'd11;  // card holds DAT0 low while programming
+  localparam W_DONE    = 5'd12;
+  localparam W_ERR     = 5'd13;
+  localparam R_DWAIT   = 5'd14;  // read: wait for the card's data start bit
+  localparam R_DATA    = 5'd15;  // read: 4096 data bits + CRC + end
+  localparam W_CGAP    = 5'd16;  // burst: 8-clock spacing before the next command
+  localparam W_STOPB   = 5'd17;  // burst: CMD12 R1b - let busy assert, then poll
+
+  // which command the running W_CMD/W_R1WAIT/W_R1 sequence carries
+  localparam CP_RW   = 3'd0;  // CMD17/CMD24/CMD18/CMD25 - response leads to data
+  localparam CP_C55  = 3'd1;  // CMD55 (APP_CMD prefix of ACMD23)
+  localparam CP_A23  = 3'd2;  // ACMD23 (pre-erase block count)
+  localparam CP_STOP = 3'd3;  // CMD12 (stop transmission)
+  localparam CP_C55W = 3'd4;  // CMD55 (APP_CMD prefix of ACMD6, 4-bit switch)
+  localparam CP_A6   = 3'd5;  // ACMD6 (bus width 2 = 4-bit)
+
+  reg [4:0]  state;
+  reg        rd_r;         // latched rd_mode
+  reg        multi;        // latched burst mode (burst_len > 1)
+  reg        wide;         // latched use_4bit (clean 0/1, never x/z)
+  reg        wide_ok;      // a 4-bit width is negotiated and still valid
+  reg        err_pending;  // burst aborted: err (not done) after CMD12 completes
+  reg [2:0]  cphase;
+  reg [8:0]  blen_r;       // latched burst_len (ACMD23 argument)
+  reg [8:0]  blkleft;      // blocks remaining AFTER the current one
+  reg [31:0] sector_r;     // latched first sector (CMD25 is sent after ACMD23)
+  reg [47:0] cmdreg;
+  reg [6:0]  crc7;
+  reg [15:0] crc16;        // TX/1-bit CRC16; line DAT0 in 4-bit mode
+  reg [15:0] crc16_1;      // 4-bit mode: per-line CRC16 for DAT1
+  reg [15:0] crc16_2;      // 4-bit mode: per-line CRC16 for DAT2
+  reg [15:0] crc16_3;      // 4-bit mode: per-line CRC16 for DAT3
+  reg [12:0] bitcnt;
+  reg [45:0] r1sr;       // R1 capture: first received bit ends at [45],
+                         // card status = r1sr[38:7] (see W_R1)
+  reg [7:0]  shreg;
+  reg [31:0] toctr;
+  reg [3:0]  csbits;
+  reg [7:0]  s_pause;  // sdclk low-phase stretch (host-side flow control)
+
+  assign busy = (state != W_IDLE);
+
+  // read-path geometry: 4-bit = 1024 nibble samples, 1-bit = 4096 bit samples
+  wire [12:0] s_rx_nsmp = wide ? 13'd1024 : 13'd4096;
+  wire [12:0] s_rx_end  = wide ? (13'd1024 + 13'd16) : (13'd4096 + 13'd16);
+  wire [3:0]  s_rx_nib  = {sd_dat3_i, sd_dat2_i, sd_dat1_i, sd_dat0_i};
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      state       <= W_IDLE;
+      divcnt      <= 0;
+      sd_clk_o    <= 1'b0;
+      sd_cmd_o    <= 1'b1;
+      sd_cmd_oe   <= 1'b0;
+      sd_dat0_o   <= 1'b1;
+      sd_dat0_oe  <= 1'b0;
+      sd_dat1_o   <= 1'b1;
+      sd_dat1_oe  <= 1'b0;
+      sd_dat2_o   <= 1'b1;
+      sd_dat2_oe  <= 1'b0;
+      sd_dat3_o   <= 1'b1;
+      sd_dat3_oe  <= 1'b0;
+      done        <= 1'b0;
+      err         <= 1'b0;
+      block_next  <= 1'b0;
+      rd_addr     <= 0;
+      rx_we       <= 1'b0;
+      rx_addr     <= 0;
+      rx_data     <= 0;
+      rd_r        <= 1'b0;
+      multi       <= 1'b0;
+      wide        <= 1'b0;
+      wide_ok     <= 1'b0;
+      err_pending <= 1'b0;
+      cphase      <= CP_RW;
+      blen_r      <= 9'd1;
+      blkleft     <= 9'd0;
+      sector_r    <= 0;
+      cmdreg      <= 0;
+      crc7        <= 0;
+      crc16       <= 0;
+      crc16_1     <= 0;
+      crc16_2     <= 0;
+      crc16_3     <= 0;
+      bitcnt      <= 0;
+      shreg       <= 0;
+      toctr       <= 0;
+      csbits      <= 0;
+      s_pause     <= 0;
+    end else begin
+      // A negotiated 4-bit width survives only while the holder says the card
+      // has not been re-initialised (CMD0 returns a card to 1-bit). Cleared
+      // here, set where ACMD6 is acknowledged. width_hold low - including an
+      // unconnected input, which is not 1 - means renegotiate every operation.
+      if (width_hold != 1'b1) wide_ok <= 1'b0;
+      done       <= 1'b0;
+      err        <= 1'b0;
+      rx_we      <= 1'b0;
+      block_next <= 1'b0;
+
+      if (state == W_IDLE) begin
+        divcnt     <= 0;
+        sd_clk_o   <= 1'b0;
+        sd_cmd_oe  <= 1'b0;
+        sd_dat0_oe <= 1'b0;
+        sd_dat1_oe <= 1'b0;
+        sd_dat2_oe <= 1'b0;
+        sd_dat3_oe <= 1'b0;
+        s_pause    <= 8'd0;
+        if (start) begin
+          // 48-bit command: start(0) host(1) index(6) arg(32) crc7 end(1);
+          // CRC7 is accumulated while shifting (over the first 40 bits)
+          rd_r        <= rd_mode;
+          crc7        <= 0;
+          bitcnt      <= 0;
+          rd_addr     <= 0;
+          err_pending <= 1'b0;
+          sector_r    <= sector;
+          cphase      <= CP_RW;
+          // burst_len 0/1 (or unconnected: the != comparison of an x/z
+          // value is false) keeps the original single-sector behavior
+          if (burst_len[8:1] != 8'd0) begin
+            multi   <= 1'b1;
+            blen_r  <= burst_len;
+            blkleft <= burst_len - 9'd1;
+          end else begin
+            multi   <= 1'b0;
+            blen_r  <= 9'd1;
+            blkleft <= 9'd0;
+          end
+          // an unconnected use_4bit is x/z: the if condition is then false,
+          // so the latched wide flag is a clean 0 (original 1-bit engine)
+          if (use_4bit && wide_ok) begin
+            // The width is already negotiated and nothing has re-initialised
+            // the card since, so go straight to the data command. This is
+            // what makes 4-bit cost two commands per MOUNT instead of two
+            // per operation.
+            wide <= 1'b1;
+            if (burst_len[8:1] != 8'd0) begin
+              if (rd_mode) begin
+                cmdreg <= {2'b01, 6'd18, sector, 7'b0000000, 1'b1};
+              end else begin
+                cmdreg <= {2'b01, 6'd55, rca, 16'h0000, 7'b0000000, 1'b1};
+                cphase <= CP_C55;
+              end
+            end else begin
+              cmdreg <= {2'b01, rd_mode ? 6'd17 : 6'd24, sector, 7'b0000000, 1'b1};
+            end
+          end else if (use_4bit) begin
+            // 4-bit, width not established: switch it first (CMD55 -> ACMD6);
+            // the main command chain continues from the CP_A6 routing below
+            wide   <= 1'b1;
+            cmdreg <= {2'b01, 6'd55, rca, 16'h0000, 7'b0000000, 1'b1};
+            cphase <= CP_C55W;
+          end else begin
+            wide <= 1'b0;
+            if (burst_len[8:1] != 8'd0) begin
+              if (rd_mode) begin
+                cmdreg <= {2'b01, 6'd18, sector, 7'b0000000, 1'b1};
+              end else begin
+                // CMD55 first (ACMD23 prefix); the write chain continues
+                // ACMD23 -> CMD25 through the cphase routing below
+                cmdreg <= {2'b01, 6'd55, rca, 16'h0000, 7'b0000000, 1'b1};
+                cphase <= CP_C55;
+              end
+            end else begin
+              cmdreg <= {2'b01, rd_mode ? 6'd17 : 6'd24, sector, 7'b0000000, 1'b1};
+            end
+          end
+          state <= W_CMD;
+        end
+      end else begin
+        // bit clock while active. The HOST owns sdclk and may pause it at
+        // any time at default speed - the card freezes and waits (SD spec
+        // section 4.4: clock control as flow control). At every burst-read
+        // block boundary the low phase is stretched by a few system clocks
+        // (s_pause), so the next block's start bit CANNOT arrive before the
+        // start-bit hunt is re-armed, whatever the FSM's re-arm latency -
+        // the spec allows the card to present it as little as N_AC = 2
+        // clocks after the previous end bit.
+        if (s_pause != 8'd0 && !sd_clk_o) begin
+          s_pause <= s_pause - 8'd1;  // hold sdclk LOW: card is frozen
+          divcnt  <= 8'd0;
+        end else begin
+          divcnt <= tick ? 8'd0 : divcnt + 8'd1;
+          if (tick) sd_clk_o <= ~sd_clk_o;
+        end
+
+        case (state)
+          // ---- command phase --------------------------------------------
+          W_CMD:
+          if (fall_tick) begin
+            if (bitcnt < 13'd40) begin
+              sd_cmd_oe <= 1'b1;
+              sd_cmd_o  <= cmdreg[47];
+              crc7      <= crc7_step(crc7, cmdreg[47]);
+              cmdreg    <= {cmdreg[46:0], 1'b1};
+            end else if (bitcnt < 13'd47) begin
+              sd_cmd_o <= crc7[6];  // the 7 CRC bits
+              crc7     <= {crc7[5:0], 1'b0};
+            end else begin
+              sd_cmd_o <= 1'b1;     // end bit
+            end
+            if (bitcnt == 13'd47) begin
+              bitcnt <= 0;
+              toctr  <= 0;
+              state  <= W_R1WAIT;
+            end else bitcnt <= bitcnt + 13'd1;
+          end
+
+          W_R1WAIT: begin
+            if (fall_tick) sd_cmd_oe <= 1'b0;  // release CMD after the end bit
+            if (rise_tick && !sd_cmd_oe) begin
+              if (sd_cmd_i == 1'b0) begin
+                bitcnt <= 0;
+                state  <= W_R1;
+              end else if (toctr == 32'd500) state <= W_ERR;
+              else toctr <= toctr + 1;
+            end
+          end
+
+          W_R1:  // receive the remaining 47 bits of the R1 response
+          if (rise_tick) begin
+            // capture as we go. After the shift at bitcnt 45 the register
+            // holds 46 of the 47 bits (only the end bit is still to come),
+            // first received bit at [45]: [45]=transmission, [44:39]=command
+            // index, [38:7]=card status, [6:0]=CRC7.
+            r1sr <= {r1sr[44:0], sd_cmd_i};
+            if (bitcnt == 13'd46) begin
+              bitcnt <= 0;
+              toctr  <= 0;
+              case (cphase)
+                CP_C55W: begin
+                  // CMD55 must be ACKNOWLEDGED before ACMD6 means anything.
+                  // Card status bit 5 (APP_CMD) = r1sr[7+5] = r1sr[12] says
+                  // the card will interpret the NEXT command as an ACMD. If
+                  // it is clear the card did not accept CMD55 as addressed to
+                  // it - the classic cause being a wrong or zero RCA in the
+                  // argument - and ACMD6 would be taken as plain CMD6. Going
+                  // wide anyway is the dangerous case: the host would drive
+                  // and sample DAT3..DAT0 while the card still answers on
+                  // DAT0 alone, which reads as data corruption rather than as
+                  // a rejected command. Fail loudly instead.
+                  if (!r1sr[12]) begin
+                    wide  <= 1'b0;
+                    state <= W_ERR;
+                  end else begin
+                    // ACMD6: bus width in arg[1:0], 10 = 4 bits
+                    cmdreg <= {2'b01, 6'd6, 32'h0000_0002, 7'b0000000, 1'b1};
+                    crc7   <= 0;
+                    cphase <= CP_A6;
+                    state  <= W_CGAP;
+                  end
+                end
+                CP_A6: begin
+                  // ACMD6 answered. Card status bit 22 (ILLEGAL_COMMAND) =
+                  // r1sr[29] and bit 23 (COM_CRC_ERROR) = r1sr[30]; either
+                  // means the width switch did not happen, so do NOT go wide.
+                  if (r1sr[29] || r1sr[30]) begin
+                    wide    <= 1'b0;
+                    wide_ok <= 1'b0;
+                    state   <= W_ERR;
+                  end else begin
+                  wide_ok <= 1'b1;   // negotiated: later operations may skip
+                  // bus is 4-bit now: issue the main command (the same
+                  // routing the 1-bit path performs directly at start)
+                  crc7 <= 0;
+                  if (multi) begin
+                    if (rd_r) begin
+                      cmdreg <= {2'b01, 6'd18, sector_r, 7'b0000000, 1'b1};
+                      cphase <= CP_RW;
+                    end else begin
+                      cmdreg <= {2'b01, 6'd55, rca, 16'h0000, 7'b0000000, 1'b1};
+                      cphase <= CP_C55;
+                    end
+                  end else begin
+                    cmdreg <= {2'b01, rd_r ? 6'd17 : 6'd24, sector_r,
+                               7'b0000000, 1'b1};
+                    cphase <= CP_RW;
+                  end
+                  state <= W_CGAP;
+                  end
+                end
+                CP_C55: begin
+                  // ACMD23: pre-erase block count in arg[22:0]
+                  cmdreg <= {2'b01, 6'd23, 9'd0, 14'd0, blen_r, 7'b0000000, 1'b1};
+                  crc7   <= 0;
+                  cphase <= CP_A23;
+                  state  <= W_CGAP;
+                end
+                CP_A23: begin
+                  cmdreg <= {2'b01, 6'd25, sector_r, 7'b0000000, 1'b1};
+                  crc7   <= 0;
+                  cphase <= CP_RW;
+                  state  <= W_CGAP;
+                end
+                CP_STOP: state <= W_STOPB;
+                default: state <= rd_r ? R_DWAIT : W_GAP;
+              endcase
+            end else bitcnt <= bitcnt + 13'd1;
+          end
+
+          W_CGAP:  // NCC command spacing: 8 clocks with CMD released
+          if (fall_tick) begin
+            if (bitcnt == 13'd7) begin
+              bitcnt <= 0;
+              state  <= W_CMD;
+            end else bitcnt <= bitcnt + 13'd1;
+          end
+
+          // ---- read: receive the card's data block(s) --------------------
+          // the start-bit hunt is armed CONTINUOUSLY in this state - every
+          // sdclk rising edge samples the DAT lines; in 4-bit mode the
+          // start token is nibble 0x0 on ALL FOUR lines (spec 3.6.1), so
+          // requiring all four low rejects single-line glitches
+          R_DWAIT:
+          if (rise_tick) begin
+            if (wide ? (s_rx_nib == 4'h0) : (sd_dat0_i == 1'b0)) begin
+              bitcnt <= 0;
+              shreg  <= 0;
+              state  <= R_DATA;
+            end else if (toctr == 32'd1_000_000) begin
+              if (multi) begin  // abort the open CMD18 stream, then err
+                err_pending <= 1'b1;
+                cmdreg      <= {2'b01, 6'd12, 32'd0, 7'b0000000, 1'b1};
+                crc7        <= 0;
+                bitcnt      <= 0;
+                cphase      <= CP_STOP;
+                state       <= W_CGAP;
+              end else state <= W_ERR;
+            end else toctr <= toctr + 1;
+          end
+
+          R_DATA:
+          if (rise_tick) begin
+            if (bitcnt < s_rx_nsmp) begin
+              if (wide) begin
+                // two nibbles per byte, MSB nibble first (DAT3 = bit 3)
+                if (!bitcnt[0]) shreg[7:4] <= s_rx_nib;
+                else begin
+                  rx_we   <= 1'b1;
+                  rx_addr <= bitcnt[9:1];
+                  rx_data <= {shreg[7:4], s_rx_nib};
+                end
+              end else begin
+                shreg <= {shreg[6:0], sd_dat0_i};
+                if (bitcnt[2:0] == 3'd7) begin
+                  rx_we   <= 1'b1;
+                  rx_addr <= bitcnt[11:3];
+                  rx_data <= {shreg[6:0], sd_dat0_i};
+                end
+              end
+              bitcnt <= bitcnt + 13'd1;
+            end else if (bitcnt == s_rx_end) begin  // CRC skipped, end bit
+              if (multi && blkleft != 9'd0) begin
+                blkleft    <= blkleft - 9'd1;
+                block_next <= 1'b1;  // caller advances to its next block
+                toctr      <= 0;
+                s_pause    <= 8'd4;  // stretch the low phase: flow control
+                state      <= R_DWAIT;
+              end else if (multi) begin
+                cmdreg <= {2'b01, 6'd12, 32'd0, 7'b0000000, 1'b1};
+                crc7   <= 0;
+                bitcnt <= 0;
+                cphase <= CP_STOP;
+                state  <= W_CGAP;
+              end else state <= W_DONE;
+            end else bitcnt <= bitcnt + 13'd1;
+          end
+
+          // ---- data block ------------------------------------------------
+          W_GAP:  // Nwr >= 2 clocks; use 8
+          if (fall_tick) begin
+            if (bitcnt == 13'd7) begin
+              bitcnt <= 0;
+              state  <= W_DSTART;
+            end else bitcnt <= bitcnt + 13'd1;
+          end
+
+          W_DSTART:
+          if (fall_tick) begin
+            sd_dat0_oe <= 1'b1;
+            sd_dat0_o  <= 1'b0;    // data start bit / start nibble bit 0
+            if (wide) begin        // start nibble 0x0 on all four lines
+              sd_dat1_oe <= 1'b1;
+              sd_dat1_o  <= 1'b0;
+              sd_dat2_oe <= 1'b1;
+              sd_dat2_o  <= 1'b0;
+              sd_dat3_oe <= 1'b1;
+              sd_dat3_o  <= 1'b0;
+            end
+            shreg      <= rd_data; // byte 0 (rd_addr has been 0 long enough)
+            rd_addr    <= 9'd1;
+            crc16      <= 0;
+            crc16_1    <= 0;
+            crc16_2    <= 0;
+            crc16_3    <= 0;
+            bitcnt     <= 0;
+            state      <= W_DATA;
+          end
+
+          W_DATA:
+          if (fall_tick) begin
+            if (wide) begin
+              // one nibble per sdclk, MSB nibble first; each line's CRC16
+              // accumulates only the serial bits that line carries
+              sd_dat3_o <= bitcnt[0] ? shreg[3] : shreg[7];
+              sd_dat2_o <= bitcnt[0] ? shreg[2] : shreg[6];
+              sd_dat1_o <= bitcnt[0] ? shreg[1] : shreg[5];
+              sd_dat0_o <= bitcnt[0] ? shreg[0] : shreg[4];
+              crc16_3   <= crc16_step(crc16_3, bitcnt[0] ? shreg[3] : shreg[7]);
+              crc16_2   <= crc16_step(crc16_2, bitcnt[0] ? shreg[2] : shreg[6]);
+              crc16_1   <= crc16_step(crc16_1, bitcnt[0] ? shreg[1] : shreg[5]);
+              crc16     <= crc16_step(crc16,   bitcnt[0] ? shreg[0] : shreg[4]);
+              if (bitcnt[0]) begin
+                shreg   <= rd_data;           // next byte (fetched 2 sdclk ago)
+                rd_addr <= rd_addr + 9'd1;
+              end
+              if (bitcnt == 13'd1023) begin
+                bitcnt <= 0;
+                state  <= W_CRC;
+              end else bitcnt <= bitcnt + 13'd1;
+            end else begin
+              sd_dat0_o <= shreg[7];
+              crc16     <= crc16_step(crc16, shreg[7]);
+              if (bitcnt[2:0] == 3'd7) begin
+                shreg   <= rd_data;           // next byte (fetched 8 ticks ago)
+                rd_addr <= rd_addr + 9'd1;
+              end else shreg <= {shreg[6:0], 1'b0};
+              if (bitcnt == 13'd4095) begin
+                bitcnt <= 0;
+                state  <= W_CRC;
+              end else bitcnt <= bitcnt + 13'd1;
+            end
+          end
+
+          W_CRC:
+          if (fall_tick) begin
+            sd_dat0_o <= crc16[15];
+            crc16     <= {crc16[14:0], 1'b0};
+            if (wide) begin  // 16 CRC clocks: every line shifts its own CRC16
+              sd_dat1_o <= crc16_1[15];
+              crc16_1   <= {crc16_1[14:0], 1'b0};
+              sd_dat2_o <= crc16_2[15];
+              crc16_2   <= {crc16_2[14:0], 1'b0};
+              sd_dat3_o <= crc16_3[15];
+              crc16_3   <= {crc16_3[14:0], 1'b0};
+            end
+            if (bitcnt == 13'd15) begin
+              bitcnt <= 0;
+              state  <= W_DEND;
+            end else bitcnt <= bitcnt + 13'd1;
+          end
+
+          W_DEND:
+          if (fall_tick) begin
+            if (bitcnt == 13'd0) begin
+              sd_dat0_o <= 1'b1;  // end bit / end nibble 0xF
+              if (wide) begin
+                sd_dat1_o <= 1'b1;
+                sd_dat2_o <= 1'b1;
+                sd_dat3_o <= 1'b1;
+              end
+              bitcnt <= 13'd1;
+            end else begin
+              sd_dat0_oe <= 1'b0;  // release the DAT lines to the card
+              sd_dat1_oe <= 1'b0;
+              sd_dat2_oe <= 1'b0;
+              sd_dat3_oe <= 1'b0;
+              toctr      <= 0;
+              bitcnt     <= 0;
+              state      <= W_CSWAIT;
+            end
+          end
+
+          // ---- CRC status + busy ----------------------------------------
+          W_CSWAIT:
+          if (rise_tick) begin
+            if (sd_dat0_i == 1'b0) begin  // status token start bit
+              bitcnt <= 0;
+              csbits <= 0;
+              state  <= W_CS;
+            end else if (toctr == 32'd500) begin
+              if (multi) begin  // abort the open CMD25 burst, then err
+                err_pending <= 1'b1;
+                cmdreg      <= {2'b01, 6'd12, 32'd0, 7'b0000000, 1'b1};
+                crc7        <= 0;
+                bitcnt      <= 0;
+                cphase      <= CP_STOP;
+                state       <= W_CGAP;
+              end else state <= W_ERR;
+            end else toctr <= toctr + 1;
+          end
+
+          W_CS:  // 3 status bits, then the token end bit
+          if (rise_tick) begin
+            if (bitcnt == 13'd3) begin
+              // csbits[2:0] holds the 3 status bits; this sample is the end
+              // bit. "010" = data accepted; anything else = CRC/write error.
+              toctr <= 0;
+              if (csbits[2:0] == 3'b010) state <= W_BUSY;
+              else if (multi) begin
+                // "101"/"110" mid-burst: stop the transfer, then report err
+                err_pending <= 1'b1;
+                cmdreg      <= {2'b01, 6'd12, 32'd0, 7'b0000000, 1'b1};
+                crc7        <= 0;
+                bitcnt      <= 0;
+                cphase      <= CP_STOP;
+                state       <= W_CGAP;
+              end else state <= W_ERR;
+            end else begin
+              csbits <= {csbits[2:0], sd_dat0_i};
+              bitcnt <= bitcnt + 13'd1;
+            end
+          end
+
+          W_STOPB:  // CMD12 R1b: let the card assert busy before polling ready
+          if (fall_tick) begin
+            if (bitcnt == 13'd7) begin
+              bitcnt <= 0;
+              toctr  <= 0;
+              state  <= W_BUSY;
+            end else bitcnt <= bitcnt + 13'd1;
+          end
+
+          W_BUSY:
+          if (rise_tick) begin
+            if (sd_dat0_i == 1'b1) begin  // programming finished
+              if (cphase == CP_STOP) state <= err_pending ? W_ERR : W_DONE;
+              else if (multi && blkleft != 9'd0) begin
+                blkleft    <= blkleft - 9'd1;
+                block_next <= 1'b1;  // caller advances to its next block
+                rd_addr    <= 0;
+                bitcnt     <= 0;
+                state      <= W_GAP;
+              end else if (multi) begin
+                // burst complete: CMD12 (R1b + final busy), then done
+                cmdreg <= {2'b01, 6'd12, 32'd0, 7'b0000000, 1'b1};
+                crc7   <= 0;
+                bitcnt <= 0;
+                cphase <= CP_STOP;
+                state  <= W_CGAP;
+              end else state <= W_DONE;
+            end else if (toctr == BUSY_TIMEOUT) state <= W_ERR;
+            else toctr <= toctr + 1;
+          end
+
+          W_DONE: begin
+            done  <= 1'b1;
+            state <= W_IDLE;
+          end
+
+          W_ERR: begin
+            err   <= 1'b1;
+            state <= W_IDLE;
+          end
+
+          default: state <= W_IDLE;
+        endcase
+      end
+    end
+  end
+
+endmodule
+```
+
+</details>

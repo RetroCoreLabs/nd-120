@@ -19,6 +19,16 @@ Source: `Verilog/Shared/logisim/Multiplexer_2_w_enable.v`
 
 ![Multiplexer_2_w_enable symbol](Multiplexer_2_w_enable.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.IO.DCD.DGA.POW.A620.PLEXERS_1`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![Multiplexer_2_w_enable schematic](Multiplexer_2_w_enable.svg)](Multiplexer_2_w_enable.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Component : Multiplexer_2_w_enable
@@ -32,3 +42,31 @@ Refactored 03.12.2023 Ronny Hansen
 | input | `1` | `muxIn_1` |  |
 | input | `1` | `sel` |  |
 | output | `1` | `muxOut` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/Multiplexer_2_w_enable.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/Multiplexer_2_w_enable.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of Multiplexer_2_w_enable (16 lines)</summary>
+
+```verilog
+/******************************************************************************
+ **                                                                          **
+ ** Component : Multiplexer_2_w_enable                                       **
+ **                                                                          **
+ ** Refactored 03.12.2023 Ronny Hansen                                       **
+ *****************************************************************************/
+/* */
+
+module Multiplexer_2_w_enable( input wire enable,
+                      input wire muxIn_0,
+                      input wire muxIn_1,                      
+                      input wire sel,
+                      output wire muxOut
+                      );   
+      assign muxOut = (enable == 1'b0) ? 1'b0 : (sel ? muxIn_1 : muxIn_0);
+endmodule
+```
+
+</details>

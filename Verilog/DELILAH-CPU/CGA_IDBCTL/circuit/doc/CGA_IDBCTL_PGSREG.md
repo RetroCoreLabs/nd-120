@@ -19,6 +19,16 @@ Source: `Verilog/DELILAH-CPU/CGA_IDBCTL/circuit/CGA_IDBCTL_PGSREG.v`
 
 ![CGA_IDBCTL_PGSREG symbol](CGA_IDBCTL_PGSREG.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.IDBCTL.PGSREG`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![CGA_IDBCTL_PGSREG schematic](CGA_IDBCTL_PGSREG.svg)](CGA_IDBCTL_PGSREG.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 CPU GATE ARRAY - CGA - DELILAH
@@ -33,10 +43,261 @@ Ronny Hansen
 |---|---|---|---|
 | input | `1` | `sysclk` | FPGA system clock (P2: MCLK_EN capture) |
 | input | `1` | `MCLK_EN` | MCLK clock-enable pulse (FPGA_FF_MODE, else 0) |
-| input | `1` | `FETCHN` |  |
-| input | `[11:0]` | `LA_21_10` |  |
-| input | `1` | `MCLK` |  |
+| input | `1` | `FETCHN` | Fetch negated (from CGA_DCD.FETCHN) |
+| input | `[11:0]` | `LA_21_10` | Latch Address bits 23 to 10 (from CGA_MAC.LA_23_10[11:0]) |
+| input | `1` | `MCLK` | Microcycle clock (= TERM outside RWCS, stretched during RWCS) (from CPU_PROC_CGA_33.MCLK) |
 | input | `1` | `PVIOL` |  |
-| input | `1` | `VACCN` |  |
+| input | `1` | `VACCN` | VACC_n - passed straight down to CGA_IDBCTL_PGSREG as its load enable (from CGA_IDBCTL.VACCN) |
 | output | `[11:0]` | `PGS_11_0` |  |
 | output | `[1:0]` | `PGS_15_14` |  |
+
+## Verilog source
+
+[`Verilog/DELILAH-CPU/CGA_IDBCTL/circuit/CGA_IDBCTL_PGSREG.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/DELILAH-CPU/CGA_IDBCTL/circuit/CGA_IDBCTL_PGSREG.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of CGA_IDBCTL_PGSREG (239 lines)</summary>
+
+```verilog
+/**************************************************************************
+** CPU GATE ARRAY - CGA - DELILAH                                        **
+**                                                                       **
+** CGA/IDBCTL/PGSREG - IDB Control Logic                                 **
+**                                                                       **
+** PDF page 98 of 108                                                    **
+**                                                                       **
+** Last reviewed: 9-NOV-2024                                             **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+
+
+module CGA_IDBCTL_PGSREG (
+    input sysclk,   //! FPGA system clock (P2: MCLK_EN capture)
+    input MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0)
+
+    input FETCHN,   //! Fetch negated (from CGA_DCD.FETCHN)
+    input [11:0] LA_21_10,  //! Latch Address bits 23 to 10 (from CGA_MAC.LA_23_10[11:0])
+    input MCLK,     //! Microcycle clock (= TERM outside RWCS, stretched during RWCS) (from CPU_PROC_CGA_33.MCLK)
+    input PVIOL,
+    // VACCN is the LOAD ENABLE of this register (inverted to s_vacc and wired
+    // to TE on every SCAN_FF_EN cell below; D is tied back to Q, so TE=0 holds).
+    // Consequence: PGS = THE LAST LA_21_10 PRESENTED WHILE VACC WAS HIGH. There
+    // is no separate lock - the register stops capturing simply because VACC
+    // stops rising, and VACC cannot rise while paging is off (CGA_DCD.v sheet
+    // 10/10, GATES_75). That is how PGS survives long enough for the trap
+    // handler to read it back through EPGS.
+    input VACCN,    //! VACC_n - passed straight down to CGA_IDBCTL_PGSREG as its load enable (from CGA_IDBCTL.VACCN)
+
+    output [11:0] PGS_11_0,
+    output [ 1:0] PGS_15_14
+);
+
+  /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+  wire        s_fetch_n;
+  wire        s_mclk;
+  wire        s_pgs15_dq;
+  wire        s_pviol;
+  wire        s_vacc_n;
+  wire        s_vacc;
+  wire [ 1:0] s_pga_15_14_out;
+  wire [11:0] s_la_21_10;
+  wire [11:0] s_pgs_11_0_out;
+
+  /*******************************************************************************
+   ** Here all input connections are defined                                     **
+   *******************************************************************************/
+  assign s_la_21_10[11:0] = LA_21_10;
+  assign s_mclk           = MCLK;
+  assign s_fetch_n        = FETCHN;
+  assign s_pviol          = PVIOL;
+  assign s_vacc_n         = VACCN;
+
+  // P2 (docs/plan-fix-unconstrained-clocks.md): in FF mode the MCLK-
+  // clocked registers capture on posedge sysclk gated by MCLK_EN
+  // (aligned to the MCLK rise) instead of clocking on the routed net.
+`ifdef FPGA_FF_MODE
+  localparam MCLK_CE = 1;
+`else
+  localparam MCLK_CE = 0;
+`endif
+
+  /*******************************************************************************
+   ** Here all output connections are defined                                    **
+   *******************************************************************************/
+  assign PGS_11_0         = s_pgs_11_0_out[11:0];
+  assign PGS_15_14        = s_pga_15_14_out[1:0];
+
+  /*******************************************************************************
+   ** Here all in-lined components are defined                                   **
+   *******************************************************************************/
+
+  // NOT Gate
+  assign s_vacc    = ~s_vacc_n;
+
+  /*******************************************************************************
+   ** Here all sub-circuits are defined                                          **
+   *******************************************************************************/
+
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS15 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs15_dq),
+      .Q  (s_pgs15_dq),
+      .QN (s_pga_15_14_out[1]),
+      .TE (s_vacc),
+      .TI (s_fetch_n)
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS14 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pga_15_14_out[0]),
+      .Q  (s_pga_15_14_out[0]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_pviol)
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS11 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[11]),
+      .Q  (s_pgs_11_0_out[11]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[11])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS10 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[10]),
+      .Q  (s_pgs_11_0_out[10]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[10])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS9 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[9]),
+      .Q  (s_pgs_11_0_out[9]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[9])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS8 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[8]),
+      .Q  (s_pgs_11_0_out[8]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[8])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS7 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[7]),
+      .Q  (s_pgs_11_0_out[7]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[7])
+  );
+
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS3 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[3]),
+      .Q  (s_pgs_11_0_out[3]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[3])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS2 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[2]),
+      .Q  (s_pgs_11_0_out[2]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[2])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS1 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[1]),
+      .Q  (s_pgs_11_0_out[1]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[1])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS0 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[0]),
+      .Q  (s_pgs_11_0_out[0]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[0])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS6 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[6]),
+      .Q  (s_pgs_11_0_out[6]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[6])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS5 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[5]),
+      .Q  (s_pgs_11_0_out[5]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[5])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(MCLK_CE)) PGS4 (
+      .sysclk(sysclk),
+      .EN(MCLK_EN),
+      .CLK(s_mclk),
+      .D  (s_pgs_11_0_out[4]),
+      .Q  (s_pgs_11_0_out[4]),
+      .QN (),
+      .TE (s_vacc),
+      .TI (s_la_21_10[4])
+  );
+
+endmodule
+```
+
+</details>

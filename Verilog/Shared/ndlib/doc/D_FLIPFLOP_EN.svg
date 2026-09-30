@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="713.0" height="550.0" viewBox="-80.0 -80.0 713.0 550.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="713.0" height="550.0" fill="#ffffff" /><g transform="translate(242.33333333333334,328)" id="cell_$auto$proc_dff.cc:74:gen_dffsr_complex$37133"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$auto$proc_dff.cc:74:gen_dffsr_complex$37133" /><g /><g /><g /><g /></g>
+<g transform="translate(171.33333333333331,227)" id="cell_$auto$proc_dff.cc:78:gen_dffsr_complex$37131"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$auto$proc_dff.cc:78:gen_dffsr_complex$37131" /><g /><g /><g /><g /></g>
+<g transform="translate(242.33333333333334,237)" id="cell_$auto$proc_dff.cc:78:gen_dffsr_complex$37137"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$auto$proc_dff.cc:78:gen_dffsr_complex$37137" /><g /><g /><g /><g /></g>
+<g transform="translate(446,122)" id="cell_$not$D_FLIPFLOP_EN.v:55$10014"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$D_FLIPFLOP_EN.v:55$10014" /><circle cx="23" cy="10" r="3" class="cell_$not$D_FLIPFLOP_EN.v:55$10014" /><g /><g /></g>
+<g transform="translate(327,56.5)" id="cell_$procdff$37139"><text x="15" y="-4" class="nodelabel cell_$procdff$37139">$dffsr</text><rect width="30" height="80" class="cell_$procdff$37139" /><g transform="translate(0,10)" id="port_$procdff$37139~CLK"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37139">CLK</text></g><g transform="translate(0,30)" id="port_$procdff$37139~CLR"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37139">CLR</text></g><g transform="translate(0,50)" id="port_$procdff$37139~D"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37139">D</text></g><g transform="translate(0,70)" id="port_$procdff$37139~SET"><text x="-3" y="-4" class="inputPortLabel cell_$procdff$37139">SET</text></g><g transform="translate(30,10)" id="port_$procdff$37139~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_$procdff$37139">Q</text></g></g>
+<g transform="translate(245.66666666666666,87)" id="cell_$procmux$10925"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$procmux$10925" /><g /><g /><g /><g /></g>
+<g transform="translate(237,32)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(166,172)" id="cell_EN"><text x="15" y="-4" class="nodelabel cell_EN">EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EN" /><g /></g>
+<g transform="translate(12,22)" id="cell_clock"><text x="15" y="-4" class="nodelabel cell_clock">clock</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_clock" /><g /></g>
+<g transform="translate(166,107)" id="cell_d"><text x="15" y="-4" class="nodelabel cell_d">d</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_d" /><g /></g>
+<g transform="translate(166,308)" id="cell_preset"><text x="15" y="-4" class="nodelabel cell_preset">preset</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_preset" /><g /></g>
+<g transform="translate(96,162)" id="cell_reset"><text x="15" y="-4" class="nodelabel cell_reset">reset</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_reset" /><g /></g>
+<g transform="translate(54,22)" id="cell_tick"><text x="15" y="-4" class="nodelabel cell_tick">tick</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_tick" /><g /></g>
+<g transform="translate(511,57)" id="cell_q"><text x="15" y="-4" class="nodelabel cell_q">q</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_q" /><g /></g>
+<g transform="translate(511,122)" id="cell_qBar"><text x="15" y="-4" class="nodelabel cell_qBar">qBar</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_qBar" /><g /></g>
+<g transform="translate(96,227)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(96,348)" id="cell_1"><text x="15" y="-4" class="nodelabel cell_1">1</text><rect width="30" height="20" class="cell_1" /><g /></g>
+<line x1="126" x2="136" y1="237" y2="237" class="net_15" />
+<line x1="136" x2="136" y1="237" y2="287" class="net_15" />
+<line x1="136" x2="222" y1="287" y2="287" class="net_15" />
+<line x1="222" x2="222" y1="287" y2="338" class="net_15" />
+<circle cx="136" cy="237" r="2" style="fill:#000" class="net_15" />
+<line x1="222" x2="242.33333333333334" y1="338" y2="338" class="net_15" />
+<line x1="126" x2="171.33333333333331" y1="237" y2="237" class="net_15" />
+<line x1="126" x2="136" y1="237" y2="237" class="net_15" />
+<line x1="136" x2="136" y1="237" y2="287" class="net_15" />
+<line x1="136" x2="222" y1="287" y2="287" class="net_15" />
+<line x1="222" x2="222" y1="287" y2="267" class="net_15" />
+<circle cx="222" cy="287" r="2" style="fill:#000" class="net_15" />
+<line x1="222" x2="242.33333333333334" y1="267" y2="267" class="net_15" />
+<line x1="126" x2="242.33333333333334" y1="358" y2="358" class="net_16" />
+<line x1="126" x2="146" y1="358" y2="358" class="net_16" />
+<line x1="146" x2="146" y1="358" y2="257" class="net_16" />
+<circle cx="146" cy="358" r="2" style="fill:#000" class="net_16" />
+<line x1="146" x2="171.33333333333331" y1="257" y2="257" class="net_16" />
+<line x1="194" x2="212" y1="318" y2="318" class="net_6"><title>preset</title></line>
+<line x1="212" x2="212" y1="318" y2="378" class="net_6"><title>preset</title></line>
+<line x1="212" x2="252.33333333333334" y1="378" y2="378" class="net_6"><title>preset</title></line>
+<circle cx="212" cy="318" r="2" style="fill:#000" class="net_6" />
+<line x1="252.33333333333334" x2="252.33333333333334" y1="378" y2="363" class="net_6"><title>preset</title></line>
+<line x1="194" x2="252.33333333333334" y1="318" y2="318" class="net_6"><title>preset</title></line>
+<line x1="252.33333333333334" x2="252.33333333333334" y1="318" y2="272" class="net_6"><title>preset</title></line>
+<line x1="124" x2="156" y1="172" y2="172" class="net_7"><title>reset</title></line>
+<line x1="156" x2="156" y1="172" y2="277" class="net_7"><title>reset</title></line>
+<line x1="156" x2="181.33333333333331" y1="277" y2="277" class="net_7"><title>reset</title></line>
+<line x1="181.33333333333331" x2="181.33333333333331" y1="277" y2="262" class="net_7"><title>reset</title></line>
+<line x1="191.33333333333331" x2="242.33333333333334" y1="247" y2="247" class="net_12" />
+<line x1="358" x2="421" y1="67" y2="67" class="net_9"><title>q</title></line>
+<line x1="421" x2="421" y1="67" y2="132" class="net_9"><title>q</title></line>
+<line x1="421" x2="446" y1="132" y2="132" class="net_9"><title>q</title></line>
+<line x1="358" x2="421" y1="67" y2="67" class="net_9"><title>q</title></line>
+<line x1="421" x2="421" y1="67" y2="12" class="net_9"><title>q</title></line>
+<line x1="421" x2="222" y1="12" y2="12" class="net_9"><title>q</title></line>
+<line x1="222" x2="222" y1="12" y2="97" class="net_9"><title>q</title></line>
+<circle cx="421" cy="67" r="2" style="fill:#000" class="net_9" />
+<line x1="222" x2="245.66666666666666" y1="97" y2="97" class="net_9"><title>q</title></line>
+<line x1="358" x2="511" y1="67" y2="67" class="net_9"><title>q</title></line>
+<line x1="265" x2="283" y1="42" y2="42" class="net_2"><title>sysclk</title></line>
+<line x1="283" x2="283" y1="42" y2="67" class="net_2"><title>sysclk</title></line>
+<line x1="283" x2="327" y1="67" y2="67" class="net_2"><title>sysclk</title></line>
+<line x1="262.33333333333337" x2="283" y1="257" y2="257" class="net_13" />
+<line x1="283" x2="283" y1="257" y2="87" class="net_13" />
+<line x1="283" x2="327" y1="87" y2="87" class="net_13" />
+<line x1="265.66666666666663" x2="327" y1="107" y2="107" class="net_14" />
+<line x1="262.33333333333337" x2="293" y1="348" y2="348" class="net_11" />
+<line x1="293" x2="293" y1="348" y2="127" class="net_11" />
+<line x1="293" x2="327" y1="127" y2="127" class="net_11" />
+<line x1="194" x2="245.66666666666666" y1="117" y2="117" class="net_5"><title>d</title></line>
+<line x1="194" x2="255.66666666666666" y1="182" y2="182" class="net_3"><title>EN</title></line>
+<line x1="255.66666666666666" x2="255.66666666666666" y1="182" y2="122" class="net_3"><title>EN</title></line>
+<line x1="471" x2="511" y1="132" y2="132" class="net_10"><title>qBar</title></line>
+<text x="474.0" y="129.0" class="netlabel">qBar</text>
+<text x="286.0" y="64.0" class="netlabel">sysclk</text>
+<text x="197.0" y="179.0" class="netlabel">EN</text>
+<text x="197.0" y="114.0" class="netlabel">d</text>
+<text x="197.0" y="315.0" class="netlabel">preset</text>
+<text x="127.0" y="169.0" class="netlabel">reset</text>
+<text x="225.0" y="9.0" class="netlabel">q</text>
+</svg>

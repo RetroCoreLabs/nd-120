@@ -14,6 +14,16 @@ Source: `Verilog/fpga/tang-nano-20k/sdram-test/src/sdram_test_top.v`
 
 ![sdram_test_top symbol](sdram_test_top.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![sdram_test_top schematic](sdram_test_top.svg)](sdram_test_top.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Tang Nano 20K embedded-SDRAM test
@@ -60,3 +70,496 @@ Ronny Hansen
 | output | `[1:0]` | `O_sdram_ba` |  |
 | output | `[3:0]` | `O_sdram_dqm` |  |
 | output | `[5:0]` | `led` | active low: {error, pass, state[3:0]} |
+
+## Verilog source
+
+[`Verilog/fpga/tang-nano-20k/sdram-test/src/sdram_test_top.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/tang-nano-20k/sdram-test/src/sdram_test_top.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of sdram_test_top (481 lines)</summary>
+
+```verilog
+/****************************************************************************
+** Tang Nano 20K embedded-SDRAM test                                       **
+**                                                                         **
+** Exercises the 8 MB on-package SDRAM (64 Mbit, 32-bit SDR) through the   **
+** nand2mario byte-based controller (src/sdram.v) and reports every step   **
+** over UART at 115200 baud 8N1 so the read/write behaviour is visible on a**
+** terminal (the BL616 USB serial port of the board).                      **
+**                                                                         **
+** Test sequence (started by pressing S1 or sending any UART character):   **
+**   1. Verbose demo: write 4 bytes to 4 spread addresses (different       **
+**      banks, first/last byte), read them back; every operation is       **
+**      printed as "W aaaaaa=dd" / "R aaaaaa=dd OK".                       **
+**   2. Block test: write ALL 8 MB with an address-derived pattern, then   **
+**      read and verify every byte. A progress dot is printed every        **
+**      DOT_STEP bytes. Ends with PASS or FAIL.                            **
+** SDRAM auto-refresh runs continuously (one refresh per 15 us).           **
+**                                                                         **
+** Last reviewed: 8-JUL-2026                                               **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module sdram_test_top #(
+    parameter CLK_FREQ   = 27_000_000,  // PLL clkout frequency (see gowin_rpll.v)
+    parameter BAUD       = 115200,  // 27 MHz / 115200 = 234 clks/bit (-0.16%)
+    parameter BLOCK_SIZE = 24'h800000,  // block test size in bytes (full 8 MB), power of 2
+    parameter DOT_STEP   = 24'h40000    // progress dot interval (256 KB -> 32 dots), power of 2
+) (
+    input sys_clk,   // 27 MHz crystal
+    input s1,        // S1 push button (pin 88) - start / restart
+    input uart_rxp,  // from BL616 USB serial
+    output uart_txp, // to BL616 USB serial
+
+    // "Magic" port names - the Gowin toolchain connects these to the
+    // on-package SDRAM die. For the OSS flow the same names are pinned
+    // explicitly in sdram_pins_oss.cst.
+    output        O_sdram_clk,
+    output        O_sdram_cke,
+    output        O_sdram_cs_n,
+    output        O_sdram_cas_n,
+    output        O_sdram_ras_n,
+    output        O_sdram_wen_n,
+    inout  [31:0] IO_sdram_dq,
+    output [10:0] O_sdram_addr,
+    output [ 1:0] O_sdram_ba,
+    output [ 3:0] O_sdram_dqm,
+
+    output [5:0] led  // active low: {error, pass, state[3:0]}
+);
+
+  localparam DELAY_FRAMES = CLK_FREQ / BAUD;
+
+  /*******************************************************************************
+   ** Clocking: rPLL gives clk (27 MHz) plus a 180-degree shifted SDRAM clock   **
+   *******************************************************************************/
+  wire clk, clk_sdram, pll_lock;
+
+`ifdef SIM
+  // Simulation: no rPLL primitive; a plain inverted clock is exactly 180 degrees
+  assign clk       = sys_clk;
+  assign clk_sdram = ~sys_clk;
+  assign pll_lock  = 1'b1;
+`else
+  Gowin_rPLL pll (
+      .clkout (clk),        // 27 MHz main clock
+      .clkoutp(clk_sdram),  // phase shifted clock for the SDRAM
+      .lock   (pll_lock),
+      .reset  (1'b0),
+      .clkin  (sys_clk)
+  );
+`endif
+
+  // Power-on reset: hold everything ~1k cycles after PLL lock
+  reg [10:0] rst_cnt = 0;
+  reg rst_n = 0;
+  always @(posedge clk) begin
+    if (!pll_lock) begin
+      rst_cnt <= 0;
+      rst_n   <= 0;
+    end else if (!rst_cnt[10]) begin
+      rst_cnt <= rst_cnt + 1;
+      rst_n   <= 0;
+    end else begin
+      rst_n <= 1;
+    end
+  end
+
+  /*******************************************************************************
+   ** Start events: S1 button (synchronized) or any received UART byte          **
+   *******************************************************************************/
+  reg s1_r1, s1_r2, s1_r3;
+  always @(posedge clk) begin
+    s1_r1 <= s1;
+    s1_r2 <= s1_r1;
+    s1_r3 <= s1_r2;
+  end
+  wire s1_press = s1_r2 & ~s1_r3;
+
+  wire [7:0] rx_data;  // received byte (only used as a start trigger)
+  wire rx_valid;
+
+  uart_rx #(
+      .DELAY_FRAMES(DELAY_FRAMES)
+  ) u_rx (
+      .clk(clk),
+      .rst_n(rst_n),
+      .rxd(uart_rxp),
+      .rx_data(rx_data),
+      .rx_valid(rx_valid)
+  );
+
+  wire start_evt = s1_press | rx_valid;
+
+  /*******************************************************************************
+   ** UART message printer (115200 8N1)                                          **
+   *******************************************************************************/
+  localparam MSG_BANNER   = 4'd0;
+  localparam MSG_PROMPT   = 4'd1;
+  localparam MSG_WRITE    = 4'd2;
+  localparam MSG_READ_OK  = 4'd3;
+  localparam MSG_READ_ERR = 4'd4;
+  localparam MSG_BLOCK    = 4'd5;
+  localparam MSG_VERIFY   = 4'd6;
+  localparam MSG_DOT      = 4'd7;
+  localparam MSG_PASS     = 4'd8;
+  localparam MSG_FAIL     = 4'd9;
+
+  reg        p_start;
+  reg [ 3:0] p_msg;
+  reg [22:0] p_addr;
+  reg [ 7:0] p_data;
+  wire p_busy;
+
+  msg_printer #(
+      .DELAY_FRAMES(DELAY_FRAMES)
+  ) u_printer (
+      .clk(clk),
+      .rst_n(rst_n),
+      .start(p_start),
+      .msg(p_msg),
+      .addr(p_addr),
+      .data(p_data),
+      .busy(p_busy),
+      .txd(uart_txp)
+  );
+
+  /*******************************************************************************
+   ** SDRAM controller (vendored nand2mario, byte-based, CL=2)                   **
+   *******************************************************************************/
+  reg rd, wr, refresh;
+  reg [22:0] mem_addr;
+  reg [ 7:0] mem_din;
+  wire [7:0] dout;
+  wire data_ready, busy;
+
+  sdram #(
+      .FREQ(CLK_FREQ)
+  ) u_sdram (
+      .clk(clk),
+      .clk_sdram(clk_sdram),
+      .resetn(rst_n),
+      .addr(mem_addr),
+      .rd(rd),
+      .wr(wr),
+      .refresh(refresh),
+      .din(mem_din),
+      .dout(dout),
+      .dout32(),
+      .data_ready(data_ready),
+      .busy(busy),
+
+      .SDRAM_DQ(IO_sdram_dq),
+      .SDRAM_A(O_sdram_addr),
+      .SDRAM_BA(O_sdram_ba),
+      .SDRAM_nCS(O_sdram_cs_n),
+      .SDRAM_nWE(O_sdram_wen_n),
+      .SDRAM_nRAS(O_sdram_ras_n),
+      .SDRAM_nCAS(O_sdram_cas_n),
+      .SDRAM_CLK(O_sdram_clk),
+      .SDRAM_CKE(O_sdram_cke),
+      .SDRAM_DQM(O_sdram_dqm)
+  );
+
+  /*******************************************************************************
+   ** Refresh scheduling: request one auto-refresh every 15 us                   **
+   *******************************************************************************/
+  localparam REFRESH_INTERVAL = CLK_FREQ / 1_000_000 * 15;  // cycles per 15 us
+
+  reg [9:0] ref_cnt;
+  reg refresh_needed;
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      ref_cnt        <= 0;
+      refresh_needed <= 0;
+    end else begin
+      ref_cnt <= ref_cnt + 1;
+      if (ref_cnt >= REFRESH_INTERVAL[9:0]) refresh_needed <= 1;
+      if (refresh) begin
+        ref_cnt        <= 0;
+        refresh_needed <= 0;
+      end
+    end
+  end
+
+  /*******************************************************************************
+   ** Test state machine                                                         **
+   *******************************************************************************/
+  localparam ST_RESET     = 5'd0;
+  localparam ST_BANNER    = 5'd1;
+  localparam ST_PROMPT    = 5'd2;
+  localparam ST_WAIT      = 5'd3;
+  localparam ST_WR        = 5'd4;
+  localparam ST_WR_WAIT   = 5'd5;
+  localparam ST_RD        = 5'd6;
+  localparam ST_RD_WAIT   = 5'd7;
+  localparam ST_RD_PRINT  = 5'd8;
+  localparam ST_BLOCK_MSG = 5'd9;
+  localparam ST_BW        = 5'd10;
+  localparam ST_BW_WAIT   = 5'd11;
+  localparam ST_VER_MSG   = 5'd12;
+  localparam ST_VR        = 5'd13;
+  localparam ST_VR_WAIT   = 5'd14;
+  localparam ST_ERR_PRINT = 5'd15;
+  localparam ST_PASS      = 5'd16;
+  localparam ST_FAIL      = 5'd17;
+  localparam ST_DONE      = 5'd18;
+
+  // Verbose demo: 4 spread addresses (bank 0 / bank 1 / last byte) and values
+  function [22:0] demo_addr(input [1:0] i);
+    case (i)
+      2'd0: demo_addr = 23'h000000;
+      2'd1: demo_addr = 23'h000001;
+      2'd2: demo_addr = 23'h200000;  // bank 1
+      2'd3: demo_addr = 23'h7FFFFF;  // last byte of the 8 MB
+    endcase
+  endfunction
+
+  function [7:0] demo_data(input [1:0] i);
+    case (i)
+      2'd0: demo_data = 8'hA5;
+      2'd1: demo_data = 8'h5A;
+      2'd2: demo_data = 8'h3E;
+      2'd3: demo_data = 8'hED;
+    endcase
+  endfunction
+
+  // Address-derived pattern for the block test
+  function [7:0] pattern(input [22:0] a);
+    pattern = a[7:0] ^ a[15:8] ^ {1'b0, a[22:16]};
+  endfunction
+
+  reg [ 4:0] state;
+  reg [ 1:0] demo_i;
+  reg [23:0] taddr;  // one bit wider than the address so it can reach BLOCK_SIZE = 8 MB
+  reg [ 7:0] actual;
+  reg error_f, pass_f, dot_pending;
+
+  // Issue a rd/wr only when the controller is free and no refresh is pending
+  wire can_op = !busy && !refresh_needed && !wr && !rd && !refresh;
+  // A print may be started only when the printer is free (and no start in flight)
+  wire can_print = !p_busy && !p_start;
+
+  assign led = ~{error_f, pass_f, state[3:0]};
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      state       <= ST_RESET;
+      wr          <= 0;
+      rd          <= 0;
+      refresh     <= 0;
+      p_start     <= 0;
+      p_msg       <= MSG_BANNER;
+      p_addr      <= 0;
+      p_data      <= 0;
+      mem_addr    <= 0;
+      mem_din     <= 0;
+      demo_i      <= 0;
+      taddr       <= 0;
+      actual      <= 0;
+      error_f     <= 0;
+      pass_f      <= 0;
+      dot_pending <= 0;
+    end else begin
+      // command outputs are 1-cycle pulses
+      wr      <= 0;
+      rd      <= 0;
+      refresh <= 0;
+      p_start <= 0;
+
+      // global refresh: runs in every state, whenever the controller is free.
+      // can_op excludes refresh_needed, so this never collides with a rd/wr.
+      if (refresh_needed && !busy && !wr && !rd && !refresh) refresh <= 1;
+
+      case (state)
+        // wait for the SDRAM init/config sequence (~200 us) to finish
+        ST_RESET: if (!busy) state <= ST_BANNER;
+
+        ST_BANNER:
+        if (can_print) begin
+          p_start <= 1;
+          p_msg   <= MSG_BANNER;
+          state   <= ST_PROMPT;
+        end
+
+        ST_PROMPT:
+        if (can_print) begin
+          p_start <= 1;
+          p_msg   <= MSG_PROMPT;
+          state   <= ST_WAIT;
+        end
+
+        ST_WAIT:
+        if (start_evt) begin
+          demo_i  <= 0;
+          error_f <= 0;
+          pass_f  <= 0;
+          dot_pending <= 0;
+          state   <= ST_WR;
+        end
+
+        // ---- verbose demo: 4 writes, each printed ----
+        ST_WR:
+        if (can_op && can_print) begin
+          wr       <= 1;
+          mem_addr <= demo_addr(demo_i);
+          mem_din  <= demo_data(demo_i);
+          p_start  <= 1;
+          p_msg    <= MSG_WRITE;
+          p_addr   <= demo_addr(demo_i);
+          p_data   <= demo_data(demo_i);
+          state    <= ST_WR_WAIT;
+        end
+
+        ST_WR_WAIT:
+        if (!wr && !busy) begin
+          if (demo_i == 2'd3) begin
+            demo_i <= 0;
+            state  <= ST_RD;
+          end else begin
+            demo_i <= demo_i + 1;
+            state  <= ST_WR;
+          end
+        end
+
+        // ---- verbose demo: 4 reads, each printed with OK/ERR ----
+        ST_RD:
+        if (can_op) begin
+          rd       <= 1;
+          mem_addr <= demo_addr(demo_i);
+          state    <= ST_RD_WAIT;
+        end
+
+        ST_RD_WAIT:
+        if (data_ready) begin
+          actual <= dout;
+          state  <= ST_RD_PRINT;
+        end
+
+        ST_RD_PRINT:
+        if (can_print && !busy) begin
+          p_start <= 1;
+          p_addr  <= demo_addr(demo_i);
+          p_data  <= actual;
+          if (actual == demo_data(demo_i)) begin
+            p_msg <= MSG_READ_OK;
+          end else begin
+            p_msg   <= MSG_READ_ERR;
+            error_f <= 1;
+          end
+          if (demo_i == 2'd3) begin
+            state <= (error_f || (actual != demo_data(demo_i))) ? ST_FAIL : ST_BLOCK_MSG;
+          end else begin
+            demo_i <= demo_i + 1;
+            state  <= ST_RD;
+          end
+        end
+
+        // ---- block test: write BLOCK_SIZE bytes ----
+        ST_BLOCK_MSG:
+        if (can_print) begin
+          p_start <= 1;
+          p_msg   <= MSG_BLOCK;
+          taddr   <= 0;
+          state   <= ST_BW;
+        end
+
+        ST_BW:
+        if (dot_pending) begin
+          if (can_print) begin
+            p_start     <= 1;
+            p_msg       <= MSG_DOT;
+            dot_pending <= 0;
+          end
+        end else if (taddr == BLOCK_SIZE) begin
+          taddr <= 0;
+          state <= ST_VER_MSG;
+        end else if (can_op) begin
+          wr       <= 1;
+          mem_addr <= taddr[22:0];
+          mem_din  <= pattern(taddr[22:0]);
+          state    <= ST_BW_WAIT;
+        end
+
+        ST_BW_WAIT:
+        if (!wr && !busy) begin
+          taddr <= taddr + 1;
+          if (((taddr + 24'd1) & (DOT_STEP - 24'd1)) == 0) dot_pending <= 1;
+          state <= ST_BW;
+        end
+
+        // ---- block test: read back and verify ----
+        ST_VER_MSG:
+        if (can_print) begin
+          p_start <= 1;
+          p_msg   <= MSG_VERIFY;
+          state   <= ST_VR;
+        end
+
+        ST_VR:
+        if (dot_pending) begin
+          if (can_print) begin
+            p_start     <= 1;
+            p_msg       <= MSG_DOT;
+            dot_pending <= 0;
+          end
+        end else if (taddr == BLOCK_SIZE) begin
+          state <= ST_PASS;
+        end else if (can_op) begin
+          rd       <= 1;
+          mem_addr <= taddr[22:0];
+          state    <= ST_VR_WAIT;
+        end
+
+        ST_VR_WAIT:
+        if (data_ready) begin
+          if (dout != pattern(taddr[22:0])) begin
+            actual  <= dout;
+            error_f <= 1;
+            state   <= ST_ERR_PRINT;
+          end else begin
+            taddr <= taddr + 1;
+            if (((taddr + 24'd1) & (DOT_STEP - 24'd1)) == 0) dot_pending <= 1;
+            state <= ST_VR;
+          end
+        end
+
+        ST_ERR_PRINT:
+        if (can_print && !busy) begin
+          p_start <= 1;
+          p_msg   <= MSG_READ_ERR;
+          p_addr  <= taddr[22:0];
+          p_data  <= actual;
+          state   <= ST_FAIL;
+        end
+
+        // ---- result ----
+        ST_PASS:
+        if (can_print) begin
+          p_start <= 1;
+          p_msg   <= MSG_PASS;
+          pass_f  <= 1;
+          state   <= ST_DONE;
+        end
+
+        ST_FAIL:
+        if (can_print) begin
+          p_start <= 1;
+          p_msg   <= MSG_FAIL;
+          state   <= ST_DONE;
+        end
+
+        ST_DONE:
+        if (start_evt && !p_busy) begin
+          state <= ST_BANNER;
+        end
+
+        default: state <= ST_RESET;
+      endcase
+    end
+  end
+
+endmodule
+```
+
+</details>

@@ -7,7 +7,7 @@ Source: `Verilog/SD-FAT/circuit/nds_sync.v`
 <!-- HIERARCHY-NAV:BEGIN - written by Verilog/tests/gen_hierarchy.py, do not edit -->
 
 **Where it sits** (Simulation): [ND120_TOP](../../../doc/ND120_TOP.md) > [nd_storage_devices](nd_storage_devices.md) > [nd_storage](nd_storage.md) > [nd_storage_engine](nd_storage_engine.md) > **nds_sync_level**
-- instance path: `TAPE_SDFAT_SOURCE.u_nd_storage.u_engine.u_sync_ok`
+- instance path: `TAPE_SDFAT_SOURCE.u_nd_storage.u_engine.u_sync_err`
 
 **Used in:** [nd_storage_engine](nd_storage_engine.md) (Simulation, Tang, Nexys, QMTECH)
 
@@ -18,6 +18,16 @@ Source: `Verilog/SD-FAT/circuit/nds_sync.v`
 <!-- HIERARCHY-NAV:END -->
 
 ![nds_sync_level symbol](nds_sync_level.png)
+
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `TAPE_SDFAT_SOURCE.u_nd_storage.u_engine.u_sync_grant`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nds_sync_level schematic](nds_sync_level.svg)](nds_sync_level.svg)
+
+<!-- SCHEMATIC:END -->
 
 ## Description
 
@@ -56,3 +66,40 @@ Ronny Hansen
 | input | `1` | `rst_dst_n` *(active low)* | destination-domain reset |
 | input | `[WIDTH-1:0]` | `d_src` | level in the source domain |
 | output | `[WIDTH-1:0]` | `q_dst` | synchronized level |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/nds_sync.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/nds_sync.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nds_sync_level (25 lines)</summary>
+
+```verilog
+module nds_sync_level #(
+    parameter WIDTH = 1
+) (
+    input  wire             clk_dst,    // destination clock
+    input  wire             rst_dst_n,  // destination-domain reset
+    input  wire [WIDTH-1:0] d_src,      // level in the source domain
+    output wire [WIDTH-1:0] q_dst       // synchronized level
+);
+
+  reg [WIDTH-1:0] s_meta;
+  reg [WIDTH-1:0] s_sync;
+
+  always @(posedge clk_dst) begin
+    if (!rst_dst_n) begin
+      s_meta <= {WIDTH{1'b0}};
+      s_sync <= {WIDTH{1'b0}};
+    end else begin
+      s_meta <= d_src;
+      s_sync <= s_meta;
+    end
+  end
+
+  assign q_dst = s_sync;
+
+endmodule
+```
+
+</details>

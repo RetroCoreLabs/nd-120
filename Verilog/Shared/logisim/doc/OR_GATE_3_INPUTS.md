@@ -19,6 +19,16 @@ Source: `Verilog/Shared/logisim/OR_GATE_3_INPUTS.v`
 
 ![OR_GATE_3_INPUTS symbol](OR_GATE_3_INPUTS.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.DCD.GATES_37`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![OR_GATE_3_INPUTS schematic](OR_GATE_3_INPUTS.svg)](OR_GATE_3_INPUTS.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Logisim-evolution goes FPGA automatic generated Verilog code
@@ -33,3 +43,71 @@ Component : OR_GATE_3_INPUTS
 | input | `1` | `input2` |  |
 | input | `1` | `input3` |  |
 | output | `1` | `result` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/OR_GATE_3_INPUTS.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/OR_GATE_3_INPUTS.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of OR_GATE_3_INPUTS (56 lines)</summary>
+
+```verilog
+/******************************************************************************
+ ** Logisim-evolution goes FPGA automatic generated Verilog code             **
+ ** https://github.com/logisim-evolution/                                    **
+ **                                                                          **
+ ** Component : OR_GATE_3_INPUTS                                             **
+ **                                                                          **
+ *****************************************************************************/
+
+module OR_GATE_3_INPUTS( input1,
+                         input2,
+                         input3,
+                         result );
+
+   /*******************************************************************************
+   ** Here all module parameters are defined with a dummy value                  **
+   *******************************************************************************/
+   parameter [64:0] BubblesMask = 1;
+
+   /*******************************************************************************
+   ** The inputs are defined here                                                **
+   *******************************************************************************/
+   input input1;
+   input input2;
+   input input3;
+
+   /*******************************************************************************
+   ** The outputs are defined here                                               **
+   *******************************************************************************/
+   output result;
+
+   /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+   wire s_realInput1;
+   wire s_realInput2;
+   wire s_realInput3;
+
+   /*******************************************************************************
+   ** The module functionality is described here                                 **
+   *******************************************************************************/
+
+   /*******************************************************************************
+   ** Here the bubbles are processed                                             **
+   *******************************************************************************/
+   assign  s_realInput1 = (BubblesMask[0] == 1'b0) ? input1 : ~input1;
+   assign  s_realInput2 = (BubblesMask[1] == 1'b0) ? input2 : ~input2;
+   assign  s_realInput3 = (BubblesMask[2] == 1'b0) ? input3 : ~input3;
+
+   /*******************************************************************************
+   ** Here the functionality is defined                                          **
+   *******************************************************************************/
+   assign result = s_realInput1|
+                   s_realInput2|
+                   s_realInput3;
+
+endmodule
+```
+
+</details>

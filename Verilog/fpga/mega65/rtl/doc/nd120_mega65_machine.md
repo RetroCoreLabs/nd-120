@@ -18,6 +18,16 @@ Source: `Verilog/fpga/mega65/rtl/nd120_mega65_machine.v`
 
 ![nd120_mega65_machine symbol](nd120_mega65_machine.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the MEGA65 R4 R5 R6 build, where it is the top. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd120_mega65_machine schematic](nd120_mega65_machine.svg)](nd120_mega65_machine.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Parameters
 
 | Parameter | Default |
@@ -85,3 +95,622 @@ Source: `Verilog/fpga/mega65/rtl/nd120_mega65_machine.v`
 | output | `1` | `cpu_green` | self-test passed, initialisation complete |
 | output | `1` | `cpu_running` |  |
 | output | `1` | `disc_activity` |  |
+
+## Verilog source
+
+[`Verilog/fpga/mega65/rtl/nd120_mega65_machine.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/mega65/rtl/nd120_mega65_machine.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd120_mega65_machine (607 lines)</summary>
+
+```verilog
+//============================================================================
+//! The ND-120 machine on the MEGA65: CPU board, main memory, console, and
+//! the floppy / Winchester / tape controllers on virtual drives.
+//!
+//! Full path: Verilog/fpga/mega65/rtl/nd120_mega65_machine.v
+//!
+//! This is the MEGA65 counterpart of fpga/mister/nd120.sv's `emu` module,
+//! written 02-SEP-2026 from the version of it that booted SINTRAN on the
+//! DE10-Nano (4 MB SDRAM main memory, 7E1 console, storage over the MiSTer
+//! block protocol). Everything MiSTer-specific is replaced by the
+//! MiSTer2MEGA65 framework's contract, which CORE/vhdl/main.vhd hands in:
+//!
+//!   keyboard   the framework's 1 kHz key scan -> nd120_console_mega65
+//!   video      RGB + syncs + blanks at 40 MHz, one pixel per clock
+//!   storage    vdrives (MiSTer sd_* protocol, BYTE-wide buffer, QNICE
+//!              clock) -> nd_storage_vdrives -> the same three
+//!              controller-facing adapters the MiSTer and Nexys use
+//!   memory     ONE of two, chosen at build time (docs/00-plan.md):
+//!     MAIN_RAM_SDRAM  R4/R5/R6: the board's 64 MB SDRAM on the Tang/MiSTer
+//!                     sheet-49 bridge (MEM_RAM_49_SDRAM + sdram18), 16-bit
+//!                     module mode (ND_SDRAM_PACK16 + ND_SDRAM_DQ16) exactly
+//!                     as on the DE10-Nano - the pins come out of this module
+//!     MAIN_RAM_DDR2   R3: the 8 MiB HyperRAM through the framework's
+//!                     Avalon-MM port. The define's name is the Nexys's,
+//!                     because what it selects is the Nexys's variable-
+//!                     latency seam (MEM_RAM_49_DDR2 cache + MEM_HOLD) whose
+//!                     request/response contract nd_avalon_port implements.
+//!
+//! CLOCKS (all from CORE/vhdl/clk.vhd's one MMCM, so the bridge's
+//! "same PLL, edge-aligned" rule holds):
+//!   clk_cpu      20 MHz   the CPU board (13.333 MHz on R3, see build.tcl;
+//!                         BOARD_CLK_FREQ must say the same)
+//!   clk_2x       40 MHz   SDRAM bridge clock AND the console's pixel clock
+//!   clk_2x_sdram 40 MHz   180 degrees, the SDRAM chip's clock pin
+//!   clk_qnice    50 MHz   the framework's QNICE clock: vdrives' sd_* side
+//!   hr_clk      100 MHz   the framework's HyperRAM clock: the Avalon side
+//!
+//! Panel lamps, the CPU's own two LEDs, the MIPS field and the disc lamps
+//! feed the terminal's operator panel exactly as on the MiSTer.
+//============================================================================
+
+`default_nettype none
+
+module nd120_mega65_machine #(
+    parameter integer N_CLIENTS  = 5,   //! storage slots: fd0 fd1 wd0 wd1 tape
+    parameter integer LOCAL_ECHO = 0    //! 1 only for a console-only test build
+) (
+    // ---- clocks and resets ----
+    input wire clk_cpu,        //! 20 MHz
+    input wire clk_2x,         //! 40 MHz, same MMCM, edge-aligned
+    input wire clk_2x_sdram,   //! 40 MHz, 180 degrees (SDRAM builds)
+    input wire rst_n,          //! async, active low, released in the clk_2x domain
+    input wire cache_on,       //! CACHE_SW: 1 = the CPU's own cache enabled
+
+    // ---- keyboard scan (clk_2x domain) ----
+    input wire [6:0] key_num,
+    input wire       key_pressed_n,
+    input wire [1:0] text_colour,
+    input wire       panel_enable,
+
+    // ---- video (clk_2x domain) ----
+    output wire [7:0] video_r,
+    output wire [7:0] video_g,
+    output wire [7:0] video_b,
+    output wire       video_hs,
+    output wire       video_vs,
+    output wire       video_hblank,
+    output wire       video_vblank,
+
+    // ---- storage: the vdrives side (clk_qnice domain), flattened ----
+    input  wire                   clk_qnice,
+    input  wire                   rst_qnice_n,
+    input  wire [N_CLIENTS-1:0]   img_mounted,
+    input  wire                   img_readonly,
+    input  wire [31:0]            img_size,
+    output wire [N_CLIENTS*32-1:0] sd_lba,
+    output wire [N_CLIENTS*6-1:0]  sd_blk_cnt,
+    output wire [N_CLIENTS-1:0]   sd_rd,
+    output wire [N_CLIENTS-1:0]   sd_wr,
+    input  wire [N_CLIENTS-1:0]   sd_ack,
+    input  wire [13:0]            sd_buff_addr,
+    input  wire [7:0]             sd_buff_dout,
+    output wire [7:0]             sd_buff_din,
+    input  wire                   sd_buff_wr,
+
+    // Both memory port groups are ALWAYS present, whichever backend the build
+    // selects: the VHDL wrapper (CORE/vhdl/main.vhd) declares this module as
+    // a component with one fixed port list. The unused group is driven idle.
+    // ---- main memory: the board's SDRAM (R4/R5/R6, MAIN_RAM_SDRAM) ----
+    output wire        sdram_clk,
+    output wire        sdram_cke,
+    output wire        sdram_cs_n,
+    output wire        sdram_ras_n,
+    output wire        sdram_cas_n,
+    output wire        sdram_we_n,
+    output wire [12:0] sdram_a,
+    output wire [1:0]  sdram_ba,
+    output wire        sdram_dqml,
+    output wire        sdram_dqmh,
+    inout  wire [15:0] sdram_dq,
+    // ---- main memory: the framework's HyperRAM Avalon port (R3, MAIN_RAM_DDR2) ----
+    input  wire        hr_clk,
+    input  wire        hr_rst,             //! active HIGH (the framework's)
+    output wire        hr_write,
+    output wire        hr_read,
+    output wire [31:0] hr_address,
+    output wire [15:0] hr_writedata,
+    output wire [1:0]  hr_byteenable,
+    output wire [7:0]  hr_burstcount,
+    input  wire [15:0] hr_readdata,
+    input  wire        hr_readdatavalid,
+    input  wire        hr_waitrequest,
+
+    // ---- status, for LEDs (clk_cpu domain) ----
+    output wire cpu_red,      //! MACL in progress (active high here)
+    output wire cpu_green,    //! self-test passed, initialisation complete
+    output wire cpu_running,
+    output wire disc_activity
+);
+
+  //--------------------------------------------------------------------------
+  // Resets
+  //--------------------------------------------------------------------------
+  // rst_n is the framework's reset (MMCM lock + reset button), released in the
+  // clk_2x domain. The CPU gets it synchronised onto its own clock, so the
+  // core never sees a reset edge that violates its setup (MiSTer nd120.sv).
+  reg [1:0] cpu_rst_sync = 2'b00;
+  always @(posedge clk_cpu or negedge rst_n) begin
+    if (!rst_n) cpu_rst_sync <= 2'b00;
+    else        cpu_rst_sync <= {cpu_rst_sync[0], 1'b1};
+  end
+  wire cpu_rst_n = cpu_rst_sync[1];
+
+  // The OSD's cache switch arrives from the framework's main_clk domain and
+  // feeds ~45 ns of CPU logic (CACHE_SW -> MMU cache -> CGA). Re-registered
+  // here in the CPU domain so that logic starts from a cpu_clk flop, and
+  // build.tcl false-paths the crossing INTO this synchroniser - a
+  // quasi-static setting, not a data path. Measured 02-SEP-2026 (R3 build):
+  // without this, 4673 endpoints failed on the 25 ns budget between the
+  // related 40 MHz and CPU clocks.
+  reg [1:0] s_cache_sync = 2'b11;
+  always @(posedge clk_cpu) s_cache_sync <= {s_cache_sync[0], cache_on};
+  wire s_cache_on_cpu = s_cache_sync[1];
+
+  //--------------------------------------------------------------------------
+  // Console: the shared terminal on the framework's keyboard and video, with
+  // the byte-level UART bridge to the CPU's real serial pins
+  //--------------------------------------------------------------------------
+  wire       s_cpu_byte_valid;
+  wire [7:0] s_cpu_byte_data;
+  wire       s_console_byte_ready;
+  wire       s_kbd_valid;
+  wire [7:0] s_kbd_data;
+  wire       s_kbd_ready;
+  wire       s_cpu_txd, s_cpu_rxd;
+
+  wire [ 6:0] s_core_led;
+  wire        s_core_run_n;
+  wire [ 3:0] s_core_pil;
+  wire [ 7:0] s_core_dbg_panel;
+  wire [15:0] s_core_panel_actlv;
+  wire        s_core_debug_cfetch;
+  wire [15:0] s_panel_mips;
+  wire        s_lamp_hdd_rd, s_lamp_hdd_wr, s_lamp_flp_rd, s_lamp_flp_wr;
+
+  nd120_console_mega65 #(
+      .FONT_FILE ("embedded"),
+      .LOCAL_ECHO(LOCAL_ECHO)
+  ) CONSOLE (
+      .clk  (clk_2x),
+      .rst_n(rst_n),
+
+      .key_num      (key_num),
+      .key_pressed_n(key_pressed_n),
+      .text_colour  (text_colour),
+
+      .cpu_byte_valid(s_cpu_byte_valid),
+      .cpu_byte_data (s_cpu_byte_data),
+      .cpu_byte_ready(s_console_byte_ready),
+
+      .panel_enable      (panel_enable),
+      .panel_pil         (s_core_pil),
+      .panel_actlv       (s_core_panel_actlv),
+      .panel_mips        (s_panel_mips),
+      // The CPU board's own lamps: ACTIVE LOW at the source (IO_REG_41.v),
+      // measured on the MiSTer - passing them straight through showed every
+      // lamp backwards.
+      .panel_cpu_red     (~s_core_led[0]),
+      .panel_cpu_green   (~s_core_led[1]),
+      .panel_lev0        (s_core_dbg_panel[5]),
+      .panel_hit         (s_core_dbg_panel[4]),
+      .panel_ring        (s_core_dbg_panel[1:0]),
+      .panel_paging_on   (s_core_dbg_panel[2]),
+      .panel_interrupt_on(s_core_dbg_panel[3]),
+      .panel_running     (~s_core_run_n),
+      .panel_hdd_rd      (s_lamp_hdd_rd),
+      .panel_hdd_wr      (s_lamp_hdd_wr),
+      .panel_flp_rd      (s_lamp_flp_rd),
+      .panel_flp_wr      (s_lamp_flp_wr),
+
+      .kbd_ready(s_kbd_ready),
+      .kbd_valid(s_kbd_valid),
+      .kbd_data (s_kbd_data),
+
+      .video_r(video_r),
+      .video_g(video_g),
+      .video_b(video_b),
+      .hsync  (video_hs),
+      .vsync  (video_vs),
+      .hblank (video_hblank),
+      .vblank (video_vblank),
+      .de     (),
+      .bell   ()
+  );
+
+  // The console UART bridge, as on the MiSTer (nd120.sv, 02-SEP-2026):
+  // 7 DATA BITS + PARITY on receive - SINTRAN's boot text carries software
+  // parity in bit 7, and an 8N1 receiver hands the terminal bytes >= 0x7F
+  // that it drops, losing every other character of those lines. 8N1 on
+  // transmit. 115200 fixed. Both on the 40 MHz console clock.
+  console_uart_rx #(
+      .CLK_HZ   (40_000_000),
+      .BAUD     (115_200),
+      .DATA_BITS(7),
+      .PARITY   (1'b1)
+  ) CONSOLE_UART_RX (
+      .clk        (clk_2x),
+      .rst_n      (rst_n),
+      .divisor_ovr(16'd0),
+      .rxd        (s_cpu_txd),
+      .byte_valid (s_cpu_byte_valid),
+      .byte_data  (s_cpu_byte_data)
+  );
+
+  console_uart_tx #(
+      .CLK_HZ    (40_000_000),
+      .BAUD      (115_200),
+      .DATA_BITS (8),
+      .PARITY    (1'b0),
+      .PARITY_ODD(1'b0)
+  ) CONSOLE_UART_TX (
+      .clk        (clk_2x),
+      .rst_n      (rst_n),
+      .divisor_ovr(16'd0),
+      .byte_valid (s_kbd_valid),
+      .byte_data  (s_kbd_data),
+      .ready      (s_kbd_ready),
+      .txd        (s_cpu_rxd)
+  );
+
+  // Counts CFETCH in the CPU domain; CLOCK_HZ must be the CPU's clock, which
+  // is the build's BOARD_CLK_FREQ (20 MHz on R4-R6, 13.333 MHz on R3).
+`ifdef BOARD_CLK_FREQ
+  localparam integer CPU_HZ = `BOARD_CLK_FREQ;
+`else
+  localparam integer CPU_HZ = 20_000_000;
+`endif
+  mips_counter #(
+      .CLOCK_HZ(CPU_HZ)
+  ) MIPS (
+      .clk     (clk_cpu),
+      .rst_n   (cpu_rst_n),
+      .fetch   (s_core_debug_cfetch),
+      .mips_bcd(s_panel_mips)
+  );
+
+  //--------------------------------------------------------------------------
+  // Storage: the three controller seams served from the virtual drives
+  //--------------------------------------------------------------------------
+  wire        s_tape_req, s_tape_valid, s_tape_rewind;
+  wire [7:0]  s_tape_data;
+  wire        s_tdisk_fault;
+  wire [3:0]  s_tdisk_code;
+  wire        s_fd_req, s_fd_wr, s_fd_done, s_fd_err, s_fdb_we;
+  wire [15:0] s_fd_lsect, s_fdb_wdata, s_fdb_rdata;
+  wire [1:0]  s_fd_format, s_fd_drive;
+  wire [10:0] s_fd_wc;
+  wire [3:0]  s_fd_code, s_fd_media;
+  wire [9:0]  s_fdb_addr;
+  wire        s_wd_start, s_wd_req, s_wd_wr, s_wd_done, s_wd_err, s_wdb_we;
+  wire [15:0] s_wd_ba1, s_wd_ba2, s_wdb_wdata, s_wdb_rdata;
+  wire [2:0]  s_wd_unit;
+  wire [10:0] s_wd_wc;
+  wire [3:0]  s_wd_code;
+  wire [9:0]  s_wdb_addr;
+  wire [N_CLIENTS-1:0] s_img_mounted_cpu;
+
+  nd_storage_mega65_devices #(
+      .N_CLIENTS(N_CLIENTS)
+  ) STORAGE (
+      .clk_cpu   (clk_cpu),
+      .rst_cpu_n (cpu_rst_n),
+      .clk_sys   (clk_qnice),
+      .rst_sys_n (rst_qnice_n),
+
+      .byte_req      (s_tape_req),
+      .byte_valid    (s_tape_valid),
+      .byte_data     (s_tape_data),
+      .source_rewind (s_tape_rewind),
+      .TDISK_FAULT   (s_tdisk_fault),
+      .TDISK_ERR_CODE(s_tdisk_code),
+
+      .FDISK_REQ      (s_fd_req),
+      .FDISK_WR       (s_fd_wr),
+      .FDISK_LSECT    (s_fd_lsect),
+      .FDISK_FORMAT   (s_fd_format),
+      .FDISK_DRIVE    (s_fd_drive),
+      .FDISK_WORDCOUNT(s_fd_wc),
+      .FDISK_DONE     (s_fd_done),
+      .FDISK_ERR      (s_fd_err),
+      .FDISK_ERR_CODE (s_fd_code),
+      .FDISK_MEDIA_FMT(s_fd_media),
+      .FDBUF_ADDR     (s_fdb_addr),
+      .FDBUF_WDATA    (s_fdb_wdata),
+      .FDBUF_WE       (s_fdb_we),
+      .FDBUF_RDATA    (s_fdb_rdata),
+
+      .WDISK_START    (s_wd_start),
+      .WDISK_REQ      (s_wd_req),
+      .WDISK_WR       (s_wd_wr),
+      .WDISK_BLKADDR1 (s_wd_ba1),
+      .WDISK_BLKADDR2 (s_wd_ba2),
+      .WDISK_UNIT     (s_wd_unit),
+      .WDISK_WORDCOUNT(s_wd_wc),
+      .WDISK_DONE     (s_wd_done),
+      .WDISK_ERR      (s_wd_err),
+      .WDISK_ERR_CODE (s_wd_code),
+      .WDBUF_ADDR     (s_wdb_addr),
+      .WDBUF_WDATA    (s_wdb_wdata),
+      .WDBUF_WE       (s_wdb_we),
+      .WDBUF_RDATA    (s_wdb_rdata),
+
+      .img_mounted (img_mounted),
+      .img_readonly(img_readonly),
+      .img_size    (img_size),
+      .sd_lba      (sd_lba),
+      .sd_blk_cnt  (sd_blk_cnt),
+      .sd_rd       (sd_rd),
+      .sd_wr       (sd_wr),
+      .sd_ack      (sd_ack),
+      .sd_buff_addr(sd_buff_addr),
+      .sd_buff_dout(sd_buff_dout),
+      .sd_buff_din (sd_buff_din),
+      .sd_buff_wr  (sd_buff_wr),
+
+      .MOUNTED(s_img_mounted_cpu)
+  );
+
+  // panel lamps: the same four expressions the Nexys and MiSTer tops use
+  assign s_lamp_hdd_rd = s_wd_req & ~s_wd_wr;
+  assign s_lamp_hdd_wr = s_wd_req &  s_wd_wr;
+  assign s_lamp_flp_rd = s_fd_req & ~s_fd_wr;
+  assign s_lamp_flp_wr = s_fd_req &  s_fd_wr;
+  assign disc_activity = s_wd_req | s_fd_req | s_tape_req;
+
+  //--------------------------------------------------------------------------
+  // Main memory backend wiring
+  //--------------------------------------------------------------------------
+`ifdef MAIN_RAM_SDRAM
+  // The bridge's ports are the Tang's 32-bit shape; on a 16-bit module the
+  // upper 16 DQ bits and the upper 2 DQM bits go nowhere and A[12:11] = 0
+  // (2K rows x 256 columns x 4 banks = the 4 MB map), exactly as nd120.sv.
+  wire [15:0] s_sdram_dq_hi;
+  wire [10:0] s_sdram_a11;
+  wire [ 3:0] s_sdram_dqm4;
+  assign sdram_a    = {2'b00, s_sdram_a11};
+  assign sdram_dqml = s_sdram_dqm4[0];
+  assign sdram_dqmh = s_sdram_dqm4[1];
+`endif
+`ifndef MAIN_RAM_SDRAM
+  // no SDRAM in this build: park the pins the way the framework's own top
+  // does (cke 0, cs_n 1, dq released)
+  assign sdram_clk   = 1'b0;
+  assign sdram_cke   = 1'b0;
+  assign sdram_cs_n  = 1'b1;
+  assign sdram_ras_n = 1'b1;
+  assign sdram_cas_n = 1'b1;
+  assign sdram_we_n  = 1'b1;
+  assign sdram_a     = 13'd0;
+  assign sdram_ba    = 2'b00;
+  assign sdram_dqml  = 1'b0;
+  assign sdram_dqmh  = 1'b0;
+  assign sdram_dq    = 16'bz;
+`endif
+`ifndef MAIN_RAM_DDR2
+  // no HyperRAM traffic in this build
+  assign hr_write      = 1'b0;
+  assign hr_read       = 1'b0;
+  assign hr_address    = 32'd0;
+  assign hr_writedata  = 16'd0;
+  assign hr_byteenable = 2'b00;
+  assign hr_burstcount = 8'd0;
+`endif
+`ifdef MAIN_RAM_DDR2
+  wire         mm_req_valid, mm_req_we, mm_req_ready, mm_rsp_valid;
+  wire [ 26:0] mm_req_addr;
+  wire [127:0] mm_req_wdata, mm_rsp_rdata;
+  wire [ 15:0] mm_req_wmask;
+
+  nd_avalon_port #(
+      .BASE_WORDS(32'h0020_0000),   // globals.vhd C_HMAP_DEMO: the core's 4 MiB window
+      .G_BURST   (1)
+  ) MEMPORT (
+      .clk(hr_clk),
+      .rst(hr_rst),
+      .req_valid(mm_req_valid),
+      .req_we   (mm_req_we),
+      .req_addr (mm_req_addr),
+      .req_wdata(mm_req_wdata),
+      .req_wmask(mm_req_wmask),
+      .req_ready(mm_req_ready),
+      .rsp_valid(mm_rsp_valid),
+      .rsp_rdata(mm_rsp_rdata),
+      .avm_write        (hr_write),
+      .avm_read         (hr_read),
+      .avm_address      (hr_address),
+      .avm_writedata    (hr_writedata),
+      .avm_byteenable   (hr_byteenable),
+      .avm_burstcount   (hr_burstcount),
+      .avm_readdata     (hr_readdata),
+      .avm_readdatavalid(hr_readdatavalid),
+      .avm_waitrequest  (hr_waitrequest)
+  );
+`endif
+
+  //--------------------------------------------------------------------------
+  // The ND-120 CPU board
+  //--------------------------------------------------------------------------
+  // No external ND bus on this board: same tie-offs as the Tang and MiSTer.
+  wire [23:0] s_bd_in = 24'hFFFFFF;
+  // Both console sources idle high; the CPU's RX is only the local keyboard
+  // here (no serial port on the MEGA65).
+  wire s_cpu_rxd_merged = s_cpu_rxd;
+
+  ND120_CORE #(
+      .INCLUDE_TAPE  (1),
+      .INCLUDE_FLOPPY(1),
+      .INCLUDE_SMD   (0),
+      .INCLUDE_WD    (1)
+  ) CORE (
+      .BAUD_9600(1'b0),   // no baud switch - console fixed 115200
+      .clk_cpu  (clk_cpu),
+      .sys_rst_n(cpu_rst_n),
+      .CACHE_SW (s_cache_on_cpu),
+
+      .BREQ_n(1'b1),
+      .BINT10_n(1'b1),
+      .BINT11_n(1'b1),
+      .BINT12_n(1'b1),
+      .BINT13_n(1'b1),
+      .BINT15_n(1'b1),
+      .POWSENSE_n(1'b1),
+
+      .BD_23_0_n_IN(s_bd_in),
+      .BD_23_0_n_OUT(),
+
+      .SEMRQ_n_IN(1'b1),
+      .SEMRQ_n_OUT(),
+      .BINPUT_n_IN(1'b1),
+      .BINPUT_n_OUT(),
+      .BDAP_n_IN(1'b1),
+      .BDAP_n_OUT(),
+      .BDRY_n_IN(1'b1),
+      .BDRY_n_OUT(),
+      .BAPR_n_IN(1'b1),
+      .BAPR_n_OUT(),
+
+      .BREF_n(),
+      .BERROR_n(),
+      .BINACK_n(),
+      .BIOXE_n(),
+      .BMEM_n(),
+      .OUTGRANT_n(),
+      .OUTIDENT_n(),
+      .MCL(),
+
+      .RXD(s_cpu_rxd_merged),
+      .TXD(s_cpu_txd),
+
+      .TAPE_BYTE_REQ(s_tape_req),
+      .TAPE_BYTE_VALID(s_tape_valid),
+      .TAPE_BYTE_DATA(s_tape_data),
+      .TAPE_REWIND(s_tape_rewind),
+
+      .DMA_REQ(1'b0),
+      .DMA_WR(1'b0),
+      .DMA_ADDR(24'd0),
+      .DMA_WDATA(16'd0),
+      .DMA_RDATA(),
+      .DMA_ACK(),
+      .DMA_ERR(),
+      .DMA_BUSY(),
+
+      .FDISK_REQ(s_fd_req),
+      .FDISK_WR(s_fd_wr),
+      .FDISK_LSECT(s_fd_lsect),
+      .FDISK_FORMAT(s_fd_format),
+      .FDISK_DRIVE(s_fd_drive),
+      .FDISK_WORDCOUNT(s_fd_wc),
+      .FDISK_DONE(s_fd_done),
+      .FDISK_ERR(s_fd_err),
+      .FDISK_ERR_CODE(s_fd_code),
+      .FDISK_MEDIA_FMT(s_fd_media),
+      .FDBUF_ADDR(s_fdb_addr),
+      .FDBUF_WDATA(s_fdb_wdata),
+      .FDBUF_WE(s_fdb_we),
+      .FDBUF_RDATA(s_fdb_rdata),
+
+      .SDISK_START(),
+      .SDISK_REQ(),
+      .SDISK_WR(),
+      .SDISK_BLKADDR1(),
+      .SDISK_BLKADDR2(),
+      .SDISK_UNIT(),
+      .SDISK_WORDCOUNT(),
+      .SDISK_DONE(1'b0),
+      .SDISK_ERR(1'b0),
+      .SDISK_ERR_CODE(4'd0),
+      .SDBUF_ADDR(10'd0),
+      .SDBUF_WDATA(16'd0),
+      .SDBUF_WE(1'b0),
+      .SDBUF_RDATA(),
+
+      .WDISK_START(s_wd_start),
+      .WDISK_REQ(s_wd_req),
+      .WDISK_WR(s_wd_wr),
+      .WDISK_BLKADDR1(s_wd_ba1),
+      .WDISK_BLKADDR2(s_wd_ba2),
+      .WDISK_UNIT(s_wd_unit),
+      .WDISK_WORDCOUNT(s_wd_wc),
+      .WDISK_DONE(s_wd_done),
+      .WDISK_ERR(s_wd_err),
+      .WDISK_ERR_CODE(s_wd_code),
+      .WDBUF_ADDR(s_wdb_addr),
+      .WDBUF_WDATA(s_wdb_wdata),
+      .WDBUF_WE(s_wdb_we),
+      .WDBUF_RDATA(s_wdb_rdata),
+
+`ifdef MAIN_RAM_SDRAM
+      .clk2x        (clk_2x),
+      .clk2x_sdram  (clk_2x_sdram),
+      .O_sdram_clk  (sdram_clk),
+      .O_sdram_cke  (sdram_cke),
+      .O_sdram_cs_n (sdram_cs_n),
+      .O_sdram_cas_n(sdram_cas_n),
+      .O_sdram_ras_n(sdram_ras_n),
+      .O_sdram_wen_n(sdram_we_n),
+      .IO_sdram_dq  ({s_sdram_dq_hi, sdram_dq}),
+      .O_sdram_addr (s_sdram_a11),
+      .O_sdram_ba   (sdram_ba),
+      .O_sdram_dqm  (s_sdram_dqm4),
+      .DBG_MEMW     (),
+      .DBG_PTW      (),
+      .PF_CAPTURED  (),
+      .DBG_WDSTAGE  (),
+      .DBG_PPN      (),
+      .DBG_PGW      (),
+`endif
+`ifdef MAIN_RAM_DDR2
+      .ui_clk      (hr_clk),
+      .ui_rst      (hr_rst),
+      .mm_req_valid(mm_req_valid),
+      .mm_req_we   (mm_req_we),
+      .mm_req_addr (mm_req_addr),
+      .mm_req_wdata(mm_req_wdata),
+      .mm_req_wmask(mm_req_wmask),
+      .mm_req_ready(mm_req_ready),
+      .mm_rsp_valid(mm_rsp_valid),
+      .mm_rsp_rdata(mm_rsp_rdata),
+      .DBG_DDR2_BRIDGE(),
+`endif
+
+      .LED(s_core_led),
+      .RUN_n(s_core_run_n),
+      .CSA_12_0(),
+      .PIL(s_core_pil),
+      .LA_23_10(),
+      .CA_9_0(),
+      .DEBUG_CC_TERM(),
+      .DEBUG_MCLK(),
+      .DEBUG_LCS_n(),
+      .DEBUG_FETCH(),
+      .DEBUG_MAP_n(),
+      .DEBUG_CFETCH(s_core_debug_cfetch),
+      .DEBUG_MR_n(),
+      .DEBUG_CLEAR_n(),
+      .DEBUG_REFRQ_n(),
+      .DEBUG_INTRQ_n(),
+      .DEBUG_POWFAIL_n(),
+      .DEBUG_FIDBO_15_0(),
+      .DEBUG_IREQ_15_0_N(),
+      .XMIC_DBG_15_0(),
+      .XWRFB_DBG_19_0(),
+      .XCYC_DBG_7_0(),
+      .DBG_PTW_LVL(),
+      .DBG_PANEL(s_core_dbg_panel),
+      .PANEL_ACTLV(s_core_panel_actlv),
+      .DBG_CACHE()
+  );
+
+  assign cpu_red     = ~s_core_led[0];
+  assign cpu_green   = ~s_core_led[1];
+  assign cpu_running = ~s_core_run_n;
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

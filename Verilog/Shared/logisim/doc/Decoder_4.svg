@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512.0" height="579.0" viewBox="-80.0 -80.0 512.0 579.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="512.0" height="579.0" fill="#ffffff" /><g transform="translate(148,49.5)" id="cell_$and$Decoder_4.v:33$2"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$Decoder_4.v:33$2" /><g /><g /><g /></g>
+<g transform="translate(148,369.5)" id="cell_$and$Decoder_4.v:34$5"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$Decoder_4.v:34$5" /><g /><g /><g /></g>
+<g transform="translate(148,304.5)" id="cell_$and$Decoder_4.v:35$8"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$Decoder_4.v:35$8" /><g /><g /><g /></g>
+<g transform="translate(148,239.5)" id="cell_$and$Decoder_4.v:36$11"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$Decoder_4.v:36$11" /><g /><g /><g /></g>
+<g transform="translate(80,59.5)" id="cell_$eq$Decoder_4.v:33$1"><path d="M0,0 L0,20 L20,10 Z" class="cell_$eq$Decoder_4.v:33$1" /><circle cx="23" cy="10" r="3" class="cell_$eq$Decoder_4.v:33$1" /><g /><g /></g>
+<g transform="translate(80.66666666666667,377)" id="cell_$eq$Decoder_4.v:34$4"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$eq$Decoder_4.v:34$4" /><line x1="7.5" x2="17.5" y1="10" y2="10" class="cell_$eq$Decoder_4.v:34$4" /><line x1="7.5" x2="17.5" y1="15" y2="15" class="cell_$eq$Decoder_4.v:34$4" /><g /><g /><g /></g>
+<g transform="translate(80.66666666666667,312)" id="cell_$eq$Decoder_4.v:35$7"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$eq$Decoder_4.v:35$7" /><line x1="7.5" x2="17.5" y1="10" y2="10" class="cell_$eq$Decoder_4.v:35$7" /><line x1="7.5" x2="17.5" y1="15" y2="15" class="cell_$eq$Decoder_4.v:35$7" /><g /><g /><g /></g>
+<g transform="translate(80.66666666666667,247)" id="cell_$eq$Decoder_4.v:36$10"><circle r="12.5" cx="12.5" cy="12.5" class="cell_$eq$Decoder_4.v:36$10" /><line x1="7.5" x2="17.5" y1="10" y2="10" class="cell_$eq$Decoder_4.v:36$10" /><line x1="7.5" x2="17.5" y1="15" y2="15" class="cell_$eq$Decoder_4.v:36$10" /><g /><g /><g /></g>
+<g transform="translate(213,12)" id="cell_$ternary$Decoder_4.v:33$3"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$Decoder_4.v:33$3" /><g /><g /><g /><g /></g>
+<g transform="translate(213,332)" id="cell_$ternary$Decoder_4.v:34$6"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$Decoder_4.v:34$6" /><g /><g /><g /><g /></g>
+<g transform="translate(213,262)" id="cell_$ternary$Decoder_4.v:35$9"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$Decoder_4.v:35$9" /><g /><g /><g /><g /></g>
+<g transform="translate(213,164.5)" id="cell_$ternary$Decoder_4.v:36$12"><path d="M0,0 L20,10 L20,30 L0,40 Z" class="cell_$ternary$Decoder_4.v:36$12" /><g /><g /><g /><g /></g>
+<g transform="translate(268,22)" id="cell_decoderOut_0"><text x="15" y="-4" class="nodelabel cell_decoderOut_0">decoderOut_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_decoderOut_0" /><g /></g>
+<g transform="translate(268,342)" id="cell_decoderOut_1"><text x="15" y="-4" class="nodelabel cell_decoderOut_1">decoderOut_1</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_decoderOut_1" /><g /></g>
+<g transform="translate(268,272)" id="cell_decoderOut_2"><text x="15" y="-4" class="nodelabel cell_decoderOut_2">decoderOut_2</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_decoderOut_2" /><g /></g>
+<g transform="translate(268,174.5)" id="cell_decoderOut_3"><text x="15" y="-4" class="nodelabel cell_decoderOut_3">decoderOut_3</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_decoderOut_3" /><g /></g>
+<g transform="translate(77,192)" id="cell_enable"><text x="15" y="-4" class="nodelabel cell_enable">enable</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_enable" /><g /></g>
+<g transform="translate(12,59.5)" id="cell_sel"><text x="15" y="-4" class="nodelabel cell_sel">sel</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sel" /><g /></g>
+<g transform="translate(12,387)" id="cell_01"><text x="15" y="-4" class="nodelabel cell_01">01</text><rect width="30" height="20" class="cell_01" /><g /></g>
+<g transform="translate(12,322)" id="cell_10"><text x="15" y="-4" class="nodelabel cell_10">10</text><rect width="30" height="20" class="cell_10" /><g /></g>
+<g transform="translate(12,257)" id="cell_11"><text x="15" y="-4" class="nodelabel cell_11">11</text><rect width="30" height="20" class="cell_11" /><g /></g>
+<g transform="translate(148,119.5)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(148,184.5)" id="cell_1"><text x="15" y="-4" class="nodelabel cell_1">1</text><rect width="30" height="20" class="cell_1" /><g /></g>
+<line x1="105" x2="123" y1="202" y2="202" class="net_6"><title>enable</title></line>
+<line x1="123" x2="123" y1="202" y2="54.5" class="net_6"><title>enable</title></line>
+<circle cx="123" cy="202" r="2" style="fill:#000" class="net_6" />
+<line x1="123" x2="148" y1="54.5" y2="54.5" class="net_6"><title>enable</title></line>
+<line x1="105" x2="123" y1="202" y2="202" class="net_6"><title>enable</title></line>
+<line x1="123" x2="123" y1="202" y2="374.5" class="net_6"><title>enable</title></line>
+<line x1="123" x2="148" y1="374.5" y2="374.5" class="net_6"><title>enable</title></line>
+<line x1="105" x2="123" y1="202" y2="202" class="net_6"><title>enable</title></line>
+<line x1="123" x2="123" y1="202" y2="309.5" class="net_6"><title>enable</title></line>
+<circle cx="123" cy="309.5" r="2" style="fill:#000" class="net_6" />
+<line x1="123" x2="148" y1="309.5" y2="309.5" class="net_6"><title>enable</title></line>
+<line x1="105" x2="123" y1="202" y2="202" class="net_6"><title>enable</title></line>
+<line x1="123" x2="123" y1="202" y2="244.5" class="net_6"><title>enable</title></line>
+<circle cx="123" cy="244.5" r="2" style="fill:#000" class="net_6" />
+<line x1="123" x2="148" y1="244.5" y2="244.5" class="net_6"><title>enable</title></line>
+<line x1="105" x2="148" y1="69.5" y2="69.5" class="net_9" />
+<line x1="105.66666666666667" x2="148" y1="389.5" y2="389.5" class="net_11" />
+<line x1="105.66666666666667" x2="148" y1="324.5" y2="324.5" class="net_13" />
+<line x1="105.66666666666667" x2="148" y1="259.5" y2="259.5" class="net_15" />
+<line x1="40" x2="80" y1="69.5" y2="69.5" class="net_7,8"><title>sel</title></line>
+<line x1="40" x2="52" y1="69.5" y2="69.5" class="net_7,8"><title>sel</title></line>
+<line x1="52" x2="52" y1="69.5" y2="382" class="net_7,8"><title>sel</title></line>
+<circle cx="52" cy="69.5" r="2" style="fill:#000" class="net_7,8" />
+<line x1="52" x2="83.66666666666667" y1="382" y2="382" class="net_7,8"><title>sel</title></line>
+<line x1="40" x2="52" y1="69.5" y2="69.5" class="net_7,8"><title>sel</title></line>
+<line x1="52" x2="52" y1="69.5" y2="317" class="net_7,8"><title>sel</title></line>
+<circle cx="52" cy="317" r="2" style="fill:#000" class="net_7,8" />
+<line x1="52" x2="83.66666666666667" y1="317" y2="317" class="net_7,8"><title>sel</title></line>
+<line x1="40" x2="52" y1="69.5" y2="69.5" class="net_7,8"><title>sel</title></line>
+<line x1="52" x2="52" y1="69.5" y2="252" class="net_7,8"><title>sel</title></line>
+<circle cx="52" cy="252" r="2" style="fill:#000" class="net_7,8" />
+<line x1="52" x2="83.66666666666667" y1="252" y2="252" class="net_7,8"><title>sel</title></line>
+<line x1="42" x2="83.66666666666667" y1="397" y2="397" class="net_17,18" />
+<line x1="42" x2="83.66666666666667" y1="332" y2="332" class="net_19,20" />
+<line x1="42" x2="83.66666666666667" y1="267" y2="267" class="net_21,22" />
+<line x1="178" x2="198" y1="129.5" y2="129.5" class="net_23" />
+<line x1="198" x2="198" y1="129.5" y2="22" class="net_23" />
+<circle cx="198" cy="129.5" r="2" style="fill:#000" class="net_23" />
+<line x1="198" x2="213" y1="22" y2="22" class="net_23" />
+<line x1="178" x2="198" y1="129.5" y2="129.5" class="net_23" />
+<line x1="198" x2="198" y1="129.5" y2="342" class="net_23" />
+<line x1="198" x2="213" y1="342" y2="342" class="net_23" />
+<line x1="178" x2="198" y1="129.5" y2="129.5" class="net_23" />
+<line x1="198" x2="198" y1="129.5" y2="272" class="net_23" />
+<circle cx="198" cy="272" r="2" style="fill:#000" class="net_23" />
+<line x1="198" x2="213" y1="272" y2="272" class="net_23" />
+<line x1="178" x2="198" y1="129.5" y2="129.5" class="net_23" />
+<line x1="198" x2="198" y1="129.5" y2="174.5" class="net_23" />
+<circle cx="198" cy="174.5" r="2" style="fill:#000" class="net_23" />
+<line x1="198" x2="213" y1="174.5" y2="174.5" class="net_23" />
+<line x1="178" x2="188" y1="194.5" y2="194.5" class="net_24" />
+<line x1="188" x2="188" y1="194.5" y2="42" class="net_24" />
+<circle cx="188" cy="194.5" r="2" style="fill:#000" class="net_24" />
+<line x1="188" x2="213" y1="42" y2="42" class="net_24" />
+<line x1="178" x2="188" y1="194.5" y2="194.5" class="net_24" />
+<line x1="188" x2="188" y1="194.5" y2="362" class="net_24" />
+<line x1="188" x2="213" y1="362" y2="362" class="net_24" />
+<line x1="178" x2="188" y1="194.5" y2="194.5" class="net_24" />
+<line x1="188" x2="188" y1="194.5" y2="292" class="net_24" />
+<circle cx="188" cy="292" r="2" style="fill:#000" class="net_24" />
+<line x1="188" x2="213" y1="292" y2="292" class="net_24" />
+<line x1="178" x2="213" y1="194.5" y2="194.5" class="net_24" />
+<line x1="178" x2="223" y1="62" y2="62" class="net_10" />
+<line x1="223" x2="223" y1="62" y2="47" class="net_10" />
+<line x1="178" x2="223" y1="382" y2="382" class="net_12" />
+<line x1="223" x2="223" y1="382" y2="367" class="net_12" />
+<line x1="178" x2="223" y1="317" y2="317" class="net_14" />
+<line x1="223" x2="223" y1="317" y2="297" class="net_14" />
+<line x1="178" x2="223" y1="252" y2="252" class="net_16" />
+<line x1="223" x2="223" y1="252" y2="199.5" class="net_16" />
+<line x1="233" x2="268" y1="32" y2="32" class="net_2"><title>decoderOut_0</title></line>
+<line x1="233" x2="268" y1="352" y2="352" class="net_3"><title>decoderOut_1</title></line>
+<line x1="233" x2="268" y1="282" y2="282" class="net_4"><title>decoderOut_2</title></line>
+<line x1="233" x2="268" y1="184.5" y2="184.5" class="net_5"><title>decoderOut_3</title></line>
+<text x="236.0" y="29.0" class="netlabel">decoderOut_0</text>
+<text x="236.0" y="349.0" class="netlabel">decoderOut_1</text>
+<text x="236.0" y="279.0" class="netlabel">decoderOut_2</text>
+<text x="236.0" y="181.5" class="netlabel">decoderOut_3</text>
+<text x="126.0" y="51.5" class="netlabel">enable</text>
+<text x="43.0" y="66.5" class="netlabel">sel</text>
+</svg>

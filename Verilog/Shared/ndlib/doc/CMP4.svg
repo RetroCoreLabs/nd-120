@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="503.0" height="669.0" viewBox="-80.0 -80.0 503.0 669.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="503.0" height="669.0" fill="#ffffff" /><a href="../../logisim/doc/Comparator.md"><title>ARITH_1 (Comparator) - open its page</title><g transform="translate(156,76.5)" id="cell_ARITH_1"><text x="15" y="-4" class="nodelabel cell_ARITH_1">Comparator</text><rect width="30" height="60" class="cell_ARITH_1" /><g transform="translate(0,10)" id="port_ARITH_1~dataA"><text x="-3" y="-4" class="inputPortLabel cell_ARITH_1">dataA</text></g><g transform="translate(0,30)" id="port_ARITH_1~dataB"><text x="-3" y="-4" class="inputPortLabel cell_ARITH_1">dataB</text></g><g transform="translate(30,10)" id="port_ARITH_1~aEqualsB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_ARITH_1">aEqualsB</text></g><g transform="translate(30,30)" id="port_ARITH_1~aGreaterThanB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_ARITH_1">aGreaterThanB</text></g><g transform="translate(30,50)" id="port_ARITH_1~aLessThanB"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_ARITH_1">aLessThanB</text></g></g></a>
+<g transform="translate(12,22)" id="cell_A0"><text x="15" y="-4" class="nodelabel cell_A0">A0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A0" /><g /></g>
+<g transform="translate(12,87)" id="cell_A1"><text x="15" y="-4" class="nodelabel cell_A1">A1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A1" /><g /></g>
+<g transform="translate(12,152)" id="cell_A2"><text x="15" y="-4" class="nodelabel cell_A2">A2</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A2" /><g /></g>
+<g transform="translate(12,217)" id="cell_A3"><text x="15" y="-4" class="nodelabel cell_A3">A3</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A3" /><g /></g>
+<g transform="translate(12,282)" id="cell_B0"><text x="15" y="-4" class="nodelabel cell_B0">B0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B0" /><g /></g>
+<g transform="translate(12,347)" id="cell_B1"><text x="15" y="-4" class="nodelabel cell_B1">B1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B1" /><g /></g>
+<g transform="translate(12,412)" id="cell_B2"><text x="15" y="-4" class="nodelabel cell_B2">B2</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B2" /><g /></g>
+<g transform="translate(12,477)" id="cell_B3"><text x="15" y="-4" class="nodelabel cell_B3">B3</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B3" /><g /></g>
+<g transform="translate(301,77)" id="cell_AEB"><text x="15" y="-4" class="nodelabel cell_AEB">AEB</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_AEB" /><g /></g>
+<g transform="translate(301,142)" id="cell_AGB"><text x="15" y="-4" class="nodelabel cell_AGB">AGB</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_AGB" /><g /></g>
+<g transform="translate(301,207)" id="cell_ALB"><text x="15" y="-4" class="nodelabel cell_ALB">ALB</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_ALB" /><g /></g>
+<g transform="translate(84,66.5)" id="cell_$join$,2,3,4,5,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
+<g transform="translate(84,326.5)" id="cell_$join$,6,7,8,9,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
+<line x1="90" x2="156" y1="87" y2="87" class="net_2,3,4,5"><title>s_data_A</title></line>
+<line x1="90" x2="100" y1="347" y2="347" class="net_6,7,8,9"><title>s_data_B</title></line>
+<line x1="100" x2="100" y1="347" y2="107" class="net_6,7,8,9"><title>s_data_B</title></line>
+<line x1="100" x2="156" y1="107" y2="107" class="net_6,7,8,9"><title>s_data_B</title></line>
+<line x1="187" x2="301" y1="87" y2="87" class="net_10"><title>AEB</title></line>
+<line x1="187" x2="286" y1="107" y2="107" class="net_11"><title>AGB</title></line>
+<line x1="286" x2="286" y1="107" y2="152" class="net_11"><title>AGB</title></line>
+<line x1="286" x2="301" y1="152" y2="152" class="net_11"><title>AGB</title></line>
+<line x1="187" x2="276" y1="127" y2="127" class="net_12"><title>ALB</title></line>
+<line x1="276" x2="276" y1="127" y2="217" class="net_12"><title>ALB</title></line>
+<line x1="276" x2="301" y1="217" y2="217" class="net_12"><title>ALB</title></line>
+<line x1="40" x2="52" y1="32" y2="32" class="net_2"><title>A0</title></line>
+<line x1="52" x2="52" y1="32" y2="77" class="net_2"><title>A0</title></line>
+<line x1="52" x2="84" y1="77" y2="77" class="net_2"><title>A0</title></line>
+<line x1="40" x2="84" y1="97" y2="97" class="net_3"><title>A1</title></line>
+<line x1="40" x2="52" y1="162" y2="162" class="net_4"><title>A2</title></line>
+<line x1="52" x2="52" y1="162" y2="117" class="net_4"><title>A2</title></line>
+<line x1="52" x2="84" y1="117" y2="117" class="net_4"><title>A2</title></line>
+<line x1="40" x2="84.5" y1="227" y2="227" class="net_5"><title>A3</title></line>
+<line x1="84.5" x2="84.5" y1="227" y2="137.5" class="net_5"><title>A3</title></line>
+<line x1="40" x2="52" y1="292" y2="292" class="net_6"><title>B0</title></line>
+<line x1="52" x2="52" y1="292" y2="337" class="net_6"><title>B0</title></line>
+<line x1="52" x2="84" y1="337" y2="337" class="net_6"><title>B0</title></line>
+<line x1="40" x2="84" y1="357" y2="357" class="net_7"><title>B1</title></line>
+<line x1="40" x2="52" y1="422" y2="422" class="net_8"><title>B2</title></line>
+<line x1="52" x2="52" y1="422" y2="377" class="net_8"><title>B2</title></line>
+<line x1="52" x2="84" y1="377" y2="377" class="net_8"><title>B2</title></line>
+<line x1="40" x2="84.5" y1="487" y2="487" class="net_9"><title>B3</title></line>
+<line x1="84.5" x2="84.5" y1="487" y2="397.5" class="net_9"><title>B3</title></line>
+<text x="190.0" y="84.0" class="netlabel">AEB</text>
+<text x="190.0" y="104.0" class="netlabel">AGB</text>
+<text x="190.0" y="124.0" class="netlabel">ALB</text>
+<text x="55.0" y="74.0" class="netlabel">A0</text>
+<text x="93.0" y="84.0" class="netlabel">s_data_A</text>
+<text x="43.0" y="94.0" class="netlabel">A1</text>
+<text x="55.0" y="114.0" class="netlabel">A2</text>
+<text x="43.0" y="224.0" class="netlabel">A3</text>
+<text x="55.0" y="334.0" class="netlabel">B0</text>
+<text x="103.0" y="104.0" class="netlabel">s_data_B</text>
+<text x="43.0" y="354.0" class="netlabel">B1</text>
+<text x="55.0" y="374.0" class="netlabel">B2</text>
+<text x="43.0" y="484.0" class="netlabel">B3</text>
+</svg>

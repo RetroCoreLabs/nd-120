@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="564.0" height="562.0" viewBox="-80.0 -80.0 564.0 562.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="564.0" height="562.0" fill="#ffffff" /><a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_1 (NAND_GATE) - open its page</title><g transform="translate(119,66.5)" id="cell_GATES_1"><text x="15" y="-4" class="nodelabel cell_GATES_1">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_1" /><g transform="translate(0,10)" id="port_GATES_1~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input1</text></g><g transform="translate(0,30)" id="port_GATES_1~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input2</text></g><g transform="translate(30,10)" id="port_GATES_1~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_1">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_2 (NAND_GATE) - open its page</title><g transform="translate(119,154.5)" id="cell_GATES_2"><text x="15" y="-4" class="nodelabel cell_GATES_2">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_2" /><g transform="translate(0,10)" id="port_GATES_2~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input1</text></g><g transform="translate(0,30)" id="port_GATES_2~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input2</text></g><g transform="translate(30,10)" id="port_GATES_2~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_2">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE_4_INPUTS.md"><title>GATES_3 (NAND_GATE_4_INPUTS) - open its page</title><g transform="translate(119,264.5)" id="cell_GATES_3"><text x="15" y="-4" class="nodelabel cell_GATES_3">NAND_GATE_4_INPUTS</text><rect width="30" height="80" class="cell_GATES_3" /><g transform="translate(0,10)" id="port_GATES_3~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input1</text></g><g transform="translate(0,30)" id="port_GATES_3~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input2</text></g><g transform="translate(0,50)" id="port_GATES_3~input3"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input3</text></g><g transform="translate(0,70)" id="port_GATES_3~input4"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input4</text></g><g transform="translate(30,10)" id="port_GATES_3~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_3">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/OR_GATE_3_INPUTS.md"><title>GATES_4 (OR_GATE_3_INPUTS) - open its page</title><g transform="translate(259,134.5)" id="cell_GATES_4"><text x="15" y="-4" class="nodelabel cell_GATES_4">OR_GATE_3_INPUTS</text><rect width="30" height="60" class="cell_GATES_4" /><g transform="translate(0,10)" id="port_GATES_4~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input1</text></g><g transform="translate(0,30)" id="port_GATES_4~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input2</text></g><g transform="translate(0,50)" id="port_GATES_4~input3"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input3</text></g><g transform="translate(30,10)" id="port_GATES_4~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_4">result</text></g></g></a>
+<g transform="translate(12,175)" id="cell_DATA"><text x="15" y="-4" class="nodelabel cell_DATA">DATA</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_DATA" /><g /></g>
+<g transform="translate(12,22)" id="cell_DCDJ"><text x="15" y="-4" class="nodelabel cell_DCDJ">DCDJ</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_DCDJ" /><g /></g>
+<g transform="translate(12,87)" id="cell_DCDK"><text x="15" y="-4" class="nodelabel cell_DCDK">DCDK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_DCDK" /><g /></g>
+<g transform="translate(12,240)" id="cell_X0"><text x="15" y="-4" class="nodelabel cell_X0">X0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_X0" /><g /></g>
+<g transform="translate(12,305)" id="cell_X1"><text x="15" y="-4" class="nodelabel cell_X1">X1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_X1" /><g /></g>
+<g transform="translate(12,370)" id="cell_X2"><text x="15" y="-4" class="nodelabel cell_X2">X2</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_X2" /><g /></g>
+<g transform="translate(362,135)" id="cell_BIT"><text x="15" y="-4" class="nodelabel cell_BIT">BIT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_BIT" /><g /></g>
+<line x1="40" x2="72" y1="32" y2="32" class="net_3"><title>DCDJ</title></line>
+<line x1="72" x2="72" y1="32" y2="77" class="net_3"><title>DCDJ</title></line>
+<circle cx="72" cy="77" r="2" style="fill:#000" class="net_3" />
+<line x1="72" x2="119" y1="77" y2="77" class="net_3"><title>DCDJ</title></line>
+<line x1="40" x2="72" y1="32" y2="32" class="net_3"><title>DCDJ</title></line>
+<line x1="72" x2="72" y1="32" y2="165" class="net_3"><title>DCDJ</title></line>
+<line x1="72" x2="119" y1="165" y2="165" class="net_3"><title>DCDJ</title></line>
+<line x1="40" x2="119" y1="97" y2="97" class="net_4"><title>DCDK</title></line>
+<line x1="40" x2="62" y1="97" y2="97" class="net_4"><title>DCDK</title></line>
+<line x1="62" x2="62" y1="97" y2="275" class="net_4"><title>DCDK</title></line>
+<circle cx="62" cy="97" r="2" style="fill:#000" class="net_4" />
+<line x1="62" x2="119" y1="275" y2="275" class="net_4"><title>DCDK</title></line>
+<line x1="40" x2="119" y1="185" y2="185" class="net_2"><title>DATA</title></line>
+<line x1="40" x2="52" y1="250" y2="250" class="net_5"><title>X0</title></line>
+<line x1="52" x2="52" y1="250" y2="295" class="net_5"><title>X0</title></line>
+<line x1="52" x2="119" y1="295" y2="295" class="net_5"><title>X0</title></line>
+<line x1="40" x2="119" y1="315" y2="315" class="net_6"><title>X1</title></line>
+<line x1="40" x2="52" y1="380" y2="380" class="net_7"><title>X2</title></line>
+<line x1="52" x2="52" y1="380" y2="335" class="net_7"><title>X2</title></line>
+<line x1="52" x2="119" y1="335" y2="335" class="net_7"><title>X2</title></line>
+<line x1="150" x2="197" y1="77" y2="77" class="net_9"><title>s_gates1_out</title></line>
+<line x1="197" x2="197" y1="77" y2="145" class="net_9"><title>s_gates1_out</title></line>
+<line x1="197" x2="259" y1="145" y2="145" class="net_9"><title>s_gates1_out</title></line>
+<line x1="150" x2="259" y1="165" y2="165" class="net_10"><title>s_gates2_out</title></line>
+<line x1="150" x2="197" y1="275" y2="275" class="net_11"><title>s_gates3_out</title></line>
+<line x1="197" x2="197" y1="275" y2="185" class="net_11"><title>s_gates3_out</title></line>
+<line x1="197" x2="259" y1="185" y2="185" class="net_11"><title>s_gates3_out</title></line>
+<line x1="290" x2="362" y1="145" y2="145" class="net_8"><title>BIT</title></line>
+<text x="153.0" y="162.0" class="netlabel">s_gates2_out</text>
+<text x="200.0" y="182.0" class="netlabel">s_gates3_out</text>
+<text x="43.0" y="182.0" class="netlabel">DATA</text>
+<text x="75.0" y="74.0" class="netlabel">DCDJ</text>
+<text x="43.0" y="94.0" class="netlabel">DCDK</text>
+<text x="55.0" y="292.0" class="netlabel">X0</text>
+<text x="43.0" y="312.0" class="netlabel">X1</text>
+<text x="55.0" y="332.0" class="netlabel">X2</text>
+<text x="293.0" y="142.0" class="netlabel">BIT</text>
+<text x="200.0" y="142.0" class="netlabel">s_gates1_out</text>
+</svg>

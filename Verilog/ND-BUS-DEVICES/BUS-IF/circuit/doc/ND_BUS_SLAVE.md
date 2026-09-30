@@ -19,6 +19,16 @@ Source: `Verilog/ND-BUS-DEVICES/BUS-IF/circuit/ND_BUS_SLAVE.v`
 
 ![ND_BUS_SLAVE symbol](ND_BUS_SLAVE.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.gen_bus_slave.BUS_SLAVE`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![ND_BUS_SLAVE schematic](ND_BUS_SLAVE.svg)](ND_BUS_SLAVE.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND-100 BUS SLAVE ADAPTER
@@ -65,3 +75,213 @@ Ronny Hansen
 | output | `[3:0]` | `ident_level` | binary 10..13, valid with ident_strobe |
 | input | `1` | `ident_hit` | daisy-chain result, valid during strobe |
 | input | `[15:0]` | `ident_code` | ident code of the granted core |
+
+## Verilog source
+
+[`Verilog/ND-BUS-DEVICES/BUS-IF/circuit/ND_BUS_SLAVE.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/ND-BUS-DEVICES/BUS-IF/circuit/ND_BUS_SLAVE.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of ND_BUS_SLAVE (198 lines)</summary>
+
+```verilog
+/**************************************************************************
+** ND-100 BUS SLAVE ADAPTER                                              **
+**                                                                       **
+** The one bus adapter for all external bus devices.                     **
+** Implements the device side of the ND-100 bus IOX/IDENT handshake:     **
+**   BAPR/BIOXE/BINPUT/BINACK/BDAP/BDRY/OUTIDENT + BINT10-13             **
+**                                                                       **
+** Ported from the C reference model simDevices/NDBus.cpp                **
+** (proccess_bif_signal), which runSim boots with today. Signal          **
+** sequence per ND-06.026.1 EN page 126.                                 **
+**                                                                       **
+** All bus signals are active low. The BD bus is inverted: a released    **
+** bus reads all ones. Outputs drive their inactive level (1) when       **
+** idle - wired-AND with other bus agents, no z inside the FPGA.         **
+**                                                                       **
+** Device-side bus: see ND-BUS-DEVICES/README.md                        **
+**                                                                       **
+** Last reviewed: 11-JUL-2026                                            **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module ND_BUS_SLAVE (
+    input wire sysclk,   // System clock
+    input wire sys_rst_n, // System reset (active low)
+
+    // ND-100 bus, CPU side (names as on ND120_TOP)
+    input  wire [23:0] BD_23_0_n_OUT,  // bus data/address driven BY the CPU
+    output reg  [23:0] BD_23_0_n_IN,   // bus data driven TO the CPU
+    input  wire        BAPR_n,         // address present (falling edge = capture)
+    input  wire        BIOXE_n,        // IOX enable window
+    input  wire        BINACK_n,       // CPU ready to receive input data
+    input  wire        OUTIDENT_n,     // IDENT poll window
+    output reg         BINPUT_n,       // we have input data for the CPU
+    output reg         BDAP_n,         // data present
+    output reg         BDRY_n,         // data ready / accepted
+    output wire        BINT10_n,       // interrupt level lines
+    output wire        BINT11_n,
+    output wire        BINT12_n,
+    output wire        BINT13_n,
+
+    // Device-side bus
+    output reg  [15:0] iox_addr,       // captured IOX address
+    output reg         iox_wr,         // 1-cycle write strobe
+    output reg  [15:0] iox_wdata,      // write data, valid with iox_wr
+    output reg         iox_rd,         // 1-cycle read strobe
+    input  wire [15:0] iox_rdata,      // OR-bus from cores, valid during iox_rd
+    input  wire        iox_hit,        // 1 = some core owns iox_addr (else no answer)
+    input  wire [3:0]  int_pending,    // {lvl13,lvl12,lvl11,lvl10} OR of all cores
+    output reg         ident_strobe,   // 1-cycle IDENT poll
+    output reg  [3:0]  ident_level,    // binary 10..13, valid with ident_strobe
+    input  wire        ident_hit,      // daisy-chain result, valid during strobe
+    input  wire [15:0] ident_code      // ident code of the granted core
+);
+
+  // Transaction state (from address LSB at BAPR, as in the C model)
+  localparam ST_IDLE  = 2'd0;
+  localparam ST_READ  = 2'd1;
+  localparam ST_WRITE = 2'd2;
+
+  reg [1:0]  s_state;
+  reg [23:0] s_bus_addr;      // full 24-bit address captured at BAPR
+  reg        s_prev_bapr_n;
+  reg        s_prev_bioxe_n;
+  reg        s_prev_binack_n;
+  reg        s_prev_outident_n;
+  reg        s_ident_valid;   // an ident code is latched for this OUTIDENT window
+  reg [15:0] s_ident_code_q;
+
+  // Interrupt level lines: NOR of the pending flags (the C model's intent)
+  assign BINT10_n = ~int_pending[0];
+  assign BINT11_n = ~int_pending[1];
+  assign BINT12_n = ~int_pending[2];
+  assign BINT13_n = ~int_pending[3];
+
+  wire s_bapr_fall     = (BAPR_n     == 1'b0) && (s_prev_bapr_n     == 1'b1);
+  wire s_bioxe_fall    = (BIOXE_n    == 1'b0) && (s_prev_bioxe_n    == 1'b1);
+  wire s_bioxe_rise    = (BIOXE_n    == 1'b1) && (s_prev_bioxe_n    == 1'b0);
+  wire s_binack_fall   = (BINACK_n   == 1'b0) && (s_prev_binack_n   == 1'b1);
+  wire s_outident_fall = (OUTIDENT_n == 1'b0) && (s_prev_outident_n == 1'b1);
+  wire s_outident_rise = (OUTIDENT_n == 1'b1) && (s_prev_outident_n == 1'b0);
+
+  // IDENT level from the address strobed at BAPR (NDBus.cpp switch)
+  wire [3:0] s_level_dec = (s_bus_addr[15:0] == 16'o000004) ? 4'd10 :
+                           (s_bus_addr[15:0] == 16'o000011) ? 4'd11 :
+                           (s_bus_addr[15:0] == 16'o000022) ? 4'd12 :
+                           (s_bus_addr[15:0] == 16'o000043) ? 4'd13 : 4'd0;
+
+  always @(posedge sysclk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+      s_state           <= ST_IDLE;
+      s_bus_addr        <= 24'd0;
+      s_prev_bapr_n     <= 1'b1;
+      s_prev_bioxe_n    <= 1'b1;
+      s_prev_binack_n   <= 1'b1;
+      s_prev_outident_n <= 1'b1;
+      s_ident_valid     <= 1'b0;
+      s_ident_code_q    <= 16'd0;
+      BD_23_0_n_IN      <= 24'hFFFFFF;
+      BINPUT_n          <= 1'b1;
+      BDAP_n            <= 1'b1;
+      BDRY_n            <= 1'b1;
+      iox_addr          <= 16'd0;
+      iox_wr            <= 1'b0;
+      iox_wdata         <= 16'd0;
+      iox_rd            <= 1'b0;
+      ident_strobe      <= 1'b0;
+      ident_level       <= 4'd0;
+    end else begin
+      // Default: strobes are single-cycle
+      iox_wr       <= 1'b0;
+      iox_rd       <= 1'b0;
+      ident_strobe <= 1'b0;
+
+      // Address present: capture, direction from LSB (0=read, 1=write)
+      if (s_bapr_fall) begin
+        s_bus_addr <= ~BD_23_0_n_OUT;
+        iox_addr   <= ~BD_23_0_n_OUT[15:0];
+        s_state    <= (~BD_23_0_n_OUT[0]) ? ST_WRITE : ST_READ;
+        BINPUT_n   <= 1'b1;
+      end
+
+      // IOX window opens: data (write) is on the bus now.
+      // Only answer if a device core owns this address (iox_hit). If none
+      // does, drive nothing so the CPU bus-times-out -> level-14 IOX error,
+      // instead of the slave answering every address.
+      if (s_bioxe_fall) begin
+        if (s_state == ST_WRITE && iox_hit) begin
+          iox_wdata <= ~BD_23_0_n_OUT[15:0];
+          iox_wr    <= 1'b1;
+          BDRY_n    <= 1'b0;  // data accepted
+        end
+        if (s_state == ST_READ && iox_hit) begin
+          BINPUT_n <= 1'b0;   // we will put data on the bus, wait for BINACK
+        end
+      end
+
+      // CPU ready to receive: issue the read strobe, answer next cycle.
+      // An IDENT answer has priority: the level code strobed at BAPR
+      // (004/011/022/043) would otherwise be misread as an IOX
+      // direction (its LSB is meaningless here).
+      if (s_binack_fall) begin
+        if (s_ident_valid) begin
+          BD_23_0_n_IN <= ~{8'h00, s_ident_code_q};
+          BDAP_n       <= 1'b0;
+          BDRY_n       <= 1'b0;
+        end else if (s_state == ST_READ && iox_hit) begin
+          iox_rd <= 1'b1;
+        end
+      end
+      // One cycle after the read strobe the OR-bus data is captured
+      if (iox_rd) begin
+        BD_23_0_n_IN <= ~{8'h00, iox_rdata};
+        BDAP_n       <= 1'b0;
+        BDRY_n       <= 1'b0;
+      end
+
+      // IDENT poll: level from the captured address; the granted core
+      // clears its pending+enable flags during this same strobe
+      if (s_outident_fall) begin
+        ident_level  <= s_level_dec;
+        ident_strobe <= 1'b1;
+        s_state      <= ST_IDLE;  // an IDENT window is not an IOX transaction
+      end
+      if (ident_strobe) begin
+        if (ident_hit) begin
+          s_ident_valid  <= 1'b1;
+          s_ident_code_q <= ident_code;
+          BD_23_0_n_IN   <= ~{8'h00, ident_code};
+          BINPUT_n       <= 1'b0;  // tell CPU we have data, wait for BINACK
+        end
+      end
+      if (s_outident_rise) begin
+        if (s_ident_valid) begin
+          s_ident_valid <= 1'b0;
+          BINPUT_n      <= 1'b1;
+          BDRY_n        <= 1'b1;
+          BDAP_n        <= 1'b1;
+          BD_23_0_n_IN  <= 24'hFFFFFF;
+        end
+      end
+
+      // IOX window closes: release everything
+      if (s_bioxe_rise) begin
+        BDRY_n       <= 1'b1;
+        BDAP_n       <= 1'b1;
+        BINPUT_n     <= 1'b1;
+        BD_23_0_n_IN <= 24'hFFFFFF;
+        s_state      <= ST_IDLE;
+      end
+
+      s_prev_bapr_n     <= BAPR_n;
+      s_prev_bioxe_n    <= BIOXE_n;
+      s_prev_binack_n   <= BINACK_n;
+      s_prev_outident_n <= OUTIDENT_n;
+    end
+  end
+
+endmodule
+```
+
+</details>

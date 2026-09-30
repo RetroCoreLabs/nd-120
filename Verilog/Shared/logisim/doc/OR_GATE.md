@@ -6,8 +6,8 @@ Source: `Verilog/Shared/logisim/OR_GATE.v`
 
 <!-- HIERARCHY-NAV:BEGIN - written by Verilog/tests/gen_hierarchy.py, do not edit -->
 
-**Where it sits** (Simulation): [ND120_TOP](../../../doc/ND120_TOP.md) > [ND120_CORE](../../../doc/ND120_CORE.md) > [ND3202D](../../../CPU-BOARD-3202/circuit/doc/ND3202D.md) > [CPU_15](../../../CPU-BOARD-3202/circuit/doc/CPU_15.md) > [CPU_PROC_32](../../../CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md) > [CPU_PROC_CGA_33](../../../CPU-BOARD-3202/circuit/doc/CPU_PROC_CGA_33.md) > [CGA](../../../DELILAH-CPU/CGA/circuit/doc/CGA.md) > [CGA_MIC](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC.md) > **OR_GATE**
-- instance path: `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.MIC.GATES_1`
+**Where it sits** (Simulation): [ND120_TOP](../../../doc/ND120_TOP.md) > [ND120_CORE](../../../doc/ND120_CORE.md) > [ND3202D](../../../CPU-BOARD-3202/circuit/doc/ND3202D.md) > [BIF_5](../../../CPU-BOARD-3202/circuit/doc/BIF_5.md) > [BIF_BCTL_6](../../../CPU-BOARD-3202/circuit/doc/BIF_BCTL_6.md) > [BIF_BCTL_BDRV_7](../../../CPU-BOARD-3202/circuit/doc/BIF_BCTL_BDRV_7.md) > **OR_GATE**
+- instance path: `CORE.CPU_BOARD.BIF.BCTL.BDRV.GATES_1`
 
 **Used in:** [BIF_BCTL_BDRV_7](../../../CPU-BOARD-3202/circuit/doc/BIF_BCTL_BDRV_7.md) (all tops), [CGA_DCD](../../../DELILAH-CPU/CGA_DCD/circuit/doc/CGA_DCD.md) (all tops), [CGA_INTR](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR.md) (all tops), [CGA_INTR_CNTLR_IRGEL_HIRL](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_HIRL.md) (all tops), [CGA_INTR_CNTLR_IRGEL_VMUX](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_VMUX.md) (all tops), [CGA_INTR_CNTLR_MDCD](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_MDCD.md) (all tops), [CGA_INTR_CNTLR_VECGEN_ISMUX](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_ISMUX.md) (all tops), [CGA_INTR_CNTLR_VECGEN_OSMUX](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_OSMUX.md) (all tops), [CGA_INTR_CNTLR_VECGEN_PTY_PTYENC](../../../DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_PTY_PTYENC.md) (all tops), [CGA_MAC_ADD](../../../DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_ADD.md) (all tops), [CGA_MAC_LA1025](../../../DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_LA1025.md) (all tops), [CGA_MAC_LASEL](../../../DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_LASEL.md) (all tops), [CGA_MAC_PTSEL](../../../DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_PTSEL.md) (all tops), [CGA_MIC](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC.md) (all tops), [CGA_MIC_STACK_BIT](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK_BIT.md) (all tops), [CGA_MIC_STACK_BIT12](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK_BIT12.md) (all tops)
 
@@ -18,6 +18,16 @@ Source: `Verilog/Shared/logisim/OR_GATE.v`
 <!-- HIERARCHY-NAV:END -->
 
 ![OR_GATE symbol](OR_GATE.png)
+
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.BIF.BCTL.BDRV.GATES_1`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![OR_GATE schematic](OR_GATE.svg)](OR_GATE.svg)
+
+<!-- SCHEMATIC:END -->
 
 ## Description
 
@@ -32,3 +42,66 @@ Component : OR_GATE
 | input | `1` | `input1` |  |
 | input | `1` | `input2` |  |
 | output | `1` | `result` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/OR_GATE.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/OR_GATE.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of OR_GATE (51 lines)</summary>
+
+```verilog
+/******************************************************************************
+ ** Logisim-evolution goes FPGA automatic generated Verilog code             **
+ ** https://github.com/logisim-evolution/                                    **
+ **                                                                          **
+ ** Component : OR_GATE                                                      **
+ **                                                                          **
+ *****************************************************************************/
+
+module OR_GATE( input1,
+                input2,
+                result );
+
+   /*******************************************************************************
+   ** Here all module parameters are defined with a dummy value                  **
+   *******************************************************************************/
+   parameter [64:0] BubblesMask = 1;
+
+   /*******************************************************************************
+   ** The inputs are defined here                                                **
+   *******************************************************************************/
+   input input1;
+   input input2;
+
+   /*******************************************************************************
+   ** The outputs are defined here                                               **
+   *******************************************************************************/
+   output result;
+
+   /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+   wire s_realInput1;
+   wire s_realInput2;
+
+   /*******************************************************************************
+   ** The module functionality is described here                                 **
+   *******************************************************************************/
+
+   /*******************************************************************************
+   ** Here the bubbles are processed                                             **
+   *******************************************************************************/
+   assign  s_realInput1 = (BubblesMask[0] == 1'b0) ? input1 : ~input1;
+   assign  s_realInput2 = (BubblesMask[1] == 1'b0) ? input2 : ~input2;
+
+   /*******************************************************************************
+   ** Here the functionality is defined                                          **
+   *******************************************************************************/
+   assign result = s_realInput1|
+                   s_realInput2;
+
+endmodule
+```
+
+</details>

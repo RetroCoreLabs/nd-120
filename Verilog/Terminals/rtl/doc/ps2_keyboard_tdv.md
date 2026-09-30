@@ -19,6 +19,16 @@ Source: `Verilog/Terminals/rtl/ps2_keyboard_tdv.v`
 
 ![ps2_keyboard_tdv symbol](ps2_keyboard_tdv.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Nexys 4 DDR build, instance `KEYBOARD`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![ps2_keyboard_tdv schematic](ps2_keyboard_tdv.svg)](ps2_keyboard_tdv.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Parameters
 
 | Parameter | Default |
@@ -40,3 +50,192 @@ Source: `Verilog/Terminals/rtl/ps2_keyboard_tdv.v`
 | output | `[7:0]` | `code_data` |  |
 | output | `1` | `code_release` |  |
 | output | `1` | `code_extended` |  |
+
+## Verilog source
+
+[`Verilog/Terminals/rtl/ps2_keyboard_tdv.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Terminals/rtl/ps2_keyboard_tdv.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of ps2_keyboard_tdv (177 lines)</summary>
+
+```verilog
+//============================================================================
+//! PS/2 keyboard receiver + scancode-set-2 to TDV2200 decoder
+//!
+//! Part of the board-independent terminal core (Verilog/Terminals/).
+//! Thin sibling of ps2_keyboard.v (VT100) - the 11-bit PS/2 framing and
+//! E0/F0 prefix handling are IDENTICAL (that part is board wiring, not
+//! terminal-type logic); the only difference is instantiating
+//! ps2_decoder_tdv instead of ps2_decoder, per the decision to keep VT100
+//! and TDV2200 as two separate, compile-time-selected modules.
+//!
+//! Written 31-AUG-2026.
+//============================================================================
+
+`default_nettype none
+
+module ps2_keyboard_tdv #(
+    parameter integer FILTER_LEN = 8
+) (
+    input wire clk,
+    input wire rst_n,
+
+    input wire ps2_clk_in,
+    input wire ps2_data_in,
+
+    input wire layout_no,
+
+    output wire       ascii_valid,
+    output wire [7:0] ascii_data,
+
+    output reg       code_valid,
+    output reg [7:0] code_data,
+    output reg       code_release,
+    output reg       code_extended
+);
+
+  //--------------------------------------------------------------------------
+  // Input conditioning: synchronize, then require FILTER_LEN stable samples
+  //--------------------------------------------------------------------------
+
+  reg [1:0] s_clk_sync;
+  reg [1:0] s_dat_sync;
+
+  reg [FILTER_LEN-1:0] s_clk_filter;
+  reg                  s_clk_stable;
+  reg                  s_clk_stable_d;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      s_clk_sync     <= 2'b11;
+      s_dat_sync     <= 2'b11;
+      s_clk_filter   <= {FILTER_LEN{1'b1}};
+      s_clk_stable   <= 1'b1;
+      s_clk_stable_d <= 1'b1;
+    end else begin
+      s_clk_sync <= {s_clk_sync[0], ps2_clk_in};
+      s_dat_sync <= {s_dat_sync[0], ps2_data_in};
+
+      s_clk_filter <= {s_clk_filter[FILTER_LEN-2:0], s_clk_sync[1]};
+
+      if (s_clk_filter == {FILTER_LEN{1'b1}}) s_clk_stable <= 1'b1;
+      else if (s_clk_filter == {FILTER_LEN{1'b0}}) s_clk_stable <= 1'b0;
+
+      s_clk_stable_d <= s_clk_stable;
+    end
+  end
+
+  wire s_falling_edge = s_clk_stable_d && !s_clk_stable;
+
+  //--------------------------------------------------------------------------
+  // Frame receiver - 11 bits, LSB first
+  //--------------------------------------------------------------------------
+
+  reg  [3:0] s_bit_count;
+  reg [10:0] s_shift;
+
+  wire [10:0] s_frame_next = {s_dat_sync[1], s_shift[10:1]};
+
+  wire s_frame_start  = s_frame_next[0];
+  wire s_frame_stop   = s_frame_next[10];
+  wire s_parity_ok    = (^s_frame_next[9:1]) == 1'b1;
+  wire s_frame_ok     = (s_frame_start == 1'b0) && (s_frame_stop == 1'b1) && s_parity_ok;
+
+  reg s_byte_valid;
+  reg [7:0] s_byte_data;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      s_bit_count  <= 4'd0;
+      s_shift      <= 11'd0;
+      s_byte_valid <= 1'b0;
+      s_byte_data  <= 8'h00;
+    end else begin
+      s_byte_valid <= 1'b0;
+
+      if (s_falling_edge) begin
+        s_shift <= s_frame_next;
+
+        if (s_bit_count == 4'd10) begin
+          s_bit_count <= 4'd0;
+          if (s_frame_ok) begin
+            s_byte_valid <= 1'b1;
+            s_byte_data  <= s_frame_next[8:1];
+          end
+        end else begin
+          s_bit_count <= s_bit_count + 4'd1;
+        end
+      end
+    end
+  end
+
+  //--------------------------------------------------------------------------
+  // Prefix handling - E0 (extended) and F0 (release)
+  //--------------------------------------------------------------------------
+
+  localparam [7:0] SC_RELEASE  = 8'hF0;
+  localparam [7:0] SC_EXTENDED = 8'hE0;
+
+  reg s_pending_release;
+  reg s_pending_extended;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      s_pending_release  <= 1'b0;
+      s_pending_extended <= 1'b0;
+      code_valid         <= 1'b0;
+      code_data          <= 8'h00;
+      code_release       <= 1'b0;
+      code_extended      <= 1'b0;
+    end else begin
+      code_valid <= 1'b0;
+
+      if (s_byte_valid) begin
+        case (s_byte_data)
+          SC_RELEASE:  s_pending_release  <= 1'b1;
+          SC_EXTENDED: s_pending_extended <= 1'b1;
+
+          default: begin
+            code_valid    <= 1'b1;
+            code_data     <= s_byte_data;
+            code_release  <= s_pending_release;
+            code_extended <= s_pending_extended;
+
+            s_pending_release  <= 1'b0;
+            s_pending_extended <= 1'b0;
+          end
+        endcase
+      end
+    end
+  end
+
+  //--------------------------------------------------------------------------
+  // The TDV2200 decoder
+  //--------------------------------------------------------------------------
+
+  ps2_decoder_tdv DECODER (
+      .clk  (clk),
+      .rst_n(rst_n),
+
+      .code_valid   (code_valid),
+      .code_data    (code_data),
+      .code_release (code_release),
+      .code_extended(code_extended),
+
+      .layout_no(layout_no),
+
+      .ascii_valid(ascii_valid),
+      .ascii_data (ascii_data),
+
+      .shift_active(),
+      .ctrl_active (),
+      .caps_active (),
+      .alt_active  ()
+  );
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

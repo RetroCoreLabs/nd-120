@@ -14,6 +14,16 @@ Source: `Verilog/Terminals/rtl/ps2_ascii_table.v`
 
 ![ps2_ascii_table symbol](ps2_ascii_table.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![ps2_ascii_table schematic](ps2_ascii_table.svg)](ps2_ascii_table.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Ports
 
 | Direction | Width | Name | Description |
@@ -23,3 +33,268 @@ Source: `Verilog/Terminals/rtl/ps2_ascii_table.v`
 | output | `[7:0]` | `unshifted` |  |
 | output | `[7:0]` | `shifted` |  |
 | output | `[7:0]` | `extended` |  |
+
+## Verilog source
+
+[`Verilog/Terminals/rtl/ps2_ascii_table.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Terminals/rtl/ps2_ascii_table.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of ps2_ascii_table (253 lines)</summary>
+
+```verilog
+//============================================================================
+//! PS/2 scancode set 2 -> ASCII, unshifted and shifted
+//!
+//! Part of the board-independent terminal core (Verilog/Terminals/).
+//! Pure combinational lookup; 0x00 out means "this key has no character".
+//!
+//! SCANCODES CROSS-CHECKED 30-AUG-2026 against two independent published
+//! references, which agree with every entry below including the F7=0x83
+//! oddity: the OSDev wiki's set-2 table (wiki.osdev.org/PS/2_Keyboard) and
+//! Vetra Systems' scan-code translation table (vetra.com/scancodes.html).
+//! Scan code set 2 is a fixed standard every PS/2-compatible keyboard and
+//! the Nexys board's USB-HID bridge implement, so the codes are facts, not
+//! transcription hopes. What documentation CANNOT settle - and typing on
+//! the real board still can (fpga/nexys4ddr/PLAN-vga-console.md phase 3):
+//! whether the board's bridge really emits set 2 unsurprisingly, and the
+//! NORWEGIAN LAYOUT POSITIONS below, which come from RetroTerm's
+//! KBD-ND-246.md rather than from a scancode standard.
+//!
+//! Extended (E0-prefixed) keys ARE here, in their own `extended` output and
+//! their own case block below. Since the 30-AUG-2026 VT100 decision the
+//! arrows and HOME emit SEQUENCE MARKERS (0x80 | final byte) that
+//! key_vt100.v expands into the real ESC [ x bytes on the way to the UART -
+//! see the block comment on the case below.
+//!
+//! Written 27-AUG-2026.
+//============================================================================
+
+`default_nettype none
+
+module ps2_ascii_table (
+    input  wire [7:0] code,
+
+    //! 0 = US ANSI, 1 = Norwegian (NS 4551-1). See the block comment below.
+    input  wire       layout_no,
+    output wire [7:0] unshifted,
+    output wire [7:0] shifted,
+
+    //! Byte for the same scancode when it arrived with the E0 (extended)
+    //! prefix - the arrows, HOME and DELETE. 0x00 = this extended key sends
+    //! nothing; 0x80|f = key_vt100.v expands it to ESC [ f (see below).
+    output reg  [7:0] extended
+);
+
+  //--------------------------------------------------------------------------
+  // Extended (E0-prefixed) keys -> VT100 (30-AUG-2026)
+  //
+  // A VT100 sends multi-byte escape sequences for the special keys - three
+  // to five bytes per keypress. One lookup cannot produce that, so the table
+  // emits a MARKER byte that key_vt100.v expands. Bit 7 is the marker flag
+  // (safe: the ND-120 is a 7-bit machine, no typed character has it, and a
+  // marker that leaks unexpanded is visible instead of vanishing); bits 6:5
+  // select the sequence FAMILY, bits 4:0 the payload
+  // (SPEC-vt100-keys.md has the full story):
+  //
+  //   100f_ffff  ESC [ <0x40+f>    arrows: f 1..4 = A B C D
+  //   101f_ffff  ESC O <0x40+f>    DEC PF keys: f 16..19 = P Q R S
+  //   110n_nnnn  ESC [ <n> ~       editing keys n=1..6, F5-F12 n=15..24
+  //   111x_xxxx  reserved - key_vt100 drops it
+  //
+  // (Until 30-AUG-2026 these were the TDV bare C0 bytes - UP=0x1C, DOWN=0x0B,
+  // LEFT=0x08, RIGHT=0x18, HOME=0x1D - correct for terminal type 53, whose
+  // evidence trail is in docs/SPEC-tdv2200.md and the git history. The
+  // terminal is a VT100 now.)
+  //
+  // Scancodes cross-checked against OSDev + Vetra 30-AUG-2026 - see the
+  // module header. Both agree on every code below.
+  //--------------------------------------------------------------------------
+
+  always @(*) begin
+    case (code)
+      8'h75:   extended = 8'h81;  // Up     -> ESC [ A
+      8'h72:   extended = 8'h82;  // Down   -> ESC [ B
+      8'h74:   extended = 8'h83;  // Right  -> ESC [ C
+      8'h6B:   extended = 8'h84;  // Left   -> ESC [ D
+      // Home is ESC [ H, MEASURED (30-AUG-2026, live PED on a type-6
+      // SINTRAN line): ESC[H toggles to/from the PED: command line, while
+      // ESC[1~ (DEC FIND, which the spec first chose) does NOTHING in PED.
+      // The doc-derived guess pointed both ways; the live editor settled it.
+      8'h6C:   extended = 8'h88;  // Home   -> ESC [ H
+      8'h70:   extended = 8'hC2;  // Insert -> ESC [ 2 ~  (DEC INSERT HERE)
+      8'h71:   extended = 8'hC3;  // Delete -> ESC [ 3 ~  (DEC REMOVE)
+      8'h69:   extended = 8'hC4;  // End    -> ESC [ 4 ~  (DEC SELECT)
+      8'h7D:   extended = 8'hC5;  // PgUp   -> ESC [ 5 ~  (DEC PREV SCREEN)
+      8'h7A:   extended = 8'hC6;  // PgDn   -> ESC [ 6 ~  (DEC NEXT SCREEN)
+      8'h5A:   extended = 8'h0D;  // keypad Enter -> CR
+      default: extended = 8'h00;  // no VT100 equivalent (GUI keys, menu...):
+                                  // send NOTHING rather than invent bytes.
+    endcase
+  end
+
+  //--------------------------------------------------------------------------
+  // Norwegian (NS 4551-1) - the layout_no overrides
+  //
+  // TWO THINGS DIFFER, and getting only one right produces nonsense:
+  //
+  //   1. WHICH KEY carries the character. Positions taken from RetroTerm's
+  //      docs/KBD-ND-246.md (the ND 246 keyboard grid): D11, where US has [,
+  //      is AA; C10 (US ;) is OE; C11 (US ') is AE; B8 (US ,) is , / ; ;
+  //      B9 (US .) is . / : ; B10 (US /) is - / _ ; E11 (US -) is + / ?.
+  //      Those are the same positions a modern PC Norwegian keyboard uses,
+  //      which is the corroboration - two independent sources agreeing beats
+  //      one source trusted.
+  //
+  //   2. WHICH BYTE it sends. NOT Latin-1. The ND-120 is a 7-BIT machine
+  //      speaking ISO 646, where AE OE AA REPLACE [ \ ] and ae oe aa replace
+  //      { | }. RetroTerm's FontTDV2200.cs says it outright: "The host sends
+  //      7-bit ASCII position bytes (e.g. '[' = 0x5B for AE)". Send 0xC6 for
+  //      AE and SINTRAN sees a byte with no meaning; send 0x5B and it is right.
+  //
+  // The SCREEN has to agree, which is why font_rom carries a second page (see
+  // font/make_font.py). Keyboard and font are selected by the SAME bit -
+  // letting them disagree would draw '[' for a typed AE.
+  //
+  // DEAD KEYS ARE NOT IMPLEMENTED. On a PC Norwegian layout the ¨/^ and ´/`
+  // keys compose with the next keystroke, which needs state this table does
+  // not have. They send their shifted character where that is plain ISO 646,
+  // and nothing unshifted. Sending a plausible wrong byte would be worse than
+  // sending none.
+  //--------------------------------------------------------------------------
+
+  reg [7:0] no_unshifted, no_shifted;
+  reg       no_override;
+
+  always @(*) begin
+    no_override  = 1'b1;
+    no_unshifted = 8'h00;
+    no_shifted   = 8'h00;
+    case (code)
+      // number row - only the SHIFTED symbols move
+      8'h1E: begin no_unshifted = "2"; no_shifted = 8'h22; end  // " where US has @
+      8'h25: begin no_unshifted = "4"; no_shifted = 8'h24; end  // 0x24 is the currency sign in ISO 646 NO
+      8'h36: begin no_unshifted = "6"; no_shifted = "&";   end
+      8'h3D: begin no_unshifted = "7"; no_shifted = "/";   end
+      8'h3E: begin no_unshifted = "8"; no_shifted = "(";   end
+      8'h46: begin no_unshifted = "9"; no_shifted = ")";   end
+      8'h45: begin no_unshifted = "0"; no_shifted = "=";   end
+
+      // the three Norwegian letters, in their ISO 646 positions
+      8'h54: begin no_unshifted = 8'h7D; no_shifted = 8'h5D; end  // D11  aa / AA
+      8'h4C: begin no_unshifted = 8'h7C; no_shifted = 8'h5C; end  // C10  oe / OE
+      8'h52: begin no_unshifted = 8'h7B; no_shifted = 8'h5B; end  // C11  ae / AE
+
+      // the punctuation that moves
+      8'h4E: begin no_unshifted = "+";   no_shifted = "?";   end  // E11
+      8'h55: begin no_unshifted = 8'h5C; no_shifted = 8'h60; end  // \ and `
+      8'h5D: begin no_unshifted = 8'h27; no_shifted = "*";   end  // C12  ' / *
+      8'h41: begin no_unshifted = ",";   no_shifted = ";";   end  // B8
+      8'h49: begin no_unshifted = ".";   no_shifted = ":";   end  // B9
+      8'h4A: begin no_unshifted = "-";   no_shifted = 8'h5F; end  // B10  - / _
+      8'h61: begin no_unshifted = "<";   no_shifted = ">";   end  // the extra ISO key US ANSI does not have
+
+      // dead keys - shifted only, see the note above
+      8'h5B: begin no_unshifted = 8'h00; no_shifted = 8'h5E; end  // D12  dead diaeresis / ^
+
+      default: no_override = 1'b0;   // this key is the same in both layouts
+    endcase
+  end
+
+  reg [7:0] us_unshifted, us_shifted;
+
+  assign unshifted = (layout_no && no_override) ? no_unshifted : us_unshifted;
+  assign shifted   = (layout_no && no_override) ? no_shifted   : us_shifted;
+
+  always @(*) begin
+    case (code)
+      // --- letters ---------------------------------------------------------
+      8'h1C: begin us_unshifted = "a"; us_shifted = "A"; end
+      8'h32: begin us_unshifted = "b"; us_shifted = "B"; end
+      8'h21: begin us_unshifted = "c"; us_shifted = "C"; end
+      8'h23: begin us_unshifted = "d"; us_shifted = "D"; end
+      8'h24: begin us_unshifted = "e"; us_shifted = "E"; end
+      8'h2B: begin us_unshifted = "f"; us_shifted = "F"; end
+      8'h34: begin us_unshifted = "g"; us_shifted = "G"; end
+      8'h33: begin us_unshifted = "h"; us_shifted = "H"; end
+      8'h43: begin us_unshifted = "i"; us_shifted = "I"; end
+      8'h3B: begin us_unshifted = "j"; us_shifted = "J"; end
+      8'h42: begin us_unshifted = "k"; us_shifted = "K"; end
+      8'h4B: begin us_unshifted = "l"; us_shifted = "L"; end
+      8'h3A: begin us_unshifted = "m"; us_shifted = "M"; end
+      8'h31: begin us_unshifted = "n"; us_shifted = "N"; end
+      8'h44: begin us_unshifted = "o"; us_shifted = "O"; end
+      8'h4D: begin us_unshifted = "p"; us_shifted = "P"; end
+      8'h15: begin us_unshifted = "q"; us_shifted = "Q"; end
+      8'h2D: begin us_unshifted = "r"; us_shifted = "R"; end
+      8'h1B: begin us_unshifted = "s"; us_shifted = "S"; end
+      8'h2C: begin us_unshifted = "t"; us_shifted = "T"; end
+      8'h3C: begin us_unshifted = "u"; us_shifted = "U"; end
+      8'h2A: begin us_unshifted = "v"; us_shifted = "V"; end
+      8'h1D: begin us_unshifted = "w"; us_shifted = "W"; end
+      8'h22: begin us_unshifted = "x"; us_shifted = "X"; end
+      8'h35: begin us_unshifted = "y"; us_shifted = "Y"; end
+      8'h1A: begin us_unshifted = "z"; us_shifted = "Z"; end
+
+      // --- digits and their shifted symbols (US layout) --------------------
+      8'h45: begin us_unshifted = "0"; us_shifted = ")"; end
+      8'h16: begin us_unshifted = "1"; us_shifted = "!"; end
+      8'h1E: begin us_unshifted = "2"; us_shifted = "@"; end
+      8'h26: begin us_unshifted = "3"; us_shifted = "#"; end
+      8'h25: begin us_unshifted = "4"; us_shifted = "$"; end
+      8'h2E: begin us_unshifted = "5"; us_shifted = "%"; end
+      8'h36: begin us_unshifted = "6"; us_shifted = "^"; end
+      8'h3D: begin us_unshifted = "7"; us_shifted = "&"; end
+      8'h3E: begin us_unshifted = "8"; us_shifted = "*"; end
+      8'h46: begin us_unshifted = "9"; us_shifted = "("; end
+
+      // --- punctuation -----------------------------------------------------
+      8'h0E: begin us_unshifted = "`";  us_shifted = "~"; end
+      8'h4E: begin us_unshifted = "-";  us_shifted = "_"; end
+      8'h55: begin us_unshifted = "=";  us_shifted = "+"; end
+      8'h54: begin us_unshifted = "[";  us_shifted = "{"; end
+      8'h5B: begin us_unshifted = "]";  us_shifted = "}"; end
+      8'h5D: begin us_unshifted = 8'h5C; us_shifted = "|"; end  // 0x5C = backslash
+      8'h4C: begin us_unshifted = ";";  us_shifted = ":"; end
+      8'h52: begin us_unshifted = "'";  us_shifted = 8'h22; end  // 0x22 = double quote
+      8'h41: begin us_unshifted = ",";  us_shifted = "<"; end
+      8'h49: begin us_unshifted = ".";  us_shifted = ">"; end
+      8'h4A: begin us_unshifted = "/";  us_shifted = "?"; end
+
+      // --- the control keys a console needs --------------------------------
+      8'h29: begin us_unshifted = 8'h20; us_shifted = 8'h20; end  // space
+      8'h5A: begin us_unshifted = 8'h0D; us_shifted = 8'h0D; end  // Enter -> CR
+      8'h66: begin us_unshifted = 8'h08; us_shifted = 8'h08; end  // Backspace -> BS
+      8'h0D: begin us_unshifted = 8'h09; us_shifted = 8'h09; end  // Tab -> HT
+      8'h76: begin us_unshifted = 8'h1B; us_shifted = 8'h1B; end  // Esc
+
+      // 0x00 = no character for this key. Modifiers land here too, which is
+      // correct: the decoder handles them before it ever consults this table.
+      // --- function keys - marker in BOTH columns: a VT220 sends the same
+      // code shifted or not, and there is no Shift-F encoding in this era
+      // (SPEC-vt100-keys.md, "Modifiers"). F1-F4 are DEC's keypad PF1-PF4
+      // by universal emulator convention; F5-F12 the VT220 top-row codes
+      // 15,17,18,19,20,21,23,24 - the gaps at 16 and 22 are DEC's.
+      // NOTE F7 = scancode 0x83, the one printable-range oddity in set 2.
+      8'h05: begin us_unshifted = 8'hB0; us_shifted = 8'hB0; end  // F1  ESC O P
+      8'h06: begin us_unshifted = 8'hB1; us_shifted = 8'hB1; end  // F2  ESC O Q
+      8'h04: begin us_unshifted = 8'hB2; us_shifted = 8'hB2; end  // F3  ESC O R
+      8'h0C: begin us_unshifted = 8'hB3; us_shifted = 8'hB3; end  // F4  ESC O S
+      8'h03: begin us_unshifted = 8'hCF; us_shifted = 8'hCF; end  // F5  ESC [ 15 ~
+      8'h0B: begin us_unshifted = 8'hD1; us_shifted = 8'hD1; end  // F6  ESC [ 17 ~
+      8'h83: begin us_unshifted = 8'hD2; us_shifted = 8'hD2; end  // F7  ESC [ 18 ~
+      8'h0A: begin us_unshifted = 8'hD3; us_shifted = 8'hD3; end  // F8  ESC [ 19 ~
+      8'h01: begin us_unshifted = 8'hD4; us_shifted = 8'hD4; end  // F9  ESC [ 20 ~
+      8'h09: begin us_unshifted = 8'hD5; us_shifted = 8'hD5; end  // F10 ESC [ 21 ~
+      8'h78: begin us_unshifted = 8'hD7; us_shifted = 8'hD7; end  // F11 ESC [ 23 ~
+      8'h07: begin us_unshifted = 8'hD8; us_shifted = 8'hD8; end  // F12 ESC [ 24 ~
+
+      default: begin us_unshifted = 8'h00; us_shifted = 8'h00; end
+    endcase
+  end
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

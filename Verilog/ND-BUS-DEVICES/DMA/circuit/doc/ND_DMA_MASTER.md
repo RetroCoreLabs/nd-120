@@ -19,6 +19,16 @@ Source: `Verilog/ND-BUS-DEVICES/DMA/circuit/ND_DMA_MASTER.v`
 
 ![ND_DMA_MASTER symbol](ND_DMA_MASTER.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.gen_floppy.FLOPPY_DMA_MASTER`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![ND_DMA_MASTER schematic](ND_DMA_MASTER.svg)](ND_DMA_MASTER.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND-100 DMA BUS MASTER
@@ -57,3 +67,385 @@ Ronny Hansen
 | `BINPUT_HOLD` | `0` |
 | `EARLY_REREQ` | ``ND_DMA_EARLY_REREQ` |
 | `EARLY_REREQ` | `0` |
+
+## Verilog source
+
+[`Verilog/ND-BUS-DEVICES/DMA/circuit/ND_DMA_MASTER.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/ND-BUS-DEVICES/DMA/circuit/ND_DMA_MASTER.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of ND_DMA_MASTER (370 lines)</summary>
+
+```verilog
+/**************************************************************************
+** ND-100 DMA BUS MASTER                                                 **
+**                                                                       **
+** The request/grant + memory-reference engine every DMA controller      **
+** (floppy DMA, SMD) uses to exchange single words directly with the     **
+** NORD-100 memory system. Protocol per ND-06.016.01 chapter V and       **
+** docs/nd100-bus-dma.md:                                                **
+**                                                                       **
+**   1. Assert BREQ (wired-OR bus request) and wait.                     **
+**   2. The Bus Control Unit answers with BMEM (leading edge freezes     **
+**      request status) and daisy-chains OUTGRANT; the first module      **
+**      with a frozen request receives INGRANT and stops the token.      **
+**   3. Granted: present the 24-bit physical address on BD with BAPR;    **
+**      BINPUT inactive = memory read, active = memory write.            **
+**   4. Read: remove the address (no feedback), assert BDAP ("BD free,   **
+**      memory may drive"); memory answers data + BDRY; strobe data on   **
+**      BDRY. Write: present data combined with BDAP; memory strobes on  **
+**      BDAP and answers BDRY = accepted.                                **
+**   5. BDRY leading edge ends the grant; trailing edge releases the     **
+**      bus. One word per allocation - block transfers re-request.       **
+**                                                                       **
+** BDAP driver note: the master drives BDAP in BOTH directions -         **
+** verified against PAL_44902A ("PAUSE UNTIL BDAP OCCURS"), see          **
+** docs/nd100-bus-dma.md section 9 gap 1 resolution.                     **
+**                                                                       **
+** Daisy chain: INGRANT_n in, OUTGRANT_n out. A module that is not       **
+** requesting passes the token through; a claiming module consumes it.   **
+**                                                                       **
+** All bus signals active low; BD released = all ones. Client side is a  **
+** one-word request/ack interface; the device (word counter, core        **
+** address register) sits on top and re-requests per word.               **
+**                                                                       **
+** Last reviewed: 11-JUL-2026                                            **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+module ND_DMA_MASTER #(
+    // Safety net only: the real timeout guard is the BCU's (memory out
+    // of range -> PES bit 14). This local counter stops a hung FSM in
+    // sim/tbs; 0 disables it.
+    parameter [15:0] TIMEOUT_TICKS = 16'd4096,
+    // BINPUT is an ADDRESS-PHASE signal: memory latches the direction
+    // at BAPR; after BAPR goes inactive BINPUT carries no meaning
+    // (confirmed 11-JUL-2026 against Figure V.4.2).
+    //   0 = release BINPUT together with BAPR (correct behavior)
+    //   1 = hold BINPUT until the BDRY leading edge (conservative
+    //       variant, kept selectable for validation runs)
+    parameter BINPUT_HOLD = 0,
+    // Early re-request (open question, both variants unit-tested):
+    //   0 = a new dma_req is accepted only after dma_ack (BREQ
+    //       re-asserted after the BDRY trailing edge)
+    //   1 = a dma_req arriving during a transfer is buffered and BREQ
+    //       re-asserted already in the cycle tail (overlapping BDRY)
+    // `ND_DMA_EARLY_REREQ overrides the default at COMPILE time ONLY - no
+    // build defines it, so every normal build keeps 0. The dmaSim P3 teeth
+    // target sets it to 1 (with MIN_GAP 0) to reproduce the back-to-back
+    // hazard, proving the recovery gap is load-bearing.
+`ifdef ND_DMA_EARLY_REREQ
+    parameter EARLY_REREQ = `ND_DMA_EARLY_REREQ,
+`else
+    parameter EARLY_REREQ = 0,
+`endif
+    // Recovery gap between granted cycles, in sysclk ticks. MEASURED on
+    // the real CPU-board RTL (full-RTL gate): the memory-side grant and
+    // decode chain (BLRQ/BCGNT 25/50ns stages) needs time to unwind
+    // after BDRY before it can latch the next externally strobed
+    // address - a back-to-back re-request wins the bus grant but the
+    // RAM cycle never happens (every second read lost). Real ND-100
+    // controllers re-request at 1.4us+ periods (manual II.4 examples),
+    // so hardware never hit this. The request is ACCEPTED at any time;
+    // only the BREQ assertion is deferred.
+    //
+    // UNITS - READ THIS: the quantity that matters is a real-TIME interval,
+    // not a tick count. The target is the ND-100 controller re-request
+    // period, ~1.4us (manual II.4). "32 ticks" is only that interval
+    // expressed in sysclk periods AT THE SIM CLOCK. This design does not pin
+    // one CPU/bus clock frequency (see the clocking docs), so the equivalent
+    // tick count is clock-dependent, NOT a physical constant - 32 is the
+    // sim-era default. At a known silicon clock, re-derive it from the time
+    // (ticks = ceil(1.4us * f_sysclk)); do not carry 32 over blindly.
+    // `ND_DMA_MIN_GAP_TICKS overrides the default at COMPILE time ONLY - no
+    // build defines it, so every normal build keeps 32. The dmaSim P3 teeth
+    // target sets it to 0 (with EARLY_REREQ 1) to reproduce "every second
+    // read lost", proving the recovery gap is load-bearing.
+`ifdef ND_DMA_MIN_GAP_TICKS
+    parameter [7:0] MIN_GAP_TICKS = `ND_DMA_MIN_GAP_TICKS
+`else
+    parameter [7:0] MIN_GAP_TICKS = 8'd32
+`endif
+) (
+    input wire sysclk,
+    input wire sys_rst_n,
+
+    // Client (device core) side: one word per request
+    input  wire        dma_req,       // pulse: start transfer (when !dma_busy)
+    input  wire        dma_wr,        // with req: 0 = memory read, 1 = memory write
+    input  wire [23:0] dma_addr,      // physical memory address
+    input  wire [15:0] dma_wdata,     // write data
+    output reg  [15:0] dma_rdata,     // read data, valid with dma_ack
+    output reg         dma_ack,       // pulse: transfer complete
+    output reg         dma_err,       // with ack: local timeout hit
+    output wire        dma_busy,
+
+    // ND-100 bus, master side
+    output reg         BREQ_n,        // bus request (wired-OR line)
+    input  wire        INGRANT_n,     // grant token in (OUTGRANT of the module before us / the BCU)
+    output wire        OUTGRANT_n,    // grant token out (to the next module)
+    input  wire        BMEM_n,        // memory cycle enable from the BCU; leading edge freezes requests
+    output reg  [23:0] BD_23_0_n_OUT, // we drive the bus (address, write data); FFFFFF when released
+    input  wire [23:0] BD_23_0_n_IN,  // bus as driven by others (read data from memory)
+    output reg         BAPR_n,        // address present strobe
+    output reg         BINPUT_n,      // direction: low = write (input to memory), high = read
+    output reg         BDAP_n,        // data present / BD-free strobe (master-driven both ways)
+    input  wire        BDRY_n         // data ready from memory
+);
+
+  localparam ST_IDLE  = 3'd0;
+  localparam ST_REQ   = 3'd1;  // BREQ out, waiting for BMEM+INGRANT
+  localparam ST_ADDR  = 3'd2;  // address on BD with BAPR
+  localparam ST_DATA  = 3'd3;  // BDAP out, waiting for BDRY
+  localparam ST_END   = 3'd4;  // BDRY seen: strobe/complete, wait release
+
+  reg [2:0]  s_state;
+  reg        s_wr;
+  reg [23:0] s_addr;
+  reg [15:0] s_wdata;
+  reg [15:0] s_rd_capture;  // last driven bus value seen in the data window
+  reg        s_rd_captured;
+  reg [1:0]  s_rd_idle_cnt; // consecutive undriven-bus ticks while BDRY idle
+  reg        s_pend;        // EARLY_REREQ: buffered next request
+  reg        s_pend_wr;
+  reg [23:0] s_pend_addr;
+  reg [15:0] s_pend_wdata;
+  reg        s_prev_bmem_n;
+  reg [15:0] s_tick_cnt;
+  reg [7:0]  s_gap_cnt;     // recovery gap countdown (MIN_GAP_TICKS)
+  reg [1:0]  s_phase_cnt;   // small strobe-width counter
+
+  assign dma_busy = (s_state != ST_IDLE);
+
+  wire s_bmem_fall = (BMEM_n == 1'b0) && (s_prev_bmem_n == 1'b1);
+
+  // Request freeze (F.2, Figure V.4.1 "DMA REQ. STATUS IS FROZEN"):
+  // only a request asserted BEFORE the leading edge of BMEM takes part
+  // in the current grant round. s_req_frozen latches our status at the
+  // BMEM edge; s_frozen_eff covers the edge cycle itself (the register
+  // updates one clock later).
+  reg  s_req_frozen;
+  wire s_frozen_eff = s_req_frozen |
+                      (s_bmem_fall && (s_state == ST_REQ) && (BREQ_n == 1'b0));
+
+  // Daisy chain: combinational pass-through, like the search chain on
+  // the real backplane. We consume the token only when FROZEN-in and
+  // waiting (Figure V.5.1: an un-frozen requester must keep connecting
+  // INGRANT to OUTGRANT), and for the whole transfer once granted - if
+  // the token leaked past a granted master mid-cycle, the next
+  // requester downstream would start its own cycle on the occupied bus.
+  wire s_claiming = ((s_state == ST_REQ) && s_frozen_eff) ||
+                    (s_state == ST_ADDR) || (s_state == ST_DATA) ||
+                    (s_state == ST_END);
+  assign OUTGRANT_n = INGRANT_n | s_claiming;
+
+  always @(posedge sysclk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+      s_state       <= ST_IDLE;
+      s_wr          <= 1'b0;
+      s_addr        <= 24'd0;
+      s_wdata       <= 16'd0;
+      s_req_frozen  <= 1'b0;
+      s_rd_capture  <= 16'd0;
+      s_rd_captured <= 1'b0;
+      s_pend        <= 1'b0;
+      s_pend_wr     <= 1'b0;
+      s_pend_addr   <= 24'd0;
+      s_pend_wdata  <= 16'd0;
+      s_prev_bmem_n <= 1'b1;
+      s_tick_cnt    <= 16'd0;
+      s_gap_cnt     <= 8'd0;
+      s_phase_cnt   <= 2'd0;
+      dma_rdata     <= 16'd0;
+      dma_ack       <= 1'b0;
+      dma_err       <= 1'b0;
+      BREQ_n        <= 1'b1;
+      BD_23_0_n_OUT <= 24'hFFFFFF;
+      BAPR_n        <= 1'b1;
+      BINPUT_n      <= 1'b1;
+      BDAP_n        <= 1'b1;
+    end else begin
+      dma_ack <= 1'b0;
+
+      if (s_gap_cnt != 8'd0) s_gap_cnt <= s_gap_cnt - 8'd1;
+
+      // Freeze latch: sampled at the BMEM leading edge, cleared when the
+      // round is over (BMEM inactive)
+      if (BMEM_n == 1'b1) s_req_frozen <= 1'b0;
+      else if (s_bmem_fall)
+        s_req_frozen <= (s_state == ST_REQ) && (BREQ_n == 1'b0);
+
+      // EARLY_REREQ: buffer one request arriving while busy
+      if (EARLY_REREQ != 0 && dma_req && (s_state != ST_IDLE) && !s_pend) begin
+        s_pend       <= 1'b1;
+        s_pend_wr    <= dma_wr;
+        s_pend_addr  <= dma_addr;
+        s_pend_wdata <= dma_wdata;
+      end
+
+      case (s_state)
+        ST_IDLE: begin
+          dma_err <= 1'b0;
+          if (dma_req) begin
+            s_wr     <= dma_wr;
+            s_addr   <= dma_addr;
+            s_wdata  <= dma_wdata;
+            s_state  <= ST_REQ;
+            s_tick_cnt <= 16'd0;
+          end
+        end
+
+        // Wait for the allocation: BMEM active AND our request frozen in
+        // at its leading edge AND the grant token reaching us. A request
+        // raised after the BMEM edge waits for the next round (F.2).
+        ST_REQ: begin
+          // assert the request once the recovery gap has expired
+          if (BREQ_n == 1'b1 && s_gap_cnt == 8'd0) begin
+            BREQ_n <= 1'b0;
+          end
+          if ((BMEM_n == 1'b0) && (INGRANT_n == 1'b0) && s_frozen_eff) begin
+            // Granted: drop the request, start the address cycle
+            BREQ_n        <= 1'b1;
+            BD_23_0_n_OUT <= ~s_addr;
+            BAPR_n        <= 1'b0;
+            BINPUT_n      <= s_wr ? 1'b0 : 1'b1;  // low = write
+            s_phase_cnt   <= 2'd2;
+            s_state       <= ST_ADDR;
+          end
+        end
+
+        // Hold address + BAPR for two clocks, then move to the data part
+        ST_ADDR: begin
+          if (s_phase_cnt != 2'd0) begin
+            s_phase_cnt <= s_phase_cnt - 2'd1;
+          end else begin
+            BAPR_n <= 1'b1;
+            if (BINPUT_HOLD == 0) begin
+              // Direction was latched by memory at BAPR; BINPUT has no
+              // meaning in the data phase - release it with BAPR
+              BINPUT_n <= 1'b1;
+            end
+            if (s_wr) begin
+              // Write: data on BD combined with BDAP
+              BD_23_0_n_OUT <= ~{8'd0, s_wdata};
+            end else begin
+              // Read: remove the address, BD free for memory
+              BD_23_0_n_OUT <= 24'hFFFFFF;
+            end
+            BDAP_n  <= 1'b0;
+            s_rd_captured <= 1'b0;
+            s_rd_idle_cnt <= 2'd0;
+            s_state <= ST_DATA;
+          end
+        end
+
+        // Wait for memory's BDRY. Read data: on the real backplane the
+        // data holds through BDRY, so strobing at the BDRY leading edge
+        // equals taking the LAST DRIVEN value of the data window - and
+        // the latter also tolerates our zero-delay RTL, where the
+        // internal BDRY25/BDRY50 delay chains make the board release
+        // its data drivers before the externally visible BDRY edge
+        // (measured in the full-RTL gate; see docs/nd100-bus-dma.md).
+        ST_DATA: begin
+          // Capture only GENUINELY-DRIVEN read data by rejecting BOTH idle
+          // patterns of this inverted wired-AND bus:
+          //   0xFFFFFF = idle-high (tb model + the DMA's own idle drive + a
+          //              memory word of 0, which drives ~0 = 0xFFFFFF), and
+          //   0x000000 = released/undriven (ND120_TOP+FPGA "drive 0 when
+          //              disabled", and the pre-data phase there).
+          // Real non-zero data is neither (the upper byte is driven 0xFF, e.g.
+          // data 0x0F00 -> bus 0xFFF0FF; even data 0xFFFF -> bus 0xFF0000).
+          // For a data value of 0 the bus is 0xFFFFFF at the BDRY edge in BOTH
+          // environments, so the `~BD_23_0_n_IN` fallback below yields 0 - no
+          // capture needed. This makes the capture value-independent and works
+          // for both the standalone tbs (data presented AT BDRY) and ND120_TOP
+          // (data presented BEFORE BDRY, released to 0xFFFFFF at the edge).
+          // The old `!= 0xFFFFFF` captured the ND120_TOP pre-data 0x000000 as
+          // garbage 0xFFFF, corrupting zero-word reads (FLOMON command block
+          // sector -> 65535 -> floppy boot hang); `!= 0x000000` alone broke the
+          // tbs (idle-high captured as 0). Rejecting both is correct everywhere.
+          if (!s_wr && (BD_23_0_n_IN != 24'hFFFFFF) && (BD_23_0_n_IN != 24'h000000)) begin
+            s_rd_capture  <= ~BD_23_0_n_IN[15:0];
+            s_rd_captured <= 1'b1;
+            s_rd_idle_cnt <= 2'd0;
+          end else if (!s_wr && s_rd_captured && (s_rd_idle_cnt != 2'd3)) begin
+            // Undriven tick: age the capture. A captured value is only
+            // trusted at the BDRY edge while FRESH (bus driven within the
+            // last 2 ticks) - see the acceptance test below.
+            s_rd_idle_cnt <= s_rd_idle_cnt + 2'd1;
+          end
+          if (BDRY_n == 1'b0) begin
+            if (!s_wr) begin
+              // Accept the captured value only if the drive window ran
+              // (near-)contiguously into this BDRY edge: the board may
+              // release its data drivers up to ~2 ticks before the edge
+              // (measured 0-1 ticks), but a CPU-fetch TRANSIENT leaking
+              // through the BIF transceiver sits at least a memory-access
+              // time (~6 ticks) before BDRY, so an age limit of 2 rejects
+              // every transient - including TRAINS of them, which the
+              // earlier clear-after-2-idle-ticks rule could miss when a
+              // new flicker kept resetting the idle counter. For a read
+              // of a ZERO word the answer drives ~0 = 24'hFFFFFF
+              // (idle-indistinguishable), so a stale capture used to win
+              // there; with the age limit the fallback 0 wins instead.
+              dma_rdata <= (s_rd_captured && (s_rd_idle_cnt <= 2'd2))
+                               ? s_rd_capture
+                               : ~BD_23_0_n_IN[15:0];
+            end
+            // Leading edge of BDRY terminates the grant: release our
+            // strobes and data
+            BDAP_n        <= 1'b1;
+            BD_23_0_n_OUT <= 24'hFFFFFF;
+            BINPUT_n      <= 1'b1;
+            s_state       <= ST_END;
+          end
+        end
+
+        // Trailing edge of BDRY releases the bus; complete toward the client
+        ST_END: begin
+          if (EARLY_REREQ != 0 && s_pend) begin
+            BREQ_n <= 1'b0;  // re-assert in the cycle tail (overlaps BDRY)
+          end
+          if (BDRY_n == 1'b1) begin
+            dma_ack   <= 1'b1;
+            s_gap_cnt <= MIN_GAP_TICKS;
+            if (EARLY_REREQ != 0 && s_pend) begin
+              s_wr    <= s_pend_wr;
+              s_addr  <= s_pend_addr;
+              s_wdata <= s_pend_wdata;
+              s_pend  <= 1'b0;
+              s_tick_cnt <= 16'd0;
+              s_state <= ST_REQ;
+            end else begin
+              s_state <= ST_IDLE;
+            end
+          end
+        end
+
+        default: s_state <= ST_IDLE;
+      endcase
+
+      // Local hang guard (sim safety net; the real guard is the BCU's)
+      if (TIMEOUT_TICKS != 16'd0 && s_state != ST_IDLE) begin
+        s_tick_cnt <= s_tick_cnt + 16'd1;
+        if (s_tick_cnt >= TIMEOUT_TICKS) begin
+          BREQ_n        <= 1'b1;
+          BAPR_n        <= 1'b1;
+          BDAP_n        <= 1'b1;
+          BINPUT_n      <= 1'b1;
+          BD_23_0_n_OUT <= 24'hFFFFFF;
+          dma_err       <= 1'b1;
+          dma_ack       <= 1'b1;
+          s_pend        <= 1'b0;
+          s_gap_cnt     <= MIN_GAP_TICKS;
+          s_state       <= ST_IDLE;
+        end
+      end
+
+      s_prev_bmem_n <= BMEM_n;
+    end
+  end
+
+endmodule
+```
+
+</details>

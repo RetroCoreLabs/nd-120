@@ -14,6 +14,16 @@ Source: `Verilog/fpga/nexys4ddr/sd-fat-test/nd_memtest_mux.v`
 
 ![nd_memtest_mux symbol](nd_memtest_mux.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd_memtest_mux schematic](nd_memtest_mux.svg)](nd_memtest_mux.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Dispatcher for the SD-FAT test's external memory commands
@@ -53,3 +63,171 @@ Ronny Hansen
 | input | `[7:0]` | `ddr2_tx_data` |  |
 | input | `1` | `ddr2_tx_valid` |  |
 | input | `1` | `ddr2_fail` |  |
+
+## Verilog source
+
+[`Verilog/fpga/nexys4ddr/sd-fat-test/nd_memtest_mux.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/nexys4ddr/sd-fat-test/nd_memtest_mux.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd_memtest_mux (156 lines)</summary>
+
+```verilog
+/****************************************************************************
+** Dispatcher for the SD-FAT test's external memory commands               **
+**                                                                         **
+** sd_fat_test_top (built with SDFAT_EXT_TEST) hands out a command id and  **
+** waits for busy to clear, while the selected test prints through the     **
+** shared UART. This module routes the id to the right test and answers    **
+** for the ones that are not compiled into this bitstream, so an           **
+** unimplemented command prints a line instead of hanging the menu.        **
+**                                                                         **
+**   id 0  M  DDR2 - only present when NEXYS_DDR2_TEST is defined          **
+**   id 1  B  ND-120 memory path (MEM_RAM_49 on BRAM), always present      **
+**                                                                         **
+** Only one test can run at a time: the menu waits for busy to clear        **
+** before it accepts another key, so the character mux is a plain priority **
+** select with no arbitration needed.                                      **
+**                                                                         **
+** Last reviewed: 20-AUG-2026                                              **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+`default_nettype none
+
+module nd_memtest_mux (
+    input wire clk,
+    input wire rst_n,
+
+    input  wire       start,
+    input  wire [3:0] id,
+    output wire       busy,
+
+    output wire [7:0] tx_data,
+    output wire       tx_valid,
+    input  wire       tx_busy,
+
+    output wire fail,
+
+    // ND-120 BRAM path test
+    output wire       bram_start,
+    input  wire       bram_busy,
+    input  wire [7:0] bram_tx_data,
+    input  wire       bram_tx_valid,
+    input  wire       bram_fail,
+
+    // DDR2 test (inputs tied off by the caller when it is not built)
+    output wire       ddr2_start,
+    input  wire       ddr2_busy,
+    input  wire [7:0] ddr2_tx_data,
+    input  wire       ddr2_tx_valid,
+    input  wire       ddr2_fail
+);
+
+  assign bram_start = start && (id == 4'd1);
+`ifdef NEXYS_DDR2_TEST
+  assign ddr2_start = start && (id == 4'd0);
+`else
+  assign ddr2_start = 1'b0;
+`endif
+
+  /*******************************************************************
+   *  "DDR2 NOT IN BUILD" reply, for a command this bitstream lacks
+   *******************************************************************/
+  localparam NB_LEN = 6'd18;
+
+  reg [5:0] nb_ptr;
+  reg       nb_run;
+  reg [7:0] nb_data;
+  reg       nb_valid;
+
+  reg [7:0] nb_ch;
+  always @(*) begin
+    case (nb_ptr)
+      6'd0:  nb_ch = "D";
+      6'd1:  nb_ch = "D";
+      6'd2:  nb_ch = "R";
+      6'd3:  nb_ch = "2";
+      6'd4:  nb_ch = " ";
+      6'd5:  nb_ch = "N";
+      6'd6:  nb_ch = "O";
+      6'd7:  nb_ch = "T";
+      6'd8:  nb_ch = " ";
+      6'd9:  nb_ch = "I";
+      6'd10: nb_ch = "N";
+      6'd11: nb_ch = " ";
+      6'd12: nb_ch = "B";
+      6'd13: nb_ch = "U";
+      6'd14: nb_ch = "I";
+      6'd15: nb_ch = "L";
+      6'd16: nb_ch = "D";
+      default: nb_ch = 8'h0D;
+    endcase
+  end
+
+  // one extra character after the ROM: the line feed
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      nb_run   <= 1'b0;
+      nb_ptr   <= 6'd0;
+      nb_valid <= 1'b0;
+      nb_data  <= 8'd0;
+    end else begin
+      nb_valid <= 1'b0;
+
+      if (start && !nb_run) begin
+`ifndef NEXYS_DDR2_TEST
+        if (id == 4'd0) begin
+          nb_run <= 1'b1;
+          nb_ptr <= 6'd0;
+        end
+`endif
+      end else if (nb_run && !tx_busy && !nb_valid) begin
+        if (nb_ptr == NB_LEN) begin
+          nb_data  <= 8'h0A;  // LF closes the line
+          nb_valid <= 1'b1;
+          nb_run   <= 1'b0;
+        end else begin
+          nb_data  <= nb_ch;
+          nb_valid <= 1'b1;
+          nb_ptr   <= nb_ptr + 6'd1;
+        end
+      end
+    end
+  end
+
+  /*******************************************************************
+   *  Outputs
+   *******************************************************************/
+  assign tx_data  = bram_tx_valid ? bram_tx_data
+                  : ddr2_tx_valid ? ddr2_tx_data
+                  : nb_data;
+  assign tx_valid = bram_tx_valid | ddr2_tx_valid | nb_valid;
+
+  // A test in another clock domain (DDR2 runs on the controller's 75 MHz
+  // ui_clk) cannot raise its busy flag in the same cycle it is started - the
+  // synchronisers take a few cycles. Without this latch the menu would see
+  // "not busy" right after the kick and declare the command finished before
+  // the test had begun. pend covers the gap: set on start, cleared once the
+  // test's own busy has been seen and released again.
+  reg pend, seen;
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      pend <= 1'b0;
+      seen <= 1'b0;
+    end else if (start) begin
+      pend <= 1'b1;
+      seen <= 1'b0;
+    end else if (pend) begin
+      if (bram_busy | ddr2_busy) seen <= 1'b1;
+      else if (seen) pend <= 1'b0;
+    end
+  end
+
+  assign busy = bram_busy | ddr2_busy | nb_run | nb_valid | pend;
+  assign fail = bram_fail | ddr2_fail;
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

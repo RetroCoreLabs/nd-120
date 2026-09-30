@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1380.0" height="1052.5" viewBox="-80.0 -80.0 1380.0 1052.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="1380.0" height="1052.5" fill="#ffffff" /><a href="../../logisim/doc/D_FLIPFLOP.md"><title>MEMORY_5 (D_FLIPFLOP) - open its page</title><g transform="translate(265,355.5)" id="cell_MEMORY_5"><text x="15" y="-4" class="nodelabel cell_MEMORY_5">D_FLIPFLOP</text><rect width="30" height="100" class="cell_MEMORY_5" /><g transform="translate(0,10)" id="port_MEMORY_5~clock"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_5">clock</text></g><g transform="translate(0,30)" id="port_MEMORY_5~d"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_5">d</text></g><g transform="translate(0,50)" id="port_MEMORY_5~preset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_5">preset</text></g><g transform="translate(0,70)" id="port_MEMORY_5~reset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_5">reset</text></g><g transform="translate(0,90)" id="port_MEMORY_5~tick"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_5">tick</text></g><g transform="translate(30,10)" id="port_MEMORY_5~q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_5">q</text></g><g transform="translate(30,30)" id="port_MEMORY_5~qBar"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_5">qBar</text></g></g></a>
+<a href="../../logisim/doc/D_FLIPFLOP.md"><title>MEMORY_6 (D_FLIPFLOP) - open its page</title><g transform="translate(539,531.5)" id="cell_MEMORY_6"><text x="15" y="-4" class="nodelabel cell_MEMORY_6">D_FLIPFLOP</text><rect width="30" height="100" class="cell_MEMORY_6" /><g transform="translate(0,10)" id="port_MEMORY_6~clock"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_6">clock</text></g><g transform="translate(0,30)" id="port_MEMORY_6~d"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_6">d</text></g><g transform="translate(0,50)" id="port_MEMORY_6~preset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_6">preset</text></g><g transform="translate(0,70)" id="port_MEMORY_6~reset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_6">reset</text></g><g transform="translate(0,90)" id="port_MEMORY_6~tick"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_6">tick</text></g><g transform="translate(30,10)" id="port_MEMORY_6~q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_6">q</text></g><g transform="translate(30,30)" id="port_MEMORY_6~qBar"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_6">qBar</text></g></g></a>
+<a href="../../logisim/doc/D_FLIPFLOP.md"><title>MEMORY_7 (D_FLIPFLOP) - open its page</title><g transform="translate(813,418)" id="cell_MEMORY_7"><text x="15" y="-4" class="nodelabel cell_MEMORY_7">D_FLIPFLOP</text><rect width="30" height="100" class="cell_MEMORY_7" /><g transform="translate(0,10)" id="port_MEMORY_7~clock"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_7">clock</text></g><g transform="translate(0,30)" id="port_MEMORY_7~d"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_7">d</text></g><g transform="translate(0,50)" id="port_MEMORY_7~preset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_7">preset</text></g><g transform="translate(0,70)" id="port_MEMORY_7~reset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_7">reset</text></g><g transform="translate(0,90)" id="port_MEMORY_7~tick"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_7">tick</text></g><g transform="translate(30,10)" id="port_MEMORY_7~q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_7">q</text></g><g transform="translate(30,30)" id="port_MEMORY_7~qBar"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_7">qBar</text></g></g></a>
+<a href="../../logisim/doc/D_FLIPFLOP.md"><title>MEMORY_8 (D_FLIPFLOP) - open its page</title><g transform="translate(1087,777.5)" id="cell_MEMORY_8"><text x="15" y="-4" class="nodelabel cell_MEMORY_8">D_FLIPFLOP</text><rect width="30" height="100" class="cell_MEMORY_8" /><g transform="translate(0,10)" id="port_MEMORY_8~clock"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_8">clock</text></g><g transform="translate(0,30)" id="port_MEMORY_8~d"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_8">d</text></g><g transform="translate(0,50)" id="port_MEMORY_8~preset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_8">preset</text></g><g transform="translate(0,70)" id="port_MEMORY_8~reset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_8">reset</text></g><g transform="translate(0,90)" id="port_MEMORY_8~tick"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_8">tick</text></g><g transform="translate(30,10)" id="port_MEMORY_8~q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_8">q</text></g><g transform="translate(30,30)" id="port_MEMORY_8~qBar"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_8">qBar</text></g></g></a>
+<a href="../../logisim/doc/Multiplexer_2.md"><title>PLEXERS_1 (Multiplexer_2) - open its page</title><g transform="translate(120,239)" id="cell_PLEXERS_1"><text x="15" y="-4" class="nodelabel cell_PLEXERS_1">Multiplexer_2</text><rect width="30" height="60" class="cell_PLEXERS_1" /><g transform="translate(0,10)" id="port_PLEXERS_1~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_1~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_1~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_1">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_1~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_1">muxOut</text></g></g></a>
+<a href="../../logisim/doc/Multiplexer_2.md"><title>PLEXERS_2 (Multiplexer_2) - open its page</title><g transform="translate(399,500.5)" id="cell_PLEXERS_2"><text x="15" y="-4" class="nodelabel cell_PLEXERS_2">Multiplexer_2</text><rect width="30" height="60" class="cell_PLEXERS_2" /><g transform="translate(0,10)" id="port_PLEXERS_2~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_2~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_2~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_2">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_2~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_2">muxOut</text></g></g></a>
+<a href="../../logisim/doc/Multiplexer_2.md"><title>PLEXERS_3 (Multiplexer_2) - open its page</title><g transform="translate(673,284)" id="cell_PLEXERS_3"><text x="15" y="-4" class="nodelabel cell_PLEXERS_3">Multiplexer_2</text><rect width="30" height="60" class="cell_PLEXERS_3" /><g transform="translate(0,10)" id="port_PLEXERS_3~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_3">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_3~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_3">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_3~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_3">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_3~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_3">muxOut</text></g></g></a>
+<a href="../../logisim/doc/Multiplexer_2.md"><title>PLEXERS_4 (Multiplexer_2) - open its page</title><g transform="translate(947,755)" id="cell_PLEXERS_4"><text x="15" y="-4" class="nodelabel cell_PLEXERS_4">Multiplexer_2</text><rect width="30" height="60" class="cell_PLEXERS_4" /><g transform="translate(0,10)" id="port_PLEXERS_4~muxIn_0"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_4">muxIn_0</text></g><g transform="translate(0,30)" id="port_PLEXERS_4~muxIn_1"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_4">muxIn_1</text></g><g transform="translate(0,50)" id="port_PLEXERS_4~sel"><text x="-3" y="-4" class="inputPortLabel cell_PLEXERS_4">sel</text></g><g transform="translate(30,10)" id="port_PLEXERS_4~muxOut"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PLEXERS_4">muxOut</text></g></g></a>
+<g transform="translate(12,259.5)" id="cell_A"><text x="15" y="-4" class="nodelabel cell_A">A</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_A" /><g /></g>
+<g transform="translate(265,521)" id="cell_B"><text x="15" y="-4" class="nodelabel cell_B">B</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_B" /><g /></g>
+<g transform="translate(539,304.5)" id="cell_C"><text x="15" y="-4" class="nodelabel cell_C">C</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_C" /><g /></g>
+<g transform="translate(120,469.5)" id="cell_CP"><text x="15" y="-4" class="nodelabel cell_CP">CP</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CP" /><g /></g>
+<g transform="translate(813,775.5)" id="cell_D"><text x="15" y="-4" class="nodelabel cell_D">D</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D" /><g /></g>
+<g transform="translate(12,324.5)" id="cell_L"><text x="15" y="-4" class="nodelabel cell_L">L</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_L" /><g /></g>
+<g transform="translate(12,194.5)" id="cell_SI"><text x="15" y="-4" class="nodelabel cell_SI">SI</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SI" /><g /></g>
+<g transform="translate(1178,242)" id="cell_QA"><text x="15" y="-4" class="nodelabel cell_QA">QA</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QA" /><g /></g>
+<g transform="translate(1178,87)" id="cell_QAN"><text x="15" y="-4" class="nodelabel cell_QAN">QAN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QAN" /><g /></g>
+<g transform="translate(1178,648)" id="cell_QB"><text x="15" y="-4" class="nodelabel cell_QB">QB</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QB" /><g /></g>
+<g transform="translate(1178,713)" id="cell_QBN"><text x="15" y="-4" class="nodelabel cell_QBN">QBN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QBN" /><g /></g>
+<g transform="translate(1178,22)" id="cell_QC"><text x="15" y="-4" class="nodelabel cell_QC">QC</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QC" /><g /></g>
+<g transform="translate(1178,152)" id="cell_QCN"><text x="15" y="-4" class="nodelabel cell_QCN">QCN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QCN" /><g /></g>
+<g transform="translate(1178,778)" id="cell_QD"><text x="15" y="-4" class="nodelabel cell_QD">QD</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QD" /><g /></g>
+<g transform="translate(1178,843)" id="cell_QDN"><text x="15" y="-4" class="nodelabel cell_QDN">QDN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QDN" /><g /></g>
+<g transform="translate(120,572)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(120,637)" id="cell_1"><text x="15" y="-4" class="nodelabel cell_1">1</text><rect width="30" height="20" class="cell_1" /><g /></g>
+<line x1="148" x2="208" y1="479.5" y2="479.5" class="net_5"><title>CP</title></line>
+<line x1="208" x2="208" y1="479.5" y2="366" class="net_5"><title>CP</title></line>
+<circle cx="208" cy="479.5" r="2" style="fill:#000" class="net_5" />
+<circle cx="208" cy="366" r="2" style="fill:#000" class="net_5" />
+<line x1="208" x2="265" y1="366" y2="366" class="net_5"><title>CP</title></line>
+<line x1="148" x2="487" y1="479.5" y2="479.5" class="net_5"><title>CP</title></line>
+<line x1="487" x2="487" y1="479.5" y2="542" class="net_5"><title>CP</title></line>
+<line x1="487" x2="539" y1="542" y2="542" class="net_5"><title>CP</title></line>
+<line x1="148" x2="208" y1="479.5" y2="479.5" class="net_5"><title>CP</title></line>
+<line x1="208" x2="208" y1="479.5" y2="263" class="net_5"><title>CP</title></line>
+<line x1="208" x2="761" y1="263" y2="263" class="net_5"><title>CP</title></line>
+<line x1="761" x2="761" y1="263" y2="428.5" class="net_5"><title>CP</title></line>
+<line x1="761" x2="813" y1="428.5" y2="428.5" class="net_5"><title>CP</title></line>
+<line x1="148" x2="208" y1="479.5" y2="479.5" class="net_5"><title>CP</title></line>
+<line x1="208" x2="208" y1="479.5" y2="734" class="net_5"><title>CP</title></line>
+<line x1="208" x2="1035" y1="734" y2="734" class="net_5"><title>CP</title></line>
+<line x1="1035" x2="1035" y1="734" y2="788" class="net_5"><title>CP</title></line>
+<line x1="1035" x2="1087" y1="788" y2="788" class="net_5"><title>CP</title></line>
+<line x1="151" x2="198" y1="249.5" y2="249.5" class="net_17"><title>s_plex1_out</title></line>
+<line x1="198" x2="198" y1="249.5" y2="386" class="net_17"><title>s_plex1_out</title></line>
+<line x1="198" x2="265" y1="386" y2="386" class="net_17"><title>s_plex1_out</title></line>
+<line x1="150" x2="218" y1="582" y2="582" class="net_21" />
+<line x1="218" x2="218" y1="582" y2="406" class="net_21" />
+<circle cx="218" cy="582" r="2" style="fill:#000" class="net_21" />
+<line x1="218" x2="265" y1="406" y2="406" class="net_21" />
+<line x1="150" x2="218" y1="582" y2="582" class="net_21" />
+<line x1="218" x2="218" y1="582" y2="426" class="net_21" />
+<circle cx="218" cy="426" r="2" style="fill:#000" class="net_21" />
+<line x1="218" x2="265" y1="426" y2="426" class="net_21" />
+<line x1="150" x2="539" y1="582" y2="582" class="net_21" />
+<line x1="150" x2="477" y1="582" y2="582" class="net_21" />
+<line x1="477" x2="477" y1="582" y2="602" class="net_21" />
+<circle cx="477" cy="582" r="2" style="fill:#000" class="net_21" />
+<line x1="477" x2="539" y1="602" y2="602" class="net_21" />
+<line x1="150" x2="218" y1="582" y2="582" class="net_21" />
+<line x1="218" x2="218" y1="582" y2="468.5" class="net_21" />
+<circle cx="218" cy="468.5" r="2" style="fill:#000" class="net_21" />
+<line x1="218" x2="813" y1="468.5" y2="468.5" class="net_21" />
+<line x1="150" x2="218" y1="582" y2="582" class="net_21" />
+<line x1="218" x2="218" y1="582" y2="468.5" class="net_21" />
+<line x1="218" x2="751" y1="468.5" y2="468.5" class="net_21" />
+<line x1="751" x2="751" y1="468.5" y2="488.5" class="net_21" />
+<circle cx="751" cy="468.5" r="2" style="fill:#000" class="net_21" />
+<line x1="751" x2="813" y1="488.5" y2="488.5" class="net_21" />
+<line x1="150" x2="218" y1="582" y2="582" class="net_21" />
+<line x1="218" x2="218" y1="582" y2="828" class="net_21" />
+<line x1="218" x2="1087" y1="828" y2="828" class="net_21" />
+<line x1="150" x2="218" y1="582" y2="582" class="net_21" />
+<line x1="218" x2="218" y1="582" y2="828" class="net_21" />
+<line x1="218" x2="1035" y1="828" y2="828" class="net_21" />
+<line x1="1035" x2="1035" y1="828" y2="848" class="net_21" />
+<circle cx="1035" cy="828" r="2" style="fill:#000" class="net_21" />
+<line x1="1035" x2="1087" y1="848" y2="848" class="net_21" />
+<line x1="150" x2="198" y1="647" y2="647" class="net_23" />
+<line x1="198" x2="198" y1="647" y2="446" class="net_23" />
+<circle cx="198" cy="647" r="2" style="fill:#000" class="net_23" />
+<line x1="198" x2="265" y1="446" y2="446" class="net_23" />
+<line x1="150" x2="477" y1="647" y2="647" class="net_23" />
+<line x1="477" x2="477" y1="647" y2="622" class="net_23" />
+<circle cx="477" cy="647" r="2" style="fill:#000" class="net_23" />
+<line x1="477" x2="539" y1="622" y2="622" class="net_23" />
+<line x1="150" x2="751" y1="647" y2="647" class="net_23" />
+<line x1="751" x2="751" y1="647" y2="508.5" class="net_23" />
+<line x1="751" x2="813" y1="508.5" y2="508.5" class="net_23" />
+<line x1="150" x2="198" y1="647" y2="647" class="net_23" />
+<line x1="198" x2="198" y1="647" y2="839" class="net_23" />
+<line x1="198" x2="1025" y1="839" y2="839" class="net_23" />
+<line x1="1025" x2="1025" y1="839" y2="868" class="net_23" />
+<line x1="1025" x2="1087" y1="868" y2="868" class="net_23" />
+<line x1="430" x2="477" y1="511" y2="511" class="net_18"><title>s_plex2_out</title></line>
+<line x1="477" x2="477" y1="511" y2="562" class="net_18"><title>s_plex2_out</title></line>
+<line x1="477" x2="539" y1="562" y2="562" class="net_18"><title>s_plex2_out</title></line>
+<line x1="704" x2="751" y1="294.5" y2="294.5" class="net_19"><title>s_plex3_out</title></line>
+<line x1="751" x2="751" y1="294.5" y2="448.5" class="net_19"><title>s_plex3_out</title></line>
+<line x1="751" x2="813" y1="448.5" y2="448.5" class="net_19"><title>s_plex3_out</title></line>
+<line x1="978" x2="1025" y1="765.5" y2="765.5" class="net_20"><title>s_plex4_out</title></line>
+<line x1="1025" x2="1025" y1="765.5" y2="808" class="net_20"><title>s_plex4_out</title></line>
+<line x1="1025" x2="1087" y1="808" y2="808" class="net_20"><title>s_plex4_out</title></line>
+<line x1="40" x2="52" y1="204.5" y2="204.5" class="net_8"><title>SI</title></line>
+<line x1="52" x2="52" y1="204.5" y2="249.5" class="net_8"><title>SI</title></line>
+<line x1="52" x2="120" y1="249.5" y2="249.5" class="net_8"><title>SI</title></line>
+<line x1="40" x2="120" y1="269.5" y2="269.5" class="net_2"><title>A</title></line>
+<line x1="40" x2="52" y1="334.5" y2="334.5" class="net_7"><title>L</title></line>
+<line x1="52" x2="52" y1="334.5" y2="289.5" class="net_7"><title>L</title></line>
+<circle cx="52" cy="334.5" r="2" style="fill:#000" class="net_7" />
+<line x1="52" x2="120" y1="289.5" y2="289.5" class="net_7"><title>L</title></line>
+<line x1="40" x2="52" y1="334.5" y2="334.5" class="net_7"><title>L</title></line>
+<line x1="52" x2="52" y1="334.5" y2="551" class="net_7"><title>L</title></line>
+<circle cx="52" cy="551" r="2" style="fill:#000" class="net_7" />
+<line x1="52" x2="399" y1="551" y2="551" class="net_7"><title>L</title></line>
+<line x1="40" x2="673" y1="334.5" y2="334.5" class="net_7"><title>L</title></line>
+<line x1="40" x2="52" y1="334.5" y2="334.5" class="net_7"><title>L</title></line>
+<line x1="52" x2="52" y1="334.5" y2="805.5" class="net_7"><title>L</title></line>
+<line x1="52" x2="947" y1="805.5" y2="805.5" class="net_7"><title>L</title></line>
+<line x1="296" x2="341" y1="366" y2="366" class="net_9"><title>QA</title></line>
+<line x1="341" x2="341" y1="366" y2="511" class="net_9"><title>QA</title></line>
+<circle cx="341" cy="366" r="2" style="fill:#000" class="net_9" />
+<line x1="341" x2="399" y1="511" y2="511" class="net_9"><title>QA</title></line>
+<line x1="296" x2="341" y1="366" y2="366" class="net_9"><title>QA</title></line>
+<line x1="341" x2="341" y1="366" y2="252" class="net_9"><title>QA</title></line>
+<line x1="341" x2="1178" y1="252" y2="252" class="net_9"><title>QA</title></line>
+<line x1="293" x2="399" y1="531" y2="531" class="net_3"><title>B</title></line>
+<line x1="570" x2="615" y1="542" y2="542" class="net_11"><title>QB</title></line>
+<line x1="615" x2="615" y1="542" y2="294.5" class="net_11"><title>QB</title></line>
+<circle cx="615" cy="542" r="2" style="fill:#000" class="net_11" />
+<line x1="615" x2="673" y1="294.5" y2="294.5" class="net_11"><title>QB</title></line>
+<line x1="570" x2="615" y1="542" y2="542" class="net_11"><title>QB</title></line>
+<line x1="615" x2="615" y1="542" y2="658" class="net_11"><title>QB</title></line>
+<line x1="615" x2="1178" y1="658" y2="658" class="net_11"><title>QB</title></line>
+<line x1="567" x2="673" y1="314.5" y2="314.5" class="net_4"><title>C</title></line>
+<line x1="844" x2="879" y1="428.5" y2="428.5" class="net_13"><title>QC</title></line>
+<line x1="879" x2="879" y1="428.5" y2="765.5" class="net_13"><title>QC</title></line>
+<circle cx="879" cy="428.5" r="2" style="fill:#000" class="net_13" />
+<line x1="879" x2="947" y1="765.5" y2="765.5" class="net_13"><title>QC</title></line>
+<line x1="844" x2="879" y1="428.5" y2="428.5" class="net_13"><title>QC</title></line>
+<line x1="879" x2="879" y1="428.5" y2="32" class="net_13"><title>QC</title></line>
+<line x1="879" x2="1178" y1="32" y2="32" class="net_13"><title>QC</title></line>
+<line x1="841" x2="947" y1="785.5" y2="785.5" class="net_6"><title>D</title></line>
+<line x1="296" x2="331" y1="386" y2="386" class="net_10"><title>QAN</title></line>
+<line x1="331" x2="331" y1="386" y2="97" class="net_10"><title>QAN</title></line>
+<line x1="331" x2="1178" y1="97" y2="97" class="net_10"><title>QAN</title></line>
+<line x1="570" x2="605" y1="562" y2="562" class="net_12"><title>QBN</title></line>
+<line x1="605" x2="605" y1="562" y2="723" class="net_12"><title>QBN</title></line>
+<line x1="605" x2="1178" y1="723" y2="723" class="net_12"><title>QBN</title></line>
+<line x1="844" x2="889" y1="448.5" y2="448.5" class="net_14"><title>QCN</title></line>
+<line x1="889" x2="889" y1="448.5" y2="162" class="net_14"><title>QCN</title></line>
+<line x1="889" x2="1178" y1="162" y2="162" class="net_14"><title>QCN</title></line>
+<line x1="1118" x2="1178" y1="788" y2="788" class="net_15"><title>QD</title></line>
+<line x1="1118" x2="1153" y1="808" y2="808" class="net_16"><title>QDN</title></line>
+<line x1="1153" x2="1153" y1="808" y2="853" class="net_16"><title>QDN</title></line>
+<line x1="1153" x2="1178" y1="853" y2="853" class="net_16"><title>QDN</title></line>
+<text x="334.0" y="94.0" class="netlabel">QAN</text>
+<text x="618.0" y="655.0" class="netlabel">QB</text>
+<text x="608.0" y="720.0" class="netlabel">QBN</text>
+<text x="882.0" y="29.0" class="netlabel">QC</text>
+<text x="892.0" y="159.0" class="netlabel">QCN</text>
+<text x="1121.0" y="785.0" class="netlabel">QD</text>
+<text x="1121.0" y="805.0" class="netlabel">QDN</text>
+<text x="201.0" y="383.0" class="netlabel">s_plex1_out</text>
+<text x="480.0" y="559.0" class="netlabel">s_plex2_out</text>
+<text x="754.0" y="445.5" class="netlabel">s_plex3_out</text>
+<text x="43.0" y="266.5" class="netlabel">A</text>
+<text x="1028.0" y="805.0" class="netlabel">s_plex4_out</text>
+<text x="296.0" y="528.0" class="netlabel">B</text>
+<text x="570.0" y="311.5" class="netlabel">C</text>
+<text x="211.0" y="731.0" class="netlabel">CP</text>
+<text x="844.0" y="782.5" class="netlabel">D</text>
+<text x="55.0" y="802.5" class="netlabel">L</text>
+<text x="55.0" y="246.5" class="netlabel">SI</text>
+<text x="344.0" y="249.0" class="netlabel">QA</text>
+</svg>

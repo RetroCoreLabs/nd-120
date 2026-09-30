@@ -1,0 +1,399 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1630.0" height="2201.5" viewBox="-80.0 -80.0 1630.0 2201.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="1630.0" height="2201.5" fill="#ffffff" /><g transform="translate(1064,799.5)" id="cell_$and$BIF_DPATH_9.v:268$4842"><path d="M0,0 L0,25 L15,25 A15 12.5 0 0 0 15,0 Z" class="cell_$and$BIF_DPATH_9.v:268$4842" /><g /><g /><g /></g>
+<g transform="translate(1064,1350.5)" id="cell_$or$BIF_DPATH_9.v:196$4835"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$BIF_DPATH_9.v:196$4835" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$BIF_DPATH_9.v:196$4835" /><g /><g /><g /></g>
+<g transform="translate(1231.3333333333333,1237)" id="cell_$or$BIF_DPATH_9.v:196$4836"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$BIF_DPATH_9.v:196$4836" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$BIF_DPATH_9.v:196$4836" /><g /><g /><g /></g>
+<g transform="translate(1064,1538)" id="cell_$or$BIF_DPATH_9.v:206$4837"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$BIF_DPATH_9.v:206$4837" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$BIF_DPATH_9.v:206$4837" /><g /><g /><g /></g>
+<g transform="translate(1231.3333333333333,1297)" id="cell_$or$BIF_DPATH_9.v:206$4838"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$BIF_DPATH_9.v:206$4838" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$BIF_DPATH_9.v:206$4838" /><g /><g /><g /></g>
+<g transform="translate(1370,1304.5)" id="cell_$or$BIF_DPATH_9.v:206$4839"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$BIF_DPATH_9.v:206$4839" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$BIF_DPATH_9.v:206$4839" /><g /><g /><g /></g>
+<g transform="translate(550.3333333333334,1929.5)" id="cell_$or$BIF_DPATH_9.v:207$4840"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$BIF_DPATH_9.v:207$4840" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$BIF_DPATH_9.v:207$4840" /><g /><g /><g /></g>
+<g transform="translate(706,1538)" id="cell_$or$BIF_DPATH_9.v:207$4841"><path d="M0,25 L0,25 L15,25 A15 12.5 0 0 0 15,0 L0,0" class="cell_$or$BIF_DPATH_9.v:207$4841" /><path d="M0,0 A30 25 0 0 1 0,25" class="cell_$or$BIF_DPATH_9.v:207$4841" /><g /><g /><g /></g>
+<a href="BIF_DPATH_BDLBD_10.md"><title>BDLBD (BIF_DPATH_BDLBD_10) - open its page</title><g transform="translate(917,964)" id="cell_BDLBD"><text x="15" y="-4" class="nodelabel cell_BDLBD">BIF_DPATH_BDLBD_10</text><rect width="30" height="180" class="cell_BDLBD" /><g transform="translate(0,10)" id="port_BDLBD~BD_23_0_n_IN"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">BD_23_0_n_IN</text></g><g transform="translate(0,30)" id="port_BDLBD~BGNTCACT_n"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">BGNTCACT_n</text></g><g transform="translate(0,50)" id="port_BDLBD~BGNT_n"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">BGNT_n</text></g><g transform="translate(0,70)" id="port_BDLBD~CLKBD"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">CLKBD</text></g><g transform="translate(0,90)" id="port_BDLBD~EBADR"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">EBADR</text></g><g transform="translate(0,110)" id="port_BDLBD~EBD_n"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">EBD_n</text></g><g transform="translate(0,130)" id="port_BDLBD~LBD_23_0_IN"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">LBD_23_0_IN</text></g><g transform="translate(0,150)" id="port_BDLBD~WBD_n"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">WBD_n</text></g><g transform="translate(0,170)" id="port_BDLBD~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_BDLBD">sysclk</text></g><g transform="translate(30,10)" id="port_BDLBD~BD_23_0_n_OUT"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_BDLBD">BD_23_0_n_OUT</text></g><g transform="translate(30,30)" id="port_BDLBD~LBD_23_0_OUT"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_BDLBD">LBD_23_0_OUT</text></g></g></a>
+<a href="BIF_DPATH_CDLBD_11.md"><title>CDLBD (BIF_DPATH_CDLBD_11) - open its page</title><g transform="translate(548,1174)" id="cell_CDLBD"><text x="15" y="-4" class="nodelabel cell_CDLBD">BIF_DPATH_CDLBD_11</text><rect width="30" height="140" class="cell_CDLBD" /><g transform="translate(0,10)" id="port_CDLBD~CD_15_0_IN"><text x="-3" y="-4" class="inputPortLabel cell_CDLBD">CD_15_0_IN</text></g><g transform="translate(0,30)" id="port_CDLBD~DSTB_n"><text x="-3" y="-4" class="inputPortLabel cell_CDLBD">DSTB_n</text></g><g transform="translate(0,50)" id="port_CDLBD~ECREQ"><text x="-3" y="-4" class="inputPortLabel cell_CDLBD">ECREQ</text></g><g transform="translate(0,70)" id="port_CDLBD~EMD_n"><text x="-3" y="-4" class="inputPortLabel cell_CDLBD">EMD_n</text></g><g transform="translate(0,90)" id="port_CDLBD~LBD_15_0_IN"><text x="-3" y="-4" class="inputPortLabel cell_CDLBD">LBD_15_0_IN</text></g><g transform="translate(0,110)" id="port_CDLBD~WLBD_n"><text x="-3" y="-4" class="inputPortLabel cell_CDLBD">WLBD_n</text></g><g transform="translate(0,130)" id="port_CDLBD~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CDLBD">sysclk</text></g><g transform="translate(30,10)" id="port_CDLBD~CD_15_0_OUT"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CDLBD">CD_15_0_OUT</text></g><g transform="translate(30,30)" id="port_CDLBD~LBD_15_0_OUT"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CDLBD">LBD_15_0_OUT</text></g></g></a>
+<a href="BIF_DPATH_LDBCTL_12.md"><title>LDBCTL (BIF_DPATH_LDBCTL_12) - open its page</title><g transform="translate(285.0263157894737,586.5)" id="cell_LDBCTL"><text x="15" y="-4" class="nodelabel cell_LDBCTL">BIF_DPATH_LDBCTL_12</text><rect width="30" height="540" class="cell_LDBCTL" /><g transform="translate(0,10)" id="port_LDBCTL~BDAP50_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">BDAP50_n</text></g><g transform="translate(0,30)" id="port_LDBCTL~BDRY25_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">BDRY25_n</text></g><g transform="translate(0,50)" id="port_LDBCTL~BDRY50_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">BDRY50_n</text></g><g transform="translate(0,70)" id="port_LDBCTL~BGNT50_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">BGNT50_n</text></g><g transform="translate(0,90)" id="port_LDBCTL~BGNT_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">BGNT_n</text></g><g transform="translate(0,110)" id="port_LDBCTL~BINPUT50_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">BINPUT50_n</text></g><g transform="translate(0,130)" id="port_LDBCTL~CACT_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">CACT_n</text></g><g transform="translate(0,150)" id="port_LDBCTL~CC2_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">CC2_n</text></g><g transform="translate(0,170)" id="port_LDBCTL~CGNT50_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">CGNT50_n</text></g><g transform="translate(0,190)" id="port_LDBCTL~CGNT_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">CGNT_n</text></g><g transform="translate(0,210)" id="port_LDBCTL~EADR_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">EADR_n</text></g><g transform="translate(0,230)" id="port_LDBCTL~EBUS_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">EBUS_n</text></g><g transform="translate(0,250)" id="port_LDBCTL~GNT_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">GNT_n</text></g><g transform="translate(0,270)" id="port_LDBCTL~IBAPR_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">IBAPR_n</text></g><g transform="translate(0,290)" id="port_LDBCTL~IOD_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">IOD_n</text></g><g transform="translate(0,310)" id="port_LDBCTL~IORQ_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">IORQ_n</text></g><g transform="translate(0,330)" id="port_LDBCTL~MIS0"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">MIS0</text></g><g transform="translate(0,350)" id="port_LDBCTL~MWRITE_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">MWRITE_n</text></g><g transform="translate(0,370)" id="port_LDBCTL~OSC"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">OSC</text></g><g transform="translate(0,390)" id="port_LDBCTL~PD1"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">PD1</text></g><g transform="translate(0,410)" id="port_LDBCTL~PD3"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">PD3</text></g><g transform="translate(0,430)" id="port_LDBCTL~Q0_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">Q0_n</text></g><g transform="translate(0,450)" id="port_LDBCTL~Q2_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">Q2_n</text></g><g transform="translate(0,470)" id="port_LDBCTL~RT_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">RT_n</text></g><g transform="translate(0,490)" id="port_LDBCTL~TERM_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">TERM_n</text></g><g transform="translate(0,510)" id="port_LDBCTL~WRITE"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">WRITE</text></g><g transform="translate(0,530)" id="port_LDBCTL~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_LDBCTL">sys_rst_n</text></g><g transform="translate(30,10)" id="port_LDBCTL~BGNTCACT"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">BGNTCACT</text></g><g transform="translate(30,30)" id="port_LDBCTL~CBWRITE_n"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">CBWRITE_n</text></g><g transform="translate(30,50)" id="port_LDBCTL~CGNTCACT_n"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">CGNTCACT_n</text></g><g transform="translate(30,70)" id="port_LDBCTL~CLKBD"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">CLKBD</text></g><g transform="translate(30,90)" id="port_LDBCTL~DBAPR"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">DBAPR</text></g><g transform="translate(30,110)" id="port_LDBCTL~DSTB_n"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">DSTB_n</text></g><g transform="translate(30,130)" id="port_LDBCTL~EBADR"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">EBADR</text></g><g transform="translate(30,150)" id="port_LDBCTL~EBD_n"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">EBD_n</text></g><g transform="translate(30,170)" id="port_LDBCTL~EMD_n"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">EMD_n</text></g><g transform="translate(30,190)" id="port_LDBCTL~WBD_n"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">WBD_n</text></g><g transform="translate(30,210)" id="port_LDBCTL~WLBD_n"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_LDBCTL">WLBD_n</text></g></g></a>
+<a href="BIF_DPATH_PESPEA_13.md"><title>PESPEA (BIF_DPATH_PESPEA_13) - open its page</title><g transform="translate(1231,801.5)" id="cell_PESPEA"><text x="15" y="-4" class="nodelabel cell_PESPEA">BIF_DPATH_PESPEA_13</text><rect width="30" height="160" class="cell_PESPEA" /><g transform="translate(0,10)" id="port_PESPEA~BD_23_0_n_IN"><text x="-3" y="-4" class="inputPortLabel cell_PESPEA">BD_23_0_n_IN</text></g><g transform="translate(0,30)" id="port_PESPEA~EPEA_n"><text x="-3" y="-4" class="inputPortLabel cell_PESPEA">EPEA_n</text></g><g transform="translate(0,50)" id="port_PESPEA~EPES_n"><text x="-3" y="-4" class="inputPortLabel cell_PESPEA">EPES_n</text></g><g transform="translate(0,70)" id="port_PESPEA~FETCH"><text x="-3" y="-4" class="inputPortLabel cell_PESPEA">FETCH</text></g><g transform="translate(0,90)" id="port_PESPEA~GNT_n"><text x="-3" y="-4" class="inputPortLabel cell_PESPEA">GNT_n</text></g><g transform="translate(0,110)" id="port_PESPEA~SPEA"><text x="-3" y="-4" class="inputPortLabel cell_PESPEA">SPEA</text></g><g transform="translate(0,130)" id="port_PESPEA~SPES"><text x="-3" y="-4" class="inputPortLabel cell_PESPEA">SPES</text></g><g transform="translate(0,150)" id="port_PESPEA~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_PESPEA">sysclk</text></g><g transform="translate(30,10)" id="port_PESPEA~IDB_15_0_OUT"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PESPEA">IDB_15_0_OUT</text></g></g></a>
+<a href="BIF_DPATH_PPNLBD_14.md"><title>PPNLBD (BIF_DPATH_PPNLBD_14) - open its page</title><g transform="translate(277,1776.5)" id="cell_PPNLBD"><text x="15" y="-4" class="nodelabel cell_PPNLBD">BIF_DPATH_PPNLBD_14</text><rect width="30" height="100" class="cell_PPNLBD" /><g transform="translate(0,10)" id="port_PPNLBD~CA_9_0"><text x="-3" y="-4" class="inputPortLabel cell_PPNLBD">CA_9_0</text></g><g transform="translate(0,30)" id="port_PPNLBD~EADR_n"><text x="-3" y="-4" class="inputPortLabel cell_PPNLBD">EADR_n</text></g><g transform="translate(0,50)" id="port_PPNLBD~ECREQ"><text x="-3" y="-4" class="inputPortLabel cell_PPNLBD">ECREQ</text></g><g transform="translate(0,70)" id="port_PPNLBD~PPN_23_10"><text x="-3" y="-4" class="inputPortLabel cell_PPNLBD">PPN_23_10</text></g><g transform="translate(0,90)" id="port_PPNLBD~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_PPNLBD">sysclk</text></g><g transform="translate(30,10)" id="port_PPNLBD~LBD_23_0_OUT"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PPNLBD">LBD_23_0_OUT</text></g></g></a>
+<g transform="translate(12,1517)" id="cell_OSC"><text x="15" y="-4" class="nodelabel cell_OSC">OSC</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_OSC" /><g /></g>
+<g transform="translate(12,1712)" id="cell_sys_rst_n"><text x="15" y="-4" class="nodelabel cell_sys_rst_n">sys_rst_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sys_rst_n" /><g /></g>
+<g transform="translate(12,1777)" id="cell_CA_9_0"><text x="15" y="-4" class="nodelabel cell_CA_9_0">CA_9_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CA_9_0" /><g /></g>
+<g transform="translate(12,2009.5)" id="cell_PPN_23_10"><text x="15" y="-4" class="nodelabel cell_PPN_23_10">PPN_23_10</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PPN_23_10" /><g /></g>
+<g transform="translate(12,22)" id="cell_BDAP50_n"><text x="15" y="-4" class="nodelabel cell_BDAP50_n">BDAP50_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_BDAP50_n" /><g /></g>
+<g transform="translate(12,87)" id="cell_BDRY25_n"><text x="15" y="-4" class="nodelabel cell_BDRY25_n">BDRY25_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_BDRY25_n" /><g /></g>
+<g transform="translate(12,217)" id="cell_BDRY50_n"><text x="15" y="-4" class="nodelabel cell_BDRY50_n">BDRY50_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_BDRY50_n" /><g /></g>
+<g transform="translate(12,152)" id="cell_BGNT_n"><text x="15" y="-4" class="nodelabel cell_BGNT_n">BGNT_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_BGNT_n" /><g /></g>
+<g transform="translate(12,282)" id="cell_BGNT50_n"><text x="15" y="-4" class="nodelabel cell_BGNT50_n">BGNT50_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_BGNT50_n" /><g /></g>
+<g transform="translate(12,412)" id="cell_BINPUT50_n"><text x="15" y="-4" class="nodelabel cell_BINPUT50_n">BINPUT50_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_BINPUT50_n" /><g /></g>
+<g transform="translate(12,477)" id="cell_CACT_n"><text x="15" y="-4" class="nodelabel cell_CACT_n">CACT_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CACT_n" /><g /></g>
+<g transform="translate(12,542)" id="cell_CC2_n"><text x="15" y="-4" class="nodelabel cell_CC2_n">CC2_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CC2_n" /><g /></g>
+<g transform="translate(12,672)" id="cell_CGNT_n"><text x="15" y="-4" class="nodelabel cell_CGNT_n">CGNT_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CGNT_n" /><g /></g>
+<g transform="translate(12,607)" id="cell_CGNT50_n"><text x="15" y="-4" class="nodelabel cell_CGNT50_n">CGNT50_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CGNT50_n" /><g /></g>
+<g transform="translate(12,1192)" id="cell_EADDR_n"><text x="15" y="-4" class="nodelabel cell_EADDR_n">EADDR_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EADDR_n" /><g /></g>
+<g transform="translate(12,737)" id="cell_EBUS_n"><text x="15" y="-4" class="nodelabel cell_EBUS_n">EBUS_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EBUS_n" /><g /></g>
+<g transform="translate(12,1944.5)" id="cell_ECREQ"><text x="15" y="-4" class="nodelabel cell_ECREQ">ECREQ</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_ECREQ" /><g /></g>
+<g transform="translate(1062,717)" id="cell_EPEA_n"><text x="15" y="-4" class="nodelabel cell_EPEA_n">EPEA_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EPEA_n" /><g /></g>
+<g transform="translate(1062,652)" id="cell_EPES_n"><text x="15" y="-4" class="nodelabel cell_EPES_n">EPES_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EPES_n" /><g /></g>
+<g transform="translate(1062,587)" id="cell_FETCH"><text x="15" y="-4" class="nodelabel cell_FETCH">FETCH</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FETCH" /><g /></g>
+<g transform="translate(12,347)" id="cell_GNT_n"><text x="15" y="-4" class="nodelabel cell_GNT_n">GNT_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_GNT_n" /><g /></g>
+<g transform="translate(12,802)" id="cell_IBAPR_n"><text x="15" y="-4" class="nodelabel cell_IBAPR_n">IBAPR_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IBAPR_n" /><g /></g>
+<g transform="translate(12,867)" id="cell_IOD_n"><text x="15" y="-4" class="nodelabel cell_IOD_n">IOD_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IOD_n" /><g /></g>
+<g transform="translate(12,932)" id="cell_IORQ_n"><text x="15" y="-4" class="nodelabel cell_IORQ_n">IORQ_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IORQ_n" /><g /></g>
+<g transform="translate(12,997)" id="cell_MIS0"><text x="15" y="-4" class="nodelabel cell_MIS0">MIS0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MIS0" /><g /></g>
+<g transform="translate(12,1062)" id="cell_MWRITE_n"><text x="15" y="-4" class="nodelabel cell_MWRITE_n">MWRITE_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MWRITE_n" /><g /></g>
+<g transform="translate(12,1127)" id="cell_PD1"><text x="15" y="-4" class="nodelabel cell_PD1">PD1</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PD1" /><g /></g>
+<g transform="translate(12,1257)" id="cell_PD3"><text x="15" y="-4" class="nodelabel cell_PD3">PD3</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PD3" /><g /></g>
+<g transform="translate(12,1322)" id="cell_Q0_n"><text x="15" y="-4" class="nodelabel cell_Q0_n">Q0_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_Q0_n" /><g /></g>
+<g transform="translate(12,1387)" id="cell_Q2_n"><text x="15" y="-4" class="nodelabel cell_Q2_n">Q2_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_Q2_n" /><g /></g>
+<g transform="translate(12,1452)" id="cell_RT_n"><text x="15" y="-4" class="nodelabel cell_RT_n">RT_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_RT_n" /><g /></g>
+<g transform="translate(1062,995.5)" id="cell_SPEA"><text x="15" y="-4" class="nodelabel cell_SPEA">SPEA</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SPEA" /><g /></g>
+<g transform="translate(1062,1225.5)" id="cell_SPES"><text x="15" y="-4" class="nodelabel cell_SPES">SPES</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_SPES" /><g /></g>
+<g transform="translate(12,1582)" id="cell_TERM_n"><text x="15" y="-4" class="nodelabel cell_TERM_n">TERM_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TERM_n" /><g /></g>
+<g transform="translate(12,1647)" id="cell_WRITE"><text x="15" y="-4" class="nodelabel cell_WRITE">WRITE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_WRITE" /><g /></g>
+<g transform="translate(277,1174.5)" id="cell_CD_15_0_IN"><text x="15" y="-4" class="nodelabel cell_CD_15_0_IN">CD_15_0_IN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CD_15_0_IN" /><g /></g>
+<g transform="translate(1370,1174.5)" id="cell_CD_15_0_OUT"><text x="15" y="-4" class="nodelabel cell_CD_15_0_OUT">CD_15_0_OUT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_CD_15_0_OUT" /><g /></g>
+<g transform="translate(692,794.5)" id="cell_BD_23_0_n_IN"><text x="15" y="-4" class="nodelabel cell_BD_23_0_n_IN">BD_23_0_n_IN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_BD_23_0_n_IN" /><g /></g>
+<g transform="translate(1370,964.5)" id="cell_BD_23_0_n_OUT"><text x="15" y="-4" class="nodelabel cell_BD_23_0_n_OUT">BD_23_0_n_OUT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_BD_23_0_n_OUT" /><g /></g>
+<g transform="translate(277,1924.5)" id="cell_LBD_23_0_IN"><text x="15" y="-4" class="nodelabel cell_LBD_23_0_IN">LBD_23_0_IN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LBD_23_0_IN" /><g /></g>
+<g transform="translate(1370,1239.5)" id="cell_LBD_23_0_OUT"><text x="15" y="-4" class="nodelabel cell_LBD_23_0_OUT">LBD_23_0_OUT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_LBD_23_0_OUT" /><g /></g>
+<g transform="translate(1370,607)" id="cell_CBWRITE_n"><text x="15" y="-4" class="nodelabel cell_CBWRITE_n">CBWRITE_n</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_CBWRITE_n" /><g /></g>
+<g transform="translate(1370,672)" id="cell_CGNTCACT_n"><text x="15" y="-4" class="nodelabel cell_CGNTCACT_n">CGNTCACT_n</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_CGNTCACT_n" /><g /></g>
+<g transform="translate(1370,737)" id="cell_DBAPR"><text x="15" y="-4" class="nodelabel cell_DBAPR">DBAPR</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DBAPR" /><g /></g>
+<g transform="translate(1370,802)" id="cell_IDB_15_0_OUT"><text x="15" y="-4" class="nodelabel cell_IDB_15_0_OUT">IDB_15_0_OUT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IDB_15_0_OUT" /><g /></g>
+<g transform="translate(942,1808)" id="cell_$split$,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:15</text></g></g>
+<g transform="translate(942,1547.5)" id="cell_$split$,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:15</text></g></g>
+<g transform="translate(1068,1050.5)" id="cell_$split$,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,"><rect width="5" height="20" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:15</text></g></g>
+<line x1="720" x2="1064" y1="804.5" y2="804.5" class="net_91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114"><title>BD_23_0_n_IN</title></line>
+<line x1="720" x2="834" y1="804.5" y2="804.5" class="net_91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114"><title>BD_23_0_n_IN</title></line>
+<line x1="834" x2="834" y1="804.5" y2="974.5" class="net_91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114"><title>BD_23_0_n_IN</title></line>
+<circle cx="834" cy="804.5" r="2" style="fill:#000" class="net_91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114" />
+<line x1="834" x2="917" y1="974.5" y2="974.5" class="net_91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114"><title>BD_23_0_n_IN</title></line>
+<line x1="948" x2="1037" y1="974.5" y2="974.5" class="net_115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138"><title>BD_23_0_n_OUT</title></line>
+<line x1="1037" x2="1037" y1="974.5" y2="819.5" class="net_115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138"><title>BD_23_0_n_OUT</title></line>
+<circle cx="1037" cy="974.5" r="2" style="fill:#000" class="net_115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138" />
+<line x1="1037" x2="1064" y1="819.5" y2="819.5" class="net_115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138"><title>BD_23_0_n_OUT</title></line>
+<line x1="948" x2="1370" y1="974.5" y2="974.5" class="net_115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138"><title>BD_23_0_n_OUT</title></line>
+<line x1="308" x2="774" y1="1787" y2="1787" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<line x1="774" x2="774" y1="1787" y2="1797" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<line x1="774" x2="1037" y1="1797" y2="1797" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<line x1="1037" x2="1037" y1="1797" y2="1355.5" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<circle cx="774" cy="1787" r="2" style="fill:#000" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253" />
+<line x1="1037" x2="1067" y1="1355.5" y2="1355.5" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<line x1="308" x2="421" y1="1787" y2="1787" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<line x1="421" x2="421" y1="1787" y2="1949.5" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<circle cx="421" cy="1787" r="2" style="fill:#000" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253" />
+<line x1="421" x2="553.3333333333334" y1="1949.5" y2="1949.5" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<line x1="308" x2="942.5" y1="1787" y2="1787" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<line x1="942.5" x2="942.5" y1="1787" y2="1568.5" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253"><title>s_ppnlbd_lbd_23_0_out</title></line>
+<line x1="579" x2="1047" y1="1204.5" y2="1204.5" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<line x1="1047" x2="1047" y1="1204.5" y2="1370.5" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<circle cx="1047" cy="1204.5" r="2" style="fill:#000" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269" />
+<line x1="1047" x2="1067" y1="1370.5" y2="1370.5" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<line x1="579" x2="1345" y1="1204.5" y2="1204.5" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<line x1="1345" x2="1345" y1="1204.5" y2="1324.5" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<line x1="1345" x2="1373" y1="1324.5" y2="1324.5" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<line x1="579" x2="682" y1="1204.5" y2="1204.5" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<line x1="682" x2="682" y1="1204.5" y2="1558" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<circle cx="682" cy="1204.5" r="2" style="fill:#000" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269" />
+<line x1="682" x2="709" y1="1558" y2="1558" class="net_254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269"><title>s_cdlbd_lbd_15_0_out</title></line>
+<line x1="1094" x2="1108" y1="1363" y2="1363" class="net_270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293" />
+<line x1="1108" x2="1108" y1="1363" y2="1242" class="net_270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293" />
+<line x1="1108" x2="1234.3333333333333" y1="1242" y2="1242" class="net_270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293" />
+<line x1="948" x2="1037" y1="994.5" y2="994.5" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<line x1="1037" x2="1037" y1="994.5" y2="1093.5" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<line x1="1037" x2="1138" y1="1093.5" y2="1093.5" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<line x1="1138" x2="1138" y1="1093.5" y2="1257" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<line x1="1138" x2="1234.3333333333333" y1="1257" y2="1257" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<line x1="948" x2="1037" y1="994.5" y2="994.5" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<line x1="1037" x2="1037" y1="994.5" y2="1083.5" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<line x1="1037" x2="1068.5" y1="1083.5" y2="1083.5" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<circle cx="1037" cy="1083.5" r="2" style="fill:#000" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317" />
+<line x1="1068.5" x2="1068.5" y1="1083.5" y2="1071.5" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317"><title>s_bdlbd_lbd_23_0_out</title></line>
+<line x1="947" x2="1047" y1="1818.5" y2="1818.5" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154"><title>LBD_23_0_IN[15:0]</title></line>
+<line x1="1047" x2="1047" y1="1818.5" y2="1543" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154"><title>LBD_23_0_IN[15:0]</title></line>
+<line x1="1047" x2="1067" y1="1543" y2="1543" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154"><title>LBD_23_0_IN[15:0]</title></line>
+<line x1="947" x2="1067" y1="1558" y2="1558" class="net_230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245"><title>s_ppnlbd_lbd_23_0_out[15:0]</title></line>
+<line x1="1094" x2="1138" y1="1550.5" y2="1550.5" class="net_318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333" />
+<line x1="1138" x2="1138" y1="1550.5" y2="1302" class="net_318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333" />
+<line x1="1138" x2="1234.3333333333333" y1="1302" y2="1302" class="net_318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333" />
+<line x1="1073" x2="1148" y1="1061" y2="1061" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309"><title>s_bdlbd_lbd_23_0_out[15:0]</title></line>
+<line x1="1148" x2="1148" y1="1061" y2="1317" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309"><title>s_bdlbd_lbd_23_0_out[15:0]</title></line>
+<line x1="1148" x2="1234.3333333333333" y1="1317" y2="1317" class="net_294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309"><title>s_bdlbd_lbd_23_0_out[15:0]</title></line>
+<line x1="1261.3333333333333" x2="1373" y1="1309.5" y2="1309.5" class="net_334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349" />
+<line x1="305" x2="553.3333333333334" y1="1934.5" y2="1934.5" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162"><title>LBD_23_0_IN</title></line>
+<line x1="305" x2="411" y1="1934.5" y2="1934.5" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162"><title>LBD_23_0_IN</title></line>
+<line x1="411" x2="411" y1="1934.5" y2="1964.5" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162"><title>LBD_23_0_IN</title></line>
+<line x1="411" x2="942.5" y1="1964.5" y2="1964.5" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162"><title>LBD_23_0_IN</title></line>
+<circle cx="411" cy="1934.5" r="2" style="fill:#000" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162" />
+<line x1="942.5" x2="942.5" y1="1964.5" y2="1829" class="net_139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162"><title>LBD_23_0_IN</title></line>
+<line x1="580.3333333333334" x2="672" y1="1942" y2="1942" class="net_366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389" />
+<line x1="672" x2="672" y1="1942" y2="1543" class="net_366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389" />
+<line x1="672" x2="709" y1="1543" y2="1543" class="net_366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389" />
+<line x1="316.0263157894737" x2="814" y1="597" y2="597" class="net_414"><title>s_bgntcact_n</title></line>
+<line x1="814" x2="814" y1="597" y2="994.5" class="net_414"><title>s_bgntcact_n</title></line>
+<line x1="814" x2="917" y1="994.5" y2="994.5" class="net_414"><title>s_bgntcact_n</title></line>
+<line x1="40" x2="824" y1="162" y2="162" class="net_31"><title>BGNT_n</title></line>
+<line x1="824" x2="824" y1="162" y2="1014.5" class="net_31"><title>BGNT_n</title></line>
+<line x1="824" x2="917" y1="1014.5" y2="1014.5" class="net_31"><title>BGNT_n</title></line>
+<line x1="40" x2="192" y1="162" y2="162" class="net_31"><title>BGNT_n</title></line>
+<line x1="192" x2="192" y1="162" y2="677" class="net_31"><title>BGNT_n</title></line>
+<circle cx="192" cy="162" r="2" style="fill:#000" class="net_31" />
+<line x1="192" x2="285.0263157894737" y1="677" y2="677" class="net_31"><title>BGNT_n</title></line>
+<line x1="316.0263157894737" x2="461" y1="657" y2="657" class="net_415"><title>s_clkbd</title></line>
+<line x1="461" x2="461" y1="657" y2="693" class="net_415"><title>s_clkbd</title></line>
+<line x1="461" x2="804" y1="693" y2="693" class="net_415"><title>s_clkbd</title></line>
+<line x1="804" x2="804" y1="693" y2="1034.5" class="net_415"><title>s_clkbd</title></line>
+<line x1="804" x2="917" y1="1034.5" y2="1034.5" class="net_415"><title>s_clkbd</title></line>
+<line x1="316.0263157894737" x2="431" y1="717" y2="717" class="net_416"><title>s_ebadr</title></line>
+<line x1="431" x2="431" y1="717" y2="758" class="net_416"><title>s_ebadr</title></line>
+<line x1="431" x2="794" y1="758" y2="758" class="net_416"><title>s_ebadr</title></line>
+<line x1="794" x2="794" y1="758" y2="1054.5" class="net_416"><title>s_ebadr</title></line>
+<line x1="794" x2="917" y1="1054.5" y2="1054.5" class="net_416"><title>s_ebadr</title></line>
+<line x1="316.0263157894737" x2="421" y1="737" y2="737" class="net_417"><title>s_ebd_n</title></line>
+<line x1="421" x2="421" y1="737" y2="824.5" class="net_417"><title>s_ebd_n</title></line>
+<line x1="421" x2="784" y1="824.5" y2="824.5" class="net_417"><title>s_ebd_n</title></line>
+<line x1="784" x2="784" y1="824.5" y2="1074.5" class="net_417"><title>s_ebd_n</title></line>
+<line x1="784" x2="917" y1="1074.5" y2="1074.5" class="net_417"><title>s_ebd_n</title></line>
+<line x1="736" x2="784" y1="1550.5" y2="1550.5" class="net_390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413"><title>s_bdlbd_lbd_23_0_in</title></line>
+<line x1="784" x2="784" y1="1550.5" y2="1094.5" class="net_390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413"><title>s_bdlbd_lbd_23_0_in</title></line>
+<line x1="784" x2="917" y1="1094.5" y2="1094.5" class="net_390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413"><title>s_bdlbd_lbd_23_0_in</title></line>
+<line x1="316.0263157894737" x2="401" y1="777" y2="777" class="net_418"><title>s_wbd_n</title></line>
+<line x1="401" x2="401" y1="777" y2="835.5" class="net_418"><title>s_wbd_n</title></line>
+<line x1="401" x2="774" y1="835.5" y2="835.5" class="net_418"><title>s_wbd_n</title></line>
+<line x1="774" x2="774" y1="835.5" y2="1114.5" class="net_418"><title>s_wbd_n</title></line>
+<line x1="774" x2="917" y1="1114.5" y2="1114.5" class="net_418"><title>s_wbd_n</title></line>
+<line x1="40" x2="662" y1="1527" y2="1527" class="net_2"><title>OSC</title></line>
+<line x1="662" x2="662" y1="1527" y2="1573" class="net_2"><title>OSC</title></line>
+<line x1="662" x2="794" y1="1573" y2="1573" class="net_2"><title>OSC</title></line>
+<line x1="794" x2="794" y1="1573" y2="1134.5" class="net_2"><title>OSC</title></line>
+<circle cx="662" cy="1527" r="2" style="fill:#000" class="net_2" />
+<line x1="794" x2="917" y1="1134.5" y2="1134.5" class="net_2"><title>OSC</title></line>
+<line x1="40" x2="421" y1="1527" y2="1527" class="net_2"><title>OSC</title></line>
+<line x1="421" x2="421" y1="1527" y2="1304.5" class="net_2"><title>OSC</title></line>
+<circle cx="421" cy="1527" r="2" style="fill:#000" class="net_2" />
+<line x1="421" x2="548" y1="1304.5" y2="1304.5" class="net_2"><title>OSC</title></line>
+<line x1="40" x2="202" y1="1527" y2="1527" class="net_2"><title>OSC</title></line>
+<line x1="202" x2="202" y1="1527" y2="957" class="net_2"><title>OSC</title></line>
+<circle cx="202" cy="1527" r="2" style="fill:#000" class="net_2" />
+<line x1="202" x2="285.0263157894737" y1="957" y2="957" class="net_2"><title>OSC</title></line>
+<line x1="40" x2="1128" y1="1527" y2="1527" class="net_2"><title>OSC</title></line>
+<line x1="1128" x2="1128" y1="1527" y2="952" class="net_2"><title>OSC</title></line>
+<line x1="1128" x2="1231" y1="952" y2="952" class="net_2"><title>OSC</title></line>
+<line x1="40" x2="202" y1="1527" y2="1527" class="net_2"><title>OSC</title></line>
+<line x1="202" x2="202" y1="1527" y2="1867" class="net_2"><title>OSC</title></line>
+<line x1="202" x2="277" y1="1867" y2="1867" class="net_2"><title>OSC</title></line>
+<line x1="305" x2="548" y1="1184.5" y2="1184.5" class="net_59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74"><title>CD_15_0_IN</title></line>
+<line x1="316.0263157894737" x2="441" y1="697" y2="697" class="net_419"><title>s_dstb_n</title></line>
+<line x1="441" x2="441" y1="697" y2="1204.5" class="net_419"><title>s_dstb_n</title></line>
+<line x1="441" x2="548" y1="1204.5" y2="1204.5" class="net_419"><title>s_dstb_n</title></line>
+<line x1="40" x2="401" y1="1954.5" y2="1954.5" class="net_40"><title>ECREQ</title></line>
+<line x1="401" x2="401" y1="1954.5" y2="1224.5" class="net_40"><title>ECREQ</title></line>
+<line x1="401" x2="548" y1="1224.5" y2="1224.5" class="net_40"><title>ECREQ</title></line>
+<line x1="40" x2="82" y1="1954.5" y2="1954.5" class="net_40"><title>ECREQ</title></line>
+<line x1="82" x2="82" y1="1954.5" y2="1827" class="net_40"><title>ECREQ</title></line>
+<circle cx="82" cy="1954.5" r="2" style="fill:#000" class="net_40" />
+<line x1="82" x2="277" y1="1827" y2="1827" class="net_40"><title>ECREQ</title></line>
+<line x1="316.0263157894737" x2="411" y1="757" y2="757" class="net_420"><title>s_emd_n</title></line>
+<line x1="411" x2="411" y1="757" y2="1244.5" class="net_420"><title>s_emd_n</title></line>
+<line x1="411" x2="548" y1="1244.5" y2="1244.5" class="net_420"><title>s_emd_n</title></line>
+<line x1="1400" x2="1458" y1="1317" y2="1317" class="net_350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365"><title>s_cdlbd_lbd_15_0_in</title></line>
+<line x1="1458" x2="1458" y1="1317" y2="1339.5" class="net_350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365"><title>s_cdlbd_lbd_15_0_in</title></line>
+<line x1="1458" x2="411" y1="1339.5" y2="1339.5" class="net_350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365"><title>s_cdlbd_lbd_15_0_in</title></line>
+<line x1="411" x2="411" y1="1339.5" y2="1264.5" class="net_350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365"><title>s_cdlbd_lbd_15_0_in</title></line>
+<line x1="411" x2="548" y1="1264.5" y2="1264.5" class="net_350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365"><title>s_cdlbd_lbd_15_0_in</title></line>
+<line x1="316.0263157894737" x2="391" y1="797" y2="797" class="net_421"><title>s_wlbd_n</title></line>
+<line x1="391" x2="391" y1="797" y2="1284.5" class="net_421"><title>s_wlbd_n</title></line>
+<line x1="391" x2="548" y1="1284.5" y2="1284.5" class="net_421"><title>s_wlbd_n</title></line>
+<line x1="40" x2="212" y1="32" y2="32" class="net_28"><title>BDAP50_n</title></line>
+<line x1="212" x2="212" y1="32" y2="597" class="net_28"><title>BDAP50_n</title></line>
+<line x1="212" x2="285.0263157894737" y1="597" y2="597" class="net_28"><title>BDAP50_n</title></line>
+<line x1="40" x2="202" y1="97" y2="97" class="net_29"><title>BDRY25_n</title></line>
+<line x1="202" x2="202" y1="97" y2="617" class="net_29"><title>BDRY25_n</title></line>
+<line x1="202" x2="285.0263157894737" y1="617" y2="617" class="net_29"><title>BDRY25_n</title></line>
+<line x1="40" x2="182" y1="227" y2="227" class="net_30"><title>BDRY50_n</title></line>
+<line x1="182" x2="182" y1="227" y2="637" class="net_30"><title>BDRY50_n</title></line>
+<line x1="182" x2="285.0263157894737" y1="637" y2="637" class="net_30"><title>BDRY50_n</title></line>
+<line x1="40" x2="172" y1="292" y2="292" class="net_32"><title>BGNT50_n</title></line>
+<line x1="172" x2="172" y1="292" y2="657" class="net_32"><title>BGNT50_n</title></line>
+<line x1="172" x2="285.0263157894737" y1="657" y2="657" class="net_32"><title>BGNT50_n</title></line>
+<line x1="40" x2="152" y1="422" y2="422" class="net_33"><title>BINPUT50_n</title></line>
+<line x1="152" x2="152" y1="422" y2="697" class="net_33"><title>BINPUT50_n</title></line>
+<line x1="152" x2="285.0263157894737" y1="697" y2="697" class="net_33"><title>BINPUT50_n</title></line>
+<line x1="40" x2="142" y1="487" y2="487" class="net_34"><title>CACT_n</title></line>
+<line x1="142" x2="142" y1="487" y2="717" class="net_34"><title>CACT_n</title></line>
+<line x1="142" x2="285.0263157894737" y1="717" y2="717" class="net_34"><title>CACT_n</title></line>
+<line x1="40" x2="132" y1="552" y2="552" class="net_35"><title>CC2_n</title></line>
+<line x1="132" x2="132" y1="552" y2="737" class="net_35"><title>CC2_n</title></line>
+<line x1="132" x2="285.0263157894737" y1="737" y2="737" class="net_35"><title>CC2_n</title></line>
+<line x1="40" x2="122" y1="617" y2="617" class="net_37"><title>CGNT50_n</title></line>
+<line x1="122" x2="122" y1="617" y2="757" class="net_37"><title>CGNT50_n</title></line>
+<line x1="122" x2="285.0263157894737" y1="757" y2="757" class="net_37"><title>CGNT50_n</title></line>
+<line x1="40" x2="112" y1="682" y2="682" class="net_36"><title>CGNT_n</title></line>
+<line x1="112" x2="112" y1="682" y2="777" class="net_36"><title>CGNT_n</title></line>
+<line x1="112" x2="285.0263157894737" y1="777" y2="777" class="net_36"><title>CGNT_n</title></line>
+<line x1="40" x2="92" y1="1202" y2="1202" class="net_38"><title>EADDR_n</title></line>
+<line x1="92" x2="92" y1="1202" y2="797" class="net_38"><title>EADDR_n</title></line>
+<circle cx="92" cy="1202" r="2" style="fill:#000" class="net_38" />
+<line x1="92" x2="285.0263157894737" y1="797" y2="797" class="net_38"><title>EADDR_n</title></line>
+<line x1="40" x2="92" y1="1202" y2="1202" class="net_38"><title>EADDR_n</title></line>
+<line x1="92" x2="92" y1="1202" y2="1807" class="net_38"><title>EADDR_n</title></line>
+<line x1="92" x2="277" y1="1807" y2="1807" class="net_38"><title>EADDR_n</title></line>
+<line x1="40" x2="102" y1="747" y2="747" class="net_39"><title>EBUS_n</title></line>
+<line x1="102" x2="102" y1="747" y2="817" class="net_39"><title>EBUS_n</title></line>
+<line x1="102" x2="285.0263157894737" y1="817" y2="817" class="net_39"><title>EBUS_n</title></line>
+<line x1="40" x2="162" y1="357" y2="357" class="net_44"><title>GNT_n</title></line>
+<line x1="162" x2="162" y1="357" y2="837" class="net_44"><title>GNT_n</title></line>
+<circle cx="162" cy="357" r="2" style="fill:#000" class="net_44" />
+<line x1="162" x2="285.0263157894737" y1="837" y2="837" class="net_44"><title>GNT_n</title></line>
+<line x1="40" x2="1138" y1="357" y2="357" class="net_44"><title>GNT_n</title></line>
+<line x1="1138" x2="1138" y1="357" y2="892" class="net_44"><title>GNT_n</title></line>
+<line x1="1138" x2="1231" y1="892" y2="892" class="net_44"><title>GNT_n</title></line>
+<line x1="40" x2="82" y1="812" y2="812" class="net_45"><title>IBAPR_n</title></line>
+<line x1="82" x2="82" y1="812" y2="857" class="net_45"><title>IBAPR_n</title></line>
+<line x1="82" x2="285.0263157894737" y1="857" y2="857" class="net_45"><title>IBAPR_n</title></line>
+<line x1="40" x2="285.0263157894737" y1="877" y2="877" class="net_46"><title>IOD_n</title></line>
+<line x1="40" x2="82" y1="942" y2="942" class="net_47"><title>IORQ_n</title></line>
+<line x1="82" x2="82" y1="942" y2="897" class="net_47"><title>IORQ_n</title></line>
+<line x1="82" x2="285.0263157894737" y1="897" y2="897" class="net_47"><title>IORQ_n</title></line>
+<line x1="40" x2="102" y1="1007" y2="1007" class="net_48"><title>MIS0</title></line>
+<line x1="102" x2="102" y1="1007" y2="917" class="net_48"><title>MIS0</title></line>
+<line x1="102" x2="285.0263157894737" y1="917" y2="917" class="net_48"><title>MIS0</title></line>
+<line x1="40" x2="112" y1="1072" y2="1072" class="net_49"><title>MWRITE_n</title></line>
+<line x1="112" x2="112" y1="1072" y2="937" class="net_49"><title>MWRITE_n</title></line>
+<line x1="112" x2="285.0263157894737" y1="937" y2="937" class="net_49"><title>MWRITE_n</title></line>
+<line x1="40" x2="122" y1="1137" y2="1137" class="net_50"><title>PD1</title></line>
+<line x1="122" x2="122" y1="1137" y2="977" class="net_50"><title>PD1</title></line>
+<line x1="122" x2="285.0263157894737" y1="977" y2="977" class="net_50"><title>PD1</title></line>
+<line x1="40" x2="132" y1="1267" y2="1267" class="net_51"><title>PD3</title></line>
+<line x1="132" x2="132" y1="1267" y2="997" class="net_51"><title>PD3</title></line>
+<line x1="132" x2="285.0263157894737" y1="997" y2="997" class="net_51"><title>PD3</title></line>
+<line x1="40" x2="142" y1="1332" y2="1332" class="net_52"><title>Q0_n</title></line>
+<line x1="142" x2="142" y1="1332" y2="1017" class="net_52"><title>Q0_n</title></line>
+<line x1="142" x2="285.0263157894737" y1="1017" y2="1017" class="net_52"><title>Q0_n</title></line>
+<line x1="40" x2="152" y1="1397" y2="1397" class="net_53"><title>Q2_n</title></line>
+<line x1="152" x2="152" y1="1397" y2="1037" class="net_53"><title>Q2_n</title></line>
+<line x1="152" x2="285.0263157894737" y1="1037" y2="1037" class="net_53"><title>Q2_n</title></line>
+<line x1="40" x2="162" y1="1462" y2="1462" class="net_54"><title>RT_n</title></line>
+<line x1="162" x2="162" y1="1462" y2="1057" class="net_54"><title>RT_n</title></line>
+<line x1="162" x2="285.0263157894737" y1="1057" y2="1057" class="net_54"><title>RT_n</title></line>
+<line x1="40" x2="172" y1="1592" y2="1592" class="net_57"><title>TERM_n</title></line>
+<line x1="172" x2="172" y1="1592" y2="1077" class="net_57"><title>TERM_n</title></line>
+<line x1="172" x2="285.0263157894737" y1="1077" y2="1077" class="net_57"><title>TERM_n</title></line>
+<line x1="40" x2="182" y1="1657" y2="1657" class="net_58"><title>WRITE</title></line>
+<line x1="182" x2="182" y1="1657" y2="1097" class="net_58"><title>WRITE</title></line>
+<line x1="182" x2="285.0263157894737" y1="1097" y2="1097" class="net_58"><title>WRITE</title></line>
+<line x1="40" x2="192" y1="1722" y2="1722" class="net_3"><title>sys_rst_n</title></line>
+<line x1="192" x2="192" y1="1722" y2="1117" class="net_3"><title>sys_rst_n</title></line>
+<line x1="192" x2="285.0263157894737" y1="1117" y2="1117" class="net_3"><title>sys_rst_n</title></line>
+<line x1="1094" x2="1231" y1="812" y2="812" class="net_206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229" />
+<line x1="1090" x2="1108" y1="727" y2="727" class="net_41"><title>EPEA_n</title></line>
+<line x1="1108" x2="1108" y1="727" y2="832" class="net_41"><title>EPEA_n</title></line>
+<line x1="1108" x2="1231" y1="832" y2="832" class="net_41"><title>EPEA_n</title></line>
+<line x1="1090" x2="1118" y1="662" y2="662" class="net_42"><title>EPES_n</title></line>
+<line x1="1118" x2="1118" y1="662" y2="852" class="net_42"><title>EPES_n</title></line>
+<line x1="1118" x2="1231" y1="852" y2="852" class="net_42"><title>EPES_n</title></line>
+<line x1="1090" x2="1128" y1="597" y2="597" class="net_43"><title>FETCH</title></line>
+<line x1="1128" x2="1128" y1="597" y2="872" class="net_43"><title>FETCH</title></line>
+<line x1="1128" x2="1231" y1="872" y2="872" class="net_43"><title>FETCH</title></line>
+<line x1="1090" x2="1108" y1="1005.5" y2="1005.5" class="net_55"><title>SPEA</title></line>
+<line x1="1108" x2="1108" y1="1005.5" y2="912" class="net_55"><title>SPEA</title></line>
+<line x1="1108" x2="1231" y1="912" y2="912" class="net_55"><title>SPEA</title></line>
+<line x1="1090" x2="1118" y1="1235.5" y2="1235.5" class="net_56"><title>SPES</title></line>
+<line x1="1118" x2="1118" y1="1235.5" y2="932" class="net_56"><title>SPES</title></line>
+<line x1="1118" x2="1231" y1="932" y2="932" class="net_56"><title>SPES</title></line>
+<line x1="40" x2="277" y1="1787" y2="1787" class="net_4,5,6,7,8,9,10,11,12,13"><title>CA_9_0</title></line>
+<line x1="40" x2="92" y1="2019.5" y2="2019.5" class="net_14,15,16,17,18,19,20,21,22,23,24,25,26,27"><title>PPN_23_10</title></line>
+<line x1="92" x2="92" y1="2019.5" y2="1847" class="net_14,15,16,17,18,19,20,21,22,23,24,25,26,27"><title>PPN_23_10</title></line>
+<line x1="92" x2="277" y1="1847" y2="1847" class="net_14,15,16,17,18,19,20,21,22,23,24,25,26,27"><title>PPN_23_10</title></line>
+<line x1="579" x2="1370" y1="1184.5" y2="1184.5" class="net_75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90"><title>CD_15_0_OUT</title></line>
+<line x1="1261.3333333333333" x2="1370" y1="1249.5" y2="1249.5" class="net_163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186"><title>LBD_23_0_OUT</title></line>
+<line x1="316.0263157894737" x2="1370" y1="617" y2="617" class="net_187"><title>CBWRITE_n</title></line>
+<line x1="316.0263157894737" x2="471" y1="637" y2="637" class="net_188"><title>CGNTCACT_n</title></line>
+<line x1="471" x2="471" y1="637" y2="682" class="net_188"><title>CGNTCACT_n</title></line>
+<line x1="471" x2="1370" y1="682" y2="682" class="net_188"><title>CGNTCACT_n</title></line>
+<line x1="316.0263157894737" x2="451" y1="677" y2="677" class="net_189"><title>DBAPR</title></line>
+<line x1="451" x2="451" y1="677" y2="747" class="net_189"><title>DBAPR</title></line>
+<line x1="451" x2="1370" y1="747" y2="747" class="net_189"><title>DBAPR</title></line>
+<line x1="1262" x2="1370" y1="812" y2="812" class="net_190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205"><title>IDB_15_0_OUT</title></line>
+<text x="951.0" y="971.5" class="netlabel">BD_23_0_n_OUT</text>
+<text x="950.0" y="1815.5" class="netlabel">LBD_23_0_IN[15:0]</text>
+<text x="414.0" y="1961.5" class="netlabel">LBD_23_0_IN</text>
+<text x="95.0" y="1844.0" class="netlabel">PPN_23_10</text>
+<text x="1264.3" y="1246.5" class="netlabel">LBD_23_0_OUT</text>
+<text x="319.0" y="614.0" class="netlabel">CBWRITE_n</text>
+<text x="474.0" y="679.0" class="netlabel">CGNTCACT_n</text>
+<text x="454.0" y="744.0" class="netlabel">DBAPR</text>
+<text x="1265.0" y="809.0" class="netlabel">IDB_15_0_OUT</text>
+<text x="43.0" y="1524.0" class="netlabel">OSC</text>
+<text x="950.0" y="1555.0" class="netlabel">s_ppnlbd_lbd_23_0_out[15:0]</text>
+<text x="311.0" y="1784.0" class="netlabel">s_ppnlbd_lbd_23_0_out</text>
+<text x="582.0" y="1201.5" class="netlabel">s_cdlbd_lbd_15_0_out</text>
+<text x="43.0" y="29.0" class="netlabel">BDAP50_n</text>
+<text x="43.0" y="94.0" class="netlabel">BDRY25_n</text>
+<text x="1151.0" y="1314.0" class="netlabel">s_bdlbd_lbd_23_0_out[15:0]</text>
+<text x="1040.0" y="1090.5" class="netlabel">s_bdlbd_lbd_23_0_out</text>
+<text x="43.0" y="1719.0" class="netlabel">sys_rst_n</text>
+<text x="43.0" y="224.0" class="netlabel">BDRY50_n</text>
+<text x="43.0" y="159.0" class="netlabel">BGNT_n</text>
+<text x="43.0" y="289.0" class="netlabel">BGNT50_n</text>
+<text x="155.0" y="694.0" class="netlabel">BINPUT50_n</text>
+<text x="145.0" y="714.0" class="netlabel">CACT_n</text>
+<text x="135.0" y="734.0" class="netlabel">CC2_n</text>
+<text x="414.0" y="1336.5" class="netlabel">s_cdlbd_lbd_15_0_in</text>
+<text x="115.0" y="774.0" class="netlabel">CGNT_n</text>
+<text x="125.0" y="754.0" class="netlabel">CGNT50_n</text>
+<text x="95.0" y="794.0" class="netlabel">EADDR_n</text>
+<text x="105.0" y="814.0" class="netlabel">EBUS_n</text>
+<text x="787.0" y="1091.5" class="netlabel">s_bdlbd_lbd_23_0_in</text>
+<text x="43.0" y="1784.0" class="netlabel">CA_9_0</text>
+<text x="43.0" y="1951.5" class="netlabel">ECREQ</text>
+<text x="1111.0" y="829.0" class="netlabel">EPEA_n</text>
+<text x="319.0" y="594.0" class="netlabel">s_bgntcact_n</text>
+<text x="464.0" y="690.0" class="netlabel">s_clkbd</text>
+<text x="434.0" y="755.0" class="netlabel">s_ebadr</text>
+<text x="424.0" y="821.5" class="netlabel">s_ebd_n</text>
+<text x="404.0" y="832.5" class="netlabel">s_wbd_n</text>
+<text x="319.0" y="694.0" class="netlabel">s_dstb_n</text>
+<text x="1121.0" y="849.0" class="netlabel">EPES_n</text>
+<text x="414.0" y="1241.5" class="netlabel">s_emd_n</text>
+<text x="394.0" y="1281.5" class="netlabel">s_wlbd_n</text>
+<text x="1131.0" y="869.0" class="netlabel">FETCH</text>
+<text x="43.0" y="354.0" class="netlabel">GNT_n</text>
+<text x="85.0" y="854.0" class="netlabel">IBAPR_n</text>
+<text x="43.0" y="874.0" class="netlabel">IOD_n</text>
+<text x="85.0" y="894.0" class="netlabel">IORQ_n</text>
+<text x="105.0" y="914.0" class="netlabel">MIS0</text>
+<text x="115.0" y="934.0" class="netlabel">MWRITE_n</text>
+<text x="125.0" y="974.0" class="netlabel">PD1</text>
+<text x="135.0" y="994.0" class="netlabel">PD3</text>
+<text x="145.0" y="1014.0" class="netlabel">Q0_n</text>
+<text x="155.0" y="1034.0" class="netlabel">Q2_n</text>
+<text x="165.0" y="1054.0" class="netlabel">RT_n</text>
+<text x="1111.0" y="909.0" class="netlabel">SPEA</text>
+<text x="1121.0" y="929.0" class="netlabel">SPES</text>
+<text x="43.0" y="1589.0" class="netlabel">TERM_n</text>
+<text x="43.0" y="1654.0" class="netlabel">WRITE</text>
+<text x="308.0" y="1181.5" class="netlabel">CD_15_0_IN</text>
+<text x="582.0" y="1181.5" class="netlabel">CD_15_0_OUT</text>
+<text x="723.0" y="801.5" class="netlabel">BD_23_0_n_IN</text>
+</svg>

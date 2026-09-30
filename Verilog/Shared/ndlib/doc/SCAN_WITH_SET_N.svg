@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="752.0" height="554.5" viewBox="-80.0 -80.0 752.0 554.5"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="752.0" height="554.5" fill="#ffffff" /><g transform="translate(77,77)" id="cell_$not$SCAN_WITH_SET_N.v:57$1"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$SCAN_WITH_SET_N.v:57$1" /><circle cx="23" cy="10" r="3" class="cell_$not$SCAN_WITH_SET_N.v:57$1" /><g /><g /></g>
+<g transform="translate(319.5,232.5)" id="cell_$not$SCAN_WITH_SET_N.v:58$2"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$SCAN_WITH_SET_N.v:58$2" /><circle cx="23" cy="10" r="3" class="cell_$not$SCAN_WITH_SET_N.v:58$2" /><g /><g /></g>
+<a href="../../logisim/doc/AND_GATE.md"><title>GATES_1 (AND_GATE) - open its page</title><g transform="translate(179,56.5)" id="cell_GATES_1"><text x="15" y="-4" class="nodelabel cell_GATES_1">AND_GATE</text><rect width="30" height="40" class="cell_GATES_1" /><g transform="translate(0,10)" id="port_GATES_1~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input1</text></g><g transform="translate(0,30)" id="port_GATES_1~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input2</text></g><g transform="translate(30,10)" id="port_GATES_1~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_1">result</text></g></g></a>
+<a href="../../logisim/doc/AND_GATE.md"><title>GATES_2 (AND_GATE) - open its page</title><g transform="translate(179,144.5)" id="cell_GATES_2"><text x="15" y="-4" class="nodelabel cell_GATES_2">AND_GATE</text><rect width="30" height="40" class="cell_GATES_2" /><g transform="translate(0,10)" id="port_GATES_2~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input1</text></g><g transform="translate(0,30)" id="port_GATES_2~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input2</text></g><g transform="translate(30,10)" id="port_GATES_2~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_2">result</text></g></g></a>
+<a href="../../logisim/doc/OR_GATE.md"><title>GATES_3 (OR_GATE) - open its page</title><g transform="translate(319,124.5)" id="cell_GATES_3"><text x="15" y="-4" class="nodelabel cell_GATES_3">OR_GATE</text><rect width="30" height="40" class="cell_GATES_3" /><g transform="translate(0,10)" id="port_GATES_3~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input1</text></g><g transform="translate(0,30)" id="port_GATES_3~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input2</text></g><g transform="translate(30,10)" id="port_GATES_3~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_3">result</text></g></g></a>
+<a href="../../logisim/doc/D_FLIPFLOP.md"><title>MEMORY_4 (D_FLIPFLOP) - open its page</title><g transform="translate(459,192)" id="cell_MEMORY_4"><text x="15" y="-4" class="nodelabel cell_MEMORY_4">D_FLIPFLOP</text><rect width="30" height="100" class="cell_MEMORY_4" /><g transform="translate(0,10)" id="port_MEMORY_4~clock"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_4">clock</text></g><g transform="translate(0,30)" id="port_MEMORY_4~d"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_4">d</text></g><g transform="translate(0,50)" id="port_MEMORY_4~preset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_4">preset</text></g><g transform="translate(0,70)" id="port_MEMORY_4~reset"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_4">reset</text></g><g transform="translate(0,90)" id="port_MEMORY_4~tick"><text x="-3" y="-4" class="inputPortLabel cell_MEMORY_4">tick</text></g><g transform="translate(30,10)" id="port_MEMORY_4~q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_4">q</text></g><g transform="translate(30,30)" id="port_MEMORY_4~qBar"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_MEMORY_4">qBar</text></g></g></a>
+<g transform="translate(319,59.5)" id="cell_CLK"><text x="15" y="-4" class="nodelabel cell_CLK">CLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLK" /><g /></g>
+<g transform="translate(77,22)" id="cell_D"><text x="15" y="-4" class="nodelabel cell_D">D</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D" /><g /></g>
+<g transform="translate(179,232.5)" id="cell_S_n"><text x="15" y="-4" class="nodelabel cell_S_n">S_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_S_n" /><g /></g>
+<g transform="translate(12,134)" id="cell_TE"><text x="15" y="-4" class="nodelabel cell_TE">TE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TE" /><g /></g>
+<g transform="translate(77,165)" id="cell_TI"><text x="15" y="-4" class="nodelabel cell_TI">TI</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TI" /><g /></g>
+<g transform="translate(550,147.5)" id="cell_Q"><text x="15" y="-4" class="nodelabel cell_Q">Q</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_Q" /><g /></g>
+<g transform="translate(550,212.5)" id="cell_QN"><text x="15" y="-4" class="nodelabel cell_QN">QN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QN" /><g /></g>
+<g transform="translate(319,297.5)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(319,362.5)" id="cell_1"><text x="15" y="-4" class="nodelabel cell_1">1</text><rect width="30" height="20" class="cell_1" /><g /></g>
+<line x1="40" x2="52" y1="144" y2="144" class="net_5"><title>TE</title></line>
+<line x1="52" x2="52" y1="144" y2="87" class="net_5"><title>TE</title></line>
+<circle cx="52" cy="144" r="2" style="fill:#000" class="net_5" />
+<line x1="52" x2="77" y1="87" y2="87" class="net_5"><title>TE</title></line>
+<line x1="40" x2="117" y1="144" y2="144" class="net_5"><title>TE</title></line>
+<line x1="117" x2="117" y1="144" y2="155" class="net_5"><title>TE</title></line>
+<line x1="117" x2="179" y1="155" y2="155" class="net_5"><title>TE</title></line>
+<line x1="207" x2="319.5" y1="242.5" y2="242.5" class="net_4"><title>S_n</title></line>
+<line x1="105" x2="117" y1="32" y2="32" class="net_3"><title>D</title></line>
+<line x1="117" x2="117" y1="32" y2="67" class="net_3"><title>D</title></line>
+<line x1="117" x2="179" y1="67" y2="67" class="net_3"><title>D</title></line>
+<line x1="102" x2="179" y1="87" y2="87" class="net_9"><title>s_te_n</title></line>
+<line x1="105" x2="179" y1="175" y2="175" class="net_6"><title>TI</title></line>
+<line x1="210" x2="257" y1="67" y2="67" class="net_11"><title>s_and_d_ten</title></line>
+<line x1="257" x2="257" y1="67" y2="135" class="net_11"><title>s_and_d_ten</title></line>
+<line x1="257" x2="319" y1="135" y2="135" class="net_11"><title>s_and_d_ten</title></line>
+<line x1="210" x2="319" y1="155" y2="155" class="net_12"><title>s_and_te_ti</title></line>
+<line x1="347" x2="407" y1="69.5" y2="69.5" class="net_2"><title>CLK</title></line>
+<line x1="407" x2="407" y1="69.5" y2="202.5" class="net_2"><title>CLK</title></line>
+<line x1="407" x2="459" y1="202.5" y2="202.5" class="net_2"><title>CLK</title></line>
+<line x1="350" x2="397" y1="135" y2="135" class="net_13"><title>delayedD</title></line>
+<line x1="397" x2="397" y1="135" y2="222.5" class="net_13"><title>delayedD</title></line>
+<line x1="397" x2="459" y1="222.5" y2="222.5" class="net_13"><title>delayedD</title></line>
+<line x1="344.5" x2="459" y1="242.5" y2="242.5" class="net_10"><title>s_s_n</title></line>
+<line x1="349" x2="397" y1="307.5" y2="307.5" class="net_14" />
+<line x1="397" x2="397" y1="307.5" y2="262.5" class="net_14" />
+<line x1="397" x2="459" y1="262.5" y2="262.5" class="net_14" />
+<line x1="349" x2="407" y1="372.5" y2="372.5" class="net_15" />
+<line x1="407" x2="407" y1="372.5" y2="282.5" class="net_15" />
+<line x1="407" x2="459" y1="282.5" y2="282.5" class="net_15" />
+<line x1="490" x2="525" y1="202.5" y2="202.5" class="net_7"><title>Q</title></line>
+<line x1="525" x2="525" y1="202.5" y2="157.5" class="net_7"><title>Q</title></line>
+<line x1="525" x2="550" y1="157.5" y2="157.5" class="net_7"><title>Q</title></line>
+<line x1="490" x2="550" y1="222.5" y2="222.5" class="net_8"><title>QN</title></line>
+<text x="347.5" y="239.5" class="netlabel">s_s_n</text>
+<text x="260.0" y="132.0" class="netlabel">s_and_d_ten</text>
+<text x="213.0" y="152.0" class="netlabel">s_and_te_ti</text>
+<text x="400.0" y="219.5" class="netlabel">delayedD</text>
+<text x="350.0" y="66.5" class="netlabel">CLK</text>
+<text x="120.0" y="64.0" class="netlabel">D</text>
+<text x="210.0" y="239.5" class="netlabel">S_n</text>
+<text x="43.0" y="141.0" class="netlabel">TE</text>
+<text x="108.0" y="172.0" class="netlabel">TI</text>
+<text x="493.0" y="199.5" class="netlabel">Q</text>
+<text x="493.0" y="219.5" class="netlabel">QN</text>
+<text x="105.0" y="84.0" class="netlabel">s_te_n</text>
+</svg>

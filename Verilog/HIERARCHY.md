@@ -6,6 +6,7 @@ What sits inside what, for every build top. Each top was elaborated with the fil
 
 How to read the trees:
 
+- Click a module with a triangle to fold its contents in or out. The top two levels start open.
 - `name` after a module is the instance name in its parent.
 - A module that one parent uses several times goes on one line: `x16` and the instance names. What is inside it is drawn once, under that line.
 - A sub-tree is drawn in full the first time it appears on this page. Later copies that are exactly the same (same modules, same instance names, all the way down) say "same as above" and link to it, also across boards.
@@ -34,542 +35,958 @@ The simulation models in `SD-FAT/sim/` are behavioural test models yosys cannot 
 
 261 of our modules, 2906 module instances, 13 levels deep. Vendor parts: none.
 
-- [ND120_TOP](doc/ND120_TOP.md)
-  - [nd_storage_devices](SD-FAT/circuit/doc/nd_storage_devices.md) `TAPE_SDFAT_SOURCE`
-    - <a name="h3"></a>[nd_storage](SD-FAT/circuit/doc/nd_storage.md) `u_nd_storage`
-      - <a name="h4"></a>[sd_file_reader](SD-FAT/circuit/doc/sd_file_reader.md) `u_reader`
-        - [sd_card_ctrl](SD-FAT/circuit/doc/sd_card_ctrl.md) `u_ctrl`
-      - [sd_writer](SD-FAT/circuit/doc/sd_writer.md) `u_writer`
-      - [nd_storage_mount](SD-FAT/circuit/doc/nd_storage_mount.md) `u_mount`
-      - [nd_storage_cache](SD-FAT/circuit/doc/nd_storage_cache.md) `u_cache`
-      - <a name="h5"></a>[nd_storage_engine](SD-FAT/circuit/doc/nd_storage_engine.md) `u_engine`
-        - [nds_sync_pulse](SD-FAT/circuit/doc/nds_sync_pulse.md) x42: `u_sync_rhave`, `u_sync_want`, `g_fe[0].u_sync_open`, `g_fe[0].u_sync_req`, `g_fe[0].u_sync_ack`, `g_fe[0].u_sync_whave`, `g_fe[0].u_sync_done`, `g_fe[1].u_sync_open`, `g_fe[1].u_sync_req`, `g_fe[1].u_sync_ack`, `g_fe[1].u_sync_whave`, `g_fe[1].u_sync_done` and 30 more
-        - [nds_sync_level](SD-FAT/circuit/doc/nds_sync_level.md) x6: `u_sync_grant`, `u_sync_err`, `u_sync_errcode`, `u_sync_ok`, `u_sync_oerr`, `u_sync_nocard`
-    - [nd_storage_tape_adapter](SD-FAT/circuit/doc/nd_storage_tape_adapter.md) `gen_tape.u_tape_adapter`
-  - sd_card_model (simulation model in `SD-FAT/sim/`, read as a black box) `SD_CARD`
-  - nds_mem_model (simulation model in `SD-FAT/sim/`, read as a black box) `MEM_STOR`
-  - [ND120_CORE](doc/ND120_CORE.md) `CORE`
-    - [BACKWIRING_PROM](Shared/support/doc/BACKWIRING_PROM.md) `BACKPLANE_INR_PROM`
-    - [ND3202D](CPU-BOARD-3202/circuit/doc/ND3202D.md) `CPU_BOARD`
-      - <a name="h8"></a>[CYC_36](CPU-BOARD-3202/circuit/doc/CYC_36.md) `CYC`
-        - [CYC_TERM_D](CPU-BOARD-3202/circuit/doc/CYC_TERM_D.md) `U_TERM_D`
-        - [CYC_CC_D](CPU-BOARD-3202/circuit/doc/CYC_CC_D.md) `U_CC_D`
-        - [PAL_44307C](PAL/doc/PAL_44307C.md) x2: `PAL_44307_UCYCLK_NEXT`, `PAL_44307_UCYCLK`
-        - [PAL_44601B](PAL/doc/PAL_44601B.md) `PAL_44601_UCYCFSM`
-        - [PAL_44403C_EN](PAL/doc/PAL_44403C_EN.md) `PAL_44403_UCYIN0`
-        - [PAL_44404C_EN](PAL/doc/PAL_44404C_EN.md) `PAL_44404_UCYIN1`
-      - <a name="h9"></a>[CPU_15](CPU-BOARD-3202/circuit/doc/CPU_15.md) `CPU`
-        - <a name="h10"></a>[CPU_PROC_32](CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md) `PROC`
-          - [AM29841](Shared/support/doc/AM29841.md) `CHIP_25F`
-          - <a name="h11"></a>[CPU_PROC_CMDDEC_34](CPU-BOARD-3202/circuit/doc/CPU_PROC_CMDDEC_34.md) `CMDDEC`
-            - [PAL_44407A_EN](PAL/doc/PAL_44407A_EN.md) `PAL_44407_UERFIX`
-            - [PAL_44408B_EN](PAL/doc/PAL_44408B_EN.md) `PAL_44408B_VEXFIX`
-            - [PAL_44511A_EN](PAL/doc/PAL_44511A_EN.md) `PAL_44511_ULEV0`
-          - [TTL_74245](Shared/support/doc/TTL_74245.md) x2: `CHIP_32F`, `CHIP_33F`
-          - [CPU_PROC_CGA_33](CPU-BOARD-3202/circuit/doc/CPU_PROC_CGA_33.md) `CGA`
-            - [TTL_74374](Shared/support/doc/TTL_74374.md) `CHIP_34G`
-            - [CGA](DELILAH-CPU/CGA/circuit/doc/CGA.md) `DELILAH`
-              - [BusDriver16](DELILAH-CPU/CGA/circuit/doc/BusDriver16.md) `BD_FIDBO`
-              - <a name="h14"></a>[CGA_ALU](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU.md) `ALU`
-                - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_1`
-                - [CGA_CPU_ALU_RALU](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_RALU.md) `ALU_RALU`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x4: `GATES_1`, `GATES_2`, `GATES_3`, `GATES_10`
-                  - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x3: `GATES_4`, `GATES_5`, `GATES_9`
-                  - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `GATES_6`
-                  - [NAND_GATE_8_INPUTS](Shared/logisim/doc/NAND_GATE_8_INPUTS.md) `GATES_7`
-                  - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `GATES_8`
-                  - [NAND_GATE_6_INPUTS](Shared/logisim/doc/NAND_GATE_6_INPUTS.md) `GATES_11`
-                  - [Adder](Shared/logisim/doc/Adder.md) `ARITH_12`
-                  - [CGA_ALU_RALU_MUX216L](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_RALU_MUX216L.md) x3: `RN_R_MUX`, `SN_S_MUX`, `AF_LF_MUX`
-                    - <a name="h17"></a>[MUX21LP](Shared/ndlib/doc/MUX21LP.md) x16: `MUXQ15`, `MUXQ14`, `MUXQ13`, `MUXQ12`, `MUXQ11`, `MUXQ10`, `MUXQ9`, `MUXQ8`, `MUXQ7`, `MUXQ6`, `MUXQ5`, `MUXQ4` and 4 more
-                      - [Multiplexer_2](Shared/logisim/doc/Multiplexer_2.md) `PLEXERS_1`
-                  - [CGA_ALU_RALU_LOGOP](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_RALU_LOGOP.md) `LOGOP`
-                    - <a name="h19"></a>[MUX41P](Shared/ndlib/doc/MUX41P.md) x16: `MUXLF15`, `MUXLF14`, `MUXLF13`, `MUXLF12`, `MUXLF11`, `MUXLF10`, `MUXLF9`, `MUXLF8`, `MUXLF7`, `MUXLF6`, `MUXLF5`, `MUXLF4` and 4 more
-                      - [Multiplexer_4](Shared/logisim/doc/Multiplexer_4.md) `PLEXER`
-                - [CGA_ALU_SHIFT](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_SHIFT.md) `ALU_SHIFT`
-                  - <a name="h21"></a>[MUX31LP](Shared/ndlib/doc/MUX31LP.md) x16: `RB0MUX`, `RB1MUX`, `RB2MUX`, `RB3MUX`, `RB4MUX`, `RB5MUX`, `RB6MUX`, `RB7MUX`, `RB8MUX`, `RB9MUX`, `RB10MUX`, `RB11MUX` and 4 more
-                    - [Multiplexer_4](Shared/logisim/doc/Multiplexer_4.md) `PLEXERS_1`
-                - [CGA_ALU_STS](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_STS.md) `ALU_STS`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_1`, `GATES_2`
-                  - [MUX41P](Shared/ndlib/doc/MUX41P.md) `STS7_MUX` - same as [above](#h19)
-                  - [MUX31LP](Shared/ndlib/doc/MUX31LP.md) x3: `STS6_MUX`, `STS5_MUX`, `STS4_MUX` - same as [above](#h21)
-                  - [R41P_EN](Shared/ndlib/doc/R41P_EN.md) `STS_REG_MID`
-                  - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) x12: `STS15_FF`, `STS14_FF`, `STS13_FF`, `STS12_FF`, `STS11_FF`, `STS10_FF`, `STS9_FF`, `STS8_FF`, `STS3_FF`, `STS2_FF`, `STS1_FF`, `STS0_FF`
-                - [CGA_ALU_GPR](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_GPR.md) `ALU_GPR`
-                  - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_1`
-                  - [MUX41P](Shared/ndlib/doc/MUX41P.md) x16: `GPR15M`, `GPR14M`, `GPR13M`, `GPR12M`, `GPR11M`, `GPR10M`, `GPR9M`, `GPR8M`, `GPR7M`, `GPR6M`, `GPR5M`, `GPR4M` and 4 more - same as [above](#h19)
-                  - [MUX21LP](Shared/ndlib/doc/MUX21LP.md) `GPR0M21` - same as [above](#h17)
-                  - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) x15: `GPR15FF`, `GPR14FF`, `GPR13FF`, `GPR12FF`, `GPR11FF`, `GPR10FF`, `GPR9FF`, `GPR8FF`, `GPR7FF`, `GPR6FF`, `GPR5FF`, `GPR4FF` and 3 more
-                - [CGA_ALU_DBR](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_DBR.md) `ALU_DBR`
-                  - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) x16: `DBRF15`, `DBRF14`, `DBRf13`, `DBRF12`, `DBRF11`, `DBRF10`, `DBRF9`, `DBRF8`, `DBRF7`, `DBRF6`, `DBRF5`, `DBRF4` and 4 more
-                - [CGA_ALU_ARG](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_ARG.md) `ALU_ARG`
-                - [CGA_ALU_SWAP](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_SWAP.md) `ALU_SWAP`
-                  - [R81_EN](Shared/ndlib/doc/R81_EN.md) x2: `SWAP_LO_REG`, `SWAP_HI_REG`
-                - [MUX21LP](Shared/ndlib/doc/MUX21LP.md) `AARG0_MUX` - same as [above](#h17)
-                - [CGA_ALU_OUTMUX](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_OUTMUX.md) `ALU_OUTMUX`
-                  - [MUX31LP](Shared/ndlib/doc/MUX31LP.md) x16: `GMUX15`, `GMUX14`, `GMUX13`, `GMUX12`, `GMUX11`, `GMUX10`, `GMUX9`, `GMUX8`, `GMUX7`, `GMUX6`, `GMUX5`, `GMUX4` and 4 more - same as [above](#h21)
-                  - [CGA_ALU_OUTMUX_SEL8](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_OUTMUX_SEL8.md) x15: `DMUX15`, `DMUX14`, `DMUX13`, `DMUX12`, `DMUX11`, `DMUX10`, `DMUX9`, `DMUX8`, `DMUX6`, `DMUX5`, `DMUX4`, `DMUX3` and 3 more
-                    - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x8: `GATES_1`, `GATES_2`, `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`, `GATES_8`
-                    - [NAND_GATE_8_INPUTS](Shared/logisim/doc/NAND_GATE_8_INPUTS.md) `GATES_9`
-                  - [CGA_CPU_ALU_OUTMUX_SEL7](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_OUTMUX_SEL7.md) `DMUX7`
-                    - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x7: `GATES_1`, `GATES_2`, `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`
-                    - [OR_GATE_7_INPUTS](Shared/logisim/doc/OR_GATE_7_INPUTS.md) `GATES_8`
-                  - [CGA_ALU_OUTMUX_IDBS](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_OUTMUX_IDBS.md) `OUTMUX_IDBS`
-                    - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x4: `GATES_1`, `GATES_2`, `GATES_4`, `GATES_5`
-                    - [NAND_GATE_8_INPUTS](Shared/logisim/doc/NAND_GATE_8_INPUTS.md) `GATES_3`
-                    - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x2: `GATES_6`, `GATES_8`
-                    - [NAND_GATE_5_INPUTS](Shared/logisim/doc/NAND_GATE_5_INPUTS.md) `GATES_7`
-                    - <a name="h30"></a>[ND38GLP](Shared/ndlib/doc/ND38GLP.md) x2: `IDBS_G1`, `IDBS_G2`
-                      - [Decoder_8](Shared/logisim/doc/Decoder_8.md) `PLEXERS_1`
-                    - [R81_EN](Shared/ndlib/doc/R81_EN.md) x2: `IDBS_R1`, `IDBS_R2`
-                - [CGA_ALU_QREG](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_QREG.md) `ALU_QREG`
-                  - [MUX41P](Shared/ndlib/doc/MUX41P.md) x16: `MUXQ15`, `MUXQ14`, `MUXQ13`, `MUXQ12`, `MUXQ11`, `MUXQ10`, `MUXQ9`, `MUXQ8`, `MUXQ7`, `MUXQ6`, `MUXQ5`, `MUXQ4` and 4 more - same as [above](#h19)
-                  - [R81_EN](Shared/ndlib/doc/R81_EN.md) x2: `REG_Q_HI`, `REG_Q_LO`
-                - [CGA_CPU_ALU_RMUX](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_RMUX.md) `ALU_RMUX`
-                  - [RMUX_Gates](Shared/ndlib/doc/RMUX_Gates.md) x16: `RN15`, `RN14`, `RN13`, `RN12`, `RN11`, `RN10`, `RN9`, `RN8`, `RN7`, `RN6`, `RN5`, `RN4` and 4 more
-                    - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x2: `GATES_1`, `GATES_2`
-                    - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) `GATES_3`
-                - [CGA_ALU_SMUX](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_SMUX.md) `ALU_SMUX`
-                  - [MUX41P](Shared/ndlib/doc/MUX41P.md) x16: `MUXS15`, `MUXS14`, `MUXS13`, `MUXS12`, `MUXS11`, `MUXS10`, `MUXS9`, `MUXS8`, `MUXS7`, `MUXS6`, `MUXS5`, `MUXS4` and 4 more - same as [above](#h19)
-                - [CGA_CPU_ALU_CONTR](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_CONTR.md) `ALU_CONTR`
-                  - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x5: `GATES_1`, `GATES_50`, `GATES_52`, `GATES_53`, `GATES_56`
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x5: `GATES_2`, `GATES_21`, `GATES_22`, `GATES_24`, `GATES_54`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x34: `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`, `GATES_8`, `GATES_9`, `GATES_13`, `GATES_14`, `GATES_15`, `GATES_16`, `GATES_17` and 22 more
-                  - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x5: `GATES_10`, `GATES_11`, `GATES_19`, `GATES_25`, `GATES_38`
-                  - [NOR_GATE_3_INPUTS](Shared/logisim/doc/NOR_GATE_3_INPUTS.md) x2: `GATES_12`, `GATES_20`
-                  - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `GATES_37`
-                  - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x2: `MEMORY_45`, `MEMORY_51`
-                  - [L8](Shared/ndlib/doc/L8.md) `SSEL_LATCH`
-                  - [MUX21LP](Shared/ndlib/doc/MUX21LP.md) x6: `CSMIS1_MUX`, `CSMIS0_MUX`, `CSALUI7_MUX`, `CSALUI8_MUX`, `ALUI3_MUX`, `ALUI1N_MUX` - same as [above](#h17)
-                  - [R41P_EN](Shared/ndlib/doc/R41P_EN.md) x2: `REG_RFLA4`, `REG_BAAD`
-                  - [R81_EN](Shared/ndlib/doc/R81_EN.md) `CONTR_REG`
-                  - [MUX41P](Shared/ndlib/doc/MUX41P.md) `CI_SEL_MUX` - same as [above](#h19)
-              - <a name="h36"></a>[CGA_TRAP](DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP.md) `TRAP`
-                - [CGA_TRAP_TVGEN](DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_TVGEN.md) `TVGEN`
-                  - [OR_GATE_8_INPUTS](Shared/logisim/doc/OR_GATE_8_INPUTS.md) `GATES_1`
-                  - [OR_GATE_5_INPUTS](Shared/logisim/doc/OR_GATE_5_INPUTS.md) x2: `GATES_2`, `GATES_9`
-                  - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) x2: `GATES_3`, `GATES_10`
-                  - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) x4: `WIPN`, `PGFN`, `RV2N`, `RV3N`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) `PGUN`
-                  - [NAND_GATE_5_INPUTS](Shared/logisim/doc/NAND_GATE_5_INPUTS.md) x4: `RD1N`, `WPVN`, `FPVN`, `RPVN`
-                  - [NAND_GATE_6_INPUTS](Shared/logisim/doc/NAND_GATE_6_INPUTS.md) x3: `RD2N`, `RD3N`, `IPVN`
-                  - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `GATES_11`
-                  - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `RV1N`
-                  - [CGA_TRAP_TVGEN_P2](DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_TVGEN_P2.md) `TRAP_TVGEN`
-                    - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x4: `GATES_1`, `GATES_5`, `GATES_9`, `GATES_10`
-                    - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x2: `GATES_2`, `GATES_8`
-                    - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_3`, `GATES_11`
-                    - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x2: `GATES_4`, `GATES_7`
-                    - [NAND_GATE_5_INPUTS](Shared/logisim/doc/NAND_GATE_5_INPUTS.md) `GATES_6`
-                    - [Multiplexer_4](Shared/logisim/doc/Multiplexer_4.md) x3: `TVEC2_MUX`, `TVEC1_MUX`, `TVEC0_MUX`
-                    - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x7: `L1V0_FF`, `L2V2_FF`, `L3V1_FF`, `L2V1_FF`, `L1V1_FF`, `L3V0_FF`, `L2V0_FF`
-                - [CGA_TRAP_BRKDET](DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_BRKDET.md) `BRKDET`
-                  - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x5: `IPV`, `WIP`, `RD2`, `RV3`, `GATES_16`
-                  - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x5: `GATES_2`, `GATES_7`, `AN2_1`, `GATES_18`, `GATES_23`
-                  - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) x3: `GATES_4`, `GATES_21`, `GATES_24`
-                  - [OR_GATE_4_INPUTS](Shared/logisim/doc/OR_GATE_4_INPUTS.md) x3: `GATES_5`, `GATES_10`, `GATES_20`
-                  - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `PGF`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x3: `INTR`, `GATES_14`, `GATES_15`
-                  - [NOR_GATE_3_INPUTS](Shared/logisim/doc/NOR_GATE_3_INPUTS.md) `GATES_12`
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) `GATES_13`
-                  - [AND_GATE_4_INPUTS](Shared/logisim/doc/AND_GATE_4_INPUTS.md) x2: `GATES_19`, `GATES_22`
-                  - [A02](Shared/ndlib/doc/A02.md) x4: `A02_1`, `A02_2`, `A02_3`, `A02_4`
-                - [CGA_TRAP_TBUF](DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_TBUF.md) `TBUF`
-              - <a name="h40"></a>[CGA_IDBCTL](DELILAH-CPU/CGA_IDBCTL/circuit/doc/CGA_IDBCTL.md) `IDBCTL`
-                - [CGA_IDBCTL_SEL6](DELILAH-CPU/CGA_IDBCTL/circuit/doc/CGA_IDBCTL_SEL6.md) x16: `IDB15`, `IDB14`, `IDB13`, `IDB12`, `IDB11`, `IDB10`, `IDB9`, `IDB8`, `IDB7`, `IDB6`, `IDB5`, `IDB4` and 4 more
-                - [CGA_IDBCTL_PGSREG](DELILAH-CPU/CGA_IDBCTL/circuit/doc/CGA_IDBCTL_PGSREG.md) `PGSREG`
-                  - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) x14: `PGS15`, `PGS14`, `PGS11`, `PGS10`, `PGS9`, `PGS8`, `PGS7`, `PGS3`, `PGS2`, `PGS1`, `PGS0`, `PGS6` and 2 more
-              - <a name="h42"></a>[CGA_WRF](DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF.md) `WRF`
-                - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x16: `GATES_1`, `GATES_2`, `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`, `GATES_8`, `GATES_9`, `GATES_10`, `GATES_11`, `GATES_12` and 4 more
-                - [CGA_WRF_RBLOCK](DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK.md) `RBLOCK`
-                  - [CGA_WRF_RBLOCK_DR16](DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK_DR16.md) x13: `Z_REG_0`, `D_REG_1`, `L_REG_4`, `A_REG_5`, `T_REG_6`, `STS_REG_8`, `R1_REG_9`, `R2_REG_10`, `R3_REG_11`, `R4_REG_12`, `R5_REG_13`, `R6_REG_14` and 1 more
-                  - [CGA_WRF_RBLOCK_PREG](DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK_PREG.md) `P_REG_2`
-                    - [MUX31LP](Shared/ndlib/doc/MUX31LP.md) x16: `R0`, `R1`, `R2`, `R3`, `R4`, `R5`, `R6`, `R7`, `R8`, `R9`, `R10`, `R11` and 4 more - same as [above](#h21)
-                    - [R81_EN](Shared/ndlib/doc/R81_EN.md) x2: `R_P_0_7`, `R_P_8_15`
-                    - [L8](Shared/ndlib/doc/L8.md) x2: `L_PR_7_0`, `L_PR_8_15`
-                  - [CGA_WRF_RBLOCK_LR16](DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK_LR16.md) x2: `B_REG_3`, `X_REG_7`
-                    - [MUX24P](Shared/ndlib/doc/MUX24P.md) x4: `MUX_15_12`, `MUX_11_8`, `MUX_7_4`, `MUX_3_0`
-                      - [Multiplexer_2](Shared/logisim/doc/Multiplexer_2.md) x4: `PLEXER_1`, `PLEXER_2`, `PLEXER_3`, `PLEXER_4`
-                    - [R81_EN](Shared/ndlib/doc/R81_EN.md) x2: `R_15_8`, `R_7_0`
-                    - [L8](Shared/ndlib/doc/L8.md) x2: `L_15_8`, `L_7_0`
-                  - [CGA_WRF_RBLOCK_SEL16](DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK_SEL16.md) x16: `SEL_0`, `SEL_1`, `SEL_2`, `SEL_3`, `SEL_4`, `SEL_5`, `SEL_6`, `SEL_7`, `SEL_8`, `SEL_9`, `SEL_10`, `SEL_11` and 4 more
-                    - [A02](Shared/ndlib/doc/A02.md) x16: `A15_14`, `A13_12`, `A11_10`, `A9_8`, `A7_6`, `A5_4`, `A3_2`, `A1_0`, `B15_14`, `B13_12`, `B11_10`, `B9_8` and 4 more
-                    - [NAND_GATE_8_INPUTS](Shared/logisim/doc/NAND_GATE_8_INPUTS.md) x2: `GATES_1`, `GATES_2`
-                - [ND38GLP](Shared/ndlib/doc/ND38GLP.md) x4: `LAA_LO`, `LAA_HI`, `LBA_LO`, `LBA_HI` - same as [above](#h30)
-              - <a name="h48"></a>[CGA_DCD](DELILAH-CPU/CGA_DCD/circuit/doc/CGA_DCD.md) `DCD`
-                - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x14: `GATES_60`, `GATES_40`, `GATES_41`, `GATES_42`, `GATES_43`, `GATES_48`, `GATES_49`, `GATES_50`, `GATES_52`, `GATES_25`, `GATES_28`, `GATES_31` and 2 more
-                - [R81_EN](Shared/ndlib/doc/R81_EN.md) `COMM_MIS_REG`
-                - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x2: `GATES_63`, `GATES_26`
-                - [NAND_GATE_8_INPUTS](Shared/logisim/doc/NAND_GATE_8_INPUTS.md) x8: `GATES_72`, `GATES_80`, `GATES_7`, `GATES_11`, `GATES_12`, `GATES_58`, `GATES_64`, `GATES_76`
-                - [OR_GATE_6_INPUTS](Shared/logisim/doc/OR_GATE_6_INPUTS.md) x2: `GATES_4`, `GATES_70`
-                - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) x9: `GATES_16`, `GATES_39`, `GATES_9`, `GATES_29`, `GATES_32`, `GATES_38`, `GATES_71`, `GATES_73`, `GATES_74`
-                - [ND38GHP](Shared/ndlib/doc/ND38GHP.md) x2: `C22`, `C24`
-                  - [Decoder_8](Shared/logisim/doc/Decoder_8.md) `PLEXERS_1`
-                - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x2: `GATES_20`, `GATES_10`
-                - [OR_GATE_4_INPUTS](Shared/logisim/doc/OR_GATE_4_INPUTS.md) x4: `GATES_44`, `GATES_53`, `GATES_34`, `GATES_54`
-                - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `GATES_24`
-                - [NAND_GATE_6_INPUTS](Shared/logisim/doc/NAND_GATE_6_INPUTS.md) x19: `GATES_65`, `GATES_79`, `GATES_13`, `GATES_15`, `GATES_21`, `GATES_35`, `GATES_47`, `GATES_51`, `GATES_55`, `GATES_57`, `GATES_61`, `GATES_59` and 7 more
-                - [NAND_GATE_5_INPUTS](Shared/logisim/doc/NAND_GATE_5_INPUTS.md) x8: `GATES_3`, `GATES_8`, `GATES_18`, `GATES_19`, `GATES_22`, `GATES_36`, `GATES_45`, `GATES_69`
-                - [NOR_GATE_4_INPUTS](Shared/logisim/doc/NOR_GATE_4_INPUTS.md) `GATES_6`
-                - [OR_GATE_7_INPUTS](Shared/logisim/doc/OR_GATE_7_INPUTS.md) `GATES_23`
-                - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x18: `MEMORY_88`, `MEMORY_90`, `MEMORY_91`, `MEMORY_92`, `MEMORY_93`, `MEMORY_94`, `MEMORY_95`, `MEMORY_96`, `MEMORY_98`, `MEMORY_97`, `MEMORY_85`, `MEMORY_86` and 6 more
-                - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) x2: `GATES_37`, `GATES_77`
-                - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) `CFETCH_FF`
-                - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x4: `GATES_46`, `GATES_62`, `GATES_30`, `GATES_1`
-                - [NAND_GATE_7_INPUTS](Shared/logisim/doc/NAND_GATE_7_INPUTS.md) x3: `GATES_67`, `GATES_68`, `GATES_78`
-              - <a name="h50"></a>[CGA_INTR](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR.md) `INTR`
-                - [OR_GATE](Shared/logisim/doc/OR_GATE.md) `GATES_1`
-                - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_2`
-                - [CGA_INTR_CNTLR](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR.md) `CNTLR`
-                  - [Multiplexer_bus_2](Shared/logisim/doc/Multiplexer_bus_2.md) `PLEXERS_1`
-                  - [CGA_INTR_CNTLR_VECGEN](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN.md) `VECGEN`
-                    - [CGA_INTR_CNTLR_VECGEN_VHR](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_VHR.md) `VHR`
-                      - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) x6: `HX1`, `HX2`, `LX1`, `HX0`, `LX2`, `LX0`
-                    - [CGA_INTR_CNTLR_VECGEN_ISMUX](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_ISMUX.md) `ISMUX`
-                      - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x6: `GATES_1`, `GATES_2`, `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`
-                      - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x2: `GATES_7`, `GATES_8`
-                      - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x12: `GATES_9`, `GATES_10`, `GATES_11`, `GATES_12`, `GATES_13`, `GATES_14`, `GATES_15`, `GATES_16`, `GATES_17`, `GATES_18`, `GATES_19`, `GATES_20`
-                    - [CGA_INTR_CNTLR_VECGEN_CMP](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_CMP.md) `CMP`
-                      - [CGA_INTR_CNTLR_VECGEN_CMP_MAGCMP](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_CMP_MAGCMP.md) x2: `HICMP`, `LOCMP`
-                        - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `GATES_1`
-                        - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `GATES_2`
-                        - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x3: `GATES_3`, `GATES_5`, `GATES_6`
-                        - [NOR_GATE_3_INPUTS](Shared/logisim/doc/NOR_GATE_3_INPUTS.md) `GATES_4`
-                    - [CGA_INTR_CNTLR_VECGEN_STAT](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_STAT.md) `STAT`
-                      - [XNOR_GATE_ONEHOT](Shared/logisim/doc/XNOR_GATE_ONEHOT.md) x4: `GATES_1`, `GATES_2`, `GATES_5`, `GATES_6`
-                      - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x2: `GATES_3`, `GATES_4`
-                      - [CGA_INTR_CNTLR_VECGEN_STAT_SBIT](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_STAT_SBIT.md) x6: `SBIT1_LO`, `SBIT2_HI`, `SBIT0_LO`, `SBIT1_HI`, `SBIT0_HI`, `SBIT2_LO`
-                        - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `GATES_1`
-                        - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x2: `GATES_2`, `GATES_3`
-                        - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) `GATES_4`
-                        - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_5`
-                    - [CGA_INTR_CNTLR_VECGEN_OSMUX](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_OSMUX.md) `OSMUX`
-                      - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x3: `GATES_1`, `GATES_4`, `GATES_9`
-                      - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x6: `GATES_2`, `GATES_3`, `GATES_7`, `GATES_8`, `GATES_10`, `GATES_11`
-                      - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x2: `GATES_5`, `GATES_6`
-                    - [CGA_INTR_CNTLR_VECGEN_PTY](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_PTY.md) `PTY`
-                      - [CGA_INTR_CNTLR_VECGEN_PTY_PTYENC](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_PTY_PTYENC.md) x2: `PTYENC_HI`, `PTYENC_LO`
-                        - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x2: `NR2`, `O1`
-                        - [NOR_GATE_4_INPUTS](Shared/logisim/doc/NOR_GATE_4_INPUTS.md) x2: `NRx`, `NR4`
-                        - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) `ND2`
-                        - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `ND3`
-                        - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `ND4`
-                        - [OR_GATE_8_INPUTS](Shared/logisim/doc/OR_GATE_8_INPUTS.md) `ND8P`
-                        - [OR_GATE](Shared/logisim/doc/OR_GATE.md) `OR2`
-                        - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) `NR3`
-                  - [CGA_INTR_CNTLR_CLR](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_CLR.md) `CLR_CLEAR_CONTROL`
-                    - [CGA_INTR_CNTLR_CLR_CLRBIT](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_CLR_CLRBIT.md) x16: `CLRB3`, `CLRB2`, `CLRB1`, `CLRB0`, `CLRB7`, `CLRB6`, `CLRB5`, `CLRB4`, `CLRB11`, `CLRB10`, `CLRB9`, `CLRB8` and 4 more
-                      - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_1`, `GATES_2`
-                      - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `GATES_3`
-                      - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) `GATES_4`
-                  - [CGA_INTR_CNTLR_IRGEL](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL.md) `IRGEL`
-                    - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) `GATES_1`
-                    - [CGA_INTR_CNTLR_IRGEL_HIGEL](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_HIGEL.md) `HIGEL`
-                      - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x4: `GATES_1`, `GATES_2`, `GATES_3`, `GATES_6`
-                      - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_4`, `GATES_5`
-                      - [OR_GATE_6_INPUTS](Shared/logisim/doc/OR_GATE_6_INPUTS.md) `GATES_7`
-                      - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_8`
-                    - [CGA_INTR_CNTLR_IRGEL_VMUX](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_VMUX.md) `VMUX`
-                      - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x3: `GATES_1`, `GATES_4`, `GATES_7`
-                      - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x6: `GATES_2`, `GATES_3`, `GATES_5`, `GATES_6`, `GATES_8`, `GATES_9`
-                    - [CGA_INTR_CNTLR_IRGEL_LOGEL](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_LOGEL.md) `LOGEL`
-                      - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x2: `GATES_1`, `GATES_4`
-                      - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_2`, `GATES_3`
-                      - [OR_GATE_4_INPUTS](Shared/logisim/doc/OR_GATE_4_INPUTS.md) `GATES_5`
-                      - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_6`
-                    - [CGA_INTR_CNTLR_IRGEL_HIRL](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_HIRL.md) `HIRL`
-                      - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `GATES_1`
-                      - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) `GATES_2`
-                      - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `GATES_3`
-                      - [OR_GATE](Shared/logisim/doc/OR_GATE.md) `GATES_4`
-                      - [NOR_GATE_3_INPUTS](Shared/logisim/doc/NOR_GATE_3_INPUTS.md) `GATES_5`
-                      - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `GATES_6`
-                      - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) `GATES_7`
-                      - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) x2: `STATUS_OVERFLOW_FF`, `INT_REQ_ENABLE_FF`
-                    - [CGA_INTR_CNTLR_IRGEL_LORL](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_LORL.md) `LORL`
-                      - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) `GATES_1`
-                      - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `GATES_2`
-                      - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `GATES_3`
-                      - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) `GATES_4`
-                      - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) `INT_REQ_ENABLE_FF`
-                  - [CGA_INTR_CNTLR_MDCD](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_MDCD.md) `MDCD`
-                    - [OR_GATE_5_INPUTS](Shared/logisim/doc/OR_GATE_5_INPUTS.md) `GATES_1`
-                    - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) x3: `GATES_2`, `GATES_35`, `GATES_39`
-                    - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x7: `GATES_3`, `GATES_4`, `GATES_19`, `GATES_20`, `GATES_21`, `GATES_22`, `GATES_23`
-                    - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x6: `GATES_5`, `GATES_11`, `GATES_24`, `GATES_30`, `GATES_31`, `GATES_40`
-                    - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x14: `GATES_6`, `GATES_7`, `GATES_8`, `GATES_9`, `GATES_13`, `GATES_14`, `GATES_17`, `GATES_18`, `GATES_25`, `GATES_26`, `GATES_28`, `GATES_36` and 2 more
-                    - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) x4: `GATES_10`, `GATES_12`, `GATES_29`, `GATES_32`
-                    - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x2: `GATES_15`, `GATES_16`
-                    - [OR_GATE_4_INPUTS](Shared/logisim/doc/OR_GATE_4_INPUTS.md) x2: `GATES_27`, `GATES_38`
-                    - [NOR_GATE_3_INPUTS](Shared/logisim/doc/NOR_GATE_3_INPUTS.md) x2: `GATES_33`, `GATES_34`
-                    - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x2: `MEMORY_42`, `MEMORY_43`
-                    - [ND38GLP](Shared/ndlib/doc/ND38GLP.md) x2: `GLP_LO`, `GLP_HI` - same as [above](#h30)
-                  - [CGA_INTR_CNTLR_IRQ](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ.md) `IRQ`
-                    - [CGA_INTR_CNTLR_IRQ_REG](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_REG.md) `IRQ_REG`
-                      - [CGA_INTR_CNTLR_IRQ_REG_RQBIT_V2](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_REG_RQBIT_V2.md) x16: `RQBIT_0`, `RQBIT_1`, `RQBIT_2`, `RQBIT_3`, `RQBIT_4`, `RQBIT_5`, `RQBIT_6`, `RQBIT_7`, `RQBIT_8`, `RQBIT_9`, `RQBIT_10`, `RQBIT_11` and 4 more
-                        - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_1`
-                    - [CGA_INTR_CNTLR_IRQ_MASK](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_MASK.md) `IRQ_MASK`
-                      - [CGA_INTR_CNTLR_IRQ_MASK_MASKBIT](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_MASK_MASKBIT.md) x16: `MASKBIT15`, `MASKBIT14`, `MASKBIT13`, `MASKBIT12`, `MASKBIT11`, `MASKBIT10`, `MASKBIT9`, `MASKBIT8`, `MASKBIT7`, `MASKBIT6`, `MASKBIT5`, `MASKBIT4` and 4 more
-                        - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_1`, `GATES_2`
-                        - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `GATES_3`
-                        - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) `GATES_4`
-                        - [XNOR_GATE_ONEHOT](Shared/logisim/doc/XNOR_GATE_ONEHOT.md) `GATES_5`
-                        - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_6`
-                    - [CGA_INTR_CNTLR_IRQ_MREQ](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_MREQ.md) `IRQ_MREQ`
-                      - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x16: `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`, `GATES_8`, `GATES_9`, `GATES_10`, `GATES_11`, `GATES_12`, `GATES_13`, `GATES_14`, `GATES_15` and 4 more
-                - [CGA_INTR_IRSRC](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_IRSRC.md) `IRSRC`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x16: `GATES_1`, `GATES_2`, `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`, `GATES_8`, `GATES_9`, `GATES_10`, `GATES_11`, `GATES_12` and 4 more
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x10: `GATES_17`, `GATES_18`, `GATES_19`, `GATES_20`, `GATES_21`, `GATES_22`, `GATES_23`, `GATES_24`, `GATES_25`, `GATES_26`
-              - <a name="h78"></a>[CGA_MAC](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC.md) `MAC`
-                - [CGA_MAC_AP09](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_AP09.md) `MAC_AP09`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x16: `GATES_5`, `GATES_6`, `GATES_1`, `GATES_2`, `GATES_3`, `GATES_4`, `GATES_7`, `GATES_8`, `GATES_9`, `GATES_10`, `GATES_11`, `GATES_12` and 4 more
-                  - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) x16: `GATES_20`, `GATES_21`, `GATES_22`, `GATES_17`, `GATES_18`, `GATES_19`, `GATES_23`, `GATES_24`, `GATES_25`, `GATES_26`, `GATES_27`, `GATES_28` and 4 more
-                  - [A02](Shared/ndlib/doc/A02.md) x32: `ICA0A`, `ICA0B`, `ICA1A`, `ICA1B`, `ICA2A`, `ICA2B`, `ICA3A`, `ICA3B`, `ICA4A`, `ICA4B`, `ICA5A`, `ICA5B` and 20 more
-                  - [CGA_MAC_APOS_CALCA](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_APOS_CALCA.md) `CALCA`
-                    - [NAND_GATE_5_INPUTS](Shared/logisim/doc/NAND_GATE_5_INPUTS.md) x2: `GATES_1`, `GATES_2`
-                    - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) `GATES_3`
-                    - [R81_EN](Shared/ndlib/doc/R81_EN.md) x2: `R_LO`, `R_HI`
-                    - [L8](Shared/ndlib/doc/L8.md) x2: `L_LO`, `L_HI`
-                  - [CGA_MAC_APOS_INC](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_APOS_INC.md) `AINC`
-                - [CGA_MAC_SEGPT](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_SEGPT.md) `MAC_SEGPT`
-                  - [CGA_MAC_SEGPT_XPT](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_SEGPT_XPT.md) `XPT`
-                    - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x3: `GATES_1`, `GATES_2`, `GATES_3`
-                    - [L4](Shared/ndlib/doc/L4.md) `XPT_L`
-                  - [CGA_MAC_SEGPT_SEG](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_SEGPT_SEG.md) `SEG`
-                    - [NAND_GATE_8_INPUTS](Shared/logisim/doc/NAND_GATE_8_INPUTS.md) `GATES_1`
-                    - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `GATES_2`
-                    - [L8](Shared/ndlib/doc/L8.md) `SEG_L`
-                  - [CGA_MAC_SEGPT_PCR](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_SEGPT_PCR.md) `PCR`
-                    - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `GATES_1`
-                    - [L8](Shared/ndlib/doc/L8.md) `PCR_HI`
-                    - [L4](Shared/ndlib/doc/L4.md) `PCR_LO`
-                - [CGA_MAC_PTSEL](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_PTSEL.md) `MAC_PTSEL`
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) `GATES_1`
-                  - [OR_GATE](Shared/logisim/doc/OR_GATE.md) `GATES_2`
-                  - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) `GATES_3`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) `GATES_4`
-                  - [J_K_FLIPFLOP_EN](Shared/ndlib/doc/J_K_FLIPFLOP_EN.md) `MEMORY_5`
-                - [CGA_MAC_LASEL](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_LASEL.md) `MAC_LASEL`
-                  - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x8: `GATES_1`, `GATES_2`, `GATES_5`, `GATES_6`, `GATES_7`, `GATES_8`, `GATES_11`, `GATES_18`
-                  - [AND_GATE_4_INPUTS](Shared/logisim/doc/AND_GATE_4_INPUTS.md) x3: `GATES_3`, `GATES_4`, `GATES_9`
-                  - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) `GATES_10`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x4: `GATES_12`, `GATES_13`, `GATES_14`, `GATES_17`
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) `GATES_15`
-                  - [NAND_GATE_5_INPUTS](Shared/logisim/doc/NAND_GATE_5_INPUTS.md) x2: `GATES_16`, `GATES_22`
-                  - [OR_GATE_3_INPUTS](Shared/logisim/doc/OR_GATE_3_INPUTS.md) `GATES_19`
-                  - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x2: `GATES_20`, `GATES_21`
-                  - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `GATES_23`
-                  - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_24`
-                - [CGA_MAC_LA1025](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_LA1025.md) `MAC_LA1025`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x12: `ILA23_NAND`, `ILA22_NAND`, `ILA21_NAND`, `ILA20_NAND`, `ILA17D`, `ILA16D`, `ILA15B`, `ILA14B`, `ILA13B`, `ILA12B`, `GATES_3`, `ILA10B`
-                  - [A02](Shared/ndlib/doc/A02.md) x16: `ILA19A`, `ILA19B`, `ILA18A`, `ILA18B`, `ILA17A`, `ILA17B`, `ILA17C`, `ILA16A`, `ILA16B`, `ILA16C`, `ILA15A`, `ILA14A` and 4 more
-                  - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x8: `ILA19_OR`, `ILA18_OR`, `ILA15_OR`, `ILA14_OR`, `ILA13_OR`, `ILA12_OR`, `ILA11_OR`, `ILA10_OR`
-                  - [OR_GATE_4_INPUTS](Shared/logisim/doc/OR_GATE_4_INPUTS.md) x2: `ILA17_OR`, `GATES_21`
-                  - [NAND_GATE_6_INPUTS](Shared/logisim/doc/NAND_GATE_6_INPUTS.md) `GATES_23`
-                  - [R81_EN](Shared/ndlib/doc/R81_EN.md) x2: `R_LA_H`, `R_LA_L`
-                - [CGA_MAC_DECODE](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_DECODE.md) `MAC_DECODE`
-                  - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) x11: `GATES_1`, `GATES_2`, `GATES_7`, `GATES_13`, `GATES_16`, `GATES_24`, `GATES_26`, `GATES_28`, `GATES_29`, `GATES_32`, `GATES_42`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x10: `GATES_3`, `GATES_9`, `GATES_20`, `GATES_22`, `GATES_37`, `GATES_44`, `GATES_45`, `GATES_46`, `GATES_49`, `GATES_50`
-                  - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x18: `GATES_4`, `GATES_5`, `GATES_6`, `GATES_18`, `GATES_19`, `GATES_30`, `GATES_31`, `GATES_34`, `GATES_38`, `GATES_39`, `GATES_40`, `GATES_47` and 6 more
-                  - [NAND_GATE_6_INPUTS](Shared/logisim/doc/NAND_GATE_6_INPUTS.md) x6: `GATES_8`, `GATES_10`, `GATES_21`, `GATES_33`, `GATES_36`, `GATES_43`
-                  - [NAND_GATE_5_INPUTS](Shared/logisim/doc/NAND_GATE_5_INPUTS.md) x5: `GATES_11`, `GATES_12`, `GATES_15`, `GATES_17`, `GATES_23`
-                  - [NOR_GATE_4_INPUTS](Shared/logisim/doc/NOR_GATE_4_INPUTS.md) x2: `GATES_14`, `GATES_25`
-                  - [NAND_GATE_8_INPUTS](Shared/logisim/doc/NAND_GATE_8_INPUTS.md) x5: `GATES_27`, `GATES_54`, `GATES_55`, `GATES_58`, `GATES_60`
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x2: `GATES_35`, `GATES_41`
-                  - [NAND_GATE_7_INPUTS](Shared/logisim/doc/NAND_GATE_7_INPUTS.md) `GATES_51`
-                  - [R41P_EN](Shared/ndlib/doc/R41P_EN.md) `DECODE_R41`
-                - [CGA_MAC_ADD](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_ADD.md) `MAC_ADD`
-                  - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x16: `GATES_1`, `GATES_2`, `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`, `GATES_8`, `GATES_9`, `GATES_10`, `GATES_11`, `GATES_12` and 4 more
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x17: `GATES_17`, `GATES_18`, `GATES_19`, `GATES_20`, `GATES_21`, `GATES_22`, `GATES_23`, `GATES_24`, `GATES_25`, `GATES_27`, `GATES_28`, `GATES_29` and 5 more
-                  - [A02](Shared/ndlib/doc/A02.md) x32: `A02_31`, `A02_32`, `A02_29`, `A02_30`, `A02_27`, `A02_28`, `A02_25`, `A02_26`, `A02_23`, `A02_24`, `A02_21`, `A02_22` and 20 more
-                  - [CGA_MAC_FASTADD](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_FASTADD.md) `FASTADD`
-                    - [Adder](Shared/logisim/doc/Adder.md) x2: `ARITH_1`, `ARITH_2`
-              - [CGA_MIC](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC.md) `MIC`
-                - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x2: `GATES_1`, `GATES_4`
-                - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x4: `GATES_2`, `GATES_5`, `GATES_7`, `GATES_18`
-                - [NOR_GATE_3_INPUTS](Shared/logisim/doc/NOR_GATE_3_INPUTS.md) x2: `GATES_3`, `GATES_26`
-                - [AND_GATE_4_INPUTS](Shared/logisim/doc/AND_GATE_4_INPUTS.md) `GATES_6`
-                - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x5: `GATES_8`, `GATES_17`, `GATES_28`, `GATES_29`, `GATES_31`
-                - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x10: `GATES_9`, `GATES_10`, `GATES_11`, `GATES_12`, `GATES_13`, `GATES_14`, `GATES_15`, `GATES_16`, `GATES_25`, `GATES_30`
-                - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x7: `GATES_19`, `GATES_20`, `GATES_21`, `GATES_22`, `GATES_23`, `GATES_24`, `GATES_27`
-                - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x8: `MEMORY_33`, `MEMORY_34`, `MEMORY_35`, `MEMORY_36`, `MEMORY_37`, `MEMORY_38`, `MEMORY_39`, `MEMORY_32`
-                - <a name="h92"></a>[CGA_MIC_INCOUNT](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_INCOUNT.md) `MIC_INCOUNT`
-                  - [XOR_GATE_ONEHOT](Shared/logisim/doc/XOR_GATE_ONEHOT.md) `GATES_1`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) `GATES_2`
-                  - [XNOR_GATE_ONEHOT](Shared/logisim/doc/XNOR_GATE_ONEHOT.md) `GATES_3`
-                  - [Multiplexer_2](Shared/logisim/doc/Multiplexer_2.md) x2: `PLEXERS_4`, `PLEXERS_5`
-                  - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x2: `MEMORY_6`, `MEMORY_7`
-                - <a name="h93"></a>[M169C_EN](Shared/ndlib/doc/M169C_EN.md) x2: `LC_HI`, `LC_LO`
-                  - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x17: `gen_enable.AND_QA_NL`, `gen_enable.AND_QB_NL`, `gen_enable.AND_QC_NL`, `gen_enable.AND_QD_NL`, `gen_enable.GATES_3`, `gen_enable.GATES_13`, `gen_enable.GATES_15`, `gen_enable.GATES_17`, `gen_enable.GATES_19`, `gen_enable.AND_QAN_UP`, `gen_enable.AND_QA_UPN`, `gen_enable.GATES_22` and 5 more
-                  - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) x2: `gen_enable.GATES_5`, `gen_enable.GATES_35`
-                  - [AND_GATE_4_INPUTS](Shared/logisim/doc/AND_GATE_4_INPUTS.md) `gen_enable.GATES_7`
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x9: `gen_enable.GATES_8`, `gen_enable.GATES_9`, `gen_enable.GATES_10`, `gen_enable.GATES_11`, `gen_enable.GATES_28`, `gen_enable.GATES_29`, `gen_enable.GATES_30`, `gen_enable.GATES_31`, `gen_enable.GATES_34`
-                  - [XOR_GATE_ONEHOT](Shared/logisim/doc/XOR_GATE_ONEHOT.md) x4: `gen_enable.GATES_12`, `gen_enable.GATES_14`, `gen_enable.GATES_16`, `gen_enable.GATES_18`
-                  - [AND_GATE_6_INPUTS](Shared/logisim/doc/AND_GATE_6_INPUTS.md) x2: `gen_enable.GATES_32`, `gen_enable.GATES_33`
-                  - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x4: `gen_enable.MEMORY_36`, `gen_enable.MEMORY_37`, `gen_enable.MEMORY_38`, `gen_enable.MEMORY_39`
-                - <a name="h94"></a>[MUX21L](Shared/ndlib/doc/MUX21L.md) x2: `M_RF1`, `M_RF0`
-                  - [Multiplexer_2](Shared/logisim/doc/Multiplexer_2.md) `PLEXERS_1`
-                - <a name="h95"></a>[MUX34P](Shared/ndlib/doc/MUX34P.md) `ILC_MUX`
-                  - [Multiplexer_4](Shared/logisim/doc/Multiplexer_4.md) x4: `PLEXERS_1`, `PLEXERS_2`, `PLEXERS_3`, `PLEXERS_4`
-                - [L8](Shared/ndlib/doc/L8.md) `IRLATCH`
-                - <a name="h96"></a>[CGA_MIC_CONDREG](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CONDREG.md) `CONDREG`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x5: `GATES_1`, `GATES_4`, `GATES_5`, `GATES_7`, `GATES_8`
-                  - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x2: `GATES_2`, `GATES_6`
-                  - [XNOR_GATE_ONEHOT](Shared/logisim/doc/XNOR_GATE_ONEHOT.md) `GATES_3`
-                  - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) x12: `CSBIT11`, `CSBIT10`, `CSBIT9`, `CSBIT8`, `CSBIT7`, `CSBIT6`, `CSBIT5`, `CSBIT4`, `CSBIT3`, `CSBIT2`, `CSBIT1`, `CSBIT0`
-                - [MUX41P](Shared/ndlib/doc/MUX41P.md) x8: `M_LAA_3`, `M_LAA_2`, `M_LAA_1`, `M_LAA_0`, `M_LBA_3`, `M_LBA_2`, `M_LBA_1`, `M_LBA_0` - same as [above](#h19)
-                - [R41P_EN](Shared/ndlib/doc/R41P_EN.md) x2: `LAA_REG`, `LBA_REG`
-                - <a name="h97"></a>[CMP4](Shared/ndlib/doc/CMP4.md) `LC_CMP`
-                  - [Comparator](Shared/logisim/doc/Comparator.md) `ARITH_1`
-                - [CGA_MIC_IINC](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IINC.md) `MIC_IINC`
-                - <a name="h98"></a>[CGA_MIC_STACK](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK.md) `MIC_STACK`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_1`, `GATES_2`
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) `GATES_3`
-                  - [CGA_MIC_STACK_BIT](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK_BIT.md) x12: `Bit11`, `Bit10`, `Bit9`, `Bit8`, `Bit7`, `Bit6`, `Bit5`, `Bit4`, `Bit3`, `Bit2`, `Bit1`, `Bit0`
-                    - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x4: `GATES_1`, `GATES_2`, `GATES_9`, `GATES_10`
-                    - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x5: `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`
-                    - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `GATES_8`
-                    - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_11`
-                    - [SR44_EN](Shared/ndlib/doc/SR44_EN.md) `SR44_1`
-                  - [CGA_MIC_STACK_BIT12](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK_BIT12.md) `Bit12`
-                    - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x4: `GATES_1`, `GATES_2`, `GATES_9`, `GATES_10`
-                    - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x5: `GATES_3`, `GATES_4`, `GATES_5`, `GATES_6`, `GATES_7`
-                    - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `GATES_8`
-                    - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) `MEMORY_11`
-                    - [SR44_EN](Shared/ndlib/doc/SR44_EN.md) `SR44_2`
-                - [CGA_MIC_MASEL](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_MASEL.md) `MIC_MASEL`
-                - [SCAN_WITH_SET_N_EN](Shared/ndlib/doc/SCAN_WITH_SET_N_EN.md) x2: `OOD_FF`, `DZD_FF`
-                - <a name="h101"></a>[CGA_MIC_WCAREG](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_WCAREG.md) `MIC_WCAREG`
-                  - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) `GATES_1`
-                  - [SCAN_FF_EN](Shared/ndlib/doc/SCAN_FF_EN.md) x14: `WCAFF12`, `WCAFF11`, `WCAFF10`, `WCAFF9`, `WCAFF8`, `WCAFF7`, `WCAFF6`, `WCAFF5`, `WCAFF4`, `WCAFF3`, `WCAFF2`, `WCAFF1` and 2 more
-                - <a name="h102"></a>[CGA_MIC_IPOS](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IPOS.md) `MIC_IPOS`
-                  - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_1`, `GATES_5`
-                  - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x2: `GATES_2`, `GATES_3`
-                  - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) `GATES_4`
-                  - [Multiplexer_4](Shared/logisim/doc/Multiplexer_4.md) x13: `PLEXERS_17`, `PLEXERS_18`, `PLEXERS_6`, `PLEXERS_7`, `PLEXERS_8`, `PLEXERS_9`, `PLEXERS_10`, `PLEXERS_11`, `PLEXERS_12`, `PLEXERS_13`, `PLEXERS_14`, `PLEXERS_15` and 1 more
-                - [CGA_MIC_CSEL](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CSEL.md) `CSEL`
-                  - [Multiplexer_8](Shared/logisim/doc/Multiplexer_8.md) x2: `PLEXERS_1`, `PLEXERS_2`
-                  - [Multiplexer_2](Shared/logisim/doc/Multiplexer_2.md) `PLEXERS_3`
-                  - [LATCH](Shared/ndlib/doc/LATCH.md) `CSEL_LATCH`
-              - <a name="h104"></a>[CGA_TESTMUX](DELILAH-CPU/CGA_TESTMUX/circuit/doc/CGA_TESTMUX.md) `TESTMUX`
-                - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) `GATES_1`
-                - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x3: `GATES_2`, `GATES_3`, `GATES_4`
-                - [MUX81](Shared/ndlib/doc/MUX81.md) x5: `TM2`, `TM3`, `TM4`, `TM0`, `TM1`
-                  - [Multiplexer_8](Shared/logisim/doc/Multiplexer_8.md) `PLEXERS_1`
-        - <a name="h106"></a>[CPU_CS_16](CPU-BOARD-3202/circuit/doc/CPU_CS_16.md) `CS`
-          - [CPU_CS_PROM_19](CPU-BOARD-3202/circuit/doc/CPU_CS_PROM_19.md) `PROM`
-          - [CPU_CS_WCS_21_22](CPU-BOARD-3202/circuit/doc/CPU_CS_WCS_21_22.md) `WCS`
-            - [IDT6168A_20](Shared/support/doc/IDT6168A_20.md) x32: `CHIP_16C`, `CHIP_17C`, `CHIP_18C`, `CHIP_19C`, `CHIP_20C`, `CHIP_21C`, `CHIP_22C`, `CHIP_23C`, `CHIP_24C`, `CHIP_25C`, `CHIP_26C`, `CHIP_27C` and 20 more
-          - [CPU_CS_TCV_20](CPU-BOARD-3202/circuit/doc/CPU_CS_TCV_20.md) `TCV`
-          - [CPU_CS_CTL_18](CPU-BOARD-3202/circuit/doc/CPU_CS_CTL_18.md) `CTL`
-            - [TTL_74139](Shared/support/doc/TTL_74139.md) `CHIP_30B`
-            - [PAL_44305D](PAL/doc/PAL_44305D.md) `PAL_44305_UCSCTL`
-          - [CPU_CS_ACAL_17](CPU-BOARD-3202/circuit/doc/CPU_CS_ACAL_17.md) `ACAL`
-        - [CPU_MMU_24](CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md) `MMU`
-          - [CPU_MMU_HIT_27](CPU-BOARD-3202/circuit/doc/CPU_MMU_HIT_27.md) `MMU_HIT`
-          - [CPU_MMU_PPNX_28](CPU-BOARD-3202/circuit/doc/CPU_MMU_PPNX_28.md) `PPNX`
-          - [CPU_MMU_PTIDB_30](CPU-BOARD-3202/circuit/doc/CPU_MMU_PTIDB_30.md) `PTIDB`
-          - [CPU_MMU_CSR_26](CPU-BOARD-3202/circuit/doc/CPU_MMU_CSR_26.md) `CSR`
-          - [CPU_MMU_CACHE_25](CPU-BOARD-3202/circuit/doc/CPU_MMU_CACHE_25.md) `CACHE`
-            - [TMM2018D_25](Shared/support/doc/TMM2018D_25.md) x4: `CHIP_23F`, `CHIP_24F`, `CHIP_16F`, `CHIP_20F`
-            - [PAL_44402D_EN](PAL/doc/PAL_44402D_EN.md) `PAL_44402_UBITS`
-            - [Am9150](Shared/support/doc/Am9150.md) `CHIP_21F`
-          - [PAL_44306A](PAL/doc/PAL_44306A.md) `PAL_44306_UNOCTL`
-          - <a name="h111"></a>[CPU_MMU_PT_29](CPU-BOARD-3202/circuit/doc/CPU_MMU_PT_29.md) `PT`
-            - [TMM2018D_25](Shared/support/doc/TMM2018D_25.md) x4: `CHIP_24G`, `CHIP_25G`, `CHIP_22G`, `CHIP_23G`
-            - [IMS1403_25](Shared/support/doc/IMS1403_25.md) `CHIP_20G`
-      - <a name="h112"></a>[IO_37](CPU-BOARD-3202/circuit/doc/IO_37.md) `IO`
-        - <a name="h113"></a>[IO_REG_41](CPU-BOARD-3202/circuit/doc/IO_REG_41.md) `REG_MODULE`
-          - [TTL_74273](Shared/support/doc/TTL_74273.md) `CHIP_28A_IOC`
-          - [TTL_74244](Shared/support/doc/TTL_74244.md) x2: `CHIP_27A_STRAP`, `CHIP_25A_ALD`
-        - [IO_PANCAL_40](CPU-BOARD-3202/circuit/doc/IO_PANCAL_40.md) `PANCAL`
-          - [TTL_74374](Shared/support/doc/TTL_74374.md) `CHIP_32B`
-          - [TTL_74244](Shared/support/doc/TTL_74244.md) `CHIP_33B`
-        - <a name="h115"></a>[IO_UART_42](CPU-BOARD-3202/circuit/doc/IO_UART_42.md) `UART`
-          - [AM29C821](Shared/support/doc/AM29C821.md) `CHIP_33G`
-          - [SC2661_UART](Shared/support/doc/SC2661_UART.md) `CHIP_32H`
-        - <a name="h116"></a>[IO_DCD_38](CPU-BOARD-3202/circuit/doc/IO_DCD_38.md) `DCD`
-          - [DECODE_DGA](DECODE-GateArray/DGA/circuit/doc/DECODE_DGA.md) `DGA`
-            - [F091](DECODE-GateArray/DGA/circuit/doc/F091.md) `A090`
-            - [FIFO_8BIT](Shared/support/doc/FIFO_8BIT.md) `fifo_inst`
-            - [DECODE_DGA_POW](DECODE-GateArray/DGA/circuit/doc/DECODE_DGA_POW.md) `POW`
-              - [J_K_FLIPFLOP](Shared/logisim/doc/J_K_FLIPFLOP.md) x3: `A616`, `A618`, `A617`
-              - [F091](DECODE-GateArray/DGA/circuit/doc/F091.md) `A613B`
-              - [F595](DECODE-GateArray/DGA/circuit/doc/F595.md) x5: `A570`, `A571`, `A576`, `A574`, `A575`
-              - [F714](DECODE-GateArray/DGA/circuit/doc/F714.md) x3: `A627`, `A626`, `A624`
-              - <a name="h119"></a>[F571](DECODE-GateArray/DGA/circuit/doc/F571.md) `A620`
-                - [Multiplexer_2_w_enable](Shared/logisim/doc/Multiplexer_2_w_enable.md) `PLEXERS_1`
-              - [F103](DECODE-GateArray/DGA/circuit/doc/F103.md) `A628`
-            - [DECODE_DGA_IDBS](DECODE-GateArray/DGA/circuit/doc/DECODE_DGA_IDBS.md) `IDBS`
-              - <a name="h121"></a>[F924_EN](Shared/ndlib/doc/F924_EN.md) x4: `A282`, `A259`, `A248`, `A275`
-                - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x4: `gen_enable.MEMORY_1`, `gen_enable.MEMORY_2`, `gen_enable.MEMORY_3`, `gen_enable.MEMORY_4`
-              - [F091](DECODE-GateArray/DGA/circuit/doc/F091.md) `A277`
-            - [DECODE_DGA_COMM](DECODE-GateArray/DGA/circuit/doc/DECODE_DGA_COMM.md) `COMM`
-              - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x13: `A206`, `A237`, `A238`, `A235`, `A245`, `A243`, `A209`, `A244`, `A167`, `A195`, `A171`, `A172` and 1 more
-              - [NAND_GATE_8_INPUTS](Shared/logisim/doc/NAND_GATE_8_INPUTS.md) x12: `A212`, `A193`, `A211`, `A145`, `A216`, `A142`, `A143`, `A180`, `A186`, `A213`, `A215`, `A189`
-              - [NAND_GATE_4_INPUTS](Shared/logisim/doc/NAND_GATE_4_INPUTS.md) x4: `A156`, `A141`, `A218`, `A219`
-              - [NAND_GATE_6_INPUTS](Shared/logisim/doc/NAND_GATE_6_INPUTS.md) x10: `A149`, `A199`, `A191`, `A185`, `A183`, `A182`, `A184`, `A148`, `A144`, `A190`
-              - [NAND_GATE_5_INPUTS](Shared/logisim/doc/NAND_GATE_5_INPUTS.md) x11: `A150`, `A155`, `A152`, `A222`, `A147`, `A223`, `A198`, `A228`, `A229`, `A217`, `A153`
-              - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x9: `A158`, `A200`, `A233`, `A162`, `A239`, `A166`, `A177`, `A220`, `A192`
-              - [AND_GATE_3_INPUTS](Shared/logisim/doc/AND_GATE_3_INPUTS.md) `A242`
-              - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `A246`
-              - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) `A196`
-              - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x7: `MEMORY_63`, `A226`, `A232`, `A227`, `MEMORY_68`, `A204`, `MEMORY_66`
-              - [F924_EN](Shared/ndlib/doc/F924_EN.md) x6: `A181`, `A214`, `A140`, `A187`, `A160`, `A188` - same as [above](#h121)
-              - [F091](DECODE-GateArray/DGA/circuit/doc/F091.md) `A178`
-              - [F571](DECODE-GateArray/DGA/circuit/doc/F571.md) x4: `A221`, `A236`, `A208`, `A201` - same as [above](#h119)
-              - [F595](DECODE-GateArray/DGA/circuit/doc/F595.md) `A207`
-      - [MEM_43](CPU-BOARD-3202/circuit/doc/MEM_43.md) `MEM`
-        - <a name="h124"></a>[MEM_ADEC_45](CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md) `ADEC`
-          - [PAL_44904B](PAL/doc/PAL_44904B.md) `PAL_44904_UMSIZE`
-          - [PAL_44445B_D](CPU-BOARD-3202/circuit/doc/PAL_44445B_D.md) `PAL_UCADEC`
-          - [PAL_44446B_D](CPU-BOARD-3202/circuit/doc/PAL_44446B_D.md) `PAL_UBADEC`
-        - <a name="h125"></a>[MEM_LBDIF_48](CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md) `LBDIF`
-          - [AM29C821](Shared/support/doc/AM29C821.md) x2: `CHIP_13F`, `CHIP_14F`
-          - [PAL_44310D](PAL/doc/PAL_44310D.md) `PAL_44310_ULBDIF`
-        - <a name="h126"></a>[MEM_DATA_46](CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md) `DATA`
-          - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x2: `GATES_1`, `GATES_2`
-          - [PAL_45008B](PAL/doc/PAL_45008B.md) `PAL_45008_UDATA`
-          - [AM29833A](Shared/support/doc/AM29833A.md) x2: `CHIP_1H`, `CHIP_2H`
-        - <a name="h127"></a>[MEM_ERROR_47](CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md) `ERROR`
-          - [TTL_74374](Shared/support/doc/TTL_74374.md) x4: `CHIP_7C_PESL_HI`, `CHIP_3C_PESL_LO`, `CHIP_4C_PEAL_HI`, `CHIP_6D_PEAL_LO`
-          - [PAL_45009B](PAL/doc/PAL_45009B.md) `PAL_45009_UERROR`
-        - <a name="h128"></a>[MEM_RAMC_50](CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md) `RAMC`
-          - [PAL_44803A](PAL/doc/PAL_44803A.md) `PAL_44803_URAMA`
-          - [PAL_44902A](PAL/doc/PAL_44902A.md) `PAL_44902_URAMC`
-        - <a name="h129"></a>[MEM_ADDR_44](CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md) `ADDR`
-          - [AM29861A](Shared/support/doc/AM29861A.md) `CHIP_5H`
-          - [AM29C821](Shared/support/doc/AM29C821.md) x2: `CHIP_3H_ROW_ADDRESS`, `CHIP_4H_COL_ADDRESS`
-        - [MEM_RAM_49_SIM](CPU-BOARD-3202/circuit/doc/MEM_RAM_49_SIM.md) `RAM`
-      - <a name="h130"></a>[BIF_5](CPU-BOARD-3202/circuit/doc/BIF_5.md) `BIF`
-        - [BIF_DPATH_9](CPU-BOARD-3202/circuit/doc/BIF_DPATH_9.md) `DPATH`
-          - [BIF_DPATH_PPNLBD_14](CPU-BOARD-3202/circuit/doc/BIF_DPATH_PPNLBD_14.md) `PPNLBD`
-          - [BIF_DPATH_CDLBD_11](CPU-BOARD-3202/circuit/doc/BIF_DPATH_CDLBD_11.md) `CDLBD`
-            - [TTL_74646](Shared/support/doc/TTL_74646.md) x2: `CHIP_7B`, `CHIP_6B`
-          - [BIF_DPATH_BDLBD_10](CPU-BOARD-3202/circuit/doc/BIF_DPATH_BDLBD_10.md) `BDLBD`
-            - [TTL_74648](Shared/support/doc/TTL_74648.md) x3: `CHIP_4A`, `CHIP_5A`, `CHIP_6A`
-          - [BIF_DPATH_PESPEA_13](CPU-BOARD-3202/circuit/doc/BIF_DPATH_PESPEA_13.md) `PESPEA`
-            - [TTL_74534](Shared/support/doc/TTL_74534.md) x4: `CHIP_9A`, `CHIP_8A`, `CHIP_12A`, `CHIP_10A`
-          - [BIF_DPATH_LDBCTL_12](CPU-BOARD-3202/circuit/doc/BIF_DPATH_LDBCTL_12.md) `LDBCTL`
-            - [PAL_44303B](PAL/doc/PAL_44303B.md) `PAL_44303_ULBC2`
-            - [PAL_44302B](PAL/doc/PAL_44302B.md) `PAL_44302_ULBC1`
-            - [PAL_44304E](PAL/doc/PAL_44304E.md) `PAL_44304_ULBC3`
-        - [BIF_BCTL_6](CPU-BOARD-3202/circuit/doc/BIF_BCTL_6.md) `BCTL`
-          - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x2: `GATES_1`, `GATES_2`
-          - [PAL_44801A](PAL/doc/PAL_44801A.md) `PAL_44801_UBARB`
-          - [PAL_44401B](PAL/doc/PAL_44401B.md) `PAL_44401_UBTIM`
-          - [PAL_45001B](PAL/doc/PAL_45001B.md) `PAL_45001_UBPAR`
-          - [BIF_BCTL_BDRV_7](CPU-BOARD-3202/circuit/doc/BIF_BCTL_BDRV_7.md) `BDRV`
-            - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x2: `GATES_1`, `GATES_5`
-            - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x6: `GATES_2`, `GATES_3`, `GATES_4`, `GATES_7`, `GATES_8`, `GATES_9`
-            - [AND_GATE](Shared/logisim/doc/AND_GATE.md) `GATES_6`
-          - [BIF_BCTL_SYNC_8](CPU-BOARD-3202/circuit/doc/BIF_BCTL_SYNC_8.md) `SYNC`
-            - [AM29C821](Shared/support/doc/AM29C821.md) x2: `CHIP_3D`, `CHIP_4D`
-    - [ND_BUS_SLAVE](ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md) `gen_bus_slave.BUS_SLAVE`
-    - [ND_TAPE_400](ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md) `gen_tape.TAPE_400`
-    - [ND_FLOPPY_DMA](ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md) `gen_floppy.FLOPPY_1560`
-    - [ND_DMA_MASTER](ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md) x3: `gen_floppy.FLOPPY_DMA_MASTER`, `gen_smd.SMD_DMA_MASTER`, `gen_dma_master.DMA_MASTER`
-    - [ND_SMD](ND-BUS-DEVICES/SMD/circuit/doc/ND_SMD.md) `gen_smd.SMD_1540`
+<ul class="hier">
+<li><details open><summary><a href="doc/ND120_TOP.md">ND120_TOP</a></summary>
+<ul>
+  <li><details open><summary><a href="SD-FAT/circuit/doc/nd_storage_devices.md">nd_storage_devices</a> <code>TAPE_SDFAT_SOURCE</code></summary>
+  <ul>
+    <li><details><summary><a name="h3"></a><a href="SD-FAT/circuit/doc/nd_storage.md">nd_storage</a> <code>u_nd_storage</code></summary>
+    <ul>
+      <li><details><summary><a name="h4"></a><a href="SD-FAT/circuit/doc/sd_file_reader.md">sd_file_reader</a> <code>u_reader</code></summary>
+      <ul>
+        <li><a href="SD-FAT/circuit/doc/sd_card_ctrl.md">sd_card_ctrl</a> <code>u_ctrl</code></li>
+      </ul>
+      </details></li>
+      <li><a href="SD-FAT/circuit/doc/sd_writer.md">sd_writer</a> <code>u_writer</code></li>
+      <li><a href="SD-FAT/circuit/doc/nd_storage_mount.md">nd_storage_mount</a> <code>u_mount</code></li>
+      <li><a href="SD-FAT/circuit/doc/nd_storage_cache.md">nd_storage_cache</a> <code>u_cache</code></li>
+      <li><details><summary><a name="h5"></a><a href="SD-FAT/circuit/doc/nd_storage_engine.md">nd_storage_engine</a> <code>u_engine</code></summary>
+      <ul>
+        <li><a href="SD-FAT/circuit/doc/nds_sync_pulse.md">nds_sync_pulse</a> x42: <code>u_sync_rhave</code>, <code>u_sync_want</code>, <code>g_fe[0].u_sync_open</code>, <code>g_fe[0].u_sync_req</code>, <code>g_fe[0].u_sync_ack</code>, <code>g_fe[0].u_sync_whave</code>, <code>g_fe[0].u_sync_done</code>, <code>g_fe[1].u_sync_open</code>, <code>g_fe[1].u_sync_req</code>, <code>g_fe[1].u_sync_ack</code>, <code>g_fe[1].u_sync_whave</code>, <code>g_fe[1].u_sync_done</code> and 30 more</li>
+        <li><a href="SD-FAT/circuit/doc/nds_sync_level.md">nds_sync_level</a> x6: <code>u_sync_grant</code>, <code>u_sync_err</code>, <code>u_sync_errcode</code>, <code>u_sync_ok</code>, <code>u_sync_oerr</code>, <code>u_sync_nocard</code></li>
+      </ul>
+      </details></li>
+    </ul>
+    </details></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_tape_adapter.md">nd_storage_tape_adapter</a> <code>gen_tape.u_tape_adapter</code></li>
+  </ul>
+  </details></li>
+  <li>sd_card_model (simulation model in <code>SD-FAT/sim/</code>, read as a black box) <code>SD_CARD</code></li>
+  <li>nds_mem_model (simulation model in <code>SD-FAT/sim/</code>, read as a black box) <code>MEM_STOR</code></li>
+  <li><details open><summary><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <ul>
+    <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
+    <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
+    <ul>
+      <li><details><summary><a name="h8"></a><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code></summary>
+      <ul>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CYC_TERM_D.md">CYC_TERM_D</a> <code>U_TERM_D</code></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CYC_CC_D.md">CYC_CC_D</a> <code>U_CC_D</code></li>
+        <li><a href="PAL/doc/PAL_44307C.md">PAL_44307C</a> x2: <code>PAL_44307_UCYCLK_NEXT</code>, <code>PAL_44307_UCYCLK</code></li>
+        <li><a href="PAL/doc/PAL_44601B.md">PAL_44601B</a> <code>PAL_44601_UCYCFSM</code></li>
+        <li><a href="PAL/doc/PAL_44403C_EN.md">PAL_44403C_EN</a> <code>PAL_44403_UCYIN0</code></li>
+        <li><a href="PAL/doc/PAL_44404C_EN.md">PAL_44404C_EN</a> <code>PAL_44404_UCYIN1</code></li>
+      </ul>
+      </details></li>
+      <li><details><summary><a name="h9"></a><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code></summary>
+      <ul>
+        <li><details><summary><a name="h10"></a><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md">CPU_PROC_32</a> <code>PROC</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/AM29841.md">AM29841</a> <code>CHIP_25F</code></li>
+          <li><details><summary><a name="h11"></a><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_CMDDEC_34.md">CPU_PROC_CMDDEC_34</a> <code>CMDDEC</code></summary>
+          <ul>
+            <li><a href="PAL/doc/PAL_44407A_EN.md">PAL_44407A_EN</a> <code>PAL_44407_UERFIX</code></li>
+            <li><a href="PAL/doc/PAL_44408B_EN.md">PAL_44408B_EN</a> <code>PAL_44408B_VEXFIX</code></li>
+            <li><a href="PAL/doc/PAL_44511A_EN.md">PAL_44511A_EN</a> <code>PAL_44511_ULEV0</code></li>
+          </ul>
+          </details></li>
+          <li><a href="Shared/support/doc/TTL_74245.md">TTL_74245</a> x2: <code>CHIP_32F</code>, <code>CHIP_33F</code></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_CGA_33.md">CPU_PROC_CGA_33</a> <code>CGA</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/TTL_74374.md">TTL_74374</a> <code>CHIP_34G</code></li>
+            <li><details><summary><a href="DELILAH-CPU/CGA/circuit/doc/CGA.md">CGA</a> <code>DELILAH</code></summary>
+            <ul>
+              <li><a href="DELILAH-CPU/CGA/circuit/doc/BusDriver16.md">BusDriver16</a> <code>BD_FIDBO</code></li>
+              <li><details><summary><a name="h14"></a><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU.md">CGA_ALU</a> <code>ALU</code></summary>
+              <ul>
+                <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_1</code></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_RALU.md">CGA_CPU_ALU_RALU</a> <code>ALU_RALU</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x4: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_10</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x3: <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_9</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>GATES_6</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_8_INPUTS.md">NAND_GATE_8_INPUTS</a> <code>GATES_7</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>GATES_8</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_6_INPUTS.md">NAND_GATE_6_INPUTS</a> <code>GATES_11</code></li>
+                  <li><a href="Shared/logisim/doc/Adder.md">Adder</a> <code>ARITH_12</code></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_RALU_MUX216L.md">CGA_ALU_RALU_MUX216L</a> x3: <code>RN_R_MUX</code>, <code>SN_S_MUX</code>, <code>AF_LF_MUX</code></summary>
+                  <ul>
+                    <li><details><summary><a name="h17"></a><a href="Shared/ndlib/doc/MUX21LP.md">MUX21LP</a> x16: <code>MUXQ15</code>, <code>MUXQ14</code>, <code>MUXQ13</code>, <code>MUXQ12</code>, <code>MUXQ11</code>, <code>MUXQ10</code>, <code>MUXQ9</code>, <code>MUXQ8</code>, <code>MUXQ7</code>, <code>MUXQ6</code>, <code>MUXQ5</code>, <code>MUXQ4</code> and 4 more</summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/Multiplexer_2.md">Multiplexer_2</a> <code>PLEXERS_1</code></li>
+                    </ul>
+                    </details></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_RALU_LOGOP.md">CGA_ALU_RALU_LOGOP</a> <code>LOGOP</code></summary>
+                  <ul>
+                    <li><details><summary><a name="h19"></a><a href="Shared/ndlib/doc/MUX41P.md">MUX41P</a> x16: <code>MUXLF15</code>, <code>MUXLF14</code>, <code>MUXLF13</code>, <code>MUXLF12</code>, <code>MUXLF11</code>, <code>MUXLF10</code>, <code>MUXLF9</code>, <code>MUXLF8</code>, <code>MUXLF7</code>, <code>MUXLF6</code>, <code>MUXLF5</code>, <code>MUXLF4</code> and 4 more</summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/Multiplexer_4.md">Multiplexer_4</a> <code>PLEXER</code></li>
+                    </ul>
+                    </details></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_SHIFT.md">CGA_ALU_SHIFT</a> <code>ALU_SHIFT</code></summary>
+                <ul>
+                  <li><details><summary><a name="h21"></a><a href="Shared/ndlib/doc/MUX31LP.md">MUX31LP</a> x16: <code>RB0MUX</code>, <code>RB1MUX</code>, <code>RB2MUX</code>, <code>RB3MUX</code>, <code>RB4MUX</code>, <code>RB5MUX</code>, <code>RB6MUX</code>, <code>RB7MUX</code>, <code>RB8MUX</code>, <code>RB9MUX</code>, <code>RB10MUX</code>, <code>RB11MUX</code> and 4 more</summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/Multiplexer_4.md">Multiplexer_4</a> <code>PLEXERS_1</code></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_STS.md">CGA_ALU_STS</a> <code>ALU_STS</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+                  <li><a href="Shared/ndlib/doc/MUX41P.md">MUX41P</a> <code>STS7_MUX</code> - same as <a href="#h19">above</a></li>
+                  <li><a href="Shared/ndlib/doc/MUX31LP.md">MUX31LP</a> x3: <code>STS6_MUX</code>, <code>STS5_MUX</code>, <code>STS4_MUX</code> - same as <a href="#h21">above</a></li>
+                  <li><a href="Shared/ndlib/doc/R41P_EN.md">R41P_EN</a> <code>STS_REG_MID</code></li>
+                  <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> x12: <code>STS15_FF</code>, <code>STS14_FF</code>, <code>STS13_FF</code>, <code>STS12_FF</code>, <code>STS11_FF</code>, <code>STS10_FF</code>, <code>STS9_FF</code>, <code>STS8_FF</code>, <code>STS3_FF</code>, <code>STS2_FF</code>, <code>STS1_FF</code>, <code>STS0_FF</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_GPR.md">CGA_ALU_GPR</a> <code>ALU_GPR</code></summary>
+                <ul>
+                  <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_1</code></li>
+                  <li><a href="Shared/ndlib/doc/MUX41P.md">MUX41P</a> x16: <code>GPR15M</code>, <code>GPR14M</code>, <code>GPR13M</code>, <code>GPR12M</code>, <code>GPR11M</code>, <code>GPR10M</code>, <code>GPR9M</code>, <code>GPR8M</code>, <code>GPR7M</code>, <code>GPR6M</code>, <code>GPR5M</code>, <code>GPR4M</code> and 4 more - same as <a href="#h19">above</a></li>
+                  <li><a href="Shared/ndlib/doc/MUX21LP.md">MUX21LP</a> <code>GPR0M21</code> - same as <a href="#h17">above</a></li>
+                  <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> x15: <code>GPR15FF</code>, <code>GPR14FF</code>, <code>GPR13FF</code>, <code>GPR12FF</code>, <code>GPR11FF</code>, <code>GPR10FF</code>, <code>GPR9FF</code>, <code>GPR8FF</code>, <code>GPR7FF</code>, <code>GPR6FF</code>, <code>GPR5FF</code>, <code>GPR4FF</code> and 3 more</li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_DBR.md">CGA_ALU_DBR</a> <code>ALU_DBR</code></summary>
+                <ul>
+                  <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> x16: <code>DBRF15</code>, <code>DBRF14</code>, <code>DBRf13</code>, <code>DBRF12</code>, <code>DBRF11</code>, <code>DBRF10</code>, <code>DBRF9</code>, <code>DBRF8</code>, <code>DBRF7</code>, <code>DBRF6</code>, <code>DBRF5</code>, <code>DBRF4</code> and 4 more</li>
+                </ul>
+                </details></li>
+                <li><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_ARG.md">CGA_ALU_ARG</a> <code>ALU_ARG</code></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_SWAP.md">CGA_ALU_SWAP</a> <code>ALU_SWAP</code></summary>
+                <ul>
+                  <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> x2: <code>SWAP_LO_REG</code>, <code>SWAP_HI_REG</code></li>
+                </ul>
+                </details></li>
+                <li><a href="Shared/ndlib/doc/MUX21LP.md">MUX21LP</a> <code>AARG0_MUX</code> - same as <a href="#h17">above</a></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_OUTMUX.md">CGA_ALU_OUTMUX</a> <code>ALU_OUTMUX</code></summary>
+                <ul>
+                  <li><a href="Shared/ndlib/doc/MUX31LP.md">MUX31LP</a> x16: <code>GMUX15</code>, <code>GMUX14</code>, <code>GMUX13</code>, <code>GMUX12</code>, <code>GMUX11</code>, <code>GMUX10</code>, <code>GMUX9</code>, <code>GMUX8</code>, <code>GMUX7</code>, <code>GMUX6</code>, <code>GMUX5</code>, <code>GMUX4</code> and 4 more - same as <a href="#h21">above</a></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_OUTMUX_SEL8.md">CGA_ALU_OUTMUX_SEL8</a> x15: <code>DMUX15</code>, <code>DMUX14</code>, <code>DMUX13</code>, <code>DMUX12</code>, <code>DMUX11</code>, <code>DMUX10</code>, <code>DMUX9</code>, <code>DMUX8</code>, <code>DMUX6</code>, <code>DMUX5</code>, <code>DMUX4</code>, <code>DMUX3</code> and 3 more</summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x8: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code>, <code>GATES_8</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_8_INPUTS.md">NAND_GATE_8_INPUTS</a> <code>GATES_9</code></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_OUTMUX_SEL7.md">CGA_CPU_ALU_OUTMUX_SEL7</a> <code>DMUX7</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x7: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code></li>
+                    <li><a href="Shared/logisim/doc/OR_GATE_7_INPUTS.md">OR_GATE_7_INPUTS</a> <code>GATES_8</code></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_OUTMUX_IDBS.md">CGA_ALU_OUTMUX_IDBS</a> <code>OUTMUX_IDBS</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x4: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_4</code>, <code>GATES_5</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_8_INPUTS.md">NAND_GATE_8_INPUTS</a> <code>GATES_3</code></li>
+                    <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x2: <code>GATES_6</code>, <code>GATES_8</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_5_INPUTS.md">NAND_GATE_5_INPUTS</a> <code>GATES_7</code></li>
+                    <li><details><summary><a name="h30"></a><a href="Shared/ndlib/doc/ND38GLP.md">ND38GLP</a> x2: <code>IDBS_G1</code>, <code>IDBS_G2</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/Decoder_8.md">Decoder_8</a> <code>PLEXERS_1</code></li>
+                    </ul>
+                    </details></li>
+                    <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> x2: <code>IDBS_R1</code>, <code>IDBS_R2</code></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_QREG.md">CGA_ALU_QREG</a> <code>ALU_QREG</code></summary>
+                <ul>
+                  <li><a href="Shared/ndlib/doc/MUX41P.md">MUX41P</a> x16: <code>MUXQ15</code>, <code>MUXQ14</code>, <code>MUXQ13</code>, <code>MUXQ12</code>, <code>MUXQ11</code>, <code>MUXQ10</code>, <code>MUXQ9</code>, <code>MUXQ8</code>, <code>MUXQ7</code>, <code>MUXQ6</code>, <code>MUXQ5</code>, <code>MUXQ4</code> and 4 more - same as <a href="#h19">above</a></li>
+                  <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> x2: <code>REG_Q_HI</code>, <code>REG_Q_LO</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_RMUX.md">CGA_CPU_ALU_RMUX</a> <code>ALU_RMUX</code></summary>
+                <ul>
+                  <li><details><summary><a href="Shared/ndlib/doc/RMUX_Gates.md">RMUX_Gates</a> x16: <code>RN15</code>, <code>RN14</code>, <code>RN13</code>, <code>RN12</code>, <code>RN11</code>, <code>RN10</code>, <code>RN9</code>, <code>RN8</code>, <code>RN7</code>, <code>RN6</code>, <code>RN5</code>, <code>RN4</code> and 4 more</summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+                    <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> <code>GATES_3</code></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU_SMUX.md">CGA_ALU_SMUX</a> <code>ALU_SMUX</code></summary>
+                <ul>
+                  <li><a href="Shared/ndlib/doc/MUX41P.md">MUX41P</a> x16: <code>MUXS15</code>, <code>MUXS14</code>, <code>MUXS13</code>, <code>MUXS12</code>, <code>MUXS11</code>, <code>MUXS10</code>, <code>MUXS9</code>, <code>MUXS8</code>, <code>MUXS7</code>, <code>MUXS6</code>, <code>MUXS5</code>, <code>MUXS4</code> and 4 more - same as <a href="#h19">above</a></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_CPU_ALU_CONTR.md">CGA_CPU_ALU_CONTR</a> <code>ALU_CONTR</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x5: <code>GATES_1</code>, <code>GATES_50</code>, <code>GATES_52</code>, <code>GATES_53</code>, <code>GATES_56</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x5: <code>GATES_2</code>, <code>GATES_21</code>, <code>GATES_22</code>, <code>GATES_24</code>, <code>GATES_54</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x34: <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_9</code>, <code>GATES_13</code>, <code>GATES_14</code>, <code>GATES_15</code>, <code>GATES_16</code>, <code>GATES_17</code> and 22 more</li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x5: <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_19</code>, <code>GATES_25</code>, <code>GATES_38</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE_3_INPUTS.md">NOR_GATE_3_INPUTS</a> x2: <code>GATES_12</code>, <code>GATES_20</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>GATES_37</code></li>
+                  <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x2: <code>MEMORY_45</code>, <code>MEMORY_51</code></li>
+                  <li><a href="Shared/ndlib/doc/L8.md">L8</a> <code>SSEL_LATCH</code></li>
+                  <li><a href="Shared/ndlib/doc/MUX21LP.md">MUX21LP</a> x6: <code>CSMIS1_MUX</code>, <code>CSMIS0_MUX</code>, <code>CSALUI7_MUX</code>, <code>CSALUI8_MUX</code>, <code>ALUI3_MUX</code>, <code>ALUI1N_MUX</code> - same as <a href="#h17">above</a></li>
+                  <li><a href="Shared/ndlib/doc/R41P_EN.md">R41P_EN</a> x2: <code>REG_RFLA4</code>, <code>REG_BAAD</code></li>
+                  <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> <code>CONTR_REG</code></li>
+                  <li><a href="Shared/ndlib/doc/MUX41P.md">MUX41P</a> <code>CI_SEL_MUX</code> - same as <a href="#h19">above</a></li>
+                </ul>
+                </details></li>
+              </ul>
+              </details></li>
+              <li><details><summary><a name="h36"></a><a href="DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP.md">CGA_TRAP</a> <code>TRAP</code></summary>
+              <ul>
+                <li><details><summary><a href="DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_TVGEN.md">CGA_TRAP_TVGEN</a> <code>TVGEN</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/OR_GATE_8_INPUTS.md">OR_GATE_8_INPUTS</a> <code>GATES_1</code></li>
+                  <li><a href="Shared/logisim/doc/OR_GATE_5_INPUTS.md">OR_GATE_5_INPUTS</a> x2: <code>GATES_2</code>, <code>GATES_9</code></li>
+                  <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> x2: <code>GATES_3</code>, <code>GATES_10</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> x4: <code>WIPN</code>, <code>PGFN</code>, <code>RV2N</code>, <code>RV3N</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> <code>PGUN</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_5_INPUTS.md">NAND_GATE_5_INPUTS</a> x4: <code>RD1N</code>, <code>WPVN</code>, <code>FPVN</code>, <code>RPVN</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_6_INPUTS.md">NAND_GATE_6_INPUTS</a> x3: <code>RD2N</code>, <code>RD3N</code>, <code>IPVN</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>GATES_11</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>RV1N</code></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_TVGEN_P2.md">CGA_TRAP_TVGEN_P2</a> <code>TRAP_TVGEN</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x4: <code>GATES_1</code>, <code>GATES_5</code>, <code>GATES_9</code>, <code>GATES_10</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x2: <code>GATES_2</code>, <code>GATES_8</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_3</code>, <code>GATES_11</code></li>
+                    <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x2: <code>GATES_4</code>, <code>GATES_7</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_5_INPUTS.md">NAND_GATE_5_INPUTS</a> <code>GATES_6</code></li>
+                    <li><a href="Shared/logisim/doc/Multiplexer_4.md">Multiplexer_4</a> x3: <code>TVEC2_MUX</code>, <code>TVEC1_MUX</code>, <code>TVEC0_MUX</code></li>
+                    <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x7: <code>L1V0_FF</code>, <code>L2V2_FF</code>, <code>L3V1_FF</code>, <code>L2V1_FF</code>, <code>L1V1_FF</code>, <code>L3V0_FF</code>, <code>L2V0_FF</code></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_BRKDET.md">CGA_TRAP_BRKDET</a> <code>BRKDET</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x5: <code>IPV</code>, <code>WIP</code>, <code>RD2</code>, <code>RV3</code>, <code>GATES_16</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x5: <code>GATES_2</code>, <code>GATES_7</code>, <code>AN2_1</code>, <code>GATES_18</code>, <code>GATES_23</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> x3: <code>GATES_4</code>, <code>GATES_21</code>, <code>GATES_24</code></li>
+                  <li><a href="Shared/logisim/doc/OR_GATE_4_INPUTS.md">OR_GATE_4_INPUTS</a> x3: <code>GATES_5</code>, <code>GATES_10</code>, <code>GATES_20</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>PGF</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x3: <code>INTR</code>, <code>GATES_14</code>, <code>GATES_15</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE_3_INPUTS.md">NOR_GATE_3_INPUTS</a> <code>GATES_12</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> <code>GATES_13</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE_4_INPUTS.md">AND_GATE_4_INPUTS</a> x2: <code>GATES_19</code>, <code>GATES_22</code></li>
+                  <li><a href="Shared/ndlib/doc/A02.md">A02</a> x4: <code>A02_1</code>, <code>A02_2</code>, <code>A02_3</code>, <code>A02_4</code></li>
+                </ul>
+                </details></li>
+                <li><a href="DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP_TBUF.md">CGA_TRAP_TBUF</a> <code>TBUF</code></li>
+              </ul>
+              </details></li>
+              <li><details><summary><a name="h40"></a><a href="DELILAH-CPU/CGA_IDBCTL/circuit/doc/CGA_IDBCTL.md">CGA_IDBCTL</a> <code>IDBCTL</code></summary>
+              <ul>
+                <li><a href="DELILAH-CPU/CGA_IDBCTL/circuit/doc/CGA_IDBCTL_SEL6.md">CGA_IDBCTL_SEL6</a> x16: <code>IDB15</code>, <code>IDB14</code>, <code>IDB13</code>, <code>IDB12</code>, <code>IDB11</code>, <code>IDB10</code>, <code>IDB9</code>, <code>IDB8</code>, <code>IDB7</code>, <code>IDB6</code>, <code>IDB5</code>, <code>IDB4</code> and 4 more</li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_IDBCTL/circuit/doc/CGA_IDBCTL_PGSREG.md">CGA_IDBCTL_PGSREG</a> <code>PGSREG</code></summary>
+                <ul>
+                  <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> x14: <code>PGS15</code>, <code>PGS14</code>, <code>PGS11</code>, <code>PGS10</code>, <code>PGS9</code>, <code>PGS8</code>, <code>PGS7</code>, <code>PGS3</code>, <code>PGS2</code>, <code>PGS1</code>, <code>PGS0</code>, <code>PGS6</code> and 2 more</li>
+                </ul>
+                </details></li>
+              </ul>
+              </details></li>
+              <li><details><summary><a name="h42"></a><a href="DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF.md">CGA_WRF</a> <code>WRF</code></summary>
+              <ul>
+                <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x16: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_9</code>, <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_12</code> and 4 more</li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK.md">CGA_WRF_RBLOCK</a> <code>RBLOCK</code></summary>
+                <ul>
+                  <li><a href="DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK_DR16.md">CGA_WRF_RBLOCK_DR16</a> x13: <code>Z_REG_0</code>, <code>D_REG_1</code>, <code>L_REG_4</code>, <code>A_REG_5</code>, <code>T_REG_6</code>, <code>STS_REG_8</code>, <code>R1_REG_9</code>, <code>R2_REG_10</code>, <code>R3_REG_11</code>, <code>R4_REG_12</code>, <code>R5_REG_13</code>, <code>R6_REG_14</code> and 1 more</li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK_PREG.md">CGA_WRF_RBLOCK_PREG</a> <code>P_REG_2</code></summary>
+                  <ul>
+                    <li><a href="Shared/ndlib/doc/MUX31LP.md">MUX31LP</a> x16: <code>R0</code>, <code>R1</code>, <code>R2</code>, <code>R3</code>, <code>R4</code>, <code>R5</code>, <code>R6</code>, <code>R7</code>, <code>R8</code>, <code>R9</code>, <code>R10</code>, <code>R11</code> and 4 more - same as <a href="#h21">above</a></li>
+                    <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> x2: <code>R_P_0_7</code>, <code>R_P_8_15</code></li>
+                    <li><a href="Shared/ndlib/doc/L8.md">L8</a> x2: <code>L_PR_7_0</code>, <code>L_PR_8_15</code></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK_LR16.md">CGA_WRF_RBLOCK_LR16</a> x2: <code>B_REG_3</code>, <code>X_REG_7</code></summary>
+                  <ul>
+                    <li><details><summary><a href="Shared/ndlib/doc/MUX24P.md">MUX24P</a> x4: <code>MUX_15_12</code>, <code>MUX_11_8</code>, <code>MUX_7_4</code>, <code>MUX_3_0</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/Multiplexer_2.md">Multiplexer_2</a> x4: <code>PLEXER_1</code>, <code>PLEXER_2</code>, <code>PLEXER_3</code>, <code>PLEXER_4</code></li>
+                    </ul>
+                    </details></li>
+                    <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> x2: <code>R_15_8</code>, <code>R_7_0</code></li>
+                    <li><a href="Shared/ndlib/doc/L8.md">L8</a> x2: <code>L_15_8</code>, <code>L_7_0</code></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF_RBLOCK_SEL16.md">CGA_WRF_RBLOCK_SEL16</a> x16: <code>SEL_0</code>, <code>SEL_1</code>, <code>SEL_2</code>, <code>SEL_3</code>, <code>SEL_4</code>, <code>SEL_5</code>, <code>SEL_6</code>, <code>SEL_7</code>, <code>SEL_8</code>, <code>SEL_9</code>, <code>SEL_10</code>, <code>SEL_11</code> and 4 more</summary>
+                  <ul>
+                    <li><a href="Shared/ndlib/doc/A02.md">A02</a> x16: <code>A15_14</code>, <code>A13_12</code>, <code>A11_10</code>, <code>A9_8</code>, <code>A7_6</code>, <code>A5_4</code>, <code>A3_2</code>, <code>A1_0</code>, <code>B15_14</code>, <code>B13_12</code>, <code>B11_10</code>, <code>B9_8</code> and 4 more</li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_8_INPUTS.md">NAND_GATE_8_INPUTS</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><a href="Shared/ndlib/doc/ND38GLP.md">ND38GLP</a> x4: <code>LAA_LO</code>, <code>LAA_HI</code>, <code>LBA_LO</code>, <code>LBA_HI</code> - same as <a href="#h30">above</a></li>
+              </ul>
+              </details></li>
+              <li><details><summary><a name="h48"></a><a href="DELILAH-CPU/CGA_DCD/circuit/doc/CGA_DCD.md">CGA_DCD</a> <code>DCD</code></summary>
+              <ul>
+                <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x14: <code>GATES_60</code>, <code>GATES_40</code>, <code>GATES_41</code>, <code>GATES_42</code>, <code>GATES_43</code>, <code>GATES_48</code>, <code>GATES_49</code>, <code>GATES_50</code>, <code>GATES_52</code>, <code>GATES_25</code>, <code>GATES_28</code>, <code>GATES_31</code> and 2 more</li>
+                <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> <code>COMM_MIS_REG</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x2: <code>GATES_63</code>, <code>GATES_26</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE_8_INPUTS.md">NAND_GATE_8_INPUTS</a> x8: <code>GATES_72</code>, <code>GATES_80</code>, <code>GATES_7</code>, <code>GATES_11</code>, <code>GATES_12</code>, <code>GATES_58</code>, <code>GATES_64</code>, <code>GATES_76</code></li>
+                <li><a href="Shared/logisim/doc/OR_GATE_6_INPUTS.md">OR_GATE_6_INPUTS</a> x2: <code>GATES_4</code>, <code>GATES_70</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> x9: <code>GATES_16</code>, <code>GATES_39</code>, <code>GATES_9</code>, <code>GATES_29</code>, <code>GATES_32</code>, <code>GATES_38</code>, <code>GATES_71</code>, <code>GATES_73</code>, <code>GATES_74</code></li>
+                <li><details><summary><a href="Shared/ndlib/doc/ND38GHP.md">ND38GHP</a> x2: <code>C22</code>, <code>C24</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/Decoder_8.md">Decoder_8</a> <code>PLEXERS_1</code></li>
+                </ul>
+                </details></li>
+                <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x2: <code>GATES_20</code>, <code>GATES_10</code></li>
+                <li><a href="Shared/logisim/doc/OR_GATE_4_INPUTS.md">OR_GATE_4_INPUTS</a> x4: <code>GATES_44</code>, <code>GATES_53</code>, <code>GATES_34</code>, <code>GATES_54</code></li>
+                <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>GATES_24</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE_6_INPUTS.md">NAND_GATE_6_INPUTS</a> x19: <code>GATES_65</code>, <code>GATES_79</code>, <code>GATES_13</code>, <code>GATES_15</code>, <code>GATES_21</code>, <code>GATES_35</code>, <code>GATES_47</code>, <code>GATES_51</code>, <code>GATES_55</code>, <code>GATES_57</code>, <code>GATES_61</code>, <code>GATES_59</code> and 7 more</li>
+                <li><a href="Shared/logisim/doc/NAND_GATE_5_INPUTS.md">NAND_GATE_5_INPUTS</a> x8: <code>GATES_3</code>, <code>GATES_8</code>, <code>GATES_18</code>, <code>GATES_19</code>, <code>GATES_22</code>, <code>GATES_36</code>, <code>GATES_45</code>, <code>GATES_69</code></li>
+                <li><a href="Shared/logisim/doc/NOR_GATE_4_INPUTS.md">NOR_GATE_4_INPUTS</a> <code>GATES_6</code></li>
+                <li><a href="Shared/logisim/doc/OR_GATE_7_INPUTS.md">OR_GATE_7_INPUTS</a> <code>GATES_23</code></li>
+                <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x18: <code>MEMORY_88</code>, <code>MEMORY_90</code>, <code>MEMORY_91</code>, <code>MEMORY_92</code>, <code>MEMORY_93</code>, <code>MEMORY_94</code>, <code>MEMORY_95</code>, <code>MEMORY_96</code>, <code>MEMORY_98</code>, <code>MEMORY_97</code>, <code>MEMORY_85</code>, <code>MEMORY_86</code> and 6 more</li>
+                <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> x2: <code>GATES_37</code>, <code>GATES_77</code></li>
+                <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> <code>CFETCH_FF</code></li>
+                <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x4: <code>GATES_46</code>, <code>GATES_62</code>, <code>GATES_30</code>, <code>GATES_1</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE_7_INPUTS.md">NAND_GATE_7_INPUTS</a> x3: <code>GATES_67</code>, <code>GATES_68</code>, <code>GATES_78</code></li>
+              </ul>
+              </details></li>
+              <li><details><summary><a name="h50"></a><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR.md">CGA_INTR</a> <code>INTR</code></summary>
+              <ul>
+                <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> <code>GATES_1</code></li>
+                <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_2</code></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR.md">CGA_INTR_CNTLR</a> <code>CNTLR</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/Multiplexer_bus_2.md">Multiplexer_bus_2</a> <code>PLEXERS_1</code></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN.md">CGA_INTR_CNTLR_VECGEN</a> <code>VECGEN</code></summary>
+                  <ul>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_VHR.md">CGA_INTR_CNTLR_VECGEN_VHR</a> <code>VHR</code></summary>
+                    <ul>
+                      <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> x6: <code>HX1</code>, <code>HX2</code>, <code>LX1</code>, <code>HX0</code>, <code>LX2</code>, <code>LX0</code></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_ISMUX.md">CGA_INTR_CNTLR_VECGEN_ISMUX</a> <code>ISMUX</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x6: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code></li>
+                      <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x2: <code>GATES_7</code>, <code>GATES_8</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x12: <code>GATES_9</code>, <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_12</code>, <code>GATES_13</code>, <code>GATES_14</code>, <code>GATES_15</code>, <code>GATES_16</code>, <code>GATES_17</code>, <code>GATES_18</code>, <code>GATES_19</code>, <code>GATES_20</code></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_CMP.md">CGA_INTR_CNTLR_VECGEN_CMP</a> <code>CMP</code></summary>
+                    <ul>
+                      <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_CMP_MAGCMP.md">CGA_INTR_CNTLR_VECGEN_CMP_MAGCMP</a> x2: <code>HICMP</code>, <code>LOCMP</code></summary>
+                      <ul>
+                        <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>GATES_1</code></li>
+                        <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>GATES_2</code></li>
+                        <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x3: <code>GATES_3</code>, <code>GATES_5</code>, <code>GATES_6</code></li>
+                        <li><a href="Shared/logisim/doc/NOR_GATE_3_INPUTS.md">NOR_GATE_3_INPUTS</a> <code>GATES_4</code></li>
+                      </ul>
+                      </details></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_STAT.md">CGA_INTR_CNTLR_VECGEN_STAT</a> <code>STAT</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/XNOR_GATE_ONEHOT.md">XNOR_GATE_ONEHOT</a> x4: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_5</code>, <code>GATES_6</code></li>
+                      <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x2: <code>GATES_3</code>, <code>GATES_4</code></li>
+                      <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_STAT_SBIT.md">CGA_INTR_CNTLR_VECGEN_STAT_SBIT</a> x6: <code>SBIT1_LO</code>, <code>SBIT2_HI</code>, <code>SBIT0_LO</code>, <code>SBIT1_HI</code>, <code>SBIT0_HI</code>, <code>SBIT2_LO</code></summary>
+                      <ul>
+                        <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>GATES_1</code></li>
+                        <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x2: <code>GATES_2</code>, <code>GATES_3</code></li>
+                        <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> <code>GATES_4</code></li>
+                        <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_5</code></li>
+                      </ul>
+                      </details></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_OSMUX.md">CGA_INTR_CNTLR_VECGEN_OSMUX</a> <code>OSMUX</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x3: <code>GATES_1</code>, <code>GATES_4</code>, <code>GATES_9</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x6: <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_10</code>, <code>GATES_11</code></li>
+                      <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x2: <code>GATES_5</code>, <code>GATES_6</code></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_PTY.md">CGA_INTR_CNTLR_VECGEN_PTY</a> <code>PTY</code></summary>
+                    <ul>
+                      <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_VECGEN_PTY_PTYENC.md">CGA_INTR_CNTLR_VECGEN_PTY_PTYENC</a> x2: <code>PTYENC_HI</code>, <code>PTYENC_LO</code></summary>
+                      <ul>
+                        <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x2: <code>NR2</code>, <code>O1</code></li>
+                        <li><a href="Shared/logisim/doc/NOR_GATE_4_INPUTS.md">NOR_GATE_4_INPUTS</a> x2: <code>NRx</code>, <code>NR4</code></li>
+                        <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> <code>ND2</code></li>
+                        <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>ND3</code></li>
+                        <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>ND4</code></li>
+                        <li><a href="Shared/logisim/doc/OR_GATE_8_INPUTS.md">OR_GATE_8_INPUTS</a> <code>ND8P</code></li>
+                        <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> <code>OR2</code></li>
+                        <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> <code>NR3</code></li>
+                      </ul>
+                      </details></li>
+                    </ul>
+                    </details></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_CLR.md">CGA_INTR_CNTLR_CLR</a> <code>CLR_CLEAR_CONTROL</code></summary>
+                  <ul>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_CLR_CLRBIT.md">CGA_INTR_CNTLR_CLR_CLRBIT</a> x16: <code>CLRB3</code>, <code>CLRB2</code>, <code>CLRB1</code>, <code>CLRB0</code>, <code>CLRB7</code>, <code>CLRB6</code>, <code>CLRB5</code>, <code>CLRB4</code>, <code>CLRB11</code>, <code>CLRB10</code>, <code>CLRB9</code>, <code>CLRB8</code> and 4 more</summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>GATES_3</code></li>
+                      <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> <code>GATES_4</code></li>
+                    </ul>
+                    </details></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL.md">CGA_INTR_CNTLR_IRGEL</a> <code>IRGEL</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> <code>GATES_1</code></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_HIGEL.md">CGA_INTR_CNTLR_IRGEL_HIGEL</a> <code>HIGEL</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x4: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_6</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_4</code>, <code>GATES_5</code></li>
+                      <li><a href="Shared/logisim/doc/OR_GATE_6_INPUTS.md">OR_GATE_6_INPUTS</a> <code>GATES_7</code></li>
+                      <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_8</code></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_VMUX.md">CGA_INTR_CNTLR_IRGEL_VMUX</a> <code>VMUX</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x3: <code>GATES_1</code>, <code>GATES_4</code>, <code>GATES_7</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x6: <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_8</code>, <code>GATES_9</code></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_LOGEL.md">CGA_INTR_CNTLR_IRGEL_LOGEL</a> <code>LOGEL</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x2: <code>GATES_1</code>, <code>GATES_4</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_2</code>, <code>GATES_3</code></li>
+                      <li><a href="Shared/logisim/doc/OR_GATE_4_INPUTS.md">OR_GATE_4_INPUTS</a> <code>GATES_5</code></li>
+                      <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_6</code></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_HIRL.md">CGA_INTR_CNTLR_IRGEL_HIRL</a> <code>HIRL</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>GATES_1</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> <code>GATES_2</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>GATES_3</code></li>
+                      <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> <code>GATES_4</code></li>
+                      <li><a href="Shared/logisim/doc/NOR_GATE_3_INPUTS.md">NOR_GATE_3_INPUTS</a> <code>GATES_5</code></li>
+                      <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>GATES_6</code></li>
+                      <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> <code>GATES_7</code></li>
+                      <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> x2: <code>STATUS_OVERFLOW_FF</code>, <code>INT_REQ_ENABLE_FF</code></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRGEL_LORL.md">CGA_INTR_CNTLR_IRGEL_LORL</a> <code>LORL</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> <code>GATES_1</code></li>
+                      <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>GATES_2</code></li>
+                      <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>GATES_3</code></li>
+                      <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> <code>GATES_4</code></li>
+                      <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> <code>INT_REQ_ENABLE_FF</code></li>
+                    </ul>
+                    </details></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_MDCD.md">CGA_INTR_CNTLR_MDCD</a> <code>MDCD</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/OR_GATE_5_INPUTS.md">OR_GATE_5_INPUTS</a> <code>GATES_1</code></li>
+                    <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> x3: <code>GATES_2</code>, <code>GATES_35</code>, <code>GATES_39</code></li>
+                    <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x7: <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_19</code>, <code>GATES_20</code>, <code>GATES_21</code>, <code>GATES_22</code>, <code>GATES_23</code></li>
+                    <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x6: <code>GATES_5</code>, <code>GATES_11</code>, <code>GATES_24</code>, <code>GATES_30</code>, <code>GATES_31</code>, <code>GATES_40</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x14: <code>GATES_6</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_9</code>, <code>GATES_13</code>, <code>GATES_14</code>, <code>GATES_17</code>, <code>GATES_18</code>, <code>GATES_25</code>, <code>GATES_26</code>, <code>GATES_28</code>, <code>GATES_36</code> and 2 more</li>
+                    <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> x4: <code>GATES_10</code>, <code>GATES_12</code>, <code>GATES_29</code>, <code>GATES_32</code></li>
+                    <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x2: <code>GATES_15</code>, <code>GATES_16</code></li>
+                    <li><a href="Shared/logisim/doc/OR_GATE_4_INPUTS.md">OR_GATE_4_INPUTS</a> x2: <code>GATES_27</code>, <code>GATES_38</code></li>
+                    <li><a href="Shared/logisim/doc/NOR_GATE_3_INPUTS.md">NOR_GATE_3_INPUTS</a> x2: <code>GATES_33</code>, <code>GATES_34</code></li>
+                    <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x2: <code>MEMORY_42</code>, <code>MEMORY_43</code></li>
+                    <li><a href="Shared/ndlib/doc/ND38GLP.md">ND38GLP</a> x2: <code>GLP_LO</code>, <code>GLP_HI</code> - same as <a href="#h30">above</a></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ.md">CGA_INTR_CNTLR_IRQ</a> <code>IRQ</code></summary>
+                  <ul>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_REG.md">CGA_INTR_CNTLR_IRQ_REG</a> <code>IRQ_REG</code></summary>
+                    <ul>
+                      <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_REG_RQBIT_V2.md">CGA_INTR_CNTLR_IRQ_REG_RQBIT_V2</a> x16: <code>RQBIT_0</code>, <code>RQBIT_1</code>, <code>RQBIT_2</code>, <code>RQBIT_3</code>, <code>RQBIT_4</code>, <code>RQBIT_5</code>, <code>RQBIT_6</code>, <code>RQBIT_7</code>, <code>RQBIT_8</code>, <code>RQBIT_9</code>, <code>RQBIT_10</code>, <code>RQBIT_11</code> and 4 more</summary>
+                      <ul>
+                        <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_1</code></li>
+                      </ul>
+                      </details></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_MASK.md">CGA_INTR_CNTLR_IRQ_MASK</a> <code>IRQ_MASK</code></summary>
+                    <ul>
+                      <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_MASK_MASKBIT.md">CGA_INTR_CNTLR_IRQ_MASK_MASKBIT</a> x16: <code>MASKBIT15</code>, <code>MASKBIT14</code>, <code>MASKBIT13</code>, <code>MASKBIT12</code>, <code>MASKBIT11</code>, <code>MASKBIT10</code>, <code>MASKBIT9</code>, <code>MASKBIT8</code>, <code>MASKBIT7</code>, <code>MASKBIT6</code>, <code>MASKBIT5</code>, <code>MASKBIT4</code> and 4 more</summary>
+                      <ul>
+                        <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+                        <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>GATES_3</code></li>
+                        <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> <code>GATES_4</code></li>
+                        <li><a href="Shared/logisim/doc/XNOR_GATE_ONEHOT.md">XNOR_GATE_ONEHOT</a> <code>GATES_5</code></li>
+                        <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_6</code></li>
+                      </ul>
+                      </details></li>
+                    </ul>
+                    </details></li>
+                    <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_CNTLR_IRQ_MREQ.md">CGA_INTR_CNTLR_IRQ_MREQ</a> <code>IRQ_MREQ</code></summary>
+                    <ul>
+                      <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x16: <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_9</code>, <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_12</code>, <code>GATES_13</code>, <code>GATES_14</code>, <code>GATES_15</code> and 4 more</li>
+                    </ul>
+                    </details></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR_IRSRC.md">CGA_INTR_IRSRC</a> <code>IRSRC</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x16: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_9</code>, <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_12</code> and 4 more</li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x10: <code>GATES_17</code>, <code>GATES_18</code>, <code>GATES_19</code>, <code>GATES_20</code>, <code>GATES_21</code>, <code>GATES_22</code>, <code>GATES_23</code>, <code>GATES_24</code>, <code>GATES_25</code>, <code>GATES_26</code></li>
+                </ul>
+                </details></li>
+              </ul>
+              </details></li>
+              <li><details><summary><a name="h78"></a><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC.md">CGA_MAC</a> <code>MAC</code></summary>
+              <ul>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_AP09.md">CGA_MAC_AP09</a> <code>MAC_AP09</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x16: <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_9</code>, <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_12</code> and 4 more</li>
+                  <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> x16: <code>GATES_20</code>, <code>GATES_21</code>, <code>GATES_22</code>, <code>GATES_17</code>, <code>GATES_18</code>, <code>GATES_19</code>, <code>GATES_23</code>, <code>GATES_24</code>, <code>GATES_25</code>, <code>GATES_26</code>, <code>GATES_27</code>, <code>GATES_28</code> and 4 more</li>
+                  <li><a href="Shared/ndlib/doc/A02.md">A02</a> x32: <code>ICA0A</code>, <code>ICA0B</code>, <code>ICA1A</code>, <code>ICA1B</code>, <code>ICA2A</code>, <code>ICA2B</code>, <code>ICA3A</code>, <code>ICA3B</code>, <code>ICA4A</code>, <code>ICA4B</code>, <code>ICA5A</code>, <code>ICA5B</code> and 20 more</li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_APOS_CALCA.md">CGA_MAC_APOS_CALCA</a> <code>CALCA</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_5_INPUTS.md">NAND_GATE_5_INPUTS</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+                    <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> <code>GATES_3</code></li>
+                    <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> x2: <code>R_LO</code>, <code>R_HI</code></li>
+                    <li><a href="Shared/ndlib/doc/L8.md">L8</a> x2: <code>L_LO</code>, <code>L_HI</code></li>
+                  </ul>
+                  </details></li>
+                  <li><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_APOS_INC.md">CGA_MAC_APOS_INC</a> <code>AINC</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_SEGPT.md">CGA_MAC_SEGPT</a> <code>MAC_SEGPT</code></summary>
+                <ul>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_SEGPT_XPT.md">CGA_MAC_SEGPT_XPT</a> <code>XPT</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x3: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code></li>
+                    <li><a href="Shared/ndlib/doc/L4.md">L4</a> <code>XPT_L</code></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_SEGPT_SEG.md">CGA_MAC_SEGPT_SEG</a> <code>SEG</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_8_INPUTS.md">NAND_GATE_8_INPUTS</a> <code>GATES_1</code></li>
+                    <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>GATES_2</code></li>
+                    <li><a href="Shared/ndlib/doc/L8.md">L8</a> <code>SEG_L</code></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_SEGPT_PCR.md">CGA_MAC_SEGPT_PCR</a> <code>PCR</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>GATES_1</code></li>
+                    <li><a href="Shared/ndlib/doc/L8.md">L8</a> <code>PCR_HI</code></li>
+                    <li><a href="Shared/ndlib/doc/L4.md">L4</a> <code>PCR_LO</code></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_PTSEL.md">CGA_MAC_PTSEL</a> <code>MAC_PTSEL</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> <code>GATES_1</code></li>
+                  <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> <code>GATES_2</code></li>
+                  <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> <code>GATES_3</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> <code>GATES_4</code></li>
+                  <li><a href="Shared/ndlib/doc/J_K_FLIPFLOP_EN.md">J_K_FLIPFLOP_EN</a> <code>MEMORY_5</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_LASEL.md">CGA_MAC_LASEL</a> <code>MAC_LASEL</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x8: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_11</code>, <code>GATES_18</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE_4_INPUTS.md">AND_GATE_4_INPUTS</a> x3: <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_9</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> <code>GATES_10</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x4: <code>GATES_12</code>, <code>GATES_13</code>, <code>GATES_14</code>, <code>GATES_17</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> <code>GATES_15</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_5_INPUTS.md">NAND_GATE_5_INPUTS</a> x2: <code>GATES_16</code>, <code>GATES_22</code></li>
+                  <li><a href="Shared/logisim/doc/OR_GATE_3_INPUTS.md">OR_GATE_3_INPUTS</a> <code>GATES_19</code></li>
+                  <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x2: <code>GATES_20</code>, <code>GATES_21</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>GATES_23</code></li>
+                  <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_24</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_LA1025.md">CGA_MAC_LA1025</a> <code>MAC_LA1025</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x12: <code>ILA23_NAND</code>, <code>ILA22_NAND</code>, <code>ILA21_NAND</code>, <code>ILA20_NAND</code>, <code>ILA17D</code>, <code>ILA16D</code>, <code>ILA15B</code>, <code>ILA14B</code>, <code>ILA13B</code>, <code>ILA12B</code>, <code>GATES_3</code>, <code>ILA10B</code></li>
+                  <li><a href="Shared/ndlib/doc/A02.md">A02</a> x16: <code>ILA19A</code>, <code>ILA19B</code>, <code>ILA18A</code>, <code>ILA18B</code>, <code>ILA17A</code>, <code>ILA17B</code>, <code>ILA17C</code>, <code>ILA16A</code>, <code>ILA16B</code>, <code>ILA16C</code>, <code>ILA15A</code>, <code>ILA14A</code> and 4 more</li>
+                  <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x8: <code>ILA19_OR</code>, <code>ILA18_OR</code>, <code>ILA15_OR</code>, <code>ILA14_OR</code>, <code>ILA13_OR</code>, <code>ILA12_OR</code>, <code>ILA11_OR</code>, <code>ILA10_OR</code></li>
+                  <li><a href="Shared/logisim/doc/OR_GATE_4_INPUTS.md">OR_GATE_4_INPUTS</a> x2: <code>ILA17_OR</code>, <code>GATES_21</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_6_INPUTS.md">NAND_GATE_6_INPUTS</a> <code>GATES_23</code></li>
+                  <li><a href="Shared/ndlib/doc/R81_EN.md">R81_EN</a> x2: <code>R_LA_H</code>, <code>R_LA_L</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_DECODE.md">CGA_MAC_DECODE</a> <code>MAC_DECODE</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> x11: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_7</code>, <code>GATES_13</code>, <code>GATES_16</code>, <code>GATES_24</code>, <code>GATES_26</code>, <code>GATES_28</code>, <code>GATES_29</code>, <code>GATES_32</code>, <code>GATES_42</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x10: <code>GATES_3</code>, <code>GATES_9</code>, <code>GATES_20</code>, <code>GATES_22</code>, <code>GATES_37</code>, <code>GATES_44</code>, <code>GATES_45</code>, <code>GATES_46</code>, <code>GATES_49</code>, <code>GATES_50</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x18: <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_18</code>, <code>GATES_19</code>, <code>GATES_30</code>, <code>GATES_31</code>, <code>GATES_34</code>, <code>GATES_38</code>, <code>GATES_39</code>, <code>GATES_40</code>, <code>GATES_47</code> and 6 more</li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_6_INPUTS.md">NAND_GATE_6_INPUTS</a> x6: <code>GATES_8</code>, <code>GATES_10</code>, <code>GATES_21</code>, <code>GATES_33</code>, <code>GATES_36</code>, <code>GATES_43</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_5_INPUTS.md">NAND_GATE_5_INPUTS</a> x5: <code>GATES_11</code>, <code>GATES_12</code>, <code>GATES_15</code>, <code>GATES_17</code>, <code>GATES_23</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE_4_INPUTS.md">NOR_GATE_4_INPUTS</a> x2: <code>GATES_14</code>, <code>GATES_25</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_8_INPUTS.md">NAND_GATE_8_INPUTS</a> x5: <code>GATES_27</code>, <code>GATES_54</code>, <code>GATES_55</code>, <code>GATES_58</code>, <code>GATES_60</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x2: <code>GATES_35</code>, <code>GATES_41</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_7_INPUTS.md">NAND_GATE_7_INPUTS</a> <code>GATES_51</code></li>
+                  <li><a href="Shared/ndlib/doc/R41P_EN.md">R41P_EN</a> <code>DECODE_R41</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_ADD.md">CGA_MAC_ADD</a> <code>MAC_ADD</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x16: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_9</code>, <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_12</code> and 4 more</li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x17: <code>GATES_17</code>, <code>GATES_18</code>, <code>GATES_19</code>, <code>GATES_20</code>, <code>GATES_21</code>, <code>GATES_22</code>, <code>GATES_23</code>, <code>GATES_24</code>, <code>GATES_25</code>, <code>GATES_27</code>, <code>GATES_28</code>, <code>GATES_29</code> and 5 more</li>
+                  <li><a href="Shared/ndlib/doc/A02.md">A02</a> x32: <code>A02_31</code>, <code>A02_32</code>, <code>A02_29</code>, <code>A02_30</code>, <code>A02_27</code>, <code>A02_28</code>, <code>A02_25</code>, <code>A02_26</code>, <code>A02_23</code>, <code>A02_24</code>, <code>A02_21</code>, <code>A02_22</code> and 20 more</li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC_FASTADD.md">CGA_MAC_FASTADD</a> <code>FASTADD</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/Adder.md">Adder</a> x2: <code>ARITH_1</code>, <code>ARITH_2</code></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+              </ul>
+              </details></li>
+              <li><details><summary><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC.md">CGA_MIC</a> <code>MIC</code></summary>
+              <ul>
+                <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x2: <code>GATES_1</code>, <code>GATES_4</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x4: <code>GATES_2</code>, <code>GATES_5</code>, <code>GATES_7</code>, <code>GATES_18</code></li>
+                <li><a href="Shared/logisim/doc/NOR_GATE_3_INPUTS.md">NOR_GATE_3_INPUTS</a> x2: <code>GATES_3</code>, <code>GATES_26</code></li>
+                <li><a href="Shared/logisim/doc/AND_GATE_4_INPUTS.md">AND_GATE_4_INPUTS</a> <code>GATES_6</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x5: <code>GATES_8</code>, <code>GATES_17</code>, <code>GATES_28</code>, <code>GATES_29</code>, <code>GATES_31</code></li>
+                <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x10: <code>GATES_9</code>, <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_12</code>, <code>GATES_13</code>, <code>GATES_14</code>, <code>GATES_15</code>, <code>GATES_16</code>, <code>GATES_25</code>, <code>GATES_30</code></li>
+                <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x7: <code>GATES_19</code>, <code>GATES_20</code>, <code>GATES_21</code>, <code>GATES_22</code>, <code>GATES_23</code>, <code>GATES_24</code>, <code>GATES_27</code></li>
+                <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x8: <code>MEMORY_33</code>, <code>MEMORY_34</code>, <code>MEMORY_35</code>, <code>MEMORY_36</code>, <code>MEMORY_37</code>, <code>MEMORY_38</code>, <code>MEMORY_39</code>, <code>MEMORY_32</code></li>
+                <li><details><summary><a name="h92"></a><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_INCOUNT.md">CGA_MIC_INCOUNT</a> <code>MIC_INCOUNT</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/XOR_GATE_ONEHOT.md">XOR_GATE_ONEHOT</a> <code>GATES_1</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> <code>GATES_2</code></li>
+                  <li><a href="Shared/logisim/doc/XNOR_GATE_ONEHOT.md">XNOR_GATE_ONEHOT</a> <code>GATES_3</code></li>
+                  <li><a href="Shared/logisim/doc/Multiplexer_2.md">Multiplexer_2</a> x2: <code>PLEXERS_4</code>, <code>PLEXERS_5</code></li>
+                  <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x2: <code>MEMORY_6</code>, <code>MEMORY_7</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a name="h93"></a><a href="Shared/ndlib/doc/M169C_EN.md">M169C_EN</a> x2: <code>LC_HI</code>, <code>LC_LO</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x17: <code>gen_enable.AND_QA_NL</code>, <code>gen_enable.AND_QB_NL</code>, <code>gen_enable.AND_QC_NL</code>, <code>gen_enable.AND_QD_NL</code>, <code>gen_enable.GATES_3</code>, <code>gen_enable.GATES_13</code>, <code>gen_enable.GATES_15</code>, <code>gen_enable.GATES_17</code>, <code>gen_enable.GATES_19</code>, <code>gen_enable.AND_QAN_UP</code>, <code>gen_enable.AND_QA_UPN</code>, <code>gen_enable.GATES_22</code> and 5 more</li>
+                  <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> x2: <code>gen_enable.GATES_5</code>, <code>gen_enable.GATES_35</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE_4_INPUTS.md">AND_GATE_4_INPUTS</a> <code>gen_enable.GATES_7</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x9: <code>gen_enable.GATES_8</code>, <code>gen_enable.GATES_9</code>, <code>gen_enable.GATES_10</code>, <code>gen_enable.GATES_11</code>, <code>gen_enable.GATES_28</code>, <code>gen_enable.GATES_29</code>, <code>gen_enable.GATES_30</code>, <code>gen_enable.GATES_31</code>, <code>gen_enable.GATES_34</code></li>
+                  <li><a href="Shared/logisim/doc/XOR_GATE_ONEHOT.md">XOR_GATE_ONEHOT</a> x4: <code>gen_enable.GATES_12</code>, <code>gen_enable.GATES_14</code>, <code>gen_enable.GATES_16</code>, <code>gen_enable.GATES_18</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE_6_INPUTS.md">AND_GATE_6_INPUTS</a> x2: <code>gen_enable.GATES_32</code>, <code>gen_enable.GATES_33</code></li>
+                  <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x4: <code>gen_enable.MEMORY_36</code>, <code>gen_enable.MEMORY_37</code>, <code>gen_enable.MEMORY_38</code>, <code>gen_enable.MEMORY_39</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a name="h94"></a><a href="Shared/ndlib/doc/MUX21L.md">MUX21L</a> x2: <code>M_RF1</code>, <code>M_RF0</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/Multiplexer_2.md">Multiplexer_2</a> <code>PLEXERS_1</code></li>
+                </ul>
+                </details></li>
+                <li><details><summary><a name="h95"></a><a href="Shared/ndlib/doc/MUX34P.md">MUX34P</a> <code>ILC_MUX</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/Multiplexer_4.md">Multiplexer_4</a> x4: <code>PLEXERS_1</code>, <code>PLEXERS_2</code>, <code>PLEXERS_3</code>, <code>PLEXERS_4</code></li>
+                </ul>
+                </details></li>
+                <li><a href="Shared/ndlib/doc/L8.md">L8</a> <code>IRLATCH</code></li>
+                <li><details><summary><a name="h96"></a><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CONDREG.md">CGA_MIC_CONDREG</a> <code>CONDREG</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x5: <code>GATES_1</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_7</code>, <code>GATES_8</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x2: <code>GATES_2</code>, <code>GATES_6</code></li>
+                  <li><a href="Shared/logisim/doc/XNOR_GATE_ONEHOT.md">XNOR_GATE_ONEHOT</a> <code>GATES_3</code></li>
+                  <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> x12: <code>CSBIT11</code>, <code>CSBIT10</code>, <code>CSBIT9</code>, <code>CSBIT8</code>, <code>CSBIT7</code>, <code>CSBIT6</code>, <code>CSBIT5</code>, <code>CSBIT4</code>, <code>CSBIT3</code>, <code>CSBIT2</code>, <code>CSBIT1</code>, <code>CSBIT0</code></li>
+                </ul>
+                </details></li>
+                <li><a href="Shared/ndlib/doc/MUX41P.md">MUX41P</a> x8: <code>M_LAA_3</code>, <code>M_LAA_2</code>, <code>M_LAA_1</code>, <code>M_LAA_0</code>, <code>M_LBA_3</code>, <code>M_LBA_2</code>, <code>M_LBA_1</code>, <code>M_LBA_0</code> - same as <a href="#h19">above</a></li>
+                <li><a href="Shared/ndlib/doc/R41P_EN.md">R41P_EN</a> x2: <code>LAA_REG</code>, <code>LBA_REG</code></li>
+                <li><details><summary><a name="h97"></a><a href="Shared/ndlib/doc/CMP4.md">CMP4</a> <code>LC_CMP</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/Comparator.md">Comparator</a> <code>ARITH_1</code></li>
+                </ul>
+                </details></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IINC.md">CGA_MIC_IINC</a> <code>MIC_IINC</code></li>
+                <li><details><summary><a name="h98"></a><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK.md">CGA_MIC_STACK</a> <code>MIC_STACK</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> <code>GATES_3</code></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK_BIT.md">CGA_MIC_STACK_BIT</a> x12: <code>Bit11</code>, <code>Bit10</code>, <code>Bit9</code>, <code>Bit8</code>, <code>Bit7</code>, <code>Bit6</code>, <code>Bit5</code>, <code>Bit4</code>, <code>Bit3</code>, <code>Bit2</code>, <code>Bit1</code>, <code>Bit0</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x4: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_9</code>, <code>GATES_10</code></li>
+                    <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x5: <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>GATES_8</code></li>
+                    <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_11</code></li>
+                    <li><a href="Shared/ndlib/doc/SR44_EN.md">SR44_EN</a> <code>SR44_1</code></li>
+                  </ul>
+                  </details></li>
+                  <li><details><summary><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK_BIT12.md">CGA_MIC_STACK_BIT12</a> <code>Bit12</code></summary>
+                  <ul>
+                    <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x4: <code>GATES_1</code>, <code>GATES_2</code>, <code>GATES_9</code>, <code>GATES_10</code></li>
+                    <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x5: <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_5</code>, <code>GATES_6</code>, <code>GATES_7</code></li>
+                    <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>GATES_8</code></li>
+                    <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> <code>MEMORY_11</code></li>
+                    <li><a href="Shared/ndlib/doc/SR44_EN.md">SR44_EN</a> <code>SR44_2</code></li>
+                  </ul>
+                  </details></li>
+                </ul>
+                </details></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_MASEL.md">CGA_MIC_MASEL</a> <code>MIC_MASEL</code></li>
+                <li><a href="Shared/ndlib/doc/SCAN_WITH_SET_N_EN.md">SCAN_WITH_SET_N_EN</a> x2: <code>OOD_FF</code>, <code>DZD_FF</code></li>
+                <li><details><summary><a name="h101"></a><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_WCAREG.md">CGA_MIC_WCAREG</a> <code>MIC_WCAREG</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> <code>GATES_1</code></li>
+                  <li><a href="Shared/ndlib/doc/SCAN_FF_EN.md">SCAN_FF_EN</a> x14: <code>WCAFF12</code>, <code>WCAFF11</code>, <code>WCAFF10</code>, <code>WCAFF9</code>, <code>WCAFF8</code>, <code>WCAFF7</code>, <code>WCAFF6</code>, <code>WCAFF5</code>, <code>WCAFF4</code>, <code>WCAFF3</code>, <code>WCAFF2</code>, <code>WCAFF1</code> and 2 more</li>
+                </ul>
+                </details></li>
+                <li><details><summary><a name="h102"></a><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IPOS.md">CGA_MIC_IPOS</a> <code>MIC_IPOS</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_1</code>, <code>GATES_5</code></li>
+                  <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x2: <code>GATES_2</code>, <code>GATES_3</code></li>
+                  <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> <code>GATES_4</code></li>
+                  <li><a href="Shared/logisim/doc/Multiplexer_4.md">Multiplexer_4</a> x13: <code>PLEXERS_17</code>, <code>PLEXERS_18</code>, <code>PLEXERS_6</code>, <code>PLEXERS_7</code>, <code>PLEXERS_8</code>, <code>PLEXERS_9</code>, <code>PLEXERS_10</code>, <code>PLEXERS_11</code>, <code>PLEXERS_12</code>, <code>PLEXERS_13</code>, <code>PLEXERS_14</code>, <code>PLEXERS_15</code> and 1 more</li>
+                </ul>
+                </details></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CSEL.md">CGA_MIC_CSEL</a> <code>CSEL</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/Multiplexer_8.md">Multiplexer_8</a> x2: <code>PLEXERS_1</code>, <code>PLEXERS_2</code></li>
+                  <li><a href="Shared/logisim/doc/Multiplexer_2.md">Multiplexer_2</a> <code>PLEXERS_3</code></li>
+                  <li><a href="Shared/ndlib/doc/LATCH.md">LATCH</a> <code>CSEL_LATCH</code></li>
+                </ul>
+                </details></li>
+              </ul>
+              </details></li>
+              <li><details><summary><a name="h104"></a><a href="DELILAH-CPU/CGA_TESTMUX/circuit/doc/CGA_TESTMUX.md">CGA_TESTMUX</a> <code>TESTMUX</code></summary>
+              <ul>
+                <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> <code>GATES_1</code></li>
+                <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x3: <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code></li>
+                <li><details><summary><a href="Shared/ndlib/doc/MUX81.md">MUX81</a> x5: <code>TM2</code>, <code>TM3</code>, <code>TM4</code>, <code>TM0</code>, <code>TM1</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/Multiplexer_8.md">Multiplexer_8</a> <code>PLEXERS_1</code></li>
+                </ul>
+                </details></li>
+              </ul>
+              </details></li>
+            </ul>
+            </details></li>
+          </ul>
+          </details></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a name="h106"></a><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_16.md">CPU_CS_16</a> <code>CS</code></summary>
+        <ul>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_PROM_19.md">CPU_CS_PROM_19</a> <code>PROM</code></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_WCS_21_22.md">CPU_CS_WCS_21_22</a> <code>WCS</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/IDT6168A_20.md">IDT6168A_20</a> x32: <code>CHIP_16C</code>, <code>CHIP_17C</code>, <code>CHIP_18C</code>, <code>CHIP_19C</code>, <code>CHIP_20C</code>, <code>CHIP_21C</code>, <code>CHIP_22C</code>, <code>CHIP_23C</code>, <code>CHIP_24C</code>, <code>CHIP_25C</code>, <code>CHIP_26C</code>, <code>CHIP_27C</code> and 20 more</li>
+          </ul>
+          </details></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_TCV_20.md">CPU_CS_TCV_20</a> <code>TCV</code></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_CTL_18.md">CPU_CS_CTL_18</a> <code>CTL</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/TTL_74139.md">TTL_74139</a> <code>CHIP_30B</code></li>
+            <li><a href="PAL/doc/PAL_44305D.md">PAL_44305D</a> <code>PAL_44305_UCSCTL</code></li>
+          </ul>
+          </details></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_ACAL_17.md">CPU_CS_ACAL_17</a> <code>ACAL</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md">CPU_MMU_24</a> <code>MMU</code></summary>
+        <ul>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_HIT_27.md">CPU_MMU_HIT_27</a> <code>MMU_HIT</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_PPNX_28.md">CPU_MMU_PPNX_28</a> <code>PPNX</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_PTIDB_30.md">CPU_MMU_PTIDB_30</a> <code>PTIDB</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_CSR_26.md">CPU_MMU_CSR_26</a> <code>CSR</code></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_CACHE_25.md">CPU_MMU_CACHE_25</a> <code>CACHE</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/TMM2018D_25.md">TMM2018D_25</a> x4: <code>CHIP_23F</code>, <code>CHIP_24F</code>, <code>CHIP_16F</code>, <code>CHIP_20F</code></li>
+            <li><a href="PAL/doc/PAL_44402D_EN.md">PAL_44402D_EN</a> <code>PAL_44402_UBITS</code></li>
+            <li><a href="Shared/support/doc/Am9150.md">Am9150</a> <code>CHIP_21F</code></li>
+          </ul>
+          </details></li>
+          <li><a href="PAL/doc/PAL_44306A.md">PAL_44306A</a> <code>PAL_44306_UNOCTL</code></li>
+          <li><details><summary><a name="h111"></a><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_PT_29.md">CPU_MMU_PT_29</a> <code>PT</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/TMM2018D_25.md">TMM2018D_25</a> x4: <code>CHIP_24G</code>, <code>CHIP_25G</code>, <code>CHIP_22G</code>, <code>CHIP_23G</code></li>
+            <li><a href="Shared/support/doc/IMS1403_25.md">IMS1403_25</a> <code>CHIP_20G</code></li>
+          </ul>
+          </details></li>
+        </ul>
+        </details></li>
+      </ul>
+      </details></li>
+      <li><details><summary><a name="h112"></a><a href="CPU-BOARD-3202/circuit/doc/IO_37.md">IO_37</a> <code>IO</code></summary>
+      <ul>
+        <li><details><summary><a name="h113"></a><a href="CPU-BOARD-3202/circuit/doc/IO_REG_41.md">IO_REG_41</a> <code>REG_MODULE</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/TTL_74273.md">TTL_74273</a> <code>CHIP_28A_IOC</code></li>
+          <li><a href="Shared/support/doc/TTL_74244.md">TTL_74244</a> x2: <code>CHIP_27A_STRAP</code>, <code>CHIP_25A_ALD</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/IO_PANCAL_40.md">IO_PANCAL_40</a> <code>PANCAL</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/TTL_74374.md">TTL_74374</a> <code>CHIP_32B</code></li>
+          <li><a href="Shared/support/doc/TTL_74244.md">TTL_74244</a> <code>CHIP_33B</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a name="h115"></a><a href="CPU-BOARD-3202/circuit/doc/IO_UART_42.md">IO_UART_42</a> <code>UART</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/AM29C821.md">AM29C821</a> <code>CHIP_33G</code></li>
+          <li><a href="Shared/support/doc/SC2661_UART.md">SC2661_UART</a> <code>CHIP_32H</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a name="h116"></a><a href="CPU-BOARD-3202/circuit/doc/IO_DCD_38.md">IO_DCD_38</a> <code>DCD</code></summary>
+        <ul>
+          <li><details><summary><a href="DECODE-GateArray/DGA/circuit/doc/DECODE_DGA.md">DECODE_DGA</a> <code>DGA</code></summary>
+          <ul>
+            <li><a href="DECODE-GateArray/DGA/circuit/doc/F091.md">F091</a> <code>A090</code></li>
+            <li><a href="Shared/support/doc/FIFO_8BIT.md">FIFO_8BIT</a> <code>fifo_inst</code></li>
+            <li><details><summary><a href="DECODE-GateArray/DGA/circuit/doc/DECODE_DGA_POW.md">DECODE_DGA_POW</a> <code>POW</code></summary>
+            <ul>
+              <li><a href="Shared/logisim/doc/J_K_FLIPFLOP.md">J_K_FLIPFLOP</a> x3: <code>A616</code>, <code>A618</code>, <code>A617</code></li>
+              <li><a href="DECODE-GateArray/DGA/circuit/doc/F091.md">F091</a> <code>A613B</code></li>
+              <li><a href="DECODE-GateArray/DGA/circuit/doc/F595.md">F595</a> x5: <code>A570</code>, <code>A571</code>, <code>A576</code>, <code>A574</code>, <code>A575</code></li>
+              <li><a href="DECODE-GateArray/DGA/circuit/doc/F714.md">F714</a> x3: <code>A627</code>, <code>A626</code>, <code>A624</code></li>
+              <li><details><summary><a name="h119"></a><a href="DECODE-GateArray/DGA/circuit/doc/F571.md">F571</a> <code>A620</code></summary>
+              <ul>
+                <li><a href="Shared/logisim/doc/Multiplexer_2_w_enable.md">Multiplexer_2_w_enable</a> <code>PLEXERS_1</code></li>
+              </ul>
+              </details></li>
+              <li><a href="DECODE-GateArray/DGA/circuit/doc/F103.md">F103</a> <code>A628</code></li>
+            </ul>
+            </details></li>
+            <li><details><summary><a href="DECODE-GateArray/DGA/circuit/doc/DECODE_DGA_IDBS.md">DECODE_DGA_IDBS</a> <code>IDBS</code></summary>
+            <ul>
+              <li><details><summary><a name="h121"></a><a href="Shared/ndlib/doc/F924_EN.md">F924_EN</a> x4: <code>A282</code>, <code>A259</code>, <code>A248</code>, <code>A275</code></summary>
+              <ul>
+                <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x4: <code>gen_enable.MEMORY_1</code>, <code>gen_enable.MEMORY_2</code>, <code>gen_enable.MEMORY_3</code>, <code>gen_enable.MEMORY_4</code></li>
+              </ul>
+              </details></li>
+              <li><a href="DECODE-GateArray/DGA/circuit/doc/F091.md">F091</a> <code>A277</code></li>
+            </ul>
+            </details></li>
+            <li><details><summary><a href="DECODE-GateArray/DGA/circuit/doc/DECODE_DGA_COMM.md">DECODE_DGA_COMM</a> <code>COMM</code></summary>
+            <ul>
+              <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x13: <code>A206</code>, <code>A237</code>, <code>A238</code>, <code>A235</code>, <code>A245</code>, <code>A243</code>, <code>A209</code>, <code>A244</code>, <code>A167</code>, <code>A195</code>, <code>A171</code>, <code>A172</code> and 1 more</li>
+              <li><a href="Shared/logisim/doc/NAND_GATE_8_INPUTS.md">NAND_GATE_8_INPUTS</a> x12: <code>A212</code>, <code>A193</code>, <code>A211</code>, <code>A145</code>, <code>A216</code>, <code>A142</code>, <code>A143</code>, <code>A180</code>, <code>A186</code>, <code>A213</code>, <code>A215</code>, <code>A189</code></li>
+              <li><a href="Shared/logisim/doc/NAND_GATE_4_INPUTS.md">NAND_GATE_4_INPUTS</a> x4: <code>A156</code>, <code>A141</code>, <code>A218</code>, <code>A219</code></li>
+              <li><a href="Shared/logisim/doc/NAND_GATE_6_INPUTS.md">NAND_GATE_6_INPUTS</a> x10: <code>A149</code>, <code>A199</code>, <code>A191</code>, <code>A185</code>, <code>A183</code>, <code>A182</code>, <code>A184</code>, <code>A148</code>, <code>A144</code>, <code>A190</code></li>
+              <li><a href="Shared/logisim/doc/NAND_GATE_5_INPUTS.md">NAND_GATE_5_INPUTS</a> x11: <code>A150</code>, <code>A155</code>, <code>A152</code>, <code>A222</code>, <code>A147</code>, <code>A223</code>, <code>A198</code>, <code>A228</code>, <code>A229</code>, <code>A217</code>, <code>A153</code></li>
+              <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x9: <code>A158</code>, <code>A200</code>, <code>A233</code>, <code>A162</code>, <code>A239</code>, <code>A166</code>, <code>A177</code>, <code>A220</code>, <code>A192</code></li>
+              <li><a href="Shared/logisim/doc/AND_GATE_3_INPUTS.md">AND_GATE_3_INPUTS</a> <code>A242</code></li>
+              <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>A246</code></li>
+              <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> <code>A196</code></li>
+              <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x7: <code>MEMORY_63</code>, <code>A226</code>, <code>A232</code>, <code>A227</code>, <code>MEMORY_68</code>, <code>A204</code>, <code>MEMORY_66</code></li>
+              <li><a href="Shared/ndlib/doc/F924_EN.md">F924_EN</a> x6: <code>A181</code>, <code>A214</code>, <code>A140</code>, <code>A187</code>, <code>A160</code>, <code>A188</code> - same as <a href="#h121">above</a></li>
+              <li><a href="DECODE-GateArray/DGA/circuit/doc/F091.md">F091</a> <code>A178</code></li>
+              <li><a href="DECODE-GateArray/DGA/circuit/doc/F571.md">F571</a> x4: <code>A221</code>, <code>A236</code>, <code>A208</code>, <code>A201</code> - same as <a href="#h119">above</a></li>
+              <li><a href="DECODE-GateArray/DGA/circuit/doc/F595.md">F595</a> <code>A207</code></li>
+            </ul>
+            </details></li>
+          </ul>
+          </details></li>
+        </ul>
+        </details></li>
+      </ul>
+      </details></li>
+      <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code></summary>
+      <ul>
+        <li><details><summary><a name="h124"></a><a href="CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md">MEM_ADEC_45</a> <code>ADEC</code></summary>
+        <ul>
+          <li><a href="PAL/doc/PAL_44904B.md">PAL_44904B</a> <code>PAL_44904_UMSIZE</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/PAL_44445B_D.md">PAL_44445B_D</a> <code>PAL_UCADEC</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/PAL_44446B_D.md">PAL_44446B_D</a> <code>PAL_UBADEC</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a name="h125"></a><a href="CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md">MEM_LBDIF_48</a> <code>LBDIF</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/AM29C821.md">AM29C821</a> x2: <code>CHIP_13F</code>, <code>CHIP_14F</code></li>
+          <li><a href="PAL/doc/PAL_44310D.md">PAL_44310D</a> <code>PAL_44310_ULBDIF</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a name="h126"></a><a href="CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md">MEM_DATA_46</a> <code>DATA</code></summary>
+        <ul>
+          <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+          <li><a href="PAL/doc/PAL_45008B.md">PAL_45008B</a> <code>PAL_45008_UDATA</code></li>
+          <li><a href="Shared/support/doc/AM29833A.md">AM29833A</a> x2: <code>CHIP_1H</code>, <code>CHIP_2H</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a name="h127"></a><a href="CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md">MEM_ERROR_47</a> <code>ERROR</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/TTL_74374.md">TTL_74374</a> x4: <code>CHIP_7C_PESL_HI</code>, <code>CHIP_3C_PESL_LO</code>, <code>CHIP_4C_PEAL_HI</code>, <code>CHIP_6D_PEAL_LO</code></li>
+          <li><a href="PAL/doc/PAL_45009B.md">PAL_45009B</a> <code>PAL_45009_UERROR</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a name="h128"></a><a href="CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md">MEM_RAMC_50</a> <code>RAMC</code></summary>
+        <ul>
+          <li><a href="PAL/doc/PAL_44803A.md">PAL_44803A</a> <code>PAL_44803_URAMA</code></li>
+          <li><a href="PAL/doc/PAL_44902A.md">PAL_44902A</a> <code>PAL_44902_URAMC</code></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a name="h129"></a><a href="CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md">MEM_ADDR_44</a> <code>ADDR</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/AM29861A.md">AM29861A</a> <code>CHIP_5H</code></li>
+          <li><a href="Shared/support/doc/AM29C821.md">AM29C821</a> x2: <code>CHIP_3H_ROW_ADDRESS</code>, <code>CHIP_4H_COL_ADDRESS</code></li>
+        </ul>
+        </details></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAM_49_SIM.md">MEM_RAM_49_SIM</a> <code>RAM</code></li>
+      </ul>
+      </details></li>
+      <li><details><summary><a name="h130"></a><a href="CPU-BOARD-3202/circuit/doc/BIF_5.md">BIF_5</a> <code>BIF</code></summary>
+      <ul>
+        <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/BIF_DPATH_9.md">BIF_DPATH_9</a> <code>DPATH</code></summary>
+        <ul>
+          <li><a href="CPU-BOARD-3202/circuit/doc/BIF_DPATH_PPNLBD_14.md">BIF_DPATH_PPNLBD_14</a> <code>PPNLBD</code></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/BIF_DPATH_CDLBD_11.md">BIF_DPATH_CDLBD_11</a> <code>CDLBD</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/TTL_74646.md">TTL_74646</a> x2: <code>CHIP_7B</code>, <code>CHIP_6B</code></li>
+          </ul>
+          </details></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/BIF_DPATH_BDLBD_10.md">BIF_DPATH_BDLBD_10</a> <code>BDLBD</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/TTL_74648.md">TTL_74648</a> x3: <code>CHIP_4A</code>, <code>CHIP_5A</code>, <code>CHIP_6A</code></li>
+          </ul>
+          </details></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/BIF_DPATH_PESPEA_13.md">BIF_DPATH_PESPEA_13</a> <code>PESPEA</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/TTL_74534.md">TTL_74534</a> x4: <code>CHIP_9A</code>, <code>CHIP_8A</code>, <code>CHIP_12A</code>, <code>CHIP_10A</code></li>
+          </ul>
+          </details></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/BIF_DPATH_LDBCTL_12.md">BIF_DPATH_LDBCTL_12</a> <code>LDBCTL</code></summary>
+          <ul>
+            <li><a href="PAL/doc/PAL_44303B.md">PAL_44303B</a> <code>PAL_44303_ULBC2</code></li>
+            <li><a href="PAL/doc/PAL_44302B.md">PAL_44302B</a> <code>PAL_44302_ULBC1</code></li>
+            <li><a href="PAL/doc/PAL_44304E.md">PAL_44304E</a> <code>PAL_44304_ULBC3</code></li>
+          </ul>
+          </details></li>
+        </ul>
+        </details></li>
+        <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/BIF_BCTL_6.md">BIF_BCTL_6</a> <code>BCTL</code></summary>
+        <ul>
+          <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x2: <code>GATES_1</code>, <code>GATES_2</code></li>
+          <li><a href="PAL/doc/PAL_44801A.md">PAL_44801A</a> <code>PAL_44801_UBARB</code></li>
+          <li><a href="PAL/doc/PAL_44401B.md">PAL_44401B</a> <code>PAL_44401_UBTIM</code></li>
+          <li><a href="PAL/doc/PAL_45001B.md">PAL_45001B</a> <code>PAL_45001_UBPAR</code></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/BIF_BCTL_BDRV_7.md">BIF_BCTL_BDRV_7</a> <code>BDRV</code></summary>
+          <ul>
+            <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x2: <code>GATES_1</code>, <code>GATES_5</code></li>
+            <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x6: <code>GATES_2</code>, <code>GATES_3</code>, <code>GATES_4</code>, <code>GATES_7</code>, <code>GATES_8</code>, <code>GATES_9</code></li>
+            <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> <code>GATES_6</code></li>
+          </ul>
+          </details></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/BIF_BCTL_SYNC_8.md">BIF_BCTL_SYNC_8</a> <code>SYNC</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/AM29C821.md">AM29C821</a> x2: <code>CHIP_3D</code>, <code>CHIP_4D</code></li>
+          </ul>
+          </details></li>
+        </ul>
+        </details></li>
+      </ul>
+      </details></li>
+    </ul>
+    </details></li>
+    <li><a href="ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md">ND_BUS_SLAVE</a> <code>gen_bus_slave.BUS_SLAVE</code></li>
+    <li><a href="ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md">ND_TAPE_400</a> <code>gen_tape.TAPE_400</code></li>
+    <li><a href="ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md">ND_FLOPPY_DMA</a> <code>gen_floppy.FLOPPY_1560</code></li>
+    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x3: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_smd.SMD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/SMD/circuit/doc/ND_SMD.md">ND_SMD</a> <code>gen_smd.SMD_1540</code></li>
+  </ul>
+  </details></li>
+</ul>
+</details></li>
+</ul>
 
 ## Tang Nano 20K
 
@@ -577,46 +994,75 @@ Build: `Verilog/fpga/tang-nano-20k/Makefile` (the OSS yosys flow, default VARIAN
 
 262 of our modules, 2904 module instances, 13 levels deep. Vendor parts: `rPLL`.
 
-- [ND120_TANG20K_TOP](fpga/tang-nano-20k/src/doc/ND120_TANG20K_TOP.md)
-  - Gowin_rPLL_ND120 (vendor IP) `pll`
-    - rPLL (vendor) `rpll_inst`
-  - [uart_tx](fpga/tang-nano-20k/sdram-test/src/doc/uart_tx.md) `u_dbg_tx`
-  - <a name="h141"></a>[nd_storage_devices](SD-FAT/circuit/doc/nd_storage_devices.md) `TAPE_SDFAT_SOURCE`
-    - [nd_storage](SD-FAT/circuit/doc/nd_storage.md) `u_nd_storage` - same as [above](#h3)
-    - [nd_storage_tape_adapter](SD-FAT/circuit/doc/nd_storage_tape_adapter.md) `gen_tape.u_tape_adapter`
-    - [nd_storage_floppy_adapter](SD-FAT/circuit/doc/nd_storage_floppy_adapter.md) `gen_floppy.u_floppy_adapter`
-    - [nd_storage_disc_adapter](SD-FAT/circuit/doc/nd_storage_disc_adapter.md) `gen_wd.u_wd_adapter`
-  - [ND120_CORE](doc/ND120_CORE.md) `CORE`
-    - [BACKWIRING_PROM](Shared/support/doc/BACKWIRING_PROM.md) `BACKPLANE_INR_PROM`
-    - [ND3202D](CPU-BOARD-3202/circuit/doc/ND3202D.md) `CPU_BOARD`
-      - [CYC_36](CPU-BOARD-3202/circuit/doc/CYC_36.md) `CYC` - same as [above](#h8)
-      - [CPU_15](CPU-BOARD-3202/circuit/doc/CPU_15.md) `CPU`
-        - [CPU_PROC_32](CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md) `PROC` - same as [above](#h10)
-        - [CPU_CS_16](CPU-BOARD-3202/circuit/doc/CPU_CS_16.md) `CS` - same as [above](#h106)
-        - <a name="h145"></a>[CPU_MMU_24](CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md) `MMU`
-          - [CPU_MMU_HIT_27](CPU-BOARD-3202/circuit/doc/CPU_MMU_HIT_27.md) `MMU_HIT`
-          - [CPU_MMU_PPNX_28](CPU-BOARD-3202/circuit/doc/CPU_MMU_PPNX_28.md) `PPNX`
-          - [CPU_MMU_PTIDB_30](CPU-BOARD-3202/circuit/doc/CPU_MMU_PTIDB_30.md) `PTIDB`
-          - [CPU_MMU_CSR_26](CPU-BOARD-3202/circuit/doc/CPU_MMU_CSR_26.md) `CSR`
-          - [CPU_MMU_CACHE_25](CPU-BOARD-3202/circuit/doc/CPU_MMU_CACHE_25.md) `CACHE`
-          - [PAL_44306A](PAL/doc/PAL_44306A.md) `PAL_44306_UNOCTL`
-          - [CPU_MMU_PT_29](CPU-BOARD-3202/circuit/doc/CPU_MMU_PT_29.md) `PT` - same as [above](#h111)
-      - [IO_37](CPU-BOARD-3202/circuit/doc/IO_37.md) `IO` - same as [above](#h112)
-      - <a name="h146"></a>[MEM_43](CPU-BOARD-3202/circuit/doc/MEM_43.md) `MEM`
-        - [MEM_ADEC_45](CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md) `ADEC` - same as [above](#h124)
-        - [MEM_LBDIF_48](CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md) `LBDIF` - same as [above](#h125)
-        - [MEM_DATA_46](CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md) `DATA` - same as [above](#h126)
-        - [MEM_ERROR_47](CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md) `ERROR` - same as [above](#h127)
-        - [MEM_RAMC_50](CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md) `RAMC` - same as [above](#h128)
-        - [MEM_ADDR_44](CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md) `ADDR` - same as [above](#h129)
-        - [MEM_RAM_49_SDRAM](fpga/tang-nano-20k/sdram-bridge/doc/MEM_RAM_49_SDRAM.md) `RAM`
-          - [sdram18](fpga/tang-nano-20k/sdram-bridge/doc/sdram18.md) `u_sdram`
-      - [BIF_5](CPU-BOARD-3202/circuit/doc/BIF_5.md) `BIF` - same as [above](#h130)
-    - [ND_BUS_SLAVE](ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md) `gen_bus_slave.BUS_SLAVE`
-    - [ND_TAPE_400](ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md) `gen_tape.TAPE_400`
-    - [ND_FLOPPY_DMA](ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md) `gen_floppy.FLOPPY_1560`
-    - [ND_DMA_MASTER](ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md) x3: `gen_floppy.FLOPPY_DMA_MASTER`, `gen_wd.WD_DMA_MASTER`, `gen_dma_master.DMA_MASTER`
-    - [ND_WINCHESTER](ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md) `gen_wd.WD_500`
+<ul class="hier">
+<li><details open><summary><a href="fpga/tang-nano-20k/src/doc/ND120_TANG20K_TOP.md">ND120_TANG20K_TOP</a></summary>
+<ul>
+  <li><details open><summary>Gowin_rPLL_ND120 (vendor IP) <code>pll</code></summary>
+  <ul>
+    <li>rPLL (vendor) <code>rpll_inst</code></li>
+  </ul>
+  </details></li>
+  <li><a href="fpga/tang-nano-20k/sdram-test/src/doc/uart_tx.md">uart_tx</a> <code>u_dbg_tx</code></li>
+  <li><details open><summary><a name="h141"></a><a href="SD-FAT/circuit/doc/nd_storage_devices.md">nd_storage_devices</a> <code>TAPE_SDFAT_SOURCE</code></summary>
+  <ul>
+    <li><a href="SD-FAT/circuit/doc/nd_storage.md">nd_storage</a> <code>u_nd_storage</code> - same as <a href="#h3">above</a></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_tape_adapter.md">nd_storage_tape_adapter</a> <code>gen_tape.u_tape_adapter</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_floppy_adapter.md">nd_storage_floppy_adapter</a> <code>gen_floppy.u_floppy_adapter</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_disc_adapter.md">nd_storage_disc_adapter</a> <code>gen_wd.u_wd_adapter</code></li>
+  </ul>
+  </details></li>
+  <li><details open><summary><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <ul>
+    <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
+    <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
+    <ul>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
+      <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code></summary>
+      <ul>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md">CPU_PROC_32</a> <code>PROC</code> - same as <a href="#h10">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_16.md">CPU_CS_16</a> <code>CS</code> - same as <a href="#h106">above</a></li>
+        <li><details><summary><a name="h145"></a><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md">CPU_MMU_24</a> <code>MMU</code></summary>
+        <ul>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_HIT_27.md">CPU_MMU_HIT_27</a> <code>MMU_HIT</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_PPNX_28.md">CPU_MMU_PPNX_28</a> <code>PPNX</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_PTIDB_30.md">CPU_MMU_PTIDB_30</a> <code>PTIDB</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_CSR_26.md">CPU_MMU_CSR_26</a> <code>CSR</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_CACHE_25.md">CPU_MMU_CACHE_25</a> <code>CACHE</code></li>
+          <li><a href="PAL/doc/PAL_44306A.md">PAL_44306A</a> <code>PAL_44306_UNOCTL</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_PT_29.md">CPU_MMU_PT_29</a> <code>PT</code> - same as <a href="#h111">above</a></li>
+        </ul>
+        </details></li>
+      </ul>
+      </details></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/IO_37.md">IO_37</a> <code>IO</code> - same as <a href="#h112">above</a></li>
+      <li><details><summary><a name="h146"></a><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code></summary>
+      <ul>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md">MEM_ADEC_45</a> <code>ADEC</code> - same as <a href="#h124">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md">MEM_LBDIF_48</a> <code>LBDIF</code> - same as <a href="#h125">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md">MEM_DATA_46</a> <code>DATA</code> - same as <a href="#h126">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md">MEM_ERROR_47</a> <code>ERROR</code> - same as <a href="#h127">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md">MEM_RAMC_50</a> <code>RAMC</code> - same as <a href="#h128">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md">MEM_ADDR_44</a> <code>ADDR</code> - same as <a href="#h129">above</a></li>
+        <li><details><summary><a href="fpga/tang-nano-20k/sdram-bridge/doc/MEM_RAM_49_SDRAM.md">MEM_RAM_49_SDRAM</a> <code>RAM</code></summary>
+        <ul>
+          <li><a href="fpga/tang-nano-20k/sdram-bridge/doc/sdram18.md">sdram18</a> <code>u_sdram</code></li>
+        </ul>
+        </details></li>
+      </ul>
+      </details></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/BIF_5.md">BIF_5</a> <code>BIF</code> - same as <a href="#h130">above</a></li>
+    </ul>
+    </details></li>
+    <li><a href="ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md">ND_BUS_SLAVE</a> <code>gen_bus_slave.BUS_SLAVE</code></li>
+    <li><a href="ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md">ND_TAPE_400</a> <code>gen_tape.TAPE_400</code></li>
+    <li><a href="ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md">ND_FLOPPY_DMA</a> <code>gen_floppy.FLOPPY_1560</code></li>
+    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x3: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_wd.WD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md">ND_WINCHESTER</a> <code>gen_wd.WD_500</code></li>
+  </ul>
+  </details></li>
+</ul>
+</details></li>
+</ul>
 
 ## Nexys 4 DDR
 
@@ -626,65 +1072,109 @@ Defines: `TARGET_NEXYS4DDR`, `FPGA_FF_MODE`, `MAIN_RAM_DDR2`, `ND120_N4DDR_MMCM_
 
 287 of our modules, 2943 module instances, 13 levels deep. Vendor parts: `BUFG`, `BUFGMUX_CTRL`, `MMCME2_BASE`, `ddr`.
 
-- [nd120_nexys4ddr_top](fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md)
-  - MMCME2_BASE (vendor) x2: `mmcm`, `mmcm_video`
-  - BUFG (vendor) x5: `bufg_fb`, `bufg_cpu`, `bufg_st`, `bufg_200`, `bufg_fb2`
-  - BUFGMUX_CTRL (vendor) `bufg_pixmux`
-  - [console_uart_rx](Terminals/rtl/doc/console_uart_rx.md) `CONSOLE_RX`
-  - <a name="h149"></a>[term_console_feed](Terminals/rtl/doc/term_console_feed.md) `FEED`
-    - [term_banner](Terminals/rtl/doc/term_banner.md) `BANNER`
-      - [term_banner_rom](Terminals/rtl/doc/term_banner_rom.md) `ROM`
-  - <a name="h151"></a>[terminal_top](Terminals/rtl/doc/terminal_top.md) `TERMINAL`
-    - [cdc_byte](Terminals/rtl/doc/cdc_byte.md) `CDC`
-    - [byte_fifo](Terminals/rtl/doc/byte_fifo.md) `FIFO`
-    - [char_ram](Terminals/rtl/doc/char_ram.md) `CHARRAM`
-    - [terminal_ctrl_tdv](Terminals/rtl/doc/terminal_ctrl_tdv.md) `CTRL`
-    - [text_screen](Terminals/rtl/doc/text_screen.md) `SCREEN`
-      - [vga_timing](Terminals/rtl/doc/vga_timing.md) `TIMING`
-      - [font_rom](Terminals/rtl/doc/font_rom.md) `FONT`
-    - [rate_meter](Terminals/rtl/doc/rate_meter.md) x2: `g_panel.UTIL_METER`, `g_panel.HIT_METER`
-    - [term_panel](Terminals/rtl/doc/term_panel.md) `g_panel.PANEL`
-      - [term_panel_rom](Terminals/rtl/doc/term_panel_rom.md) `ROM`
-      - [font_rom](Terminals/rtl/doc/font_rom.md) `PANELFONT`
-  - [ps2_keyboard_tdv](Terminals/rtl/doc/ps2_keyboard_tdv.md) `KEYBOARD`
-    - <a name="h155"></a>[ps2_decoder_tdv](Terminals/rtl/doc/ps2_decoder_tdv.md) `DECODER`
-      - [ps2_ascii_table_tdv](Terminals/rtl/doc/ps2_ascii_table_tdv.md) `TABLE`
-  - [key_tdv2200](Terminals/rtl/doc/key_tdv2200.md) `KEYEXP`
-  - [console_uart_tx](Terminals/rtl/doc/console_uart_tx.md) `CONSOLE_TX`
-  - <a name="h156"></a>[ND120_CORE](doc/ND120_CORE.md) `CORE`
-    - [BACKWIRING_PROM](Shared/support/doc/BACKWIRING_PROM.md) `BACKPLANE_INR_PROM`
-    - [ND3202D](CPU-BOARD-3202/circuit/doc/ND3202D.md) `CPU_BOARD`
-      - [CYC_36](CPU-BOARD-3202/circuit/doc/CYC_36.md) `CYC` - same as [above](#h8)
-      - [CPU_15](CPU-BOARD-3202/circuit/doc/CPU_15.md) `CPU` - same as [above](#h9)
-      - <a name="h158"></a>[IO_37](CPU-BOARD-3202/circuit/doc/IO_37.md) `IO`
-        - [IO_REG_41](CPU-BOARD-3202/circuit/doc/IO_REG_41.md) `REG_MODULE` - same as [above](#h113)
-        - [IO_PANCAL_40](CPU-BOARD-3202/circuit/doc/IO_PANCAL_40.md) `PANCAL`
-          - [TTL_74374](Shared/support/doc/TTL_74374.md) `CHIP_32B`
-          - [TTL_74244](Shared/support/doc/TTL_74244.md) `CHIP_33B`
-          - [PANCAL_68705_CLOCK](CPU-BOARD-3202/circuit/doc/PANCAL_68705_CLOCK.md) `CHIP_35C`
-        - [IO_UART_42](CPU-BOARD-3202/circuit/doc/IO_UART_42.md) `UART` - same as [above](#h115)
-        - [IO_DCD_38](CPU-BOARD-3202/circuit/doc/IO_DCD_38.md) `DCD` - same as [above](#h116)
-      - [MEM_43](CPU-BOARD-3202/circuit/doc/MEM_43.md) `MEM`
-        - [MEM_ADEC_45](CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md) `ADEC` - same as [above](#h124)
-        - [MEM_LBDIF_48](CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md) `LBDIF` - same as [above](#h125)
-        - [MEM_DATA_46](CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md) `DATA` - same as [above](#h126)
-        - [MEM_ERROR_47](CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md) `ERROR` - same as [above](#h127)
-        - [MEM_RAMC_50](CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md) `RAMC` - same as [above](#h128)
-        - [MEM_ADDR_44](CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md) `ADDR` - same as [above](#h129)
-        - [MEM_RAM_49_DDR2](fpga/nexys4ddr/ddr2/doc/MEM_RAM_49_DDR2.md) `RAM`
-      - [BIF_5](CPU-BOARD-3202/circuit/doc/BIF_5.md) `BIF` - same as [above](#h130)
-    - [ND_BUS_SLAVE](ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md) `gen_bus_slave.BUS_SLAVE`
-    - [ND_TAPE_400](ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md) `gen_tape.TAPE_400`
-    - [ND_FLOPPY_DMA](ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md) `gen_floppy.FLOPPY_1560`
-    - [ND_DMA_MASTER](ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md) x3: `gen_floppy.FLOPPY_DMA_MASTER`, `gen_wd.WD_DMA_MASTER`, `gen_dma_master.DMA_MASTER`
-    - [ND_WINCHESTER](ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md) `gen_wd.WD_500`
-  - [mips_counter](Terminals/rtl/doc/mips_counter.md) `MIPS`
-  - [nd_storage_devices](SD-FAT/circuit/doc/nd_storage_devices.md) `STORAGE` - same as [above](#h141)
-  - [nd_ddr2_storage](fpga/nexys4ddr/ddr2/doc/nd_ddr2_storage.md) `u_region`
-  - [nd_ddr2_arb](fpga/nexys4ddr/ddr2/doc/nd_ddr2_arb.md) `u_arb`
-  - [nd_ddr2_port](fpga/nexys4ddr/ddr2/doc/nd_ddr2_port.md) `u_ddr2`
-    - ddr (vendor) `u_mig`
-  - [SevenSegDebug8](fpga/nexys4ddr/doc/SevenSegDebug8.md) `SEVEN_SEG`
+<ul class="hier">
+<li><details open><summary><a href="fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md">nd120_nexys4ddr_top</a></summary>
+<ul>
+  <li>MMCME2_BASE (vendor) x2: <code>mmcm</code>, <code>mmcm_video</code></li>
+  <li>BUFG (vendor) x5: <code>bufg_fb</code>, <code>bufg_cpu</code>, <code>bufg_st</code>, <code>bufg_200</code>, <code>bufg_fb2</code></li>
+  <li>BUFGMUX_CTRL (vendor) <code>bufg_pixmux</code></li>
+  <li><a href="Terminals/rtl/doc/console_uart_rx.md">console_uart_rx</a> <code>CONSOLE_RX</code></li>
+  <li><details open><summary><a name="h149"></a><a href="Terminals/rtl/doc/term_console_feed.md">term_console_feed</a> <code>FEED</code></summary>
+  <ul>
+    <li><details><summary><a href="Terminals/rtl/doc/term_banner.md">term_banner</a> <code>BANNER</code></summary>
+    <ul>
+      <li><a href="Terminals/rtl/doc/term_banner_rom.md">term_banner_rom</a> <code>ROM</code></li>
+    </ul>
+    </details></li>
+  </ul>
+  </details></li>
+  <li><details open><summary><a name="h151"></a><a href="Terminals/rtl/doc/terminal_top.md">terminal_top</a> <code>TERMINAL</code></summary>
+  <ul>
+    <li><a href="Terminals/rtl/doc/cdc_byte.md">cdc_byte</a> <code>CDC</code></li>
+    <li><a href="Terminals/rtl/doc/byte_fifo.md">byte_fifo</a> <code>FIFO</code></li>
+    <li><a href="Terminals/rtl/doc/char_ram.md">char_ram</a> <code>CHARRAM</code></li>
+    <li><a href="Terminals/rtl/doc/terminal_ctrl_tdv.md">terminal_ctrl_tdv</a> <code>CTRL</code></li>
+    <li><details><summary><a href="Terminals/rtl/doc/text_screen.md">text_screen</a> <code>SCREEN</code></summary>
+    <ul>
+      <li><a href="Terminals/rtl/doc/vga_timing.md">vga_timing</a> <code>TIMING</code></li>
+      <li><a href="Terminals/rtl/doc/font_rom.md">font_rom</a> <code>FONT</code></li>
+    </ul>
+    </details></li>
+    <li><a href="Terminals/rtl/doc/rate_meter.md">rate_meter</a> x2: <code>g_panel.UTIL_METER</code>, <code>g_panel.HIT_METER</code></li>
+    <li><details><summary><a href="Terminals/rtl/doc/term_panel.md">term_panel</a> <code>g_panel.PANEL</code></summary>
+    <ul>
+      <li><a href="Terminals/rtl/doc/term_panel_rom.md">term_panel_rom</a> <code>ROM</code></li>
+      <li><a href="Terminals/rtl/doc/font_rom.md">font_rom</a> <code>PANELFONT</code></li>
+    </ul>
+    </details></li>
+  </ul>
+  </details></li>
+  <li><details open><summary><a href="Terminals/rtl/doc/ps2_keyboard_tdv.md">ps2_keyboard_tdv</a> <code>KEYBOARD</code></summary>
+  <ul>
+    <li><details><summary><a name="h155"></a><a href="Terminals/rtl/doc/ps2_decoder_tdv.md">ps2_decoder_tdv</a> <code>DECODER</code></summary>
+    <ul>
+      <li><a href="Terminals/rtl/doc/ps2_ascii_table_tdv.md">ps2_ascii_table_tdv</a> <code>TABLE</code></li>
+    </ul>
+    </details></li>
+  </ul>
+  </details></li>
+  <li><a href="Terminals/rtl/doc/key_tdv2200.md">key_tdv2200</a> <code>KEYEXP</code></li>
+  <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_TX</code></li>
+  <li><details open><summary><a name="h156"></a><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <ul>
+    <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
+    <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
+    <ul>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code> - same as <a href="#h9">above</a></li>
+      <li><details><summary><a name="h158"></a><a href="CPU-BOARD-3202/circuit/doc/IO_37.md">IO_37</a> <code>IO</code></summary>
+      <ul>
+        <li><a href="CPU-BOARD-3202/circuit/doc/IO_REG_41.md">IO_REG_41</a> <code>REG_MODULE</code> - same as <a href="#h113">above</a></li>
+        <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/IO_PANCAL_40.md">IO_PANCAL_40</a> <code>PANCAL</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/TTL_74374.md">TTL_74374</a> <code>CHIP_32B</code></li>
+          <li><a href="Shared/support/doc/TTL_74244.md">TTL_74244</a> <code>CHIP_33B</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/PANCAL_68705_CLOCK.md">PANCAL_68705_CLOCK</a> <code>CHIP_35C</code></li>
+        </ul>
+        </details></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/IO_UART_42.md">IO_UART_42</a> <code>UART</code> - same as <a href="#h115">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/IO_DCD_38.md">IO_DCD_38</a> <code>DCD</code> - same as <a href="#h116">above</a></li>
+      </ul>
+      </details></li>
+      <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code></summary>
+      <ul>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md">MEM_ADEC_45</a> <code>ADEC</code> - same as <a href="#h124">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md">MEM_LBDIF_48</a> <code>LBDIF</code> - same as <a href="#h125">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md">MEM_DATA_46</a> <code>DATA</code> - same as <a href="#h126">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md">MEM_ERROR_47</a> <code>ERROR</code> - same as <a href="#h127">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md">MEM_RAMC_50</a> <code>RAMC</code> - same as <a href="#h128">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md">MEM_ADDR_44</a> <code>ADDR</code> - same as <a href="#h129">above</a></li>
+        <li><a href="fpga/nexys4ddr/ddr2/doc/MEM_RAM_49_DDR2.md">MEM_RAM_49_DDR2</a> <code>RAM</code></li>
+      </ul>
+      </details></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/BIF_5.md">BIF_5</a> <code>BIF</code> - same as <a href="#h130">above</a></li>
+    </ul>
+    </details></li>
+    <li><a href="ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md">ND_BUS_SLAVE</a> <code>gen_bus_slave.BUS_SLAVE</code></li>
+    <li><a href="ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md">ND_TAPE_400</a> <code>gen_tape.TAPE_400</code></li>
+    <li><a href="ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md">ND_FLOPPY_DMA</a> <code>gen_floppy.FLOPPY_1560</code></li>
+    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x3: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_wd.WD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md">ND_WINCHESTER</a> <code>gen_wd.WD_500</code></li>
+  </ul>
+  </details></li>
+  <li><a href="Terminals/rtl/doc/mips_counter.md">mips_counter</a> <code>MIPS</code></li>
+  <li><a href="SD-FAT/circuit/doc/nd_storage_devices.md">nd_storage_devices</a> <code>STORAGE</code> - same as <a href="#h141">above</a></li>
+  <li><a href="fpga/nexys4ddr/ddr2/doc/nd_ddr2_storage.md">nd_ddr2_storage</a> <code>u_region</code></li>
+  <li><a href="fpga/nexys4ddr/ddr2/doc/nd_ddr2_arb.md">nd_ddr2_arb</a> <code>u_arb</code></li>
+  <li><details open><summary><a href="fpga/nexys4ddr/ddr2/doc/nd_ddr2_port.md">nd_ddr2_port</a> <code>u_ddr2</code></summary>
+  <ul>
+    <li>ddr (vendor) <code>u_mig</code></li>
+  </ul>
+  </details></li>
+  <li><a href="fpga/nexys4ddr/doc/SevenSegDebug8.md">SevenSegDebug8</a> <code>SEVEN_SEG</code></li>
+</ul>
+</details></li>
+</ul>
 
 ## MiSTer
 
@@ -700,85 +1190,129 @@ Not followed (framework): 3 file(s).
 
 277 of our modules, 2877 module instances, 13 levels deep. Vendor parts: `altera_pll`.
 
-- [emu](fpga/mister/doc/emu.md)
-  - hps_io (vendor) `hps_io`
-  - pll (vendor) `pll`
-  - [pll_cpu](fpga/mister/rtl/doc/pll_cpu.md) `PLL_CPU`
-    - altera_pll (vendor) `altera_pll_i`
-  - [mips_counter](Terminals/rtl/doc/mips_counter.md) `MIPS`
-  - [nd120_console_mister](fpga/mister/rtl/doc/nd120_console_mister.md) `CONSOLE`
-    - [ps2_decoder_tdv](Terminals/rtl/doc/ps2_decoder_tdv.md) `DECODER` - same as [above](#h155)
-    - [key_tdv2200](Terminals/rtl/doc/key_tdv2200.md) `KEYEXP`
-    - [term_console_feed](Terminals/rtl/doc/term_console_feed.md) `FEED`
-      - [term_banner](Terminals/rtl/doc/term_banner.md) `BANNER`
-        - [term_banner_rom](Terminals/rtl/doc/term_banner_rom.md) `ROM`
-    - [terminal_top](Terminals/rtl/doc/terminal_top.md) `TERMINAL` - same as [above](#h151)
-  - [console_uart_rx](Terminals/rtl/doc/console_uart_rx.md) `CONSOLE_UART_RX`
-  - [console_uart_tx](Terminals/rtl/doc/console_uart_tx.md) `CONSOLE_UART_TX`
-  - [nd_storage_mister_devices](fpga/mister/rtl/doc/nd_storage_mister_devices.md) `STORAGE`
-    - [nd_storage_floppy_adapter](SD-FAT/circuit/doc/nd_storage_floppy_adapter.md) x2: `u_fd0`, `u_fd1`
-    - [nd_storage_disc_adapter](SD-FAT/circuit/doc/nd_storage_disc_adapter.md) x2: `u_wd0`, `u_wd1`
-    - [nd_storage_tape_adapter](SD-FAT/circuit/doc/nd_storage_tape_adapter.md) `u_tape`
-    - [nd_storage_hps](fpga/mister/rtl/doc/nd_storage_hps.md) `u_hps`
-  - [ND120_CORE](doc/ND120_CORE.md) `CORE`
-    - [BACKWIRING_PROM](Shared/support/doc/BACKWIRING_PROM.md) `BACKPLANE_INR_PROM`
-    - [ND3202D](CPU-BOARD-3202/circuit/doc/ND3202D.md) `CPU_BOARD`
-      - [CYC_36](CPU-BOARD-3202/circuit/doc/CYC_36.md) `CYC` - same as [above](#h8)
-      - [CPU_15](CPU-BOARD-3202/circuit/doc/CPU_15.md) `CPU`
-        - [CPU_PROC_32](CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md) `PROC`
-          - [AM29841](Shared/support/doc/AM29841.md) `CHIP_25F`
-          - [CPU_PROC_CMDDEC_34](CPU-BOARD-3202/circuit/doc/CPU_PROC_CMDDEC_34.md) `CMDDEC` - same as [above](#h11)
-          - [TTL_74245](Shared/support/doc/TTL_74245.md) x2: `CHIP_32F`, `CHIP_33F`
-          - [CPU_PROC_CGA_33](CPU-BOARD-3202/circuit/doc/CPU_PROC_CGA_33.md) `CGA`
-            - [TTL_74374](Shared/support/doc/TTL_74374.md) `CHIP_34G`
-            - [CGA](DELILAH-CPU/CGA/circuit/doc/CGA.md) `DELILAH`
-              - [BusDriver16](DELILAH-CPU/CGA/circuit/doc/BusDriver16.md) `BD_FIDBO`
-              - [CGA_ALU](DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU.md) `ALU` - same as [above](#h14)
-              - [CGA_TRAP](DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP.md) `TRAP` - same as [above](#h36)
-              - [CGA_IDBCTL](DELILAH-CPU/CGA_IDBCTL/circuit/doc/CGA_IDBCTL.md) `IDBCTL` - same as [above](#h40)
-              - [CGA_WRF](DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF.md) `WRF` - same as [above](#h42)
-              - [CGA_DCD](DELILAH-CPU/CGA_DCD/circuit/doc/CGA_DCD.md) `DCD` - same as [above](#h48)
-              - [CGA_INTR](DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR.md) `INTR` - same as [above](#h50)
-              - [CGA_MAC](DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC.md) `MAC` - same as [above](#h78)
-              - [CGA_MIC](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC.md) `MIC`
-                - [OR_GATE](Shared/logisim/doc/OR_GATE.md) x2: `GATES_1`, `GATES_4`
-                - [NAND_GATE_3_INPUTS](Shared/logisim/doc/NAND_GATE_3_INPUTS.md) x4: `GATES_2`, `GATES_5`, `GATES_7`, `GATES_18`
-                - [NOR_GATE_3_INPUTS](Shared/logisim/doc/NOR_GATE_3_INPUTS.md) x2: `GATES_3`, `GATES_26`
-                - [AND_GATE_4_INPUTS](Shared/logisim/doc/AND_GATE_4_INPUTS.md) `GATES_6`
-                - [NAND_GATE](Shared/logisim/doc/NAND_GATE.md) x5: `GATES_8`, `GATES_17`, `GATES_28`, `GATES_29`, `GATES_31`
-                - [AND_GATE](Shared/logisim/doc/AND_GATE.md) x10: `GATES_9`, `GATES_10`, `GATES_11`, `GATES_12`, `GATES_13`, `GATES_14`, `GATES_15`, `GATES_16`, `GATES_25`, `GATES_30`
-                - [NOR_GATE](Shared/logisim/doc/NOR_GATE.md) x7: `GATES_19`, `GATES_20`, `GATES_21`, `GATES_22`, `GATES_23`, `GATES_24`, `GATES_27`
-                - [D_FLIPFLOP_EN](Shared/ndlib/doc/D_FLIPFLOP_EN.md) x8: `MEMORY_33`, `MEMORY_34`, `MEMORY_35`, `MEMORY_36`, `MEMORY_37`, `MEMORY_38`, `MEMORY_39`, `MEMORY_32`
-                - [CGA_MIC_INCOUNT](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_INCOUNT.md) `MIC_INCOUNT` - same as [above](#h92)
-                - [M169C_EN](Shared/ndlib/doc/M169C_EN.md) x2: `LC_HI`, `LC_LO` - same as [above](#h93)
-                - [MUX21L](Shared/ndlib/doc/MUX21L.md) x2: `M_RF1`, `M_RF0` - same as [above](#h94)
-                - [MUX34P](Shared/ndlib/doc/MUX34P.md) `ILC_MUX` - same as [above](#h95)
-                - [L8](Shared/ndlib/doc/L8.md) `IRLATCH`
-                - [CGA_MIC_CONDREG](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CONDREG.md) `CONDREG` - same as [above](#h96)
-                - [MUX41P](Shared/ndlib/doc/MUX41P.md) x8: `M_LAA_3`, `M_LAA_2`, `M_LAA_1`, `M_LAA_0`, `M_LBA_3`, `M_LBA_2`, `M_LBA_1`, `M_LBA_0` - same as [above](#h19)
-                - [R41P_EN](Shared/ndlib/doc/R41P_EN.md) x2: `LAA_REG`, `LBA_REG`
-                - [CMP4](Shared/ndlib/doc/CMP4.md) `LC_CMP` - same as [above](#h97)
-                - [CGA_MIC_IINC](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IINC.md) `MIC_IINC`
-                - [CGA_MIC_STACK](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK.md) `MIC_STACK` - same as [above](#h98)
-                - [CGA_MIC_MASEL](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_MASEL.md) `MIC_MASEL`
-                - [SCAN_WITH_SET_N_EN](Shared/ndlib/doc/SCAN_WITH_SET_N_EN.md) x2: `OOD_FF`, `DZD_FF`
-                - [CGA_MIC_WCAREG](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_WCAREG.md) `MIC_WCAREG` - same as [above](#h101)
-                - [CGA_MIC_IPOS](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IPOS.md) `MIC_IPOS` - same as [above](#h102)
-                - [CGA_MIC_CSEL](DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CSEL.md) `CSEL`
-                  - [Multiplexer_8](Shared/logisim/doc/Multiplexer_8.md) x2: `PLEXERS_1`, `PLEXERS_2`
-                  - [Multiplexer_2](Shared/logisim/doc/Multiplexer_2.md) `PLEXERS_3`
-                  - [ND120_LATCH](Shared/ndlib/doc/ND120_LATCH.md) `CSEL_LATCH`
-              - [CGA_TESTMUX](DELILAH-CPU/CGA_TESTMUX/circuit/doc/CGA_TESTMUX.md) `TESTMUX` - same as [above](#h104)
-        - [CPU_CS_16](CPU-BOARD-3202/circuit/doc/CPU_CS_16.md) `CS` - same as [above](#h106)
-        - [CPU_MMU_24](CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md) `MMU` - same as [above](#h145)
-      - [IO_37](CPU-BOARD-3202/circuit/doc/IO_37.md) `IO` - same as [above](#h158)
-      - [MEM_43](CPU-BOARD-3202/circuit/doc/MEM_43.md) `MEM` - same as [above](#h146)
-      - [BIF_5](CPU-BOARD-3202/circuit/doc/BIF_5.md) `BIF` - same as [above](#h130)
-    - [ND_BUS_SLAVE](ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md) `gen_bus_slave.BUS_SLAVE`
-    - [ND_TAPE_400](ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md) `gen_tape.TAPE_400`
-    - [ND_FLOPPY_DMA](ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md) `gen_floppy.FLOPPY_1560`
-    - [ND_DMA_MASTER](ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md) x3: `gen_floppy.FLOPPY_DMA_MASTER`, `gen_wd.WD_DMA_MASTER`, `gen_dma_master.DMA_MASTER`
-    - [ND_WINCHESTER](ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md) `gen_wd.WD_500`
+<ul class="hier">
+<li><details open><summary><a href="fpga/mister/doc/emu.md">emu</a></summary>
+<ul>
+  <li>hps_io (vendor) <code>hps_io</code></li>
+  <li>pll (vendor) <code>pll</code></li>
+  <li><details open><summary><a href="fpga/mister/rtl/doc/pll_cpu.md">pll_cpu</a> <code>PLL_CPU</code></summary>
+  <ul>
+    <li>altera_pll (vendor) <code>altera_pll_i</code></li>
+  </ul>
+  </details></li>
+  <li><a href="Terminals/rtl/doc/mips_counter.md">mips_counter</a> <code>MIPS</code></li>
+  <li><details open><summary><a href="fpga/mister/rtl/doc/nd120_console_mister.md">nd120_console_mister</a> <code>CONSOLE</code></summary>
+  <ul>
+    <li><a href="Terminals/rtl/doc/ps2_decoder_tdv.md">ps2_decoder_tdv</a> <code>DECODER</code> - same as <a href="#h155">above</a></li>
+    <li><a href="Terminals/rtl/doc/key_tdv2200.md">key_tdv2200</a> <code>KEYEXP</code></li>
+    <li><details><summary><a href="Terminals/rtl/doc/term_console_feed.md">term_console_feed</a> <code>FEED</code></summary>
+    <ul>
+      <li><details><summary><a href="Terminals/rtl/doc/term_banner.md">term_banner</a> <code>BANNER</code></summary>
+      <ul>
+        <li><a href="Terminals/rtl/doc/term_banner_rom.md">term_banner_rom</a> <code>ROM</code></li>
+      </ul>
+      </details></li>
+    </ul>
+    </details></li>
+    <li><a href="Terminals/rtl/doc/terminal_top.md">terminal_top</a> <code>TERMINAL</code> - same as <a href="#h151">above</a></li>
+  </ul>
+  </details></li>
+  <li><a href="Terminals/rtl/doc/console_uart_rx.md">console_uart_rx</a> <code>CONSOLE_UART_RX</code></li>
+  <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_UART_TX</code></li>
+  <li><details open><summary><a href="fpga/mister/rtl/doc/nd_storage_mister_devices.md">nd_storage_mister_devices</a> <code>STORAGE</code></summary>
+  <ul>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_floppy_adapter.md">nd_storage_floppy_adapter</a> x2: <code>u_fd0</code>, <code>u_fd1</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_disc_adapter.md">nd_storage_disc_adapter</a> x2: <code>u_wd0</code>, <code>u_wd1</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_tape_adapter.md">nd_storage_tape_adapter</a> <code>u_tape</code></li>
+    <li><a href="fpga/mister/rtl/doc/nd_storage_hps.md">nd_storage_hps</a> <code>u_hps</code></li>
+  </ul>
+  </details></li>
+  <li><details open><summary><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <ul>
+    <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
+    <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
+    <ul>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
+      <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code></summary>
+      <ul>
+        <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md">CPU_PROC_32</a> <code>PROC</code></summary>
+        <ul>
+          <li><a href="Shared/support/doc/AM29841.md">AM29841</a> <code>CHIP_25F</code></li>
+          <li><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_CMDDEC_34.md">CPU_PROC_CMDDEC_34</a> <code>CMDDEC</code> - same as <a href="#h11">above</a></li>
+          <li><a href="Shared/support/doc/TTL_74245.md">TTL_74245</a> x2: <code>CHIP_32F</code>, <code>CHIP_33F</code></li>
+          <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_CGA_33.md">CPU_PROC_CGA_33</a> <code>CGA</code></summary>
+          <ul>
+            <li><a href="Shared/support/doc/TTL_74374.md">TTL_74374</a> <code>CHIP_34G</code></li>
+            <li><details><summary><a href="DELILAH-CPU/CGA/circuit/doc/CGA.md">CGA</a> <code>DELILAH</code></summary>
+            <ul>
+              <li><a href="DELILAH-CPU/CGA/circuit/doc/BusDriver16.md">BusDriver16</a> <code>BD_FIDBO</code></li>
+              <li><a href="DELILAH-CPU/CGA_ALU/circuit/doc/CGA_ALU.md">CGA_ALU</a> <code>ALU</code> - same as <a href="#h14">above</a></li>
+              <li><a href="DELILAH-CPU/CGA_TRAP/circuit/doc/CGA_TRAP.md">CGA_TRAP</a> <code>TRAP</code> - same as <a href="#h36">above</a></li>
+              <li><a href="DELILAH-CPU/CGA_IDBCTL/circuit/doc/CGA_IDBCTL.md">CGA_IDBCTL</a> <code>IDBCTL</code> - same as <a href="#h40">above</a></li>
+              <li><a href="DELILAH-CPU/CGA_WRF/circuit/doc/CGA_WRF.md">CGA_WRF</a> <code>WRF</code> - same as <a href="#h42">above</a></li>
+              <li><a href="DELILAH-CPU/CGA_DCD/circuit/doc/CGA_DCD.md">CGA_DCD</a> <code>DCD</code> - same as <a href="#h48">above</a></li>
+              <li><a href="DELILAH-CPU/CGA_INTR/circuit/doc/CGA_INTR.md">CGA_INTR</a> <code>INTR</code> - same as <a href="#h50">above</a></li>
+              <li><a href="DELILAH-CPU/CGA_MAC/circuit/doc/CGA_MAC.md">CGA_MAC</a> <code>MAC</code> - same as <a href="#h78">above</a></li>
+              <li><details><summary><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC.md">CGA_MIC</a> <code>MIC</code></summary>
+              <ul>
+                <li><a href="Shared/logisim/doc/OR_GATE.md">OR_GATE</a> x2: <code>GATES_1</code>, <code>GATES_4</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE_3_INPUTS.md">NAND_GATE_3_INPUTS</a> x4: <code>GATES_2</code>, <code>GATES_5</code>, <code>GATES_7</code>, <code>GATES_18</code></li>
+                <li><a href="Shared/logisim/doc/NOR_GATE_3_INPUTS.md">NOR_GATE_3_INPUTS</a> x2: <code>GATES_3</code>, <code>GATES_26</code></li>
+                <li><a href="Shared/logisim/doc/AND_GATE_4_INPUTS.md">AND_GATE_4_INPUTS</a> <code>GATES_6</code></li>
+                <li><a href="Shared/logisim/doc/NAND_GATE.md">NAND_GATE</a> x5: <code>GATES_8</code>, <code>GATES_17</code>, <code>GATES_28</code>, <code>GATES_29</code>, <code>GATES_31</code></li>
+                <li><a href="Shared/logisim/doc/AND_GATE.md">AND_GATE</a> x10: <code>GATES_9</code>, <code>GATES_10</code>, <code>GATES_11</code>, <code>GATES_12</code>, <code>GATES_13</code>, <code>GATES_14</code>, <code>GATES_15</code>, <code>GATES_16</code>, <code>GATES_25</code>, <code>GATES_30</code></li>
+                <li><a href="Shared/logisim/doc/NOR_GATE.md">NOR_GATE</a> x7: <code>GATES_19</code>, <code>GATES_20</code>, <code>GATES_21</code>, <code>GATES_22</code>, <code>GATES_23</code>, <code>GATES_24</code>, <code>GATES_27</code></li>
+                <li><a href="Shared/ndlib/doc/D_FLIPFLOP_EN.md">D_FLIPFLOP_EN</a> x8: <code>MEMORY_33</code>, <code>MEMORY_34</code>, <code>MEMORY_35</code>, <code>MEMORY_36</code>, <code>MEMORY_37</code>, <code>MEMORY_38</code>, <code>MEMORY_39</code>, <code>MEMORY_32</code></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_INCOUNT.md">CGA_MIC_INCOUNT</a> <code>MIC_INCOUNT</code> - same as <a href="#h92">above</a></li>
+                <li><a href="Shared/ndlib/doc/M169C_EN.md">M169C_EN</a> x2: <code>LC_HI</code>, <code>LC_LO</code> - same as <a href="#h93">above</a></li>
+                <li><a href="Shared/ndlib/doc/MUX21L.md">MUX21L</a> x2: <code>M_RF1</code>, <code>M_RF0</code> - same as <a href="#h94">above</a></li>
+                <li><a href="Shared/ndlib/doc/MUX34P.md">MUX34P</a> <code>ILC_MUX</code> - same as <a href="#h95">above</a></li>
+                <li><a href="Shared/ndlib/doc/L8.md">L8</a> <code>IRLATCH</code></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CONDREG.md">CGA_MIC_CONDREG</a> <code>CONDREG</code> - same as <a href="#h96">above</a></li>
+                <li><a href="Shared/ndlib/doc/MUX41P.md">MUX41P</a> x8: <code>M_LAA_3</code>, <code>M_LAA_2</code>, <code>M_LAA_1</code>, <code>M_LAA_0</code>, <code>M_LBA_3</code>, <code>M_LBA_2</code>, <code>M_LBA_1</code>, <code>M_LBA_0</code> - same as <a href="#h19">above</a></li>
+                <li><a href="Shared/ndlib/doc/R41P_EN.md">R41P_EN</a> x2: <code>LAA_REG</code>, <code>LBA_REG</code></li>
+                <li><a href="Shared/ndlib/doc/CMP4.md">CMP4</a> <code>LC_CMP</code> - same as <a href="#h97">above</a></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IINC.md">CGA_MIC_IINC</a> <code>MIC_IINC</code></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_STACK.md">CGA_MIC_STACK</a> <code>MIC_STACK</code> - same as <a href="#h98">above</a></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_MASEL.md">CGA_MIC_MASEL</a> <code>MIC_MASEL</code></li>
+                <li><a href="Shared/ndlib/doc/SCAN_WITH_SET_N_EN.md">SCAN_WITH_SET_N_EN</a> x2: <code>OOD_FF</code>, <code>DZD_FF</code></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_WCAREG.md">CGA_MIC_WCAREG</a> <code>MIC_WCAREG</code> - same as <a href="#h101">above</a></li>
+                <li><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_IPOS.md">CGA_MIC_IPOS</a> <code>MIC_IPOS</code> - same as <a href="#h102">above</a></li>
+                <li><details><summary><a href="DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CSEL.md">CGA_MIC_CSEL</a> <code>CSEL</code></summary>
+                <ul>
+                  <li><a href="Shared/logisim/doc/Multiplexer_8.md">Multiplexer_8</a> x2: <code>PLEXERS_1</code>, <code>PLEXERS_2</code></li>
+                  <li><a href="Shared/logisim/doc/Multiplexer_2.md">Multiplexer_2</a> <code>PLEXERS_3</code></li>
+                  <li><a href="Shared/ndlib/doc/ND120_LATCH.md">ND120_LATCH</a> <code>CSEL_LATCH</code></li>
+                </ul>
+                </details></li>
+              </ul>
+              </details></li>
+              <li><a href="DELILAH-CPU/CGA_TESTMUX/circuit/doc/CGA_TESTMUX.md">CGA_TESTMUX</a> <code>TESTMUX</code> - same as <a href="#h104">above</a></li>
+            </ul>
+            </details></li>
+          </ul>
+          </details></li>
+        </ul>
+        </details></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_16.md">CPU_CS_16</a> <code>CS</code> - same as <a href="#h106">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md">CPU_MMU_24</a> <code>MMU</code> - same as <a href="#h145">above</a></li>
+      </ul>
+      </details></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/IO_37.md">IO_37</a> <code>IO</code> - same as <a href="#h158">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code> - same as <a href="#h146">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/BIF_5.md">BIF_5</a> <code>BIF</code> - same as <a href="#h130">above</a></li>
+    </ul>
+    </details></li>
+    <li><a href="ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md">ND_BUS_SLAVE</a> <code>gen_bus_slave.BUS_SLAVE</code></li>
+    <li><a href="ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md">ND_TAPE_400</a> <code>gen_tape.TAPE_400</code></li>
+    <li><a href="ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md">ND_FLOPPY_DMA</a> <code>gen_floppy.FLOPPY_1560</code></li>
+    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x3: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_wd.WD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md">ND_WINCHESTER</a> <code>gen_wd.WD_500</code></li>
+  </ul>
+  </details></li>
+</ul>
+</details></li>
+</ul>
 
 ## MEGA65 R4 R5 R6
 
@@ -790,34 +1324,51 @@ Not followed (framework): 7 file(s).
 
 277 of our modules, 2880 module instances, 13 levels deep. Vendor parts: none.
 
-- [nd120_mega65_machine](fpga/mega65/rtl/doc/nd120_mega65_machine.md)
-  - <a name="h177"></a>[nd120_console_mega65](fpga/mega65/rtl/doc/nd120_console_mega65.md) `CONSOLE`
-    - [m65_keys_to_ps2](fpga/mega65/rtl/doc/m65_keys_to_ps2.md) `KEYS`
-    - [ps2_decoder_tdv](Terminals/rtl/doc/ps2_decoder_tdv.md) `DECODER` - same as [above](#h155)
-    - [key_tdv2200](Terminals/rtl/doc/key_tdv2200.md) `KEYEXP`
-    - [term_console_feed](Terminals/rtl/doc/term_console_feed.md) `FEED` - same as [above](#h149)
-    - [terminal_top](Terminals/rtl/doc/terminal_top.md) `TERMINAL` - same as [above](#h151)
-  - [console_uart_rx](Terminals/rtl/doc/console_uart_rx.md) `CONSOLE_UART_RX`
-  - [console_uart_tx](Terminals/rtl/doc/console_uart_tx.md) `CONSOLE_UART_TX`
-  - [mips_counter](Terminals/rtl/doc/mips_counter.md) `MIPS`
-  - <a name="h178"></a>[nd_storage_mega65_devices](fpga/mega65/rtl/doc/nd_storage_mega65_devices.md) `STORAGE`
-    - [nd_storage_floppy_adapter](SD-FAT/circuit/doc/nd_storage_floppy_adapter.md) x2: `u_fd0`, `u_fd1`
-    - [nd_storage_disc_adapter](SD-FAT/circuit/doc/nd_storage_disc_adapter.md) x2: `u_wd0`, `u_wd1`
-    - [nd_storage_tape_adapter](SD-FAT/circuit/doc/nd_storage_tape_adapter.md) `u_tape`
-    - [nd_storage_vdrives](fpga/mega65/rtl/doc/nd_storage_vdrives.md) `u_vd`
-  - <a name="h179"></a>[ND120_CORE](doc/ND120_CORE.md) `CORE`
-    - [BACKWIRING_PROM](Shared/support/doc/BACKWIRING_PROM.md) `BACKPLANE_INR_PROM`
-    - [ND3202D](CPU-BOARD-3202/circuit/doc/ND3202D.md) `CPU_BOARD`
-      - [CYC_36](CPU-BOARD-3202/circuit/doc/CYC_36.md) `CYC` - same as [above](#h8)
-      - [CPU_15](CPU-BOARD-3202/circuit/doc/CPU_15.md) `CPU` - same as [above](#h9)
-      - [IO_37](CPU-BOARD-3202/circuit/doc/IO_37.md) `IO` - same as [above](#h158)
-      - [MEM_43](CPU-BOARD-3202/circuit/doc/MEM_43.md) `MEM` - same as [above](#h146)
-      - [BIF_5](CPU-BOARD-3202/circuit/doc/BIF_5.md) `BIF` - same as [above](#h130)
-    - [ND_BUS_SLAVE](ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md) `gen_bus_slave.BUS_SLAVE`
-    - [ND_TAPE_400](ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md) `gen_tape.TAPE_400`
-    - [ND_FLOPPY_DMA](ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md) `gen_floppy.FLOPPY_1560`
-    - [ND_DMA_MASTER](ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md) x3: `gen_floppy.FLOPPY_DMA_MASTER`, `gen_wd.WD_DMA_MASTER`, `gen_dma_master.DMA_MASTER`
-    - [ND_WINCHESTER](ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md) `gen_wd.WD_500`
+<ul class="hier">
+<li><details open><summary><a href="fpga/mega65/rtl/doc/nd120_mega65_machine.md">nd120_mega65_machine</a></summary>
+<ul>
+  <li><details open><summary><a name="h177"></a><a href="fpga/mega65/rtl/doc/nd120_console_mega65.md">nd120_console_mega65</a> <code>CONSOLE</code></summary>
+  <ul>
+    <li><a href="fpga/mega65/rtl/doc/m65_keys_to_ps2.md">m65_keys_to_ps2</a> <code>KEYS</code></li>
+    <li><a href="Terminals/rtl/doc/ps2_decoder_tdv.md">ps2_decoder_tdv</a> <code>DECODER</code> - same as <a href="#h155">above</a></li>
+    <li><a href="Terminals/rtl/doc/key_tdv2200.md">key_tdv2200</a> <code>KEYEXP</code></li>
+    <li><a href="Terminals/rtl/doc/term_console_feed.md">term_console_feed</a> <code>FEED</code> - same as <a href="#h149">above</a></li>
+    <li><a href="Terminals/rtl/doc/terminal_top.md">terminal_top</a> <code>TERMINAL</code> - same as <a href="#h151">above</a></li>
+  </ul>
+  </details></li>
+  <li><a href="Terminals/rtl/doc/console_uart_rx.md">console_uart_rx</a> <code>CONSOLE_UART_RX</code></li>
+  <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_UART_TX</code></li>
+  <li><a href="Terminals/rtl/doc/mips_counter.md">mips_counter</a> <code>MIPS</code></li>
+  <li><details open><summary><a name="h178"></a><a href="fpga/mega65/rtl/doc/nd_storage_mega65_devices.md">nd_storage_mega65_devices</a> <code>STORAGE</code></summary>
+  <ul>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_floppy_adapter.md">nd_storage_floppy_adapter</a> x2: <code>u_fd0</code>, <code>u_fd1</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_disc_adapter.md">nd_storage_disc_adapter</a> x2: <code>u_wd0</code>, <code>u_wd1</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_tape_adapter.md">nd_storage_tape_adapter</a> <code>u_tape</code></li>
+    <li><a href="fpga/mega65/rtl/doc/nd_storage_vdrives.md">nd_storage_vdrives</a> <code>u_vd</code></li>
+  </ul>
+  </details></li>
+  <li><details open><summary><a name="h179"></a><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <ul>
+    <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
+    <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
+    <ul>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code> - same as <a href="#h9">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/IO_37.md">IO_37</a> <code>IO</code> - same as <a href="#h158">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code> - same as <a href="#h146">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/BIF_5.md">BIF_5</a> <code>BIF</code> - same as <a href="#h130">above</a></li>
+    </ul>
+    </details></li>
+    <li><a href="ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md">ND_BUS_SLAVE</a> <code>gen_bus_slave.BUS_SLAVE</code></li>
+    <li><a href="ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md">ND_TAPE_400</a> <code>gen_tape.TAPE_400</code></li>
+    <li><a href="ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md">ND_FLOPPY_DMA</a> <code>gen_floppy.FLOPPY_1560</code></li>
+    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x3: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_wd.WD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md">ND_WINCHESTER</a> <code>gen_wd.WD_500</code></li>
+  </ul>
+  </details></li>
+</ul>
+</details></li>
+</ul>
 
 ## MEGA65 R3
 
@@ -829,14 +1380,19 @@ Not followed (framework): 7 file(s).
 
 277 of our modules, 2880 module instances, 13 levels deep. Vendor parts: none.
 
-- [nd120_mega65_machine](fpga/mega65/rtl/doc/nd120_mega65_machine.md)
-  - [nd120_console_mega65](fpga/mega65/rtl/doc/nd120_console_mega65.md) `CONSOLE` - same as [above](#h177)
-  - [console_uart_rx](Terminals/rtl/doc/console_uart_rx.md) `CONSOLE_UART_RX`
-  - [console_uart_tx](Terminals/rtl/doc/console_uart_tx.md) `CONSOLE_UART_TX`
-  - [mips_counter](Terminals/rtl/doc/mips_counter.md) `MIPS`
-  - [nd_storage_mega65_devices](fpga/mega65/rtl/doc/nd_storage_mega65_devices.md) `STORAGE` - same as [above](#h178)
-  - [nd_avalon_port](fpga/mega65/rtl/doc/nd_avalon_port.md) `MEMPORT`
-  - [ND120_CORE](doc/ND120_CORE.md) `CORE` - same as [above](#h156)
+<ul class="hier">
+<li><details open><summary><a href="fpga/mega65/rtl/doc/nd120_mega65_machine.md">nd120_mega65_machine</a></summary>
+<ul>
+  <li><a href="fpga/mega65/rtl/doc/nd120_console_mega65.md">nd120_console_mega65</a> <code>CONSOLE</code> - same as <a href="#h177">above</a></li>
+  <li><a href="Terminals/rtl/doc/console_uart_rx.md">console_uart_rx</a> <code>CONSOLE_UART_RX</code></li>
+  <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_UART_TX</code></li>
+  <li><a href="Terminals/rtl/doc/mips_counter.md">mips_counter</a> <code>MIPS</code></li>
+  <li><a href="fpga/mega65/rtl/doc/nd_storage_mega65_devices.md">nd_storage_mega65_devices</a> <code>STORAGE</code> - same as <a href="#h178">above</a></li>
+  <li><a href="fpga/mega65/rtl/doc/nd_avalon_port.md">nd_avalon_port</a> <code>MEMPORT</code></li>
+  <li><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code> - same as <a href="#h156">above</a></li>
+</ul>
+</details></li>
+</ul>
 
 ## QMTECH XC7A35T
 
@@ -846,20 +1402,31 @@ Defines: `FPGA_FF_MODE`, `MAIN_RAM_SDRAM`, `ND_SDRAM_PACK16`, `ND_SDRAM_DQ16`, `
 
 263 of our modules, 2914 module instances, 13 levels deep. Vendor parts: `BUFG`, `MMCME2_BASE`.
 
-- [nd120_qmtech_top](fpga/qmtech-a35t/rtl/doc/nd120_qmtech_top.md)
-  - MMCME2_BASE (vendor) `MMCM`
-  - BUFG (vendor) x5: `bufg_fb`, `bufg_cpu`, `bufg_2x`, `bufg_2xsd`, `bufg_stor`
-  - [nd_storage_devices](SD-FAT/circuit/doc/nd_storage_devices.md) `STORAGE`
-    - [nd_storage](SD-FAT/circuit/doc/nd_storage.md) `u_nd_storage`
-      - [sd_file_reader](SD-FAT/circuit/doc/sd_file_reader.md) `u_reader` - same as [above](#h4)
-      - [sd_writer](SD-FAT/circuit/doc/sd_writer.md) `u_writer`
-      - [nd_storage_mount](SD-FAT/circuit/doc/nd_storage_mount.md) `u_mount`
-      - [nd_storage_engine](SD-FAT/circuit/doc/nd_storage_engine.md) `u_engine` - same as [above](#h5)
-    - [nd_storage_tape_adapter](SD-FAT/circuit/doc/nd_storage_tape_adapter.md) `gen_tape.u_tape_adapter`
-    - [nd_storage_floppy_adapter](SD-FAT/circuit/doc/nd_storage_floppy_adapter.md) `gen_floppy.u_floppy_adapter`
-    - [nd_storage_disc_adapter](SD-FAT/circuit/doc/nd_storage_disc_adapter.md) `gen_wd.u_wd_adapter`
-  - [nd_storage_bram](fpga/qmtech-a35t/rtl/doc/nd_storage_bram.md) `STORAGE_REGION`
-  - [ND120_CORE](doc/ND120_CORE.md) `CORE` - same as [above](#h179)
+<ul class="hier">
+<li><details open><summary><a href="fpga/qmtech-a35t/rtl/doc/nd120_qmtech_top.md">nd120_qmtech_top</a></summary>
+<ul>
+  <li>MMCME2_BASE (vendor) <code>MMCM</code></li>
+  <li>BUFG (vendor) x5: <code>bufg_fb</code>, <code>bufg_cpu</code>, <code>bufg_2x</code>, <code>bufg_2xsd</code>, <code>bufg_stor</code></li>
+  <li><details open><summary><a href="SD-FAT/circuit/doc/nd_storage_devices.md">nd_storage_devices</a> <code>STORAGE</code></summary>
+  <ul>
+    <li><details><summary><a href="SD-FAT/circuit/doc/nd_storage.md">nd_storage</a> <code>u_nd_storage</code></summary>
+    <ul>
+      <li><a href="SD-FAT/circuit/doc/sd_file_reader.md">sd_file_reader</a> <code>u_reader</code> - same as <a href="#h4">above</a></li>
+      <li><a href="SD-FAT/circuit/doc/sd_writer.md">sd_writer</a> <code>u_writer</code></li>
+      <li><a href="SD-FAT/circuit/doc/nd_storage_mount.md">nd_storage_mount</a> <code>u_mount</code></li>
+      <li><a href="SD-FAT/circuit/doc/nd_storage_engine.md">nd_storage_engine</a> <code>u_engine</code> - same as <a href="#h5">above</a></li>
+    </ul>
+    </details></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_tape_adapter.md">nd_storage_tape_adapter</a> <code>gen_tape.u_tape_adapter</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_floppy_adapter.md">nd_storage_floppy_adapter</a> <code>gen_floppy.u_floppy_adapter</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_disc_adapter.md">nd_storage_disc_adapter</a> <code>gen_wd.u_wd_adapter</code></li>
+  </ul>
+  </details></li>
+  <li><a href="fpga/qmtech-a35t/rtl/doc/nd_storage_bram.md">nd_storage_bram</a> <code>STORAGE_REGION</code></li>
+  <li><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code> - same as <a href="#h179">above</a></li>
+</ul>
+</details></li>
+</ul>
 
 ## Basys3
 
@@ -869,25 +1436,39 @@ Defines: `FPGA_FF_MODE`, `SKIP_WCS_LOAD`, `MAIN_RAM_BLOCKRAM`, `BOARD_CLK_FREQ=1
 
 244 of our modules, 2844 module instances, 13 levels deep. Vendor parts: `BUFG`, `MMCME2_BASE`.
 
-- <a name="h185"></a>[ND120_TOP](doc/ND120_TOP.md)
-  - MMCME2_BASE (vendor) `mmcm_cpu_clk`
-  - BUFG (vendor) x2: `bufg_fb`, `bufg_cpu`
-  - [SevenSegDebug](Shared/support/doc/SevenSegDebug.md) `SEVEN_SEG`
-  - [ND120_CORE](doc/ND120_CORE.md) `CORE`
-    - [BACKWIRING_PROM](Shared/support/doc/BACKWIRING_PROM.md) `BACKPLANE_INR_PROM`
-    - [ND3202D](CPU-BOARD-3202/circuit/doc/ND3202D.md) `CPU_BOARD`
-      - [CYC_36](CPU-BOARD-3202/circuit/doc/CYC_36.md) `CYC` - same as [above](#h8)
-      - [CPU_15](CPU-BOARD-3202/circuit/doc/CPU_15.md) `CPU` - same as [above](#h9)
-      - [IO_37](CPU-BOARD-3202/circuit/doc/IO_37.md) `IO` - same as [above](#h112)
-      - [MEM_43](CPU-BOARD-3202/circuit/doc/MEM_43.md) `MEM`
-        - [MEM_ADEC_45](CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md) `ADEC` - same as [above](#h124)
-        - [MEM_LBDIF_48](CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md) `LBDIF` - same as [above](#h125)
-        - [MEM_DATA_46](CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md) `DATA` - same as [above](#h126)
-        - [MEM_ERROR_47](CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md) `ERROR` - same as [above](#h127)
-        - [MEM_RAMC_50](CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md) `RAMC` - same as [above](#h128)
-        - [MEM_ADDR_44](CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md) `ADDR` - same as [above](#h129)
-        - [MEM_RAM_49_BLOCKRAM](CPU-BOARD-3202/circuit/doc/MEM_RAM_49_BLOCKRAM.md) `RAM`
-      - [BIF_5](CPU-BOARD-3202/circuit/doc/BIF_5.md) `BIF` - same as [above](#h130)
+<ul class="hier">
+<li><details open><summary><a name="h185"></a><a href="doc/ND120_TOP.md">ND120_TOP</a></summary>
+<ul>
+  <li>MMCME2_BASE (vendor) <code>mmcm_cpu_clk</code></li>
+  <li>BUFG (vendor) x2: <code>bufg_fb</code>, <code>bufg_cpu</code></li>
+  <li><a href="Shared/support/doc/SevenSegDebug.md">SevenSegDebug</a> <code>SEVEN_SEG</code></li>
+  <li><details open><summary><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <ul>
+    <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
+    <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
+    <ul>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code> - same as <a href="#h9">above</a></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/IO_37.md">IO_37</a> <code>IO</code> - same as <a href="#h112">above</a></li>
+      <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code></summary>
+      <ul>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md">MEM_ADEC_45</a> <code>ADEC</code> - same as <a href="#h124">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md">MEM_LBDIF_48</a> <code>LBDIF</code> - same as <a href="#h125">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md">MEM_DATA_46</a> <code>DATA</code> - same as <a href="#h126">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md">MEM_ERROR_47</a> <code>ERROR</code> - same as <a href="#h127">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md">MEM_RAMC_50</a> <code>RAMC</code> - same as <a href="#h128">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md">MEM_ADDR_44</a> <code>ADDR</code> - same as <a href="#h129">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAM_49_BLOCKRAM.md">MEM_RAM_49_BLOCKRAM</a> <code>RAM</code></li>
+      </ul>
+      </details></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/BIF_5.md">BIF_5</a> <code>BIF</code> - same as <a href="#h130">above</a></li>
+    </ul>
+    </details></li>
+  </ul>
+  </details></li>
+</ul>
+</details></li>
+</ul>
 
 ## Cmod A7-35T
 
@@ -897,5 +1478,10 @@ Defines: `TARGET_CMOD_A7`, `FPGA_FF_MODE`, `MAIN_RAM_BLOCKRAM`, `BOARD_CLK_FREQ=
 
 245 of our modules, 2845 module instances, 14 levels deep. Vendor parts: `BUFG`, `MMCME2_BASE`.
 
-- [nd120_cmod_top](fpga/cmod-a7-35t/doc/nd120_cmod_top.md)
-  - [ND120_TOP](doc/ND120_TOP.md) `nd120` - same as [above](#h185)
+<ul class="hier">
+<li><details open><summary><a href="fpga/cmod-a7-35t/doc/nd120_cmod_top.md">nd120_cmod_top</a></summary>
+<ul>
+  <li><a href="doc/ND120_TOP.md">ND120_TOP</a> <code>nd120</code> - same as <a href="#h185">above</a></li>
+</ul>
+</details></li>
+</ul>

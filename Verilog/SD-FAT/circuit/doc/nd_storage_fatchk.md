@@ -14,6 +14,16 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_fatchk.v`
 
 ![nd_storage_fatchk symbol](nd_storage_fatchk.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![nd_storage_fatchk schematic](nd_storage_fatchk.svg)](nd_storage_fatchk.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 nd_storage mount-time contiguity checker (fatchk)
@@ -80,3 +90,284 @@ Ronny Hansen
 | input | `1` | `sdw_rx_we` |  |
 | input | `[8:0]` | `sdw_rx_addr` |  |
 | input | `[7:0]` | `sdw_rx_data` |  |
+
+## Verilog source
+
+[`Verilog/SD-FAT/circuit/nd_storage_fatchk.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/SD-FAT/circuit/nd_storage_fatchk.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of nd_storage_fatchk (269 lines)</summary>
+
+```verilog
+/****************************************************************************
+** nd_storage mount-time contiguity checker (fatchk)                       **
+**                                                                         **
+** Design: docs/nd-storage-design.md section 2.4; binding contract:        **
+** docs/nd-storage-interface-spec.md sections 6 and 8 (contiguous files   **
+** are REQUIRED in v1, enforced at open). Feature flag:                   **
+** SDFAT_STORAGE_CHECK in sd_fat_features.vh.                             **
+**                                                                         **
+** Invoked by the mount FSM (nd_storage_mount.v M_CHK) after M_PARK, i.e. **
+** the reader is parked and phase_write=1: sd_writer owns the SD pins and **
+** this module owns sd_writer's command interface while chk_busy (the     **
+** top's writer-command mux). For                                         **
+**                                                                         **
+**   n = ceil(size_bytes / (cluster_size * 512))                          **
+**                                                                         **
+** clusters starting at first_cluster the FAT must read                   **
+**                                                                         **
+**   FAT[first_cluster + i] == first_cluster + i + 1     for i < n-1      **
+**   FAT[first_cluster + n - 1] is a proper end-of-chain mark             **
+**                                                                         **
+** FAT16 entries are 2-byte little-endian, EOC = masked 16-bit value      **
+** >= 0xFFF7; FAT32 entries are 4-byte little-endian, only bits [27:0]    **
+** are the cluster number, EOC = masked value >= 0x0FFFFFF7 (the          **
+** fat_sec/fat_off/is_eoc shapes of the proven sd_fat_check.v). Unlike    **
+** sd_fat_check this module does NOT follow chain pointers - it verifies  **
+** the expected value at every position - so a corrupted FAT can never    **
+** send it walking; the only guards needed are the up-front cluster-count **
+** cap and the per-state watchdog. Verdict is a machine level: chk_ok     **
+** valid at the chk_done pulse (and held until the next run), no text.    **
+**                                                                         **
+** FAT sectors are read via sd_writer read mode (CMD17, rx byte stream    **
+** into an internal 512-byte buffer with the 1-clk registered-read        **
+** discipline); the current FAT sector is cached and only re-read when    **
+** the entry index leaves it - consecutive clusters share sectors, so a   **
+** contiguous file costs ceil(n / entries_per_sector) reads.              **
+**                                                                         **
+** Not-ok causes: fragmented chain, missing EOC, first_cluster < 2 or    **
+** cluster_size = 0 with a nonzero size (broken geometry latch),         **
+** n > HOP_CAP, sd_writer err, watchdog. size_bytes = 0 is ok with zero  **
+** card traffic (no chain to verify). Read-only - never writes.          **
+**                                                                         **
+** This file is ORIGINAL ND-120 project code (MIT, like the repository).  **
+**                                                                         **
+** Last reviewed: 11-JUL-2026                                              **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+
+module nd_storage_fatchk #(
+    parameter [31:0] WD_MAX  = 32'd270_000_000,
+    parameter [24:0] HOP_CAP = 25'd131072       // 1<<17 clusters, guard cap
+) (
+    input wire clk_stor,
+    input wire rst_stor_n,
+
+    // ---- mount handoff (nd_storage_mount M_CHK) ----
+    input  wire chk_start,  // 1-cycle pulse; only when chk_busy=0
+    output wire chk_busy,   // owns the sd_writer command mux while high
+    output reg  chk_done,   // 1-cycle pulse
+    output reg  chk_ok,     // level: valid at chk_done, held until next run
+
+    // ---- file/fs facts (latched by the mount at file_found, stable) ----
+    input wire        fs_is_fat32,
+    input wire [7:0]  cluster_size,   // sectors per cluster (power of two)
+    input wire [31:0] fat0_sector,    // absolute first sector of FAT copy 0
+    input wire [31:0] first_cluster,
+    input wire [31:0] size_bytes,
+
+    // ---- sd_writer command interface, read mode (muxed in the top) ----
+    output reg         sdw_start,   // 1-cycle pulse (top drives rd_mode=1)
+    output reg  [31:0] sdw_sector,
+    input  wire        sdw_done,
+    input  wire        sdw_err,
+    input  wire        sdw_rx_we,
+    input  wire [8:0]  sdw_rx_addr,
+    input  wire [7:0]  sdw_rx_data
+);
+
+  // --------------------------------------------------------- FAT sector cache
+  reg [7:0] fbuf[0:511];
+  always @(posedge clk_stor) if (sdw_rx_we) fbuf[sdw_rx_addr] <= sdw_rx_data;
+
+  // registered read port (1-clk latency, same discipline as sd_fat_check)
+  reg [8:0] fb_addr;
+  reg [7:0] fb_q;
+  always @(posedge clk_stor) fb_q <= fbuf[fb_addr];
+
+  // --------------------------------------------------------- helpers
+  function [31:0] fat_sec(input [31:0] c);
+    fat_sec = fat0_sector + (fs_is_fat32 ? (c >> 7) : (c >> 8));
+  endfunction
+  function [8:0] fat_off(input [31:0] c);
+    fat_off = fs_is_fat32 ? {c[6:0], 2'b00} : {c[7:0], 1'b0};
+  endfunction
+  function is_eoc(input [31:0] c);
+    is_eoc = fs_is_fat32 ? (c[27:0] >= 28'hFFFFFF7) : (c[15:0] >= 16'hFFF7);
+  endfunction
+  function [4:0] log2cs(input [7:0] cs);
+    casez (cs)
+      8'b1???????: log2cs = 5'd7;
+      8'b01??????: log2cs = 5'd6;
+      8'b001?????: log2cs = 5'd5;
+      8'b0001????: log2cs = 5'd4;
+      8'b00001???: log2cs = 5'd3;
+      8'b000001??: log2cs = 5'd2;
+      8'b0000001?: log2cs = 5'd1;
+      default:     log2cs = 5'd0;
+    endcase
+  endfunction
+
+  // --------------------------------------------------------- FSM
+  localparam [3:0] K_IDLE    = 4'd0;
+  localparam [3:0] K_CALC    = 4'd1;   // ceil size/bytes-per-cluster + gates
+  localparam [3:0] K_STEP    = 4'd2;   // next entry: cached sector or read
+  localparam [3:0] K_RD_GO   = 4'd3;   // pulse sd_writer start (CMD17)
+  localparam [3:0] K_RD_WAIT = 4'd4;   // wait sdw_done / sdw_err
+  localparam [3:0] K_ENT_SET = 4'd5;   // present the entry byte address
+  localparam [3:0] K_ENT_LAT = 4'd6;   // registered-read latency cycle
+  localparam [3:0] K_ENT_GET = 4'd7;   // collect little-endian entry bytes
+  localparam [3:0] K_CHECK   = 4'd8;   // expected-next or EOC verdict
+  localparam [3:0] K_OK      = 4'd9;
+  localparam [3:0] K_BAD     = 4'd10;
+
+  reg [3:0]  s_state;
+  reg [32:0] s_sum;      // size_bytes + bytes_per_cluster - 1 (33-bit safe)
+  reg [24:0] s_left;     // clusters still to verify (current one included)
+  reg [31:0] s_cur;      // cluster whose FAT entry is being verified
+  reg [31:0] s_cur_sec;  // FAT sector currently in fbuf (all-1 = none)
+  reg [31:0] s_ent;      // collected entry value
+  reg [1:0]  s_byte_i;
+
+  assign chk_busy = (s_state != K_IDLE);
+
+  wire [4:0]  s_lg  = log2cs(cluster_size);       // log2(sectors per cluster)
+  wire [17:0] s_bpc = {1'b0, cluster_size, 9'd0}; // bytes per cluster
+  wire [32:0] s_n33 = s_sum >> (s_lg + 5'd9);     // ceil(size / bpc)
+
+  // entry value with the last byte merged in (used in the final K_ENT_GET)
+  wire [31:0] s_ent_full = s_ent | ({24'd0, fb_q} << {s_byte_i, 3'd0});
+  wire [31:0] s_expect   = s_cur + 32'd1;
+
+  // --------------------------------------------------------- watchdog
+  reg [3:0]  s_state_q;
+  reg [31:0] s_wd;
+  always @(posedge clk_stor) begin
+    if (!rst_stor_n) begin
+      s_state_q <= K_IDLE;
+      s_wd      <= 32'd0;
+    end else begin
+      s_state_q <= s_state;
+      if (s_state != s_state_q || s_state == K_IDLE || sdw_rx_we)
+        s_wd <= 32'd0;
+      else s_wd <= s_wd + 32'd1;
+    end
+  end
+  wire s_wd_hit = (s_wd >= WD_MAX);
+
+  // --------------------------------------------------------- main
+  always @(posedge clk_stor) begin
+    if (!rst_stor_n) begin
+      s_state    <= K_IDLE;
+      s_sum      <= 33'd0;
+      s_left     <= 25'd0;
+      s_cur      <= 32'd0;
+      s_cur_sec  <= 32'hFFFF_FFFF;
+      s_ent      <= 32'd0;
+      s_byte_i   <= 2'd0;
+      fb_addr    <= 9'd0;
+      chk_done   <= 1'b0;
+      chk_ok     <= 1'b0;
+      sdw_start  <= 1'b0;
+      sdw_sector <= 32'd0;
+    end else begin
+      chk_done  <= 1'b0;
+      sdw_start <= 1'b0;
+
+      if (s_wd_hit && s_state != K_IDLE) begin
+        s_state <= K_BAD;  // stuck engine handshake: fail the open
+      end else begin
+        case (s_state)
+          K_IDLE:
+          if (chk_start) begin
+            s_sum     <= {1'b0, size_bytes} + {15'd0, s_bpc} - 33'd1;
+            s_cur     <= first_cluster;
+            s_cur_sec <= 32'hFFFF_FFFF;  // nothing cached yet
+            s_state   <= K_CALC;
+          end
+
+          K_CALC:
+          if (size_bytes == 32'd0) begin
+            s_state <= K_OK;   // empty file: no chain to verify, no traffic
+          end else if (cluster_size == 8'd0 || first_cluster < 32'd2) begin
+            s_state <= K_BAD;  // broken geometry latch / reserved cluster
+          end else if (s_n33 > {8'd0, HOP_CAP}) begin
+            s_state <= K_BAD;  // cluster-count cap: refuse, no traffic
+          end else begin
+            s_left  <= s_n33[24:0];
+            s_state <= K_STEP;
+          end
+
+          K_STEP:  // read FAT[s_cur]; re-read the sector only on change
+          if (fat_sec(s_cur) == s_cur_sec) begin
+            s_state <= K_ENT_SET;
+          end else begin
+            sdw_sector <= fat_sec(s_cur);
+            s_cur_sec  <= fat_sec(s_cur);
+            s_state    <= K_RD_GO;
+          end
+
+          K_RD_GO: begin
+            sdw_start <= 1'b1;  // top mux drives rd_mode=1 while chk_busy
+            s_state   <= K_RD_WAIT;
+          end
+
+          K_RD_WAIT:
+          if (sdw_err) s_state <= K_BAD;       // card error: fail the open
+          else if (sdw_done) s_state <= K_ENT_SET;
+
+          K_ENT_SET: begin
+            fb_addr  <= fat_off(s_cur);
+            s_byte_i <= 2'd0;
+            s_ent    <= 32'd0;
+            s_state  <= K_ENT_LAT;
+          end
+
+          K_ENT_LAT: s_state <= K_ENT_GET;  // fb_q catches up with fb_addr
+
+          K_ENT_GET:
+          if ({1'b0, s_byte_i} == (fs_is_fat32 ? 3'd3 : 3'd1)) begin
+            s_ent   <= s_ent_full;
+            s_state <= K_CHECK;
+          end else begin
+            s_ent    <= s_ent_full;
+            s_byte_i <= s_byte_i + 2'd1;
+            fb_addr  <= fb_addr + 9'd1;
+            s_state  <= K_ENT_LAT;
+          end
+
+          K_CHECK:
+          if (s_left == 25'd1) begin
+            // last cluster of the file: a proper end-of-chain mark required
+            s_state <= is_eoc(s_ent) ? K_OK : K_BAD;
+          end else if (fs_is_fat32 ? (s_ent[27:0] == s_expect[27:0])
+                                   : (s_ent[15:0] == s_expect[15:0])) begin
+            s_cur   <= s_expect;    // contiguous so far: verify the next one
+            s_left  <= s_left - 25'd1;
+            s_state <= K_STEP;
+          end else begin
+            s_state <= K_BAD;       // fragmented: FAT[c] != c+1
+          end
+
+          K_OK: begin
+            chk_ok   <= 1'b1;
+            chk_done <= 1'b1;
+            s_state  <= K_IDLE;
+          end
+
+          K_BAD: begin
+            chk_ok   <= 1'b0;
+            chk_done <= 1'b1;
+            s_state  <= K_IDLE;
+          end
+
+          default: s_state <= K_IDLE;
+        endcase
+      end
+    end
+  end
+
+endmodule
+```
+
+</details>

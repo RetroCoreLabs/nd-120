@@ -19,6 +19,16 @@ Source: `Verilog/DELILAH-CPU/CGA_ALU/circuit/CGA_ALU_DBR.v`
 
 ![CGA_ALU_DBR symbol](CGA_ALU_DBR.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.ALU.ALU_DBR`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![CGA_ALU_DBR schematic](CGA_ALU_DBR.svg)](CGA_ALU_DBR.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 ND120 CGA (CPU Gate Array / DELILAH)
@@ -35,7 +45,262 @@ Ronny Hansen
 |---|---|---|---|
 | input | `1` | `sysclk` | FPGA system clock (P2: ALUCLK_EN capture) |
 | input | `1` | `ALUCLK_EN` | ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0) |
-| input | `1` | `ALUCLK` |  |
-| input | `[15:0]` | `CD_15_0` |  |
-| input | `1` | `LDDBRN` |  |
+| input | `1` | `ALUCLK` | ALU clock signal (from CPU_PROC_CGA_33.ALUCLK) |
+| input | `[15:0]` | `CD_15_0` | Command/Data bus (from CPU_PROC_CGA_33.CD_15_0) |
+| input | `1` | `LDDBRN` | Latch DBR negated (from CGA_DCD.LDDBRN) |
 | output | `[15:0]` | `DBR_15_0` |  |
+
+## Verilog source
+
+[`Verilog/DELILAH-CPU/CGA_ALU/circuit/CGA_ALU_DBR.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/DELILAH-CPU/CGA_ALU/circuit/CGA_ALU_DBR.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of CGA_ALU_DBR (243 lines)</summary>
+
+```verilog
+
+/**************************************************************************
+** ND120 CGA (CPU Gate Array / DELILAH)                                  **
+** /CGA/ALU/DBR                                                          **
+** DBR REGISTER (Data Bus Register)                                      **
+**                                                                       **
+** Page 52                                                               **
+** SHEET 1 of 1                                                          **
+**                                                                       **
+** Last reviewed: 10-NOV-2024                                            **
+** Ronny Hansen                                                          **
+***************************************************************************/
+
+
+module CGA_ALU_DBR (
+    input        sysclk,     //! FPGA system clock (P2: ALUCLK_EN capture)
+    input        ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0)
+    input        ALUCLK,     //! ALU clock signal (from CPU_PROC_CGA_33.ALUCLK)
+    input [15:0] CD_15_0,    //! Command/Data bus (from CPU_PROC_CGA_33.CD_15_0)
+    input        LDDBRN,     //! Latch DBR negated (from CGA_DCD.LDDBRN)
+
+    output [15:0] DBR_15_0
+);
+
+  /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+  wire [15:0] s_dbr_15_0_out;
+  wire [15:0] s_cd_15_0;
+  wire        s_aluclk;
+  wire        s_lddbr;
+  wire        s_lddbr_n;
+
+  /*******************************************************************************
+   ** Here all input connections are defined                                     **
+   *******************************************************************************/
+  assign s_cd_15_0[15:0] = CD_15_0;
+  assign s_aluclk        = ALUCLK;
+
+  // P2b (docs/plan-fix-unconstrained-clocks.md): in FF mode the ALUCLK-
+  // clocked registers capture on posedge sysclk gated by ALUCLK_EN
+  // (aligned to the ALUCLK rise) instead of clocking on the routed net.
+`ifdef FPGA_FF_MODE
+  localparam ALUCLK_CE = 1;
+`else
+  localparam ALUCLK_CE = 0;
+`endif
+
+  assign s_lddbr_n       = LDDBRN;
+
+  /*******************************************************************************
+   ** Here all output connections are defined                                    **
+   *******************************************************************************/
+  assign DBR_15_0        = s_dbr_15_0_out[15:0];
+
+  /*******************************************************************************
+   ** Here all in-lined components are defined                                   **
+   *******************************************************************************/
+
+  // NOT Gate
+  assign s_lddbr         = ~s_lddbr_n;
+
+  /*******************************************************************************
+   ** Here all sub-circuits are defined                                          **
+   *******************************************************************************/
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF15 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[15]),
+      .Q  (s_dbr_15_0_out[15]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[15])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF14 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[14]),
+      .Q  (s_dbr_15_0_out[14]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[14])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRf13 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[13]),
+      .Q  (s_dbr_15_0_out[13]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[13])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF12 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[12]),
+      .Q  (s_dbr_15_0_out[12]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[12])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF11 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[11]),
+      .Q  (s_dbr_15_0_out[11]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[11])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF10 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[10]),
+      .Q  (s_dbr_15_0_out[10]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[10])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF9 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[9]),
+      .Q  (s_dbr_15_0_out[9]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[9])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF8 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[8]),
+      .Q  (s_dbr_15_0_out[8]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[8])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF7 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[7]),
+      .Q  (s_dbr_15_0_out[7]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[7])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF6 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[6]),
+      .Q  (s_dbr_15_0_out[6]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[6])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF5 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[5]),
+      .Q  (s_dbr_15_0_out[5]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[5])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF4 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[4]),
+      .Q  (s_dbr_15_0_out[4]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[4])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF3 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[3]),
+      .Q  (s_dbr_15_0_out[3]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[3])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF2 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[2]),
+      .Q  (s_dbr_15_0_out[2]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[2])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF1 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[1]),
+      .Q  (s_dbr_15_0_out[1]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[1])
+  );
+
+  SCAN_FF_EN #(.USE_ENABLE(ALUCLK_CE)) DBRF0 (
+      .sysclk(sysclk),
+      .EN(ALUCLK_EN),
+      .CLK(s_aluclk),
+      .D  (s_dbr_15_0_out[0]),
+      .Q  (s_dbr_15_0_out[0]),
+      .QN (),
+      .TE (s_lddbr),
+      .TI (s_cd_15_0[0])
+  );
+
+ 
+endmodule
+```
+
+</details>

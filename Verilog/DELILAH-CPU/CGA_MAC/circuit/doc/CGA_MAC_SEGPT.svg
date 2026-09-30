@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="663.0" height="762.0" viewBox="-80.0 -80.0 663.0 762.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="663.0" height="762.0" fill="#ffffff" /><g transform="translate(119,289.5)" id="cell_$not$CGA_MAC_SEGPT.v:85$10439"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MAC_SEGPT.v:85$10439" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MAC_SEGPT.v:85$10439" /><g /><g /></g>
+<a href="CGA_MAC_SEGPT_PCR.md"><title>PCR (CGA_MAC_SEGPT_PCR) - open its page</title><g transform="translate(292,487)" id="cell_PCR"><text x="15" y="-4" class="nodelabel cell_PCR">CGA_MAC_SEGPT_PCR</text><rect width="30" height="100" class="cell_PCR" /><g transform="translate(0,10)" id="port_PCR~FIDBO_15_0"><text x="-3" y="-4" class="inputPortLabel cell_PCR">FIDBO_15_0</text></g><g transform="translate(0,30)" id="port_PCR~LLDPCR"><text x="-3" y="-4" class="inputPortLabel cell_PCR">LLDPCR</text></g><g transform="translate(0,50)" id="port_PCR~MCLKN"><text x="-3" y="-4" class="inputPortLabel cell_PCR">MCLKN</text></g><g transform="translate(0,70)" id="port_PCR~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_PCR">sys_rst_n</text></g><g transform="translate(0,90)" id="port_PCR~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_PCR">sysclk</text></g><g transform="translate(30,10)" id="port_PCR~PCR_15_0"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PCR">PCR_15_0</text></g><g transform="translate(30,30)" id="port_PCR~PCR_RB_15_0"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_PCR">PCR_RB_15_0</text></g></g></a>
+<a href="CGA_MAC_SEGPT_SEG.md"><title>SEG (CGA_MAC_SEGPT_SEG) - open its page</title><g transform="translate(294,339)" id="cell_SEG"><text x="15" y="-4" class="nodelabel cell_SEG">CGA_MAC_SEGPT_SEG</text><rect width="30" height="100" class="cell_SEG" /><g transform="translate(0,10)" id="port_SEG~FIDBO_7_0"><text x="-3" y="-4" class="inputPortLabel cell_SEG">FIDBO_7_0</text></g><g transform="translate(0,30)" id="port_SEG~LLDSEG"><text x="-3" y="-4" class="inputPortLabel cell_SEG">LLDSEG</text></g><g transform="translate(0,50)" id="port_SEG~MCLKN"><text x="-3" y="-4" class="inputPortLabel cell_SEG">MCLKN</text></g><g transform="translate(0,70)" id="port_SEG~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_SEG">sys_rst_n</text></g><g transform="translate(0,90)" id="port_SEG~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_SEG">sysclk</text></g><g transform="translate(30,10)" id="port_SEG~SEGZN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG">SEGZN</text></g><g transform="translate(30,30)" id="port_SEG~SEG_7_0"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_SEG">SEG_7_0</text></g></g></a>
+<a href="CGA_MAC_SEGPT_XPT.md"><title>XPT (CGA_MAC_SEGPT_XPT) - open its page</title><g transform="translate(294.3333333333333,144)" id="cell_XPT"><text x="15" y="-4" class="nodelabel cell_XPT">CGA_MAC_SEGPT_XPT</text><rect width="30" height="120" class="cell_XPT" /><g transform="translate(0,10)" id="port_XPT~EXMN"><text x="-3" y="-4" class="inputPortLabel cell_XPT">EXMN</text></g><g transform="translate(0,30)" id="port_XPT~FIDBO_2_0"><text x="-3" y="-4" class="inputPortLabel cell_XPT">FIDBO_2_0</text></g><g transform="translate(0,50)" id="port_XPT~LLDEXM"><text x="-3" y="-4" class="inputPortLabel cell_XPT">LLDEXM</text></g><g transform="translate(0,70)" id="port_XPT~MCLKN"><text x="-3" y="-4" class="inputPortLabel cell_XPT">MCLKN</text></g><g transform="translate(0,90)" id="port_XPT~sys_rst_n"><text x="-3" y="-4" class="inputPortLabel cell_XPT">sys_rst_n</text></g><g transform="translate(0,110)" id="port_XPT~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_XPT">sysclk</text></g><g transform="translate(30,10)" id="port_XPT~PEX"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_XPT">PEX</text></g><g transform="translate(30,30)" id="port_XPT~VEX"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_XPT">VEX</text></g><g transform="translate(30,50)" id="port_XPT~XPT_1_0"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_XPT">XPT_1_0</text></g></g></a>
+<g transform="translate(107,419.5)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(107,354.5)" id="cell_sys_rst_n"><text x="15" y="-4" class="nodelabel cell_sys_rst_n">sys_rst_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sys_rst_n" /><g /></g>
+<g transform="translate(107,22)" id="cell_EXMN"><text x="15" y="-4" class="nodelabel cell_EXMN">EXMN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EXMN" /><g /></g>
+<g transform="translate(12,154.5)" id="cell_FIDBO_15_0"><text x="15" y="-4" class="nodelabel cell_FIDBO_15_0">FIDBO_15_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FIDBO_15_0" /><g /></g>
+<g transform="translate(107,87)" id="cell_LLDEXM"><text x="15" y="-4" class="nodelabel cell_LLDEXM">LLDEXM</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LLDEXM" /><g /></g>
+<g transform="translate(107,507.5)" id="cell_LLDPCR"><text x="15" y="-4" class="nodelabel cell_LLDPCR">LLDPCR</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LLDPCR" /><g /></g>
+<g transform="translate(107,234.5)" id="cell_LLDSEG"><text x="15" y="-4" class="nodelabel cell_LLDSEG">LLDSEG</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LLDSEG" /><g /></g>
+<g transform="translate(12,289.5)" id="cell_MCLK"><text x="15" y="-4" class="nodelabel cell_MCLK">MCLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MCLK" /><g /></g>
+<g transform="translate(425,442.5)" id="cell_PCR_15_0"><text x="15" y="-4" class="nodelabel cell_PCR_15_0">PCR_15_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PCR_15_0" /><g /></g>
+<g transform="translate(425,507.5)" id="cell_PCR_RB_15_0"><text x="15" y="-4" class="nodelabel cell_PCR_RB_15_0">PCR_RB_15_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PCR_RB_15_0" /><g /></g>
+<g transform="translate(425,99.5)" id="cell_PEX"><text x="15" y="-4" class="nodelabel cell_PEX">PEX</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PEX" /><g /></g>
+<g transform="translate(425,294.5)" id="cell_SEGZN"><text x="15" y="-4" class="nodelabel cell_SEGZN">SEGZN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SEGZN" /><g /></g>
+<g transform="translate(425,359.5)" id="cell_SEG_7_0"><text x="15" y="-4" class="nodelabel cell_SEG_7_0">SEG_7_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_SEG_7_0" /><g /></g>
+<g transform="translate(425,164.5)" id="cell_VEX"><text x="15" y="-4" class="nodelabel cell_VEX">VEX</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_VEX" /><g /></g>
+<g transform="translate(425,229.5)" id="cell_XPT_1_0"><text x="15" y="-4" class="nodelabel cell_XPT_1_0">XPT_1_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_XPT_1_0" /><g /></g>
+<g transform="translate(131.66666666666666,144)" id="cell_$split$,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,"><rect width="5" height="40" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0:7</text></g><g transform="translate(4,30)"><text x="5" y="-4">0:2</text></g></g>
+<line x1="40" x2="119" y1="299.5" y2="299.5" class="net_24"><title>MCLK</title></line>
+<line x1="40" x2="82" y1="164.5" y2="164.5" class="net_5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"><title>FIDBO_15_0</title></line>
+<line x1="82" x2="82" y1="164.5" y2="486.5" class="net_5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"><title>FIDBO_15_0</title></line>
+<line x1="82" x2="191" y1="486.5" y2="486.5" class="net_5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"><title>FIDBO_15_0</title></line>
+<line x1="191" x2="191" y1="486.5" y2="497.5" class="net_5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"><title>FIDBO_15_0</title></line>
+<circle cx="82" cy="164.5" r="2" style="fill:#000" class="net_5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20" />
+<line x1="191" x2="292" y1="497.5" y2="497.5" class="net_5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"><title>FIDBO_15_0</title></line>
+<line x1="40" x2="131.66666666666666" y1="164.5" y2="164.5" class="net_5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"><title>FIDBO_15_0</title></line>
+<line x1="135" x2="292" y1="517.5" y2="517.5" class="net_22"><title>LLDPCR</title></line>
+<line x1="144" x2="171" y1="299.5" y2="299.5" class="net_70"><title>s_mclk_n</title></line>
+<line x1="171" x2="171" y1="299.5" y2="537.5" class="net_70"><title>s_mclk_n</title></line>
+<circle cx="171" cy="299.5" r="2" style="fill:#000" class="net_70" />
+<line x1="171" x2="292" y1="537.5" y2="537.5" class="net_70"><title>s_mclk_n</title></line>
+<line x1="144" x2="171" y1="299.5" y2="299.5" class="net_70"><title>s_mclk_n</title></line>
+<line x1="171" x2="171" y1="299.5" y2="389.5" class="net_70"><title>s_mclk_n</title></line>
+<circle cx="171" cy="389.5" r="2" style="fill:#000" class="net_70" />
+<line x1="171" x2="294" y1="389.5" y2="389.5" class="net_70"><title>s_mclk_n</title></line>
+<line x1="144" x2="171" y1="299.5" y2="299.5" class="net_70"><title>s_mclk_n</title></line>
+<line x1="171" x2="171" y1="299.5" y2="214.5" class="net_70"><title>s_mclk_n</title></line>
+<line x1="171" x2="294.3333333333333" y1="214.5" y2="214.5" class="net_70"><title>s_mclk_n</title></line>
+<line x1="135" x2="181" y1="364.5" y2="364.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="181" x2="181" y1="364.5" y2="557.5" class="net_3"><title>sys_rst_n</title></line>
+<circle cx="181" cy="364.5" r="2" style="fill:#000" class="net_3" />
+<line x1="181" x2="292" y1="557.5" y2="557.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="135" x2="181" y1="364.5" y2="364.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="181" x2="181" y1="364.5" y2="409.5" class="net_3"><title>sys_rst_n</title></line>
+<circle cx="181" cy="409.5" r="2" style="fill:#000" class="net_3" />
+<line x1="181" x2="294" y1="409.5" y2="409.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="135" x2="181" y1="364.5" y2="364.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="181" x2="181" y1="364.5" y2="234.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="181" x2="294.3333333333333" y1="234.5" y2="234.5" class="net_3"><title>sys_rst_n</title></line>
+<line x1="135" x2="211" y1="429.5" y2="429.5" class="net_2"><title>sysclk</title></line>
+<line x1="211" x2="211" y1="429.5" y2="577.5" class="net_2"><title>sysclk</title></line>
+<circle cx="211" cy="429.5" r="2" style="fill:#000" class="net_2" />
+<line x1="211" x2="292" y1="577.5" y2="577.5" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="294" y1="429.5" y2="429.5" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="211" y1="429.5" y2="429.5" class="net_2"><title>sysclk</title></line>
+<line x1="211" x2="211" y1="429.5" y2="254.5" class="net_2"><title>sysclk</title></line>
+<line x1="211" x2="294.3333333333333" y1="254.5" y2="254.5" class="net_2"><title>sysclk</title></line>
+<line x1="136.66666666666666" x2="201" y1="154.5" y2="154.5" class="net_5,6,7,8,9,10,11,12"><title>FIDBO_15_0[7:0]</title></line>
+<line x1="201" x2="201" y1="154.5" y2="349.5" class="net_5,6,7,8,9,10,11,12"><title>FIDBO_15_0[7:0]</title></line>
+<line x1="201" x2="294" y1="349.5" y2="349.5" class="net_5,6,7,8,9,10,11,12"><title>FIDBO_15_0[7:0]</title></line>
+<line x1="135" x2="191" y1="244.5" y2="244.5" class="net_23"><title>LLDSEG</title></line>
+<line x1="191" x2="191" y1="244.5" y2="369.5" class="net_23"><title>LLDSEG</title></line>
+<line x1="191" x2="294" y1="369.5" y2="369.5" class="net_23"><title>LLDSEG</title></line>
+<line x1="135" x2="221" y1="32" y2="32" class="net_4"><title>EXMN</title></line>
+<line x1="221" x2="221" y1="32" y2="154.5" class="net_4"><title>EXMN</title></line>
+<line x1="221" x2="294.3333333333333" y1="154.5" y2="154.5" class="net_4"><title>EXMN</title></line>
+<line x1="136.66666666666666" x2="294.3333333333333" y1="174.5" y2="174.5" class="net_5,6,7"><title>FIDBO_15_0[2:0]</title></line>
+<line x1="135" x2="211" y1="97" y2="97" class="net_21"><title>LLDEXM</title></line>
+<line x1="211" x2="211" y1="97" y2="194.5" class="net_21"><title>LLDEXM</title></line>
+<line x1="211" x2="294.3333333333333" y1="194.5" y2="194.5" class="net_21"><title>LLDEXM</title></line>
+<line x1="323" x2="400" y1="497.5" y2="497.5" class="net_25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40"><title>PCR_15_0</title></line>
+<line x1="400" x2="400" y1="497.5" y2="452.5" class="net_25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40"><title>PCR_15_0</title></line>
+<line x1="400" x2="425" y1="452.5" y2="452.5" class="net_25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40"><title>PCR_15_0</title></line>
+<line x1="323" x2="425" y1="517.5" y2="517.5" class="net_41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56"><title>PCR_RB_15_0</title></line>
+<line x1="325.3333333333333" x2="400" y1="154.5" y2="154.5" class="net_57"><title>PEX</title></line>
+<line x1="400" x2="400" y1="154.5" y2="109.5" class="net_57"><title>PEX</title></line>
+<line x1="400" x2="425" y1="109.5" y2="109.5" class="net_57"><title>PEX</title></line>
+<line x1="325" x2="400" y1="349.5" y2="349.5" class="net_58"><title>SEGZN</title></line>
+<line x1="400" x2="400" y1="349.5" y2="304.5" class="net_58"><title>SEGZN</title></line>
+<line x1="400" x2="425" y1="304.5" y2="304.5" class="net_58"><title>SEGZN</title></line>
+<line x1="325" x2="425" y1="369.5" y2="369.5" class="net_59,60,61,62,63,64,65,66"><title>SEG_7_0</title></line>
+<line x1="325.3333333333333" x2="425" y1="174.5" y2="174.5" class="net_67"><title>VEX</title></line>
+<line x1="325.3333333333333" x2="400" y1="194.5" y2="194.5" class="net_68,69"><title>XPT_1_0</title></line>
+<line x1="400" x2="400" y1="194.5" y2="239.5" class="net_68,69"><title>XPT_1_0</title></line>
+<line x1="400" x2="425" y1="239.5" y2="239.5" class="net_68,69"><title>XPT_1_0</title></line>
+<text x="138.0" y="426.5" class="netlabel">sysclk</text>
+<text x="214.0" y="191.5" class="netlabel">LLDEXM</text>
+<text x="138.0" y="514.5" class="netlabel">LLDPCR</text>
+<text x="194.0" y="366.5" class="netlabel">LLDSEG</text>
+<text x="43.0" y="296.5" class="netlabel">MCLK</text>
+<text x="326.0" y="494.5" class="netlabel">PCR_15_0</text>
+<text x="184.0" y="231.5" class="netlabel">sys_rst_n</text>
+<text x="138.0" y="29.0" class="netlabel">EXMN</text>
+<text x="326.0" y="514.5" class="netlabel">PCR_RB_15_0</text>
+<text x="139.7" y="171.5" class="netlabel">FIDBO_15_0[2:0]</text>
+<text x="204.0" y="346.5" class="netlabel">FIDBO_15_0[7:0]</text>
+<text x="85.0" y="483.5" class="netlabel">FIDBO_15_0</text>
+<text x="328.3" y="151.5" class="netlabel">PEX</text>
+<text x="328.0" y="346.5" class="netlabel">SEGZN</text>
+<text x="328.0" y="366.5" class="netlabel">SEG_7_0</text>
+<text x="328.3" y="171.5" class="netlabel">VEX</text>
+<text x="328.3" y="191.5" class="netlabel">XPT_1_0</text>
+<text x="174.0" y="211.5" class="netlabel">s_mclk_n</text>
+</svg>

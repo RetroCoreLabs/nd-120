@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="489.0" height="474.0" viewBox="-80.0 -80.0 489.0 474.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="489.0" height="474.0" fill="#ffffff" /><a href="SCAN_WITH_RESET_N.md"><title>gen_orig.FF (SCAN_WITH_RESET_N) - open its page</title><g transform="translate(186,111.5)" id="cell_gen_orig.FF"><text x="15" y="-4" class="nodelabel cell_gen_orig.FF">SCAN_WITH_RESET_N</text><rect width="30" height="100" class="cell_gen_orig.FF" /><g transform="translate(0,10)" id="port_gen_orig.FF~CLK"><text x="-3" y="-4" class="inputPortLabel cell_gen_orig.FF">CLK</text></g><g transform="translate(0,30)" id="port_gen_orig.FF~D"><text x="-3" y="-4" class="inputPortLabel cell_gen_orig.FF">D</text></g><g transform="translate(0,50)" id="port_gen_orig.FF~R_n"><text x="-3" y="-4" class="inputPortLabel cell_gen_orig.FF">R_n</text></g><g transform="translate(0,70)" id="port_gen_orig.FF~TE"><text x="-3" y="-4" class="inputPortLabel cell_gen_orig.FF">TE</text></g><g transform="translate(0,90)" id="port_gen_orig.FF~TI"><text x="-3" y="-4" class="inputPortLabel cell_gen_orig.FF">TI</text></g><g transform="translate(30,10)" id="port_gen_orig.FF~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_orig.FF">Q</text></g><g transform="translate(30,30)" id="port_gen_orig.FF~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_gen_orig.FF">QN</text></g></g></a>
+<g transform="translate(54,22)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(12,22)" id="cell_EN"><text x="15" y="-4" class="nodelabel cell_EN">EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EN" /><g /></g>
+<g transform="translate(102,22)" id="cell_CLK"><text x="15" y="-4" class="nodelabel cell_CLK">CLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLK" /><g /></g>
+<g transform="translate(102,87)" id="cell_D"><text x="15" y="-4" class="nodelabel cell_D">D</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_D" /><g /></g>
+<g transform="translate(102,152)" id="cell_R_n"><text x="15" y="-4" class="nodelabel cell_R_n">R_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_R_n" /><g /></g>
+<g transform="translate(102,217)" id="cell_TE"><text x="15" y="-4" class="nodelabel cell_TE">TE</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TE" /><g /></g>
+<g transform="translate(102,282)" id="cell_TI"><text x="15" y="-4" class="nodelabel cell_TI">TI</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_TI" /><g /></g>
+<g transform="translate(287,112)" id="cell_Q"><text x="15" y="-4" class="nodelabel cell_Q">Q</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_Q" /><g /></g>
+<g transform="translate(287,177)" id="cell_QN"><text x="15" y="-4" class="nodelabel cell_QN">QN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_QN" /><g /></g>
+<line x1="130" x2="152" y1="32" y2="32" class="net_4"><title>CLK</title></line>
+<line x1="152" x2="152" y1="32" y2="122" class="net_4"><title>CLK</title></line>
+<line x1="152" x2="186" y1="122" y2="122" class="net_4"><title>CLK</title></line>
+<line x1="130" x2="142" y1="97" y2="97" class="net_5"><title>D</title></line>
+<line x1="142" x2="142" y1="97" y2="142" class="net_5"><title>D</title></line>
+<line x1="142" x2="186" y1="142" y2="142" class="net_5"><title>D</title></line>
+<line x1="130" x2="186" y1="162" y2="162" class="net_6"><title>R_n</title></line>
+<line x1="130" x2="142" y1="227" y2="227" class="net_7"><title>TE</title></line>
+<line x1="142" x2="142" y1="227" y2="182" class="net_7"><title>TE</title></line>
+<line x1="142" x2="186" y1="182" y2="182" class="net_7"><title>TE</title></line>
+<line x1="130" x2="152" y1="292" y2="292" class="net_8"><title>TI</title></line>
+<line x1="152" x2="152" y1="292" y2="202" class="net_8"><title>TI</title></line>
+<line x1="152" x2="186" y1="202" y2="202" class="net_8"><title>TI</title></line>
+<line x1="217" x2="287" y1="122" y2="122" class="net_9"><title>Q</title></line>
+<line x1="217" x2="262" y1="142" y2="142" class="net_10"><title>QN</title></line>
+<line x1="262" x2="262" y1="142" y2="187" class="net_10"><title>QN</title></line>
+<line x1="262" x2="287" y1="187" y2="187" class="net_10"><title>QN</title></line>
+<text x="220.0" y="139.0" class="netlabel">QN</text>
+<text x="155.0" y="119.0" class="netlabel">CLK</text>
+<text x="145.0" y="139.0" class="netlabel">D</text>
+<text x="133.0" y="159.0" class="netlabel">R_n</text>
+<text x="145.0" y="179.0" class="netlabel">TE</text>
+<text x="155.0" y="199.0" class="netlabel">TI</text>
+<text x="220.0" y="119.0" class="netlabel">Q</text>
+</svg>

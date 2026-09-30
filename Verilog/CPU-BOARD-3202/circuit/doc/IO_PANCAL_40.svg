@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="753.0" height="649.0" viewBox="-80.0 -80.0 753.0 649.0"><style>svg {
+    stroke:#000;
+    fill:none;
+  }
+  text {
+    fill:#000;
+    stroke:none;
+    font-size:10px;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+  }
+  .nodelabel {
+    text-anchor: middle;
+  }
+  .inputPortLabel {
+    text-anchor: end;
+  }
+  .splitjoinBody {
+    fill:#000;
+  }
+.netlabel { font-family: sans-serif; font-size: 8px; fill: #1565c0; }
+a:hover rect { fill: #e3f2fd; }
+a { cursor: pointer; }
+</style>
+<rect x="-80.0" y="-80.0" width="753.0" height="649.0" fill="#ffffff" /><a href="../../../Shared/support/doc/TTL_74374.md"><title>CHIP_32B (TTL_74374) - open its page</title><g transform="translate(190,141.5)" id="cell_CHIP_32B"><text x="15" y="-4" class="nodelabel cell_CHIP_32B">TTL_74374</text><rect width="30" height="80" class="cell_CHIP_32B" /><g transform="translate(0,10)" id="port_CHIP_32B~CK"><text x="-3" y="-4" class="inputPortLabel cell_CHIP_32B">CK</text></g><g transform="translate(0,30)" id="port_CHIP_32B~D"><text x="-3" y="-4" class="inputPortLabel cell_CHIP_32B">D</text></g><g transform="translate(0,50)" id="port_CHIP_32B~OE_n"><text x="-3" y="-4" class="inputPortLabel cell_CHIP_32B">OE_n</text></g><g transform="translate(0,70)" id="port_CHIP_32B~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CHIP_32B">sysclk</text></g><g transform="translate(30,10)" id="port_CHIP_32B~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CHIP_32B">Q</text></g></g></a>
+<a href="../../../Shared/support/doc/TTL_74244.md"><title>CHIP_33B (TTL_74244) - open its page</title><g transform="translate(183.66666666666666,377)" id="cell_CHIP_33B"><text x="15" y="-4" class="nodelabel cell_CHIP_33B">TTL_74244</text><rect width="30" height="80" class="cell_CHIP_33B" /><g transform="translate(0,10)" id="port_CHIP_33B~A1"><text x="-3" y="-4" class="inputPortLabel cell_CHIP_33B">A1</text></g><g transform="translate(0,30)" id="port_CHIP_33B~A2"><text x="-3" y="-4" class="inputPortLabel cell_CHIP_33B">A2</text></g><g transform="translate(0,50)" id="port_CHIP_33B~G1_n"><text x="-3" y="-4" class="inputPortLabel cell_CHIP_33B">G1_n</text></g><g transform="translate(0,70)" id="port_CHIP_33B~G2_n"><text x="-3" y="-4" class="inputPortLabel cell_CHIP_33B">G2_n</text></g><g transform="translate(30,10)" id="port_CHIP_33B~Y1"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CHIP_33B">Y1</text></g><g transform="translate(30,30)" id="port_CHIP_33B~Y2"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CHIP_33B">Y2</text></g></g></a>
+<g transform="translate(82,202)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(12,22)" id="cell_CLK"><text x="15" y="-4" class="nodelabel cell_CLK">CLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLK" /><g /></g>
+<g transform="translate(264,22)" id="cell_CLK_EN"><text x="15" y="-4" class="nodelabel cell_CLK_EN">CLK_EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLK_EN" /><g /></g>
+<g transform="translate(360,22)" id="cell_CLEAR_n"><text x="15" y="-4" class="nodelabel cell_CLEAR_n">CLEAR_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CLEAR_n" /><g /></g>
+<g transform="translate(54,22)" id="cell_EMP_n"><text x="15" y="-4" class="nodelabel cell_EMP_n">EMP_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EMP_n" /><g /></g>
+<g transform="translate(82,332)" id="cell_EPANS"><text x="15" y="-4" class="nodelabel cell_EPANS">EPANS</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_EPANS" /><g /></g>
+<g transform="translate(12,427.5)" id="cell_FUL_n"><text x="15" y="-4" class="nodelabel cell_FUL_n">FUL_n</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_FUL_n" /><g /></g>
+<g transform="translate(96,22)" id="cell_IONI"><text x="15" y="-4" class="nodelabel cell_IONI">IONI</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_IONI" /><g /></g>
+<g transform="translate(138,22)" id="cell_LEV0"><text x="15" y="-4" class="nodelabel cell_LEV0">LEV0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LEV0" /><g /></g>
+<g transform="translate(180,22)" id="cell_LHIT"><text x="15" y="-4" class="nodelabel cell_LHIT">LHIT</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LHIT" /><g /></g>
+<g transform="translate(312,22)" id="cell_PANOSC"><text x="15" y="-4" class="nodelabel cell_PANOSC">PANOSC</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PANOSC" /><g /></g>
+<g transform="translate(82,137)" id="cell_PA_7_0"><text x="15" y="-4" class="nodelabel cell_PA_7_0">PA_7_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PA_7_0" /><g /></g>
+<g transform="translate(414,22)" id="cell_PCR_1_0"><text x="15" y="-4" class="nodelabel cell_PCR_1_0">PCR_1_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PCR_1_0" /><g /></g>
+<g transform="translate(222,22)" id="cell_PONI"><text x="15" y="-4" class="nodelabel cell_PONI">PONI</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_PONI" /><g /></g>
+<g transform="translate(12,297.5)" id="cell_VAL"><text x="15" y="-4" class="nodelabel cell_VAL">VAL</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_VAL" /><g /></g>
+<g transform="translate(333,367.5)" id="cell_IDB_15_0_OUT"><text x="15" y="-4" class="nodelabel cell_IDB_15_0_OUT">IDB_15_0_OUT</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_IDB_15_0_OUT" /><g /></g>
+<g transform="translate(533,22)" id="cell_DP_5_1_n"><text x="15" y="-4" class="nodelabel cell_DP_5_1_n">DP_5_1_n</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_DP_5_1_n" /><g /></g>
+<g transform="translate(333,106)" id="cell_RMM_n"><text x="15" y="-4" class="nodelabel cell_RMM_n">RMM_n</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_RMM_n" /><g /></g>
+<g transform="translate(77,64)" id="cell_STAT_4_3"><text x="15" y="-4" class="nodelabel cell_STAT_4_3">STAT_4_3</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_STAT_4_3" /><g /></g>
+<g transform="translate(202,64)" id="cell_PANEL_ACTLV"><text x="15" y="-4" class="nodelabel cell_PANEL_ACTLV">PANEL_ACTLV</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_PANEL_ACTLV" /><g /></g>
+<g transform="translate(12,106)" id="cell_1"><text x="15" y="-4" class="nodelabel cell_1">1</text><rect width="30" height="20" class="cell_1" /><g /></g>
+<g transform="translate(82,267)" id="cell_0000"><text x="15" y="-4" class="nodelabel cell_0000">0x0</text><rect width="30" height="20" class="cell_0000" /><g /></g>
+<g transform="translate(12,362.5)" id="cell_0"><text x="15" y="-4" class="nodelabel cell_0">0</text><rect width="30" height="20" class="cell_0" /><g /></g>
+<g transform="translate(468,22)" id="cell_11111"><text x="15" y="-4" class="nodelabel cell_11111">0x1f</text><rect width="30" height="20" class="cell_11111" /><g /></g>
+<g transform="translate(12,64)" id="cell_00"><text x="15" y="-4" class="nodelabel cell_00">00</text><rect width="30" height="20" class="cell_00" /><g /></g>
+<g transform="translate(137,64)" id="cell_0000000000000000"><text x="15" y="-4" class="nodelabel cell_0000000000000000">0x0</text><rect width="30" height="20" class="cell_0000000000000000" /><g /></g>
+<g transform="translate(93.5,387)" id="cell_$join$,24,46,8,41,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
+<g transform="translate(292,357)" id="cell_$join$,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,"><rect width="5" height="60" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0:7</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">8:11</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">12:15</text></g></g>
+<line x1="42" x2="138" y1="116" y2="116" class="net_41" />
+<line x1="138" x2="138" y1="116" y2="152" class="net_41" />
+<circle cx="138" cy="116" r="2" style="fill:#000" class="net_41" />
+<line x1="138" x2="190" y1="152" y2="152" class="net_41" />
+<line x1="42" x2="333" y1="116" y2="116" class="net_41" />
+<line x1="42" x2="72" y1="116" y2="116" class="net_41" />
+<line x1="72" x2="72" y1="116" y2="477" class="net_41" />
+<line x1="72" x2="94" y1="477" y2="477" class="net_41" />
+<circle cx="72" cy="116" r="2" style="fill:#000" class="net_41" />
+<line x1="94" x2="94" y1="477" y2="458" class="net_41" />
+<line x1="110" x2="128" y1="147" y2="147" class="net_13,14,15,16,17,18,19,20"><title>PA_7_0</title></line>
+<line x1="128" x2="128" y1="147" y2="172" class="net_13,14,15,16,17,18,19,20"><title>PA_7_0</title></line>
+<line x1="128" x2="190" y1="172" y2="172" class="net_13,14,15,16,17,18,19,20"><title>PA_7_0</title></line>
+<line x1="110" x2="128" y1="342" y2="342" class="net_7"><title>EPANS</title></line>
+<line x1="128" x2="128" y1="342" y2="192" class="net_7"><title>EPANS</title></line>
+<circle cx="128" cy="342" r="2" style="fill:#000" class="net_7" />
+<line x1="128" x2="190" y1="192" y2="192" class="net_7"><title>EPANS</title></line>
+<line x1="110" x2="128" y1="342" y2="342" class="net_7"><title>EPANS</title></line>
+<line x1="128" x2="128" y1="342" y2="427.5" class="net_7"><title>EPANS</title></line>
+<circle cx="128" cy="427.5" r="2" style="fill:#000" class="net_7" />
+<line x1="128" x2="183.66666666666666" y1="427.5" y2="427.5" class="net_7"><title>EPANS</title></line>
+<line x1="110" x2="128" y1="342" y2="342" class="net_7"><title>EPANS</title></line>
+<line x1="128" x2="128" y1="342" y2="447.5" class="net_7"><title>EPANS</title></line>
+<line x1="128" x2="183.66666666666666" y1="447.5" y2="447.5" class="net_7"><title>EPANS</title></line>
+<line x1="110" x2="190" y1="212" y2="212" class="net_2"><title>sysclk</title></line>
+<line x1="112" x2="138" y1="277" y2="277" class="net_42,43,44,45" />
+<line x1="138" x2="138" y1="277" y2="387.5" class="net_42,43,44,45" />
+<line x1="138" x2="183.66666666666666" y1="387.5" y2="387.5" class="net_42,43,44,45" />
+<line x1="99.5" x2="183.66666666666666" y1="407.5" y2="407.5" class="net_24,46,8,41" />
+<line x1="298" x2="333" y1="377.5" y2="377.5" class="net_25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40"><title>IDB_15_0_OUT</title></line>
+<line x1="498" x2="533" y1="32" y2="32" class="net_48,49,50,51,52" />
+<line x1="42" x2="77" y1="74" y2="74" class="net_54,55" />
+<line x1="167" x2="202" y1="74" y2="74" class="net_56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71" />
+<line x1="40" x2="62" y1="307.5" y2="307.5" class="net_24"><title>VAL</title></line>
+<line x1="62" x2="62" y1="307.5" y2="397.5" class="net_24"><title>VAL</title></line>
+<line x1="62" x2="93.5" y1="397.5" y2="397.5" class="net_24"><title>VAL</title></line>
+<line x1="42" x2="52" y1="372.5" y2="372.5" class="net_46" />
+<line x1="52" x2="52" y1="372.5" y2="417.5" class="net_46" />
+<line x1="52" x2="93.5" y1="417.5" y2="417.5" class="net_46" />
+<line x1="40" x2="93.5" y1="437.5" y2="437.5" class="net_8"><title>FUL_n</title></line>
+<line x1="221" x2="248" y1="152" y2="152" class="net_25,26,27,28,29,30,31,32"><title>IDB_15_0_OUT[7:0]</title></line>
+<line x1="248" x2="248" y1="152" y2="367.5" class="net_25,26,27,28,29,30,31,32"><title>IDB_15_0_OUT[7:0]</title></line>
+<line x1="248" x2="292" y1="367.5" y2="367.5" class="net_25,26,27,28,29,30,31,32"><title>IDB_15_0_OUT[7:0]</title></line>
+<line x1="214.66666666666666" x2="292" y1="387.5" y2="387.5" class="net_33,34,35,36"><title>IDB_15_0_OUT[11:8]</title></line>
+<line x1="214.66666666666666" x2="292" y1="407.5" y2="407.5" class="net_37,38,39,40"><title>IDB_15_0_OUT[15:12]</title></line>
+<text x="131.0" y="169.0" class="netlabel">PA_7_0</text>
+<text x="113.0" y="209.0" class="netlabel">sysclk</text>
+<text x="65.0" y="394.5" class="netlabel">VAL</text>
+<text x="251.0" y="364.5" class="netlabel">IDB_15_0_OUT[7:0]</text>
+<text x="301.0" y="374.5" class="netlabel">IDB_15_0_OUT</text>
+<text x="217.7" y="384.5" class="netlabel">IDB_15_0_OUT[11:8]</text>
+<text x="217.7" y="404.5" class="netlabel">IDB_15_0_OUT[15:12]</text>
+<text x="131.0" y="189.0" class="netlabel">EPANS</text>
+<text x="43.0" y="434.5" class="netlabel">FUL_n</text>
+</svg>

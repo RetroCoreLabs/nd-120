@@ -14,6 +14,16 @@ Source: `Verilog/fpga/nexys4ddr/floppy-hw-test/floppy_hwtest_top.v`
 
 ![floppy_hwtest_top symbol](floppy_hwtest_top.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: no build top uses this module, so it was elaborated from its own file with no defines and default parameters. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![floppy_hwtest_top schematic](floppy_hwtest_top.svg)](floppy_hwtest_top.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 floppy_hwtest_top - SELF-CHECKING VERILOG TEST PROGRAM ON THE REAL
@@ -79,3 +89,375 @@ Ronny Hansen
 | output | `[0:0]` | `ddr2_cs_n` *(active low)* |  |
 | output | `[1:0]` | `ddr2_dm` |  |
 | output | `[0:0]` | `ddr2_odt` |  |
+
+## Verilog source
+
+[`Verilog/fpga/nexys4ddr/floppy-hw-test/floppy_hwtest_top.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/nexys4ddr/floppy-hw-test/floppy_hwtest_top.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of floppy_hwtest_top (360 lines)</summary>
+
+```verilog
+/****************************************************************************
+** floppy_hwtest_top - SELF-CHECKING VERILOG TEST PROGRAM ON THE REAL      **
+** NEXYS 4 DDR HARDWARE for the floppy DMA path (root cause + fix:        **
+** ../HANDOFF-floppy-dma-investigation.md PART 0, retired - git c4896a4).  **
+**                                                                         **
+** WHAT IT CONTAINS - the real RTL under test, no CPU:                     **
+**   ND_FLOPPY_DMA (the floppy controller)                                 **
+**   ND_DMA_MASTER (the bus master whose read capture had the fault)       **
+**   nd_storage + nd_storage_floppy_adapter + DDR2 + real SD card          **
+**   a block-RAM main memory answering the real ND-bus handshake           **
+**   a CONTENTION INJECTOR: before every memory read answer it drives      **
+**     two clock ticks of a rotating "CPU instruction fetch" word onto     **
+**     the shared BD lines - the exact flicker measured on the failing     **
+**     system (165562 = IOX 1562 etc.). This is what the CPU's polling     **
+**     loop does on the real board; without it a zero-word read cannot     **
+**     corrupt and the test would prove nothing.                           **
+**                                                                         **
+** WHAT IT DOES, forever, ~ every 4 s: an FSM emulates the CPU's IOX       **
+** accesses - preseeds memory, writes the 12-word command block at 3000    **
+** (octal; READ fmt 3, diskAddress 0, WORD-COUNT mode 1024 words, target   **
+** 20000 octal - the exact first operation of the 1560& boot), kicks IOX   **
+** 1565/1567/1563, polls IOX 1562 for ready, then checksums ALL 1024       **
+** transferred words in hardware and prints on the UART (9600 8N1):        **
+**                                                                         **
+**   S ssssss E eeeeee F ffffff B b0 b1 b2 b3 C cccccc P                   **
+**                                                                         **
+** (same field layout as tests/floppy-dma-test; P = HW-PASS, F = HW-FAIL, **
+** T = timeout). Golden values from the nd100x oracle:                     **
+**   S 1000x0  E 000010  F 000000  B 000060 000057 000062 000015           **
+**   C 125441                                                              **
+** PASS requires: not timed out, error code bits 14:9 of E all zero,       **
+** B0 = 000060, checksum = 125441. On the PRE-FIX ND_DMA_MASTER this      **
+** test FAILS (the injector corrupts the zero-valued command-block words   **
+** exactly as the CPU did); on the fixed RTL it PASSES.                    **
+**                                                                         **
+** Ronny Hansen                                                            **
+*****************************************************************************/
+`default_nettype none
+
+module floppy_hwtest_top (
+    input  wire clk100,       // E3, 100 MHz oscillator
+    input  wire cpu_resetn,   // C12, red CPU RESET (active low)
+    input  wire btnc,         // N17, centre button - second reset
+
+    input  wire uart_txd_in,  // C4, PC -> FPGA (unused, kept for the pinout)
+    output wire uart_rxd_out, // D4, FPGA -> PC
+
+    output wire sd_reset,     // E2, LOW powers the slot
+    input  wire sd_cd,        // A1
+    output wire sd_clk,       // B1
+    inout  wire sd_cmd,       // C1
+    inout  wire sd_dat0,      // C2
+    inout  wire sd_dat1,      // E1
+    inout  wire sd_dat2,      // F1
+    inout  wire sd_dat3,      // D2
+
+    output wire [7:0] led,
+
+    inout  wire [15:0] ddr2_dq,
+    inout  wire [ 1:0] ddr2_dqs_p,
+    inout  wire [ 1:0] ddr2_dqs_n,
+    output wire [12:0] ddr2_addr,
+    output wire [ 2:0] ddr2_ba,
+    output wire        ddr2_ras_n,
+    output wire        ddr2_cas_n,
+    output wire        ddr2_we_n,
+    output wire [ 0:0] ddr2_ck_p,
+    output wire [ 0:0] ddr2_ck_n,
+    output wire [ 0:0] ddr2_cke,
+    output wire [ 0:0] ddr2_cs_n,
+    output wire [ 1:0] ddr2_dm,
+    output wire [ 0:0] ddr2_odt
+);
+
+  /*********************************************
+  *  Clocks - same values as the ND-120 build  *
+  *  (build.tcl clk=12: MMCM VCO 1000 MHz)     *
+  **********************************************/
+`ifndef HWTEST_CPU_DIV
+  `define HWTEST_CPU_DIV 80.0
+`endif
+  wire clk_cpu_pre, clk_stor_pre, clk200_pre, clkfb_out, clkfb_in, mmcm_locked;
+  wire clk_cpu, clk_stor, clk200;
+
+  MMCME2_BASE #(
+      .BANDWIDTH       ("OPTIMIZED"),
+      .CLKFBOUT_MULT_F (10.0),          // 100 MHz x10 = 1000 MHz VCO
+      .CLKIN1_PERIOD   (10.0),
+      .CLKOUT0_DIVIDE_F(`HWTEST_CPU_DIV), // 1000/80 = 12.5 MHz (ND-120 clk=12)
+      .CLKOUT1_DIVIDE  (37),            // 27.027 MHz - SD/FAT stack
+      .CLKOUT2_DIVIDE  (5),             // 200 MHz    - DDR2 controller
+      .DIVCLK_DIVIDE   (1)
+  ) mmcm (
+      .CLKIN1  (clk100),
+      .CLKFBIN (clkfb_in),
+      .CLKFBOUT(clkfb_out),
+      .CLKOUT0 (clk_cpu_pre),
+      .CLKOUT1 (clk_stor_pre),
+      .CLKOUT2 (clk200_pre),
+      .LOCKED  (mmcm_locked),
+      .PWRDWN  (1'b0),
+      .RST     (1'b0),
+      .CLKOUT0B(), .CLKOUT1B(), .CLKOUT2B(), .CLKOUT3(), .CLKOUT3B(),
+      .CLKOUT4(), .CLKOUT5(), .CLKOUT6(), .CLKFBOUTB()
+  );
+
+  BUFG bufg_fb  (.I(clkfb_out),    .O(clkfb_in));
+  BUFG bufg_cpu (.I(clk_cpu_pre),  .O(clk_cpu));
+  BUFG bufg_st  (.I(clk_stor_pre), .O(clk_stor));
+  BUFG bufg_200 (.I(clk200_pre),   .O(clk200));
+
+  wire rst_req_n = cpu_resetn & ~btnc & mmcm_locked;
+
+  reg [3:0] rst_cpu_sh = 4'd0;
+  always @(posedge clk_cpu)
+    if (!rst_req_n) rst_cpu_sh <= 4'd0;
+    else            rst_cpu_sh <= {rst_cpu_sh[2:0], 1'b1};
+  wire rst_cpu_n = rst_cpu_sh[3];
+
+  reg [3:0] rst_st_sh = 4'd0;
+  always @(posedge clk_stor)
+    if (!rst_req_n) rst_st_sh <= 4'd0;
+    else            rst_st_sh <= {rst_st_sh[2:0], 1'b1};
+  wire rst_stor_n = rst_st_sh[3];
+
+  /*********************************************
+  *  SD pads - same tristate rule as the top   *
+  **********************************************/
+  assign sd_reset = 1'b0;
+
+  wire s_sd_clk_o, s_sd_cmd_o, s_sd_cmd_oe, s_sd_dat0_o, s_sd_dat0_oe;
+  assign sd_clk  = s_sd_clk_o;
+  assign sd_cmd  = s_sd_cmd_oe  ? s_sd_cmd_o  : 1'bz;
+  assign sd_dat0 = s_sd_dat0_oe ? s_sd_dat0_o : 1'bz;
+  assign sd_dat1 = 1'bz;
+  assign sd_dat2 = 1'bz;
+  assign sd_dat3 = 1'bz;
+
+  /*********************************************
+  *  DDR2 region - identical to the ND-120 top *
+  **********************************************/
+  wire        mem_start, mem_we, mem_busy, mem_done;
+  wire [19:0] mem_addr;
+  wire [31:0] mem_wdata, mem_rdata;
+
+  wire          ui_clk, ui_rst, calib_done;
+  wire          req_valid, req_we, req_ready, rsp_valid;
+  wire [ 26:0]  req_addr;
+  wire [127:0]  req_wdata, rsp_rdata;
+  wire [ 15:0]  req_wmask;
+
+  nd_ddr2_storage u_region (
+      .stor_clk(clk_stor), .stor_rst_n(rst_stor_n),
+      .mem_start(mem_start), .mem_we(mem_we), .mem_addr(mem_addr),
+      .mem_wdata(mem_wdata), .mem_rdata(mem_rdata),
+      .mem_busy(mem_busy), .mem_done(mem_done),
+      .ui_clk(ui_clk), .ui_rst(ui_rst),
+      .req_valid(req_valid), .req_we(req_we), .req_addr(req_addr),
+      .req_wdata(req_wdata), .req_wmask(req_wmask), .req_ready(req_ready),
+      .rsp_valid(rsp_valid), .rsp_rdata(rsp_rdata)
+  );
+
+  nd_ddr2_port u_ddr2 (
+      .sys_clk_200(clk200), .rst_n(rst_req_n),
+      .ui_clk(ui_clk), .ui_rst(ui_rst), .calib_done(calib_done),
+      .req_valid(req_valid), .req_we(req_we), .req_addr(req_addr),
+      .req_wdata(req_wdata), .req_wmask(req_wmask), .req_ready(req_ready),
+      .rsp_valid(rsp_valid), .rsp_rdata(rsp_rdata),
+      .ddr2_dq(ddr2_dq), .ddr2_dqs_p(ddr2_dqs_p), .ddr2_dqs_n(ddr2_dqs_n),
+      .ddr2_addr(ddr2_addr), .ddr2_ba(ddr2_ba), .ddr2_ras_n(ddr2_ras_n),
+      .ddr2_cas_n(ddr2_cas_n), .ddr2_we_n(ddr2_we_n),
+      .ddr2_ck_p(ddr2_ck_p), .ddr2_ck_n(ddr2_ck_n), .ddr2_cke(ddr2_cke),
+      .ddr2_cs_n(ddr2_cs_n), .ddr2_dm(ddr2_dm), .ddr2_odt(ddr2_odt)
+  );
+
+  /*********************************************
+  *  nd_storage - same parameters the ND-120   *
+  *  build resolves to (wrapper INCLUDE_TAPE/  *
+  *  FLOPPY/WD => CACHE_MASK 11000000,         *
+  *  FILE0 = BOOT.TAP)                         *
+  **********************************************/
+  localparam N = 8;
+  wire [N-1:0]    open_req_w, open_ok_w, open_err_w, req_w, wr_w;
+  wire [N-1:0]    busy_w, done_w, err_w, buf_we_w;
+  wire [N*4-1:0]  err_code_w;
+  wire [N*32-1:0] size_bytes_w;
+  wire [N*16-1:0] block_w, buf_wdata_w, buf_rdata_w;
+  wire [N*10-1:0] buf_addr_w;
+  wire [1:0]      sd_status;
+
+  nd_storage #(
+      .SIMULATE   (0),
+      .CACHE_MASK (8'b11000000),
+      .FILE0_NAME ("BOOT.TAP"), .FILE0_LEN(8'd8)
+  ) u_nd_storage (
+      .clk_stor  (clk_stor),
+      .rst_stor_n(rst_stor_n),
+      .clk_cpu   (clk_cpu),
+      .rst_cpu_n (rst_cpu_n),
+      .sd_clk_o  (s_sd_clk_o),
+      .sd_cmd_i  (sd_cmd),
+      .sd_cmd_o  (s_sd_cmd_o),
+      .sd_cmd_oe (s_sd_cmd_oe),
+      .sd_dat0_i (sd_dat0),
+      .sd_dat0_o (s_sd_dat0_o),
+      .sd_dat0_oe(s_sd_dat0_oe),
+      .mem_start (mem_start),
+      .mem_we    (mem_we),
+      .mem_addr  (mem_addr),
+      .mem_wdata (mem_wdata),
+      .mem_rdata (mem_rdata),
+      .mem_busy  (mem_busy),
+      .mem_done  (mem_done),
+      .open_req  (open_req_w),
+      .open_ok   (open_ok_w),
+      .open_err  (open_err_w),
+      .size_bytes(size_bytes_w),
+      .req       (req_w),
+      .wr        (wr_w),
+      .block     (block_w),
+      .busy      (busy_w),
+      .done      (done_w),
+      .err       (err_w),
+      .err_code  (err_code_w),
+      .dbg_state(), .dbg_lba(), .dbg_wdata(), .dbg_rdata(), .dbg_bufw(),
+      .dbg_bufwe(), .dbg_fsec(), .dbg_rx_stb(), .dbg_rx_raw(),
+      .dbg_rx_byte(), .dbg_past_eof(), .dbg_grant(),
+      .buf_addr  (buf_addr_w),
+      .buf_wdata (buf_wdata_w),
+      .buf_we    (buf_we_w),
+      .buf_rdata (buf_rdata_w),
+      .sd_status (sd_status),
+      .card_type (),
+      .fs_type   ()
+  );
+
+
+  /*********************************************
+  *  Client 1 = the real floppy adapter, now   *
+  *  driven by the REAL ND_FLOPPY_DMA          *
+  **********************************************/
+  wire        fd_req, fd_wr;
+  wire [15:0] fd_lsect;
+  wire [ 1:0] fd_format, fd_drive;
+  wire [10:0] fd_wc;
+  wire        fd_done, fd_err;
+  wire [3:0]  fd_code;
+  wire [9:0]  fdb_addr;
+  wire [15:0] fdb_wdata;
+  wire        fdb_we;
+  wire [15:0] fdb_rdata;
+
+  wire        f_open_req, f_req, f_wr;
+  wire [15:0] f_block, f_buf_rdata;
+
+  // held open, exactly like the devices wrapper (gen_floppy)
+  reg s_fopened = 1'b0;
+  always @(posedge clk_cpu or negedge rst_cpu_n)
+    if (!rst_cpu_n) s_fopened <= 1'b0;
+    else if (open_ok_w[1]) s_fopened <= 1'b1;
+  wire s_fopen_pulse = !s_fopened;
+
+  nd_storage_floppy_adapter #(.DRIVE(2'd0)) u_floppy_adapter (
+      .clk_cpu       (clk_cpu),
+      .rst_n         (rst_cpu_n),
+      .disk_req      (fd_req),
+      .disk_wr       (fd_wr),
+      .disk_lsect    (fd_lsect),
+      .disk_format   (fd_format),
+      .disk_drive    (fd_drive),
+      .disk_wordcount(fd_wc),
+      .disk_done     (fd_done),
+      .disk_err      (fd_err),
+      .disk_err_code (fd_code),
+      .dbuf_addr     (fdb_addr),
+      .dbuf_wdata    (fdb_wdata),
+      .dbuf_we       (fdb_we),
+      .dbuf_rdata    (fdb_rdata),
+      .open_start    (s_fopen_pulse),
+      .c_open_req    (f_open_req),
+      .c_open_ok     (open_ok_w[1]),
+      .c_open_err    (open_err_w[1]),
+      .c_size_bytes  (size_bytes_w[63:32]),
+      .c_req         (f_req),
+      .c_wr          (f_wr),
+      .c_block       (f_block),
+      .c_busy        (busy_w[1]),
+      .c_done        (done_w[1]),
+      .c_err         (err_w[1]),
+      .c_err_code    (err_code_w[7:4]),
+      .c_buf_addr    (buf_addr_w[19:10]),
+      .c_buf_wdata   (buf_wdata_w[31:16]),
+      .c_buf_we      (buf_we_w[1]),
+      .c_buf_rdata   (f_buf_rdata)
+  );
+
+  // Clients 0 (tape) and 6 (WD): held opens like the wrapper's sequencers.
+  reg s_topened = 1'b0, s_wopened = 1'b0;
+  always @(posedge clk_cpu or negedge rst_cpu_n)
+    if (!rst_cpu_n) begin s_topened <= 1'b0; s_wopened <= 1'b0; end
+    else begin
+      if (open_ok_w[0]) s_topened <= 1'b1;
+      if (open_ok_w[6]) s_wopened <= 1'b1;
+    end
+
+  assign open_req_w = {1'b0, !s_wopened, 4'b0000, f_open_req, !s_topened};
+  assign req_w      = {6'b0, f_req, 1'b0};
+  assign wr_w       = {6'b0, f_wr, 1'b0};
+  assign block_w    = {96'd0, f_block, 16'd0};
+  assign buf_rdata_w= {96'd0, f_buf_rdata, 16'd0};
+
+  // media format is derived inside the core from the image size
+  wire w_pass, w_timeout, w_idle;
+  floppy_hwtest_core u_core (
+      .clk_cpu   (clk_cpu),
+      .rst_cpu_n (rst_cpu_n),
+      .mount_ok  (open_ok_w[1]),
+      .img_size  (size_bytes_w[63:32]),
+      .fd_req    (fd_req),
+      .fd_wr     (fd_wr),
+      .fd_lsect  (fd_lsect),
+      .fd_format (fd_format),
+      .fd_drive  (fd_drive),
+      .fd_wc     (fd_wc),
+      .fd_done   (fd_done),
+      .fd_err    (fd_err),
+      .fd_code   (fd_code),
+      .fdb_addr  (fdb_addr),
+      .fdb_wdata (fdb_wdata),
+      .fdb_we    (fdb_we),
+      .fdb_rdata (fdb_rdata),
+      .uart_txd  (uart_rxd_out),
+      .st_pass   (w_pass),
+      .st_timeout(w_timeout),
+      .st_idle   (w_idle)
+  );
+
+  assign led[0] = mmcm_locked;
+  assign led[1] = calib_done;
+  assign led[2] = sd_status[0];
+  assign led[3] = open_ok_w[1];
+  assign led[4] = w_idle;
+  assign led[5] = w_pass;
+  assign led[6] = w_timeout | (|open_err_w);
+  assign led[7] = sd_cd;
+
+  /* verilator lint_off UNUSEDSIGNAL */
+  wire _unused = &{1'b0, uart_txd_in, sd_dat1, sd_dat2, sd_dat3,
+                   busy_w[0], busy_w[7:2], done_w[0], done_w[7:2],
+                   err_w[0], err_w[7:2], err_code_w[3:0], err_code_w[31:8],
+                   size_bytes_w[31:0], size_bytes_w[255:64], block_w,
+                   buf_addr_w[9:0], buf_addr_w[159:20],
+                   buf_wdata_w[15:0], buf_wdata_w[127:32],
+                   buf_we_w[0], buf_we_w[7:2], open_ok_w, open_err_w,
+                   ui_rst, 1'b0};
+  /* verilator lint_on UNUSEDSIGNAL */
+
+endmodule
+
+`default_nettype wire
+```
+
+</details>

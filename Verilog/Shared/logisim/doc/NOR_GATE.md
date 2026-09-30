@@ -19,6 +19,16 @@ Source: `Verilog/Shared/logisim/NOR_GATE.v`
 
 ![NOR_GATE symbol](NOR_GATE.png)
 
+<!-- SCHEMATIC:BEGIN - written by Verilog/tests/gen_schematics.py, do not edit -->
+
+## Schematic
+
+Drawn from the Verilog: the yosys netlist of the Simulation (Verilator) build, instance `CORE.CPU_BOARD.MEM.DATA.GATES_1`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+
+[![NOR_GATE schematic](NOR_GATE.svg)](NOR_GATE.svg)
+
+<!-- SCHEMATIC:END -->
+
 ## Description
 
 Logisim-evolution goes FPGA automatic generated Verilog code
@@ -32,3 +42,66 @@ Component : NOR_GATE
 | input | `1` | `input1` |  |
 | input | `1` | `input2` |  |
 | output | `1` | `result` |  |
+
+## Verilog source
+
+[`Verilog/Shared/logisim/NOR_GATE.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Shared/logisim/NOR_GATE.v) on GitHub.
+
+<details markdown="1">
+<summary>Show the Verilog of NOR_GATE (51 lines)</summary>
+
+```verilog
+/******************************************************************************
+ ** Logisim-evolution goes FPGA automatic generated Verilog code             **
+ ** https://github.com/logisim-evolution/                                    **
+ **                                                                          **
+ ** Component : NOR_GATE                                                     **
+ **                                                                          **
+ *****************************************************************************/
+
+module NOR_GATE( input1,
+                 input2,
+                 result );
+
+   /*******************************************************************************
+   ** Here all module parameters are defined with a dummy value                  **
+   *******************************************************************************/
+   parameter [64:0] BubblesMask = 1;
+
+   /*******************************************************************************
+   ** The inputs are defined here                                                **
+   *******************************************************************************/
+   input input1;
+   input input2;
+
+   /*******************************************************************************
+   ** The outputs are defined here                                               **
+   *******************************************************************************/
+   output result;
+
+   /*******************************************************************************
+   ** The wires are defined here                                                 **
+   *******************************************************************************/
+   wire s_realInput1;
+   wire s_realInput2;
+
+   /*******************************************************************************
+   ** The module functionality is described here                                 **
+   *******************************************************************************/
+
+   /*******************************************************************************
+   ** Here the bubbles are processed                                             **
+   *******************************************************************************/
+   assign  s_realInput1 = (BubblesMask[0] == 1'b0) ? input1 : ~input1;
+   assign  s_realInput2 = (BubblesMask[1] == 1'b0) ? input2 : ~input2;
+
+   /*******************************************************************************
+   ** Here the functionality is defined                                          **
+   *******************************************************************************/
+   assign result = ~(s_realInput1|
+                     s_realInput2);
+
+endmodule
+```
+
+</details>
