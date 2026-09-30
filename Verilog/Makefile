@@ -46,7 +46,7 @@
 #                    one and the same memory. ~12 min (one compile + run).
 
 #   make test-democore  heavy system gate for the NDDeviceCore PORTABLE C
-#                    cores (E:\Dev\Ronny\NDDeviceCore - the same .c that
+#                    cores ($ND_REPOS/NDDeviceCore - the same .c that
 #                    runs in the RP2350 NDModulE firmware) against the REAL
 #                    ND-120 CPU + bus RTL. Boots a hand-assembled BPUN off
 #                    the DMA floppy ('1560&', the proven loader, so this

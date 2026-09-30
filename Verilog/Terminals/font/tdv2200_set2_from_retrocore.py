@@ -2,7 +2,7 @@
 """Pull the TDV2200 character set 2 glyphs out of RetroCore's ROM font dump.
 
     python3 tdv2200_set2_from_retrocore.py \
-        E:/Dev/Repos/Ronny/RetroCore/Nuget/HackerCorpLabs.Emulation.Chips.Terminal/src/FontBitmaps/FontTDV2200.cs \
+        $ND_REPOS/RetroCore/Nuget/HackerCorpLabs.Emulation.Chips.Terminal/src/FontBitmaps/FontTDV2200.cs \
         tdv2200_set2.py
 
 Character set 2 is what the TDV2200 shows for SS2 (ESC N) and for a locking

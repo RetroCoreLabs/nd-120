@@ -4,7 +4,7 @@ Generate a pre-loaded Writable Control Store (WCS) image from the two ND-120
 microcode PROM hex files, so the WCS can be $readmemh'd directly and the runtime
 WCS-load phase (LCS_n sequence) can be skipped.
 
-Full path: /mnt/e/Dev/Repos/Ronny/nd-120/Code/Microcode/gen_wcs_image.py
+Repo path: Code/Microcode/gen_wcs_image.py
 
 Data mapping (verified against RTL):
   - AM27256_45132L.hex = LO byte (bits 7:0),  AM27256_45133L.hex = HI byte (15:8)

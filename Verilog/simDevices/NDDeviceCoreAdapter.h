@@ -1,7 +1,7 @@
 /**************************************************************************
 ** NDDeviceCore -> ND-120 Verilator harness ADAPTER                       **
 **                                                                       **
-** THE BRIDGE. NDDeviceCore (E:\Dev\Ronny\NDDeviceCore) holds the         **
+** THE BRIDGE. NDDeviceCore ($ND_REPOS/NDDeviceCore) holds the            **
 ** PORTABLE C99 device cores that also compile into the RP2350 NDModulE   **
 ** firmware. This adapter wraps ONE such core (an nd_device*) in the      **
 ** C++ NDDevice interface the ND-120 harness already drives, so the very  **

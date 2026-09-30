@@ -9,7 +9,7 @@
 //! expects.
 //!
 //! DECISION 30-AUG-2026 (Ronny): plain VT100, not TDV2200. The specification
-//! source is RetroTerm (E:\Dev\Ronny\RetroTerm, MIT, Ronny's own), whose
+//! source is RetroTerm ($ND_REPOS/RetroTerm, MIT, Ronny's own), whose
 //! class hierarchy settles the relationship: TDV2200Emulator derives from the
 //! same ECMA-48 core VT100Emulator is, and adds ND private CSI finals,
 //! rectangles, work areas and nine character sets on top. We build the base.

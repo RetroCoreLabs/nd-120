@@ -9,9 +9,9 @@
 # whole file arrived intact. Dumping memory at the OPCOM prompt and comparing
 # it here is the quick, decisive check (a serial re-load takes 45+ minutes).
 #
-# Full paths, no guessing:
-#   BPUN     /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/runSim/INSTRUCTION-B.BPUN
-#   this     /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/tools/check_bpun_memory.py
+# Paths, from the repository root, no guessing:
+#   BPUN     Verilog/runSim/INSTRUCTION-B.BPUN
+#   this     Verilog/tools/check_bpun_memory.py
 #
 # USAGE
 #   1) Print the OPCOM commands to type (1K-word blocks by default):
@@ -42,7 +42,7 @@ import sys
 
 def parse_bpun(path):
     """Parse a BPUN tape image. Mirrors loadfile() in
-    /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/runSim/Run120.cpp (sections A-I):
+    Verilog/runSim/Run120.cpp (sections A-I):
       A  chars up to '!'   B/C octal numbers   D '!'
       E  load address (2 bytes, MSB first)     F word count
       G  F words (MSB first)                   H checksum of G  I action code

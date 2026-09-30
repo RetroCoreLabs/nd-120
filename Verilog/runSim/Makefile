@@ -171,7 +171,7 @@ DEVICECORE ?= 0
 # Verilog/ND-BUS-DEVICES/portable (github.com/HackerCorpLabs/NDDeviceCore).
 # This Makefile runs from Verilog/runSim, so the submodule is two dirs up +
 # over. Still `?=`-overridable: point it at a working copy for iterating on
-# NDDeviceCore itself, e.g. NDDEVICECORE_DIR=/mnt/e/Dev/Ronny/NDDeviceCore.
+# NDDeviceCore itself, e.g. NDDEVICECORE_DIR=$ND_REPOS/NDDeviceCore.
 NDDEVICECORE_DIR ?= $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../ND-BUS-DEVICES/portable)
 ifeq ($(DEVICECORE),1)
   # Character-device axis only (no DMA / no memory backdoor): the device
@@ -420,7 +420,8 @@ run-sim: compile card
 # ---- other programs on the boot card -------------------------------------
 # Same '400$' tape boot, different BOOT.BPUN. Each program gets its OWN card
 # image so they never clobber each other and switching back does not rebuild.
-# The BPUNs are committed here - these targets never read D:\ND\BPUN.
+# The BPUNs are committed here - these targets never read a BPUN folder
+# outside the repository.
 #
 #   run-config  CONFIGURATIO-C08.BPUN - device configuration. Type RUN at its
 #               prompt to make it probe the machine: this is what says whether
