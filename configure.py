@@ -341,35 +341,35 @@ def _windows_bases():
 def detect_vivado():
     on_path = shutil.which("vivado.bat" if IS_WINDOWS else "vivado")
     if on_path:
-        return on_path, "PATH"
+        return on_path, "on PATH"
     lin = _globs(_linux_bases(), ["Xilinx/Vivado/*/bin/vivado", "Xilinx/*/Vivado/bin/vivado",
                                   "AMDDesignTools/*/Vivado/bin/vivado"])
     if not IS_WINDOWS and _newest(lin):
-        return _newest(lin), "install folder"
+        return _newest(lin), "in an install folder"
     win = _globs(_windows_bases(), ["Xilinx/Vivado/*/bin/vivado.bat",
                                     "Xilinx/*/Vivado/bin/vivado.bat",
                                     "AMDDesignTools/*/Vivado/bin/vivado.bat",
                                     "AMD/*/Vivado/bin/vivado.bat"])
     if _newest(win):
-        return _newest(win), "install folder (Windows)"
+        return _newest(win), "in an install folder on the Windows side"
     return None, None
 
 
 def detect_gowin():
     on_path = shutil.which("gw_sh.exe" if IS_WINDOWS else "gw_sh")
     if on_path:
-        return on_path, "PATH"
+        return on_path, "on PATH"
     if not IS_WINDOWS:
         lin = _globs(_linux_bases(), ["gowin/IDE/bin/gw_sh", "Gowin/IDE/bin/gw_sh",
                                       "gowin/*/IDE/bin/gw_sh", "Gowin/*/IDE/bin/gw_sh"])
         if _newest(lin):
-            return _newest(lin), "install folder"
+            return _newest(lin), "in an install folder"
     win = _globs(_windows_bases(), ["Gowin/IDE/bin/gw_sh.exe", "Gowin/*/IDE/bin/gw_sh.exe"])
     # An Education edition sorts below a full one of the same version.
     full = [w for w in win if "education" not in w.lower()]
     pick = _newest(full) or _newest(win)
     if pick:
-        return pick, "install folder (Windows)"
+        return pick, "in an install folder on the Windows side"
     return None, None
 
 
@@ -377,16 +377,16 @@ def detect_quartus():
     exe = "quartus_sh.exe" if IS_WINDOWS else "quartus_sh"
     on_path = shutil.which(exe)
     if on_path:
-        return os.path.dirname(on_path), "PATH"
+        return os.path.dirname(on_path), "on PATH"
     if not IS_WINDOWS:
         lin = _globs(_linux_bases(), ["intelFPGA*/*/quartus/bin/quartus_sh",
                                       "altera*/*/quartus/bin/quartus_sh"])
         if _newest(lin):
-            return os.path.dirname(_newest(lin)), "install folder"
+            return os.path.dirname(_newest(lin)), "in an install folder"
     win = _globs(_windows_bases(), ["intelFPGA*/*/quartus/bin64/quartus_sh.exe",
                                     "altera*/*/quartus/bin64/quartus_sh.exe"])
     if _newest(win):
-        return os.path.dirname(_newest(win)), "install folder (Windows)"
+        return os.path.dirname(_newest(win)), "in an install folder on the Windows side"
     return None, None
 
 
@@ -397,15 +397,15 @@ def detect_oss_cad_suite():
         top = os.path.dirname(os.path.dirname(y))
         if os.path.exists(os.path.join(top, "environment")) or \
            os.path.exists(os.path.join(top, "environment.bat")):
-            return top, "PATH"
+            return top, "on PATH"
     if not IS_WINDOWS:
         lin = _globs(_linux_bases(), ["oss-cad-suite"])
         if _newest(lin):
-            return _newest(lin), "install folder"
+            return _newest(lin), "in an install folder"
         return None, None
     win = _globs(_windows_bases(), ["oss-cad-suite"])
     if _newest(win):
-        return _newest(win), "install folder"
+        return _newest(win), "in an install folder"
     return None, None
 
 
@@ -414,10 +414,10 @@ def detect_w64devkit():
         return None, None
     g = shutil.which("gcc")
     if g and "w64devkit" in g.lower():
-        return os.path.dirname(os.path.dirname(g)), "PATH"
+        return os.path.dirname(os.path.dirname(g)), "on PATH"
     win = _globs(_windows_bases(), ["w64devkit"])
     if _newest(win):
-        return _newest(win), "install folder"
+        return _newest(win), "in an install folder"
     return None, None
 
 
@@ -426,7 +426,7 @@ def detect_nd_repos():
     parent = os.path.dirname(ROOT)
     for sib in ("ND110Compile", "nd120uc", "NDDeviceCore", "RetroTerm", "NDInsight"):
         if os.path.isdir(os.path.join(parent, sib)):
-            return parent, "a sibling checkout next to this one"
+            return parent, "next to this checkout"
     return None, None
 
 
@@ -608,6 +608,8 @@ def ask(prompt, default):
     if line == "":            # end of input (answers piped in and used up)
         print()
         return default
+    if not sys.stdin.isatty():
+        print()               # piped answers are not echoed; end the prompt line
     ans = line.strip()
     if ans == "-":            # a single dash clears the value
         return ""
@@ -768,7 +770,7 @@ def gather(existing, sets, interactive):
         if not cur and n in DETECT:
             found, how = DETECT[n]()
             if found:
-                cur, src = store_form(n, found), "found on " + how
+                cur, src = store_form(n, found), "found " + how
         if interactive and (s.ask == "always" or (s.ask == "missing" and not cur)):
             if s.name == "ND120_BUILD_DIR" and not cur:
                 cur = os.path.join(ROOT, "build")
