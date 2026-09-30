@@ -11,14 +11,14 @@
 module BIF_DPATH_PESPEA_13 (
     input        sysclk,  //! System clock (used only for the FF-mode strobe edge-capture)
     input [23:0] BD_23_0_n_IN,
-    input        EPEA_n,
-    input        EPES_n,
+    input        EPEA_n,  //! Enable PEA register (from BIF_DPATH_9.EPEA_n)
+    input        EPES_n,  //! Enable PES register (from BIF_DPATH_9.EPES_n)
     input        FETCH,
-    input        GNT_n,
-    input        SPEA,
-    input        SPES,
+    input        GNT_n,   //! Q6_n - GNT_n  (GRANT ND100 BUS TO A DMA DEVICE OR EXTERNAL BUS CONTROLLER) (from PAL_44801A.GNT_n)
+    input        SPEA,    //! SPEA - Signal PEA Load (from BIF_DPATH_9.SPEA)
+    input        SPES,    //! SPES - Signal PES Load (from BIF_DPATH_9.SPES)
 
-    output [15:0] IDB_15_0_OUT
+    output [15:0] IDB_15_0_OUT  //! Internal Data Bus OUT (to BIF_DPATH_9.IDB_15_0_OUT)
 );
 
 

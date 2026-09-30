@@ -12,17 +12,17 @@ module IO_REG_41 (
 
     // Input signals
     input       CLEAR_n,
-    input       CX_n,
-    input       DA_n,
-    input [7:0] INR_7_0,
+    input       CX_n,    //! Q0_n - CX_n    - CX is always 1 in the fast version (CX_n = 0) (from PAL_44601B.CX_n)
+    input       DA_n,    //! Data Available (from IO_UART_42.DA_n)
+    input [7:0] INR_7_0,  //! INR 7:0 (from ND3202D.INR_7_0)
     input       RINR_n,
     input       SIOC_n,
-    input       TBMT_n,
+    input       TBMT_n,  //! Transmit Buffer Empty (from IO_UART_42.TBMT_n)
     input       TRAALD_n,
 
 
     // Input and output signals
-    input  [ 7:0] IDB_7_0_IN,
+    input  [ 7:0] IDB_7_0_IN,  //! Internal Data Bus 7:0 IN (same net as IO_UART_42.IDB_7_0_IN)
     output [15:0] IDB_15_0_OUT,
 
     // Output signals
@@ -30,7 +30,7 @@ module IO_REG_41 (
     output       BINT12_n,
     output       BINT13_n,
     output       CONSOLE_n,
-    output       EMCL_n,
+    output       EMCL_n,  //! Enable master clear (to CPU_15.EMCL_n)
     output [1:0] IOLED       // 0=RED,1=GREEN
 );
 

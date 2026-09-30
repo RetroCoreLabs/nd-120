@@ -14,12 +14,12 @@ module CPU_CS_16 (
     input sys_rst_n, //! System reset in FPGA
 
     // Clock signals
-    input CLK,
-    input MACLK,
+    input CLK,                    //! Main system clock (from CPU_15.CLK)
+    input MACLK,                  //! Micro-address latch strobe - latch enable for the control-store address latches in CPU_CS_ACAL_17 (transparent high, captures on the FALLING edge). (from CPU_15.MACLK)
 
     // Input signals
     input [15:0] IDB_15_0_IN,  //! IDB 15 bit input
-    input [1:0] RF_1_0,
+    input [1:0] RF_1_0,           //! Selects which of the 4 16 bit's of the microcode to fetch from ROM (from CPU_PROC_32.RF_1_0)
     input [2:0] CC_3_1_n,  // note: 3-1 (not 3-0)
     input [12:0] CSA_12_0,  //! XMA_12_0 from CGA (Delilah) (MA_12_0 from CGA.MIC) <= Memory Address Bits (for Control Store)
     input [9:0] CSCA_9_0, //! Source CGA.XMCA_9_0, source MAC.MCA_9_0, source MAC_AP09.MCA_9_0, source CALCA.MCA9_0 <= Input ICA.Bits [15:0] but only when MCLK is low. Almost the same as LCA15_0, execpt LCA_15_0 is locked in a register on clock lo-hi
@@ -41,13 +41,13 @@ module CPU_CS_16 (
     // 22.2 (MAP) - Address control store mapped as when FETCH. Used in Execute Register instruction (IDB contains instruction).
 
     input BLCS_n,   //! Buffered LCS_n (same as LCS_n)
-    input BRK_n,
-    input FORM_n,
+    input BRK_n,                  //! CPU Break Signal (same net as CPU_15.BRK_n)
+    input FORM_n,                 //! Format instruction (from CPU_15.FORM_n)
     input LCS_n,    //! Load Control Store (Negated)
     input RWCS_n,   //! Read/Write Control Store (low=write)
-    input TERM_n,
-    input WCA_n,
-    input WCS_n,
+    input TERM_n,                 //! Terminal signal (from CPU_15.TERM_n)
+    input WCA_n,                  //! Write Cache Address, controls writing to the cache address register (from CPU_MMU_24.WCA_n)
+    input WCS_n,                  //! Write Control Store (from CPU_PROC_32.WCS_n)
 
     // Output signals
     output        EWCA_n,         //! Enable Write Control Store Address - Active low signal to enable writing to control store address

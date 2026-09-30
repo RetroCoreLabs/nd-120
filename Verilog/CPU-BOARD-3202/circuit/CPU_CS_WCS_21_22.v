@@ -18,10 +18,10 @@ module CPU_CS_WCS_21_22 (
     input sysclk,    // System clock in FPGA
     input sys_rst_n, // System reset in FPGA
 
-    input  [63:0] CSBITS_63_0,
-    output [63:0] CSBITS_63_0_OUT,
+    input  [63:0] CSBITS_63_0,  //! 64 bits CSBITS (output when IDB IN writes a 16 bit part to the CSBITS) (from CPU_CS_TCV_20.CSBITS_OUT)
+    output [63:0] CSBITS_63_0_OUT,  //! Control Store Bits - 64-bit output containing the control store data/instructions (to CPU_CS_16.CSBITS)
 
-    input [11:0] LUA_11_0,
+    input [11:0] LUA_11_0,  //! Load Upper Address - 13-bit output for upper address bits of control store (same net as CPU_CS_16.LUA_12_0[11:0])
     input        ELOW_n,    //! Enable LOW chips
     input        WW0_n,
     input        WW1_n,

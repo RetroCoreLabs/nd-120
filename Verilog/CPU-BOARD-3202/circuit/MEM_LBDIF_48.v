@@ -10,7 +10,7 @@
 
 module MEM_LBDIF_48 (
     // Input signals
-    input sysclk,
+    input sysclk,    //! System clock in FPGA (from MEM_43.sysclk)
     input BCGNT25,   //! Bus cycle grant (Delayed 25ns)
     input BDAP50_n,  //! Bus Data Present (Delayed 50ns)
     input BGNT_n,    //! Bus Grant

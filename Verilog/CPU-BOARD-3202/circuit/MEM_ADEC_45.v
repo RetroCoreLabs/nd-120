@@ -12,28 +12,28 @@
 module MEM_ADEC_45 (
     input sysclk,     //! System clock (for the FF-mode _D PAL mirrors)
     input sys_rst_n,  //! System reset
-    input BGNT_n,
-    input BMEM_n,
-    input CGNT_n,
-    input DBAPR,
-    input ECREQ,
-    input IBINPUT_n,
-    input IORQ_n,
-    input PD4,
-    input REFRQ_n,
-    input RGNT_n,
-    input WRITE,
+    input BGNT_n,     //! Bus Grant (from MEM_RAMC_50.BGNT_n)
+    input BMEM_n,     //! BUS MEMORY Enable (from MEM_43.BMEM_n)
+    input CGNT_n,     //! Bus CPU Grant (from MEM_RAMC_50.CGNT_n)
+    input DBAPR,      //! BUS Address Present (from MEM_43.DBAPR)
+    input ECREQ,      //! BUS ECC Request (from MEM_43.ECREQ)
+    input IBINPUT_n,  //! Bus Input Enable (from MEM_43.IBINPUT_n)
+    input IORQ_n,     //! Bus Input/Output Request (from MEM_43.IORQ_n)
+    input PD4,        //! Power Down 4 (from MEM_43.PD4)
+    input REFRQ_n,    //! Refresh Request (from MEM_43.REFRQ_n)
+    input RGNT_n,     //! RAM Grant (from MEM_RAMC_50.RGNT_n)
+    input WRITE,      //! Write cycle active (same net as CPU_15.WRITE)
 
-    input [4:0] BD23_19_n,
-    input [4:0] PPN_23_19,
+    input [4:0] BD23_19_n,  //! Bus Data and Address (bits 23:19 negated) (from MEM_43.BD_23_19_n)
+    input [4:0] PPN_23_19,  //! Physical Page Number Bits 23:19 (from MEM_43.PPN_23_19)
 
     output [2:0] BANK_2_0,
-    output BLRQ_n,
-    output CLRQ_n,
-    output CRQ_n,
-    output MOFF_n,
-    output MWRITE_n,
-    output RLRQ_n
+    output BLRQ_n,    //! Bus Load Request (to MEM_LBDIF_48.BLRQ_n)
+    output CLRQ_n,    //! Bus Clear Request (to MEM_RAMC_50.CLRQ_n)
+    output CRQ_n,     //! CPU Request (to MEM_43.CRQ_n)
+    output MOFF_n,    //! Memory Off (to MEM_43.MOFF_n)
+    output MWRITE_n,  //! Memory Write (to MEM_43.MWRITE_n)
+    output RLRQ_n     //! RAM Load Request (to MEM_RAMC_50.RLRQ_n)
 );
 
   /*******************************************************************************

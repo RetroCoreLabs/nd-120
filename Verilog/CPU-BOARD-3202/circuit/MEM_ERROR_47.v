@@ -16,26 +16,26 @@ module MEM_ERROR_47 (
     input        OSC,        // Clock input (added for FPGA synthesis)
     input        sys_rst_n,  // System reset (active low, for FPGA synthesis)
 
-    input        BCGNT50,
-    input        BLOCKL25,
-    input        CGNT50_n,
+    input        BCGNT50,    //! Bus cycle grant (Delayed 50ns) (from MEM_LBDIF_48.BCGNT50)
+    input        BLOCKL25,   //! Bus Block (from MEM_LBDIF_48.BLOCKL25_n)
+    input        CGNT50_n,   //! Bus CPU Grant (Delayed 50ns) (from MEM_LBDIF_48.CGNT50_n)
     input        CORR_n,
-    input        FETCH,
-    input        HIERR,
-    input [23:0] LBD_23_0_IN,
-    input        LERR_n,
-    input        LOERR,
-    input        MR_n,
-    input        PA_n,
-    input        PD4,
-    input        PS_n,
-    input        RDATA25,
-    input        RERR_n,
+    input        FETCH,      //! Bus Fetch (from MEM_43.FETCH)
+    input        HIERR,      //! High address bits error (from MEM_DATA_46.HIERR)
+    input [23:0] LBD_23_0_IN,  //! Local Bus Address and Data 23:0 (IN) -  Address and Data for RAM (from MEM_43.LBD_23_0_IN)
+    input        LERR_n,     //! Local error (from MEM_DATA_46.LERR_n)
+    input        LOERR,      //! Low address bits error (from MEM_DATA_46.LOERR)
+    input        MR_n,       //! Master Reset (from MEM_43.MR_n)
+    input        PA_n,       //! Parity Error Address (PEA) (from MEM_43.PA_n)
+    input        PD4,        //! Power Down 4 (from MEM_43.PD4)
+    input        PS_n,       //! Parity Error Signal (PES) (from MEM_43.PS_n)
+    input        RDATA25,    //! Read Data (Delayed 25ns) (from MEM_LBDIF_48.RDATA25)
+    input        RERR_n,     //! Refresh Error (from MEM_43.RERR_n)
 
     // Output signals
 
-    output        BLOCKL_n,
-    output [15:0] IDB_15_0_OUT
+    output        BLOCKL_n,  //! Bus Block (to MEM_LBDIF_48.BLOCKL_n)
+    output [15:0] IDB_15_0_OUT  //! Bus Data 15:0 (to MEM_43.IDB_15_0_OUT)
 );
 
 

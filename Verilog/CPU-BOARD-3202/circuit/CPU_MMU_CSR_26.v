@@ -8,9 +8,9 @@
 ** Ronny Hansen                                                          **
 ***************************************************************************/
 module CPU_MMU_CSR_26 (
-    input STP,
-    input EMPID_n,
-    input EDO_n,
+    input STP,    //! Stop signal (from CPU_MMU_24.STP)
+    input EMPID_n,  //! Interrupt disable (from CPU_MMU_24.EMPID_n)
+    input EDO_n,  //! Enable data output (from CPU_MMU_24.EDO_n)
     input LCS_n,  //! Load Control Store
     input PD2,    //! Power Down 2
 

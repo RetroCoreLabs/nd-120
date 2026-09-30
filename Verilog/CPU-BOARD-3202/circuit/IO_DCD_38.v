@@ -14,85 +14,85 @@ module IO_DCD_38 (
     input CLK_EN,      // CLK rise clock-enable pulse (FPGA_FF_MODE, else 0)
     input CLK_FALL_EN, // CLK fall clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input       BDRY50_n,
-    input       BRK_n,
-    input       CLK,
-    input [4:0] CSCOMM_4_0,
-    input [4:0] CSIDBS_4_0,
-    input [1:0] CSMIS_1_0,
-    input       DAP_n,
-    input       EORF_n,
-    input       HIT,
-    input       ICONTIN_n,
+    input       BDRY50_n,  //! Bus Data Ready (Delayed 50ns) (from BIF_5.BDRY50_n)
+    input       BRK_n,  //! CPU Break Signal (from CPU_15.BRK_n)
+    input       CLK,  //! Main system clock (same net as CPU_15.CLK)
+    input [4:0] CSCOMM_4_0,  //! Control Store Command (5 bits) (from IO_37.CSCOMM_4_0)
+    input [4:0] CSIDBS_4_0,  //! Control Store IDB Source (5 bits) (from IO_37.CSIDBS_4_0)
+    input [1:0] CSMIS_1_0,  //! Control Store MIS signal (2 bits) (from IO_37.CSMIS_1_0)
+    input       DAP_n,  //! Data Present (from BIF_5.DAP_n)
+    input       EORF_n,  //! Enable output register file (same net as CPU_15.EORF_n)
+    input       HIT,  //! Cache hit (from CPU_15.HIT)
+    input       ICONTIN_n,  //! Input signal from "C PLUG", signal B15 - CONTINUE_n (from ND3202D.CONTINUE_n)
 
-    input       ILOAD_n,
-    input       ISTOP_n,
-    input       LCS_n,
-    input       LSHADOW,
-    input [1:0] OC_1_0,
-    input       OPCLCS,
-    input       OSCCL_n,
+    input       ILOAD_n,  //! Input signal from "C PLUG", signal B12 - LOAD_n (from ND3202D.LOAD_n)
+    input       ISTOP_n,  //! Input signal from "C PLUG", signal B16 - STOP_n (from ND3202D.STOP_n)
+    input       LCS_n,  //! Load control store (same net as CPU_15.LCS_n)
+    input       LSHADOW,  //! Latch Shadow signal (from CPU_15.LSHADOW)
+    input [1:0] OC_1_0,  //! Input signal from "A PLUG", signal C6 (OC0) and A6 (OC1)       => (TO IO OC_1_0) (from ND3202D.OC_1_0)
+    input       OPCLCS,  //! COMMAND 36.2 LCS - Load control store from PROM and perform a Master Clear (from CPU_15.OPCLCS)
+    input       OSCCL_n,  //! Input signal from "A PLUG", signal B3 - OSCCL_n                => (TO IO OSCCL_n) (from ND3202D.OSCCL_n)
     input       PONI,   //! Memory Protection ON, PONI=1
-    input       POWSENSE_n,
+    input       POWSENSE_n,  //! Power Sense (from ND120_CORE.POWSENSE_n)
     input       REF_n,
     input       RMM_n,
-    input       SEL5MS_n,
+    input       SEL5MS_n,  //! SEL5MS if active will trigger RTC after 5 ms, not 20ms) (from ND3202D.SEL5MS_n)
     input [1:0] STAT_4_3,  //! Status bits 4 and 3 from PANEL/CALENDAR CPU 68705
-    input       SWMCL_n,
-    input       UCLK,
-    input       XTAL1,
-    input       XTAL2,
+    input       SWMCL_n,  //! tied to 1 (in IO_37)
+    input       UCLK,  //! Microcode clock (same net as CPU_15.UCLK)
+    input       XTAL1,  //! XTAL1 = 39.3216MHZ (from ND3202D.CLOCK_1)
+    input       XTAL2,  //! CPU + bus + device domain (ND3202D sysclk/CLOCK_1/CLOCK_2) (from ND120_CORE.clk_cpu)
 
-    input  [7:0] IDB_7_0_IN,
+    input  [7:0] IDB_7_0_IN,  //! Internal Data Bus 7:0 IN (same net as IO_UART_42.IDB_7_0_IN)
     output [7:0] IDB_7_0_OUT,
 
 
-    output CA10,
-    output CCLR_n,
-    output CEUART_n,
+    output CA10,     //! Cache address bit 10 (to CPU_15.CA10)
+    output CCLR_n,   //! Cache clear (to CPU_15.CCLR_n)
+    output CEUART_n,  //! Chip Enable UART (to IO_UART_42.CEUART_n)
     output CLEAR_n,
-    output DT_n,
+    output DT_n,     //! Data transfer (to CPU_15.DT_n)
     output DVACC_n,   //! DGA access qualifier (DECODE_DGA_COMM A227, arrives as XDVN) - not the CGA's VACC
     output ECREQ,
-    output ECSR_n,
-    output EDO_n,
-    output EIOR_n,
-    output EMPID_n,
+    output ECSR_n,   //! Enable control store read (to CPU_15.ECSR_n)
+    output EDO_n,    //! Enable data out (to CPU_15.EDO_n)
+    output EIOR_n,   //! Enable I/O Read (to IO_UART_42.EIOR_n)
+    output EMPID_n,  //! Enable memory parity interrupt disable (to CPU_15.EMPID_n)
     output EMP_n,
     output EPANS_n,
-    output ESTOF_n,
+    output ESTOF_n,  //! Enable store overflow (to CPU_15.ESTOF_n)
     output FETCH,
-    output FMISS,
-    output FORM_n,
+    output FMISS,    //! Cache fetch miss (to CPU_15.FMISS)
+    output FORM_n,   //! Format instruction (to CPU_15.FORM_n)
     output FUL_n,
     output IORQ_n,
     output LHIT,
     output MCL,
-    output MREQ_n,
+    output MREQ_n,   //! Memory request (to CPU_15.MREQ_n)
     output OSC,
     output PANOSC,
-    output PAN_n,
-    output [7:0] PA_7_0,
+    output PAN_n,    //! Page address not valid (to CPU_15.PAN_n)
+    output [7:0] PA_7_0,  //! Data from FIFO in DGA (to IO_PANCAL_40.PA_7_0)
     output PA_n,
-    output POWFAIL_n,
-    output PPOSC,
+    output POWFAIL_n,  //! Power failure detected (to CPU_15.POWFAIL_n)
+    output PPOSC,    //! Panel Oscillator (to IO_UART_42.PPOSC)
     output PS_n,
     output REFRQ_n,
     output RINR_n,
-    output RT_n,
-    output RUART_n,
+    output RT_n,     //! Reset trap (to CPU_15.RT_n)
+    output RUART_n,  //! Read UART (HIGH=Write UART) (to IO_UART_42.RUART_n)
     output RWCS_n,  // (NOT CONNECTED IN SHEET 39) - find signal from one of the PAL's ??
     output SHORT_n,
     output SIOC_n,
     output SLOW_n,
     output SSEMA_n,
-    output STOC_n,
-    output STP,
+    output STOC_n,   //! Store overflow check (to CPU_15.STOC_n)
+    output STP,      //! Output-signal to "C PLUG", signal B14 RUN~ (driven by Stop flip-flop: low while CPU is running) (to ND3202D.RUN_n)
     output TOUT,
     output TRAALD_n,
     output VAL,
-    output WCHIM_n,
-    output WRITE,
+    output WCHIM_n,  //! Write cache hit memory (to CPU_15.WCHIM_n)
+    output WRITE,    //! Write cycle active (to CPU_15.WRITE)
     output EPAN_n  // Signal on the DGA chip (not connected in sheet 39). Maybe replaced by a PAL?
 );
 

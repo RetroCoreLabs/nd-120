@@ -10,7 +10,7 @@
 
 module MEM_ADDR_44 (
     // Input
-    input sysclk,
+    input sysclk,           //! System clock in FPGA (from MEM_43.sysclk)
     input [19:0] LBD_19_0,  //! Local Bus Address and Data - 20 bits (including parity 2 bits)
     input BCGNT50,          //! Bus cycle grant 50ns delayed CLOCK signal to latch LOW or HIGH bits from memory to AA_9_0
     input LOEN_n,           //! Low address bits enable

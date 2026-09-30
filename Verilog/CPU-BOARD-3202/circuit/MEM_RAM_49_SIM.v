@@ -39,15 +39,15 @@ module MEM_RAM_49_SIM (
     input sys_rst_n,  // unused
     /* verilator lint_on UNUSEDSIGNAL */
 
-    input [9:0] AA_9_0,
+    input [9:0] AA_9_0,  //! 10 bits of LBD (including parity in bit 10)- 10 bit input to MEM/RAM (from MEM_ADDR_44.AA_9_0)
     input       BANK0,
     input       BANK1,
     input       BANK2,
 
-    input CAS,
-    input RAS,
+    input CAS,        //! Column Address Strobe (from MEM_RAMC_50.CAS)
+    input RAS,        //! Row Address Strobe (from MEM_RAMC_50.RAS)
 
-    input MWRITE50_n,
+    input MWRITE50_n,  //! Memory Write (Delayed 50ns) (from MEM_LBDIF_48.MWRITE50_n)
 
     input  [17:0] DD_17_0_IN,
     output [17:0] DD_17_0_OUT,

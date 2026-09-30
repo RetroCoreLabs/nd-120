@@ -12,8 +12,8 @@
 module CPU_MMU_HIT_27 (
     input [13:0] PPN_23_10_IN,
     input [13:0] CPN_23_10_IN,
-    input        LSHADOW,
-    input        FMISS,
+    input        LSHADOW,  //! Load shadow signal (from CPU_MMU_24.LSHADOW)
+    input        FMISS,  //! Force miss (from CPU_MMU_24.FMISS)
     input        CON_n,
 
     output wire HIT0_n,

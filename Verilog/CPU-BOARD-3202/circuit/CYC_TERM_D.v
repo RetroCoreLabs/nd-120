@@ -23,20 +23,20 @@ module CYC_TERM_D (
     // Current Cycle-Control state + TERM, taken as the PAL's active-low
     // outputs (CCx_n = ~CCx_reg, TERM_n = ~TERM_reg when OE_n=0). These are
     // exactly the nets CYC_36 already has.
-    input CC0_n,
-    input CC1_n,
-    input CC2_n,
-    input CC3_n,
-    input TERM_n,
+    input CC0_n,  //! Q2_n - Cycle Control 0 (negated) (from PAL_44601B.CC0_n)
+    input CC1_n,  //! Q3_n - Cycle Control 1 (negated) (from PAL_44601B.CC1_n)
+    input CC2_n,  //! Q4_n - Cycle Control 2 (negated) (from PAL_44601B.CC2_n)
+    input CC3_n,  //! Q5_n - Cycle Control 3 (negated) (from PAL_44601B.CC3_n)
+    input TERM_n,  //! Q1_n - TERM_n  (Trigger clock signal that latches CS input signals and more) (from PAL_44601B.TERM_n)
 
     // Terminate-condition inputs - the same nets PAL_44601B receives.
-    input SHORT_n,
-    input HIT,
-    input BRK_n,
-    input SLOW_n,
-    input DLY0_n,
-    input DLY1_n,
-    input CSDELAY0,
+    input SHORT_n,  //! B1_n - SHORT_n  - SHORT Cycle (same net as PAL_44601B.SHORT_n)
+    input HIT,  //! Cache hit (from CPU_15.HIT)
+    input BRK_n,  //! CPU Break Signal (from CPU_15.BRK_n)
+    input SLOW_n,  //! B0_n - SLOW_n   - SLOW Cycle (same net as PAL_44601B.SLOW_n)
+    input DLY0_n,  //! I1 - DLY0_n    //! DLY0_ (Ouput from PAL 44403 DLY0_n (B0) (same net as PAL_44601B.DLY0_n)
+    input DLY1_n,  //! I0 - DLY1_n    //! DLY1_ (Ouput from PAL 44404 DLY1_n (B3) (same net as PAL_44601B.DLY1_n)
+    input CSDELAY0,  //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[26])
 
     // Combinational next value of TERM_reg (its D input, before the edge).
     output TERM_D

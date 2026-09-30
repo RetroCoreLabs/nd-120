@@ -15,7 +15,7 @@ module CPU_MMU_PPNX_28 (
 
   input EIPUR_n,  //! Mask away the PROTECT BITS in PPN (PPN 25:19 == 000000)
 
-  input  [15:0] IDB_15_0_IN,
+  input  [15:0] IDB_15_0_IN,  //! Internal data bus input, 16 bits (from CPU_MMU_24.IDB_15_0_IN)
   output [15:0] IDB_15_0_OUT,
 
   input  [15:0] PPN_25_10_IN,

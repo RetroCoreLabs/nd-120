@@ -6,21 +6,21 @@
 ** Last reviewed: 8-JUL-2026  Ronny Hansen                               **
 ***************************************************************************/
 module PAL_44445B_D (
-    input sysclk,
-    input sys_rst_n,
+    input sysclk,   //! System clock (for the FF-mode _D PAL mirrors) (from MEM_ADEC_45.sysclk)
+    input sys_rst_n,  //! System reset (from MEM_ADEC_45.sys_rst_n)
     input CK,       // ECREQ - used as an edge-detected ENABLE here
-    input OE_n,
-    input WRITE,
-    input IORQ_n,
-    input MOFF_n,
-    input PPN20,
-    input PPN21,
-    input PPN22,
-    input PPN23,
-    output MSIZE0_n,
-    output CLRQ_n,
-    output CRQ_n,
-    input  ECREQ,
+    input OE_n,     //! Bus CPU Grant (from MEM_RAMC_50.CGNT_n)
+    input WRITE,    //! Write cycle active (same net as CPU_15.WRITE)
+    input IORQ_n,   //! Bus Input/Output Request (from MEM_43.IORQ_n)
+    input MOFF_n,   //! tied to 1 (in MEM_ADEC_45)
+    input PPN20,    //! Physical Page Number Bits 23:19 (from MEM_43.PPN_23_19[1])
+    input PPN21,    //! Physical Page Number Bits 23:19 (from MEM_43.PPN_23_19[2])
+    input PPN22,    //! Physical Page Number Bits 23:19 (from MEM_43.PPN_23_19[3])
+    input PPN23,    //! Physical Page Number Bits 23:19 (from MEM_43.PPN_23_19[4])
+    output MSIZE0_n,  //! I0 - MSIZE0_n (to PAL_44904B.MSIZE0_n)
+    output CLRQ_n,  //! Bus Clear Request (to MEM_RAMC_50.CLRQ_n)
+    output CRQ_n,   //! CPU Request (to MEM_43.CRQ_n)
+    input  ECREQ,   //! BUS ECC Request (from MEM_43.ECREQ)
     output BANK2,
     output BANK1,
     output BANK0,

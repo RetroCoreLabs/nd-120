@@ -14,25 +14,25 @@ module CPU_MMU_CACHE_25 (
     input sysclk,    // System clock in FPGA
     input sys_rst_n, // System reset in FPGA
 
-    input        BRK_n,
-    input [10:0] CA_10_0,
-    input        CCLR_n,
-    input        CWR,
-    input        CYD,
-    input        DT_n,
+    input        BRK_n,  //! CPU Break signal (from CPU_MMU_24.BRK_n)
+    input [10:0] CA_10_0,  //! Cache address, 11 bits (from CPU_MMU_24.CA_10_0)
+    input        CCLR_n,  //! Cache clear (from CPU_MMU_24.CCLR_n)
+    input        CWR,  //! Cache write (from CPU_MMU_24.CWR)
+    input        CYD,  //! Cycle done (from CPU_MMU_24.CYD)
+    input        DT_n,  //! Data transfer (from CPU_MMU_24.DT_n)
     input        ECD_n,
-    input        FMISS,
+    input        FMISS,  //! Force miss (from CPU_MMU_24.FMISS)
     input [ 1:0] HIT_1_0_n,
-    input        LSHADOW,
-    input        PD2,
-    input        RT_n,
-    input        SW1_CONSOLE,
-    input        UCLK,
+    input        LSHADOW,  //! Load shadow signal (from CPU_MMU_24.LSHADOW)
+    input        PD2,  //! Power down 2 (from CPU_MMU_24.PD2)
+    input        RT_n,  //! Reset trap (from CPU_15.RT_n)
+    input        SW1_CONSOLE,  //! Switch on the console (on/off) (from CPU_MMU_24.SW1_CONSOLE)
+    input        UCLK,  //! User clock (from CPU_MMU_24.UCLK)
     input        UCLK_EN,  //! UCLK clock-enable pulse (FPGA_FF_MODE, else 0)
     input        WCINH_n,
 
-    input  [15:0] CD_15_0_IN,
-    output [15:0] CD_15_0_OUT,
+    input  [15:0] CD_15_0_IN,  //! Cache data input, 16 bits (from CPU_MMU_24.CD_15_0_IN)
+    output [15:0] CD_15_0_OUT,  //! Cache data output, 16 bits (to CPU_MMU_24.CD_15_0_OUT)
 
     input  [13:0] CPN_23_10_IN,
     output [13:0] CPN_23_10_OUT,
@@ -41,10 +41,10 @@ module CPU_MMU_CACHE_25 (
    ** The outputs are defined here                                               **
    *******************************************************************************/
 
-    output CON,
+    output CON,      //! Cache ON (CON) goes to IDB1 when ECSR_n is low. CON_n goes to IDB2 (to CPU_MMU_CSR_26.CON)
     output CON_n,
-    output HIT,
-    output WCA_n,
+    output HIT,      //! Cache hit signal, indicates a successful cache lookup (to CPU_MMU_24.HIT)
+    output WCA_n,    //! Write Cache Address, controls writing to the cache address register (to CPU_MMU_24.WCA_n)
 
     output LED1  //LED 1, RED. Controlld by SW1. When LED is on, CON is 0. and CON_n is 1.
 );

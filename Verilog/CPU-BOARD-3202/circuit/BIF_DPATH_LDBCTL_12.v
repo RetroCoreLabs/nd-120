@@ -12,40 +12,40 @@ module BIF_DPATH_LDBCTL_12 (
     input OSC,       //! Clock input (added for FPGA synthesis)
     input sys_rst_n, //! System reset (active low, for FPGA synthesis)
 
-    input BDAP50_n,
-    input BDRY25_n,
-    input BDRY50_n,
-    input BGNT50_n,
-    input BGNT_n,
-    input BINPUT50_n,
-    input CACT_n,
-    input CC2_n,
-    input CGNT50_n,
-    input CGNT_n,
+    input BDAP50_n,  //! Bus Data Address Present (50ns delayed) (from BIF_DPATH_9.BDAP50_n)
+    input BDRY25_n,  //! Bus Data Ready (25ns delayed) (from BIF_DPATH_9.BDRY25_n)
+    input BDRY50_n,  //! Bus Data Ready (50ns delayed) (from BIF_DPATH_9.BDRY50_n)
+    input BGNT50_n,  //! Bus Grant (50ns delayed) (from BIF_DPATH_9.BGNT50_n)
+    input BGNT_n,  //! Bus Grant (from BIF_DPATH_9.BGNT_n)
+    input BINPUT50_n,  //! Bus Input (50ns delayed) (from BIF_DPATH_9.BINPUT50_n)
+    input CACT_n,  //! CPU Active (from BIF_DPATH_9.CACT_n)
+    input CC2_n,   //! Cpu Cycle bit 2 (from BIF_DPATH_9.CC2_n)
+    input CGNT50_n,  //! Bus Grant (50ns delayed) (from BIF_DPATH_9.CGNT50_n)
+    input CGNT_n,  //! Bus Grant (from BIF_DPATH_9.CGNT_n)
     input EADR_n, //! Address from CPU to BUS
-    input EBUS_n,
-    input GNT_n,
-    input IBAPR_n,
-    input IOD_n,
-    input IORQ_n,
-    input MIS0,
-    input MWRITE_n,
-    input PD1,
-    input PD3,
-    input Q0_n,
-    input Q2_n,
-    input RT_n,
-    input TERM_n,
-    input WRITE,
+    input EBUS_n,  //! Enable External Bus (from BIF_DPATH_9.EBUS_n)
+    input GNT_n,   //! Q6_n - GNT_n  (GRANT ND100 BUS TO A DMA DEVICE OR EXTERNAL BUS CONTROLLER) (from PAL_44801A.GNT_n)
+    input IBAPR_n,  //! Bus Address Present (from BIF_DPATH_9.IBAPR_n)
+    input IOD_n,   //! IO SIGNAL TO LAST FOR THE ENTIRE BUS CYCLE (from BIF_DPATH_9.IOD_n)
+    input IORQ_n,  //! Input/Output Request (from BIF_DPATH_9.IORQ_n)
+    input MIS0,    //! Miscellaneous bit 0 (from BIF_DPATH_9.MIS0)
+    input MWRITE_n,  //! Memory Write (from BIF_DPATH_9.MWRITE_n)
+    input PD1,     //! Power Down 1 (from BIF_DPATH_9.PD1)
+    input PD3,     //! Power Down 3 (from BIF_DPATH_9.PD3)
+    input Q0_n,    //! State bits 0-2 (from BIF_BCTL_6.Q_2_0_n[0])
+    input Q2_n,    //! State bits 0-2 (from BIF_BCTL_6.Q_2_0_n[2])
+    input RT_n,    //! RT_n - Return (from BIF_DPATH_9.RT_n)
+    input TERM_n,  //! TERM_n - Terminate (from BIF_DPATH_9.TERM_n)
+    input WRITE,   //! WRITE - Write (from BIF_DPATH_9.WRITE)
 
     output BGNTCACT,  //! Bus Grant OR CPU Active
     output CBWRITE_n,  //! CPU Write cycle to bus
     output CGNTCACT_n,  //! CPU Grant OR CPU Active
-    output CLKBD,
-    output DBAPR,
-    output DSTB_n,
-    output EBADR,
-    output EBD_n,
+    output CLKBD,  //! Clock BD (to BIF_DPATH_BDLBD_10.CLKBD)
+    output DBAPR,  //! Data Bus Address Present (to BIF_DPATH_9.DBAPR)
+    output DSTB_n,  //! Data Strobe (to BIF_DPATH_CDLBD_11.DSTB_n)
+    output EBADR,  //! Enable Address from Bus to Local Memory (to BIF_DPATH_BDLBD_10.EBADR)
+    output EBD_n,  //! Enable Bus Data (Enable LBD to BD transceiver). (to BIF_DPATH_BDLBD_10.EBD_n)
     output EMD_n,  //! Enable Memory LBD to CD bus
     output WBD_n,  //! Direction from LBD to BD (LBD to BD transceiver)
     output WLBD_n  //! Direction from CD to LBD (LBD to BD transceiver)

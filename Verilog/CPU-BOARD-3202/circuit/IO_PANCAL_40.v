@@ -26,12 +26,12 @@ module IO_PANCAL_40 (
     input       EMP_n,
     input       EPANS,
     input       FUL_n,
-    input       IONI,
-    input       LEV0,
+    input       IONI,     //! Interrupt System ON (from CPU_15.IONI)
+    input       LEV0,     //! Level 0 active (from CPU_15.LEV0)
     input       LHIT,
     input       PANOSC,
     input [7:0] PA_7_0,   //! Data from FIFO in DGA
-    input [1:0] PCR_1_0,
+    input [1:0] PCR_1_0,  //! Paging Control Register - 2-bit register for paging control (from CPU_15.PCR_1_0)
     input       PONI,     //! Memory Protection ON, PONI=1
     input       VAL,
 
@@ -39,7 +39,7 @@ module IO_PANCAL_40 (
     output [15:0] IDB_15_0_OUT,
 
     // Output signals
-    output [4:0] DP_5_1_n,
+    output [4:0] DP_5_1_n,  //! Output signal to "A PLUG", signal DP~5_1 "Display signals" (C25,C26, C27, C28, C29) (to ND3202D.DP_5_1_n)
     output       RMM_n,
     output [1:0] STAT_4_3,
     output [15:0] PANEL_ACTLV  //! the microcode's ACTIVE LEVEL word (0 without ND120_PANEL_CLOCK)

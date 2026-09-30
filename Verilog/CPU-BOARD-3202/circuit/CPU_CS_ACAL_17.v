@@ -11,12 +11,12 @@
 
 module CPU_CS_ACAL_17 (
     input         sysclk,   //! FPGA system clock — used for latch-equivalent FFs
-    input         CLK,
-    input  [12:0] CSA_12_0,
-    input  [ 9:0] CSCA_9_0,
-    input         MACLK,
-    input         PD1,
-    output [12:0] LUA_12_0,
+    input         CLK,      //! Main system clock (from CPU_15.CLK)
+    input  [12:0] CSA_12_0,  //! XMA_12_0 from CGA (Delilah) (MA_12_0 from CGA.MIC) <= Memory Address Bits (for Control Store) (from CPU_CS_16.CSA_12_0)
+    input  [ 9:0] CSCA_9_0,  //! Source CGA.XMCA_9_0, source MAC.MCA_9_0, source MAC_AP09.MCA_9_0, source CALCA.MCA9_0 <= Input ICA.Bits [15:0] but only when MCLK is low. (from CPU_CS_16.CSCA_9_0)
+    input         MACLK,    //! Micro-address latch strobe - latch enable for the control-store address latches in CPU_CS_ACAL_17 (transparent high, captures on the FALLING edge). (from CPU_15.MACLK)
+    input         PD1,      //! P Disable1 - Always 0 during normal operations (from CPU_CS_16.PD1)
+    output [12:0] LUA_12_0,  //! Load Upper Address - 13-bit output for upper address bits of control store (to CPU_CS_16.LUA_12_0)
     output [11:0] UUA_11_0
 );
 

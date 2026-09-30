@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 module BIF_BCTL_6 (
-    input sysclk,
+    input sysclk,             //! System clock in FPGA (from BIF_5.sysclk)
     input CBWRITE_n,  //! CPU Bus Write
     input CC2_n,      //! Cycle Counter bit 2
     input CGNT50_n,   //! Grant 50ns delayed

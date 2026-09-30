@@ -23,17 +23,17 @@
 
 module CYC_CC_D (
     // Current cycle-control state + TERM, as the PAL's active-low outputs.
-    input CC0_n,
-    input CC1_n,
-    input CC2_n,
-    input CC3_n,
-    input TERM_n,
+    input CC0_n,  //! Q2_n - Cycle Control 0 (negated) (from PAL_44601B.CC0_n)
+    input CC1_n,  //! Q3_n - Cycle Control 1 (negated) (from PAL_44601B.CC1_n)
+    input CC2_n,  //! Q4_n - Cycle Control 2 (negated) (from PAL_44601B.CC2_n)
+    input CC3_n,  //! Q5_n - Cycle Control 3 (negated) (from PAL_44601B.CC3_n)
+    input TERM_n,  //! Q1_n - TERM_n  (Trigger clock signal that latches CS input signals and more) (from PAL_44601B.TERM_n)
 
     // FSM inputs the CC equations depend on (same nets PAL_44601B receives).
-    input CGNTCACT_n,
-    input WAIT1,
-    input WAIT2,
-    input BRK_n,
+    input CGNTCACT_n,  //! Combined CPU Grant/Active signal (from BIF_5.CGNTCACT_n)
+    input WAIT1,  //! I3 - WAIT1 (same net as PAL_44601B.WAIT1)
+    input WAIT2,  //! I4 - WAIT2 (same net as PAL_44601B.WAIT2)
+    input BRK_n,  //! CPU Break Signal (from CPU_15.BRK_n)
 
     // Combinational next values of CC3..CC0 (active-high, = CCx_reg D inputs).
     output CC0_D,

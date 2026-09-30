@@ -17,44 +17,44 @@ module CYC_36 (
 
     input OSC,
 
-    input ACOND_n,
-    input BRK_n,
-    input CGNTCACT_n,
-    input CSALUI7,
-    input CSALUI8,
-    input CSALUM0,
-    input CSALUM1,
-    input [1:0] CSDELAY_1_0,
-    input CSDLY,
-    input CSECOND,
-    input CSLOOP,
-    input FORM_n,
-    input HIT,
+    input ACOND_n,   //! ACOND is the output of the condition register. (from CPU_15.ACOND_n)
+    input BRK_n,     //! CPU Break Signal (from CPU_15.BRK_n)
+    input CGNTCACT_n,  //! Combined CPU Grant/Active signal (from BIF_5.CGNTCACT_n)
+    input CSALUI7,   //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[62])
+    input CSALUI8,   //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[63])
+    input CSALUM0,   //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[44])
+    input CSALUM1,   //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[45])
+    input [1:0] CSDELAY_1_0,  //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[27:26])
+    input CSDLY,     //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[21])
+    input CSECOND,   //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[23])
+    input CSLOOP,    //! Top Control Store Bits - 64-bit microcode control signals (from CPU_15.TOPCSB[22])
+    input FORM_n,    //! Format instruction (same net as CPU_15.FORM_n)
+    input HIT,       //! Cache hit (from CPU_15.HIT)
     input IORQ_n,
-    input LBA0,
-    input LBA1,
-    input LBA3,
-    input LSHADOW,
-    input LUA12,
-    input MREQ_n,
-    input MR_n,
-    input PD1,
-    input PD4,
-    input RRF_n,
-    input RT_n,
-    input RWCS_n,
+    input LBA0,      //! Latched Address B bits (from CPU_15.LBA_3_0[0])
+    input LBA1,      //! Latched Address B bits (from CPU_15.LBA_3_0[1])
+    input LBA3,      //! Latched Address B bits (from CPU_15.LBA_3_0[3])
+    input LSHADOW,   //! Latch Shadow signal (from CPU_15.LSHADOW)
+    input LUA12,     //! Load Upper Address - 13-bit output for upper address bits of control store (from CPU_15.LUA_12_0[12])
+    input MREQ_n,    //! Memory request (same net as CPU_15.MREQ_n)
+    input MR_n,      //! Master Reset (from BIF_5.MR_n)
+    input PD1,       //! tied to 0 (in ND3202D)
+    input PD4,       //! tied to 0 (in ND3202D)
+    input RRF_n,     //! Output RRF signal from CPU to CYCLE (from CPU_15.RRF_n)
+    input RT_n,      //! Reset trap (same net as CPU_15.RT_n)
+    input RWCS_n,    //! COMMAND 36.1 RWCS - Read/write control store as addressed by ADCS command (from CPU_15.RWCS_n)
     input SHORT_n,
     input SLOW_n,
-    input TRAP_n,
-    input VEX,
+    input TRAP_n,    //! Enable TRAP signal (from CPU_15.TRAPN)
+    input VEX,       //! Vector Exception (from CPU_15.VEX)
 
     // Outputs
-    output ALUCLK,
-    output CLK,
-    output MACLK,
+    output ALUCLK,   //! ALU clock (to CPU_15.ALUCLK)
+    output CLK,      //! Main system clock (to CPU_15.CLK)
+    output MACLK,    //! Micro-address latch strobe - latch enable for the control-store address latches in CPU_CS_ACAL_17 (transparent high, captures on the FALLING edge). (to CPU_15.MACLK)
     output MCLK,
-    output UCLK,
-    output WRFSTB,
+    output UCLK,     //! Microcode clock (to CPU_15.UCLK)
+    output WRFSTB,   //! Write register file strobe (to CPU_15.WRFSTB)
 
     // One-sysclk-wide clock-enable pulses (FPGA_FF_MODE only, else tied 0).
     // Each asserts during the sysclk cycle whose POSEDGE is the rising edge
@@ -62,19 +62,19 @@ module CYC_36 (
     // `posedge sysclk + if (XCLK_EN)` captures on exactly the edge the old
     // `posedge XCLK` flop did. P2 of docs/plan-fix-unconstrained-clocks.md.
     output CLK_EN,
-    output UCLK_EN,
-    output MCLK_EN,
+    output UCLK_EN,  //! UCLK clock-enable pulse (FPGA_FF_MODE, else 0) (to CPU_15.UCLK_EN)
+    output MCLK_EN,  //! MCLK clock-enable pulse (FPGA_FF_MODE, else 0) (to CPU_15.MCLK_EN)
     output MACLK_EN,
-    output ALUCLK_EN,
+    output ALUCLK_EN,  //! ALUCLK clock-enable pulse (FPGA_FF_MODE, else 0) (to CPU_15.ALUCLK_EN)
     // Matching FALL pulses (level & ~next): high in the cycle whose POSEDGE
     // is the FALLING edge of the phase-accurate clock, for consumers that
     // clocked on the inverted net (posedge ~xclk / InvertClockEnable).
-    output CLK_FALL_EN,
+    output CLK_FALL_EN,  //! CLK fall-enable pulse (FPGA_FF_MODE, else 0) (to IO_37.CLK_FALL_EN)
     output UCLK_FALL_EN,
-    output MCLK_FALL_EN,
+    output MCLK_FALL_EN,  //! MCLK fall-enable pulse (FPGA_FF_MODE, else 0) (to CPU_15.MCLK_FALL_EN)
     output MACLK_FALL_EN,
     output ALUCLK_FALL_EN,
-    output CYD,
+    output CYD,      //! Cycle done signal (to CPU_15.CYD)
     output [2:0] CC_3_1_n,
     output CC0_n,          // Cycle Control bit 0 (added for debug)
     output TERM_n,
@@ -93,11 +93,11 @@ module CYC_36 (
     //!   found taking a DIFFERENT CC state from IDENTICAL inputs, which is
     //!   either different clocking or different logic; these separate the two.
     output [11:0] XCYC_DBG_7_0,
-    output MAP_n,
+    output MAP_n,    //! MAP Opcode - microsequencer loads next micro-address from the opcode mapper; last microinstruction of every macro instruction (active low) (to CPU_15.MAP_n)
     output CX_n,
-    output EORF_n,
-    output ETRAP_n,
-    output LCS_n
+    output EORF_n,   //! Enable output register file (to CPU_15.EORF_n)
+    output ETRAP_n,  //! Enable trap (to CPU_15.ETRAP_n)
+    output LCS_n     //! Load control store (to CPU_15.LCS_n)
 );
 
   /*******************************************************************************

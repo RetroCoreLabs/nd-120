@@ -24,8 +24,8 @@ module MEM_DATA_46 (
     input RDATA,       //! Read Data
 
     // IN and OUT signals
-    input  [15:0] LBD_15_0_IN,
-    output [15:0] LBD_15_0_OUT,
+    input  [15:0] LBD_15_0_IN,  //! Local Bus Address and Data 23:0 (IN) -  Address and Data for RAM (from MEM_43.LBD_23_0_IN[15:0])
+    output [15:0] LBD_15_0_OUT,  //! Local Bus Address and Data 23:0 (OUT) - Data from from RAM (15:0) (to MEM_43.LBD_23_0_OUT[15:0])
 
     input  [17:0] DD_17_0_IN,
     output [17:0] DD_17_0_OUT,

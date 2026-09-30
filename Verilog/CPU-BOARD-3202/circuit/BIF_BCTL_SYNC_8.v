@@ -11,7 +11,7 @@
 module BIF_BCTL_SYNC_8 (
 
     // Inputs signals
-    input sysclk,
+    input sysclk,     //! System clock in FPGA (from BIF_5.sysclk)
     input BLOCK_n,    //! BLOCK_n - Bus Block
     input CACT_n,     //! CACT_n - CPU Active
     input CLEAR_n,    //! CLEAR_n - Clear

@@ -11,30 +11,30 @@ module CPU_PROC_CMDDEC_34 (
     input wire       sysclk,  //! FPGA system clock (FF-mode clock-enable capture)
     input wire       CLK_EN,  //! CLK-rise clock-enable pulse (FPGA_FF_MODE, else 0)
 
-    input wire       CGABRK_n,
-    input wire       CLK,
-    input wire [4:0] CSCOMM_4_0,
-    input wire [4:0] CSIDBS_4_0,
-    input wire [1:0] CSMIS_1_0,
+    input wire       CGABRK_n,  //! CGA Break, active low (from CPU_PROC_CGA_33.CGABRK_n)
+    input wire       CLK,     //! Main system clock (from CPU_15.CLK)
+    input wire [4:0] CSCOMM_4_0,  //! Control Store Bits  (64 bits Microcode) (from CPU_PROC_32.CSBITS[36:32])
+    input wire [4:0] CSIDBS_4_0,  //! Control Store Bits  (64 bits Microcode) (from CPU_PROC_32.CSBITS[41:37])
+    input wire [1:0] CSMIS_1_0,  //! Control Store Bits  (64 bits Microcode) (from CPU_PROC_32.CSBITS[43:42])
     input wire       IDB2,
-    input wire       LCS_n,
-    input wire       MREQ_n,
-    input wire       PD1,
-    input wire [3:0] PIL_3_0,
-    input wire       WCA_n,
+    input wire       LCS_n,   //! LCS_n (LCS = Load Control Store) (from CPU_PROC_32.LCS_n)
+    input wire       MREQ_n,  //! Memory Request (from CPU_PROC_32.MREQ_n)
+    input wire       PD1,     //! Powe down 1 (from CPU_PROC_32.PD1)
+    input wire [3:0] PIL_3_0,  //! Processor Interrupt Level (from CPU_PROC_CGA_33.PIL_3_0)
+    input wire       WCA_n,   //! Write Cache Address (from CPU_PROC_32.WCA_n)
     input wire       WRTRF,  //! Write to Registry File (enable flag)
 
-    output wire BRK_n,
-    output wire CUP,
-    output wire CWR,
+    output wire BRK_n,        //! CPU Break Signal (to CPU_15.BRK_n)
+    output wire CUP,          //! Cache Updated (to CPU_PROC_32.CUP)
+    output wire CWR,          //! Cache Write (to CPU_PROC_32.CWR)
     output wire ERF_n,
-    output wire LEV0,
-    output wire OPCLCS,
-    output wire RRF_n,
+    output wire LEV0,         //! Level 0 (to CPU_PROC_32.LEV0)
+    output wire OPCLCS,       //! COMMAND 36.2 LCS - Load control store from PROM and perform a Master Clear (to CPU_PROC_32.OPCLCS)
+    output wire RRF_n,        //! Read REG Flag - CSIDBS Source = 5 (REG) (to CPU_PROC_32.RRF_n)
     output wire RT_n, // This signal is not in the PAL 44408B, but in the PAL 444608 (VXFIX). Use  RT_n signal from DGA until we find out what the 44608A does with this signal.
-    output wire RWCS_n,
+    output wire RWCS_n,       //! COMMAND 36.1 RWCS - Read/write control store as addressed by ADCS command (to CPU_PROC_32.RWCS_n)
     output wire LDEXM_n, // This wire is not in the PAL 44408B, but in the PAL 444608 (VXFIX). Not sure what to do with this signal at the moment.. but brings it out here just in case..
-    output wire VEX
+    output wire VEX           //! Vector Exception (to CPU_PROC_32.VEX)
 );
 
 

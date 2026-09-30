@@ -47,7 +47,7 @@ module ND3202D (
 
     /* BUS BD to and from C-PLUG  - Bidirectional Address and Data*/
     input  [23:0] BD_23_0_n_IN,
-    output [23:0] BD_23_0_n_OUT,
+    output [23:0] BD_23_0_n_OUT,  //! Bus address/data out (to ND120_CORE.BD_23_0_n_OUT)
 
     /* Bidirectional signals */
     input  SEMRQ_n_IN,    //! Input-signal from "C PLUG", signal A17 SEMREQ~ (SEMaphore REQest)
@@ -215,7 +215,7 @@ module ND3202D (
     // nd_storage device port - straight through to MEM_43/MEM_RAM_49_SDRAM.
     // stor_clk is its own domain (the backend toggle-CDCs it into clk2x).
     ,
-    input  wire        stor_clk,
+    input  wire        stor_clk,  //! 27 MHz crystal (pin 4) (from ND120_TANG20K_TOP.sys_clk)
     input  wire        stor_rst_n,
     input  wire        mem_start,
     input  wire        mem_we,

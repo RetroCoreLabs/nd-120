@@ -8,21 +8,21 @@
 ** Last reviewed: 8-JUL-2026  Ronny Hansen                               **
 ***************************************************************************/
 module PAL_44446B_D (
-    input sysclk,
-    input sys_rst_n,
+    input sysclk,    //! System clock (for the FF-mode _D PAL mirrors) (from MEM_ADEC_45.sysclk)
+    input sys_rst_n,  //! System reset (from MEM_ADEC_45.sys_rst_n)
     input CK,        // DBAPR - used as an edge-detected ENABLE here
-    input OE_n,
-    input DBAPR,
-    input MOFF_n,
-    input BINPUT_n,
-    input BMEM_n,
-    input BD20_n,
-    input BD21_n,
-    input BD22_n,
-    input BD23_n,
+    input OE_n,      //! Bus Grant (from MEM_RAMC_50.BGNT_n)
+    input DBAPR,     //! BUS Address Present (from MEM_43.DBAPR)
+    input MOFF_n,    //! tied to 1 (in MEM_ADEC_45)
+    input BINPUT_n,  //! Bus Input Enable (from MEM_43.IBINPUT_n)
+    input BMEM_n,    //! BUS MEMORY Enable (from MEM_43.BMEM_n)
+    input BD20_n,    //! Bus Data and Address (bits 23:19 negated) (from MEM_43.BD_23_19_n[1])
+    input BD21_n,    //! Bus Data and Address (bits 23:19 negated) (from MEM_43.BD_23_19_n[2])
+    input BD22_n,    //! Bus Data and Address (bits 23:19 negated) (from MEM_43.BD_23_19_n[3])
+    input BD23_n,    //! Bus Data and Address (bits 23:19 negated) (from MEM_43.BD_23_19_n[4])
     output AOK,
     output DDBAPR,
-    output MSIZE1_n,
+    output MSIZE1_n,  //! I1 - MSIZE1_n (to PAL_44904B.MSIZE1_n)
     output BANK2,
     output BANK1,
     output BANK0,

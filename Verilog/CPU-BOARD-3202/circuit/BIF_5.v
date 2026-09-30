@@ -54,7 +54,7 @@ module BIF_5 (
     input       TOUT,       //! Timeout
     input       WRITE,      //! Write
 
-    input [13:0] PPN_23_10,
+    input [13:0] PPN_23_10,  //! Physical Page Number - 14-bit page number for memory mapping (from CPU_15.PPN_23_10)
 
     // INPUTS and OUTPUTS here
 

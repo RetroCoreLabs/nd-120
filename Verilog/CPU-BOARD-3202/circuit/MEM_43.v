@@ -99,7 +99,7 @@ module MEM_43 (
     // the CPU's half of the chip). stor_clk is its OWN domain - the backend
     // toggle-CDCs it into clk2x. See MEM_RAM_49_SDRAM.v section 5.2.
     ,
-    input  wire        stor_clk,
+    input  wire        stor_clk,  //! 27 MHz crystal (pin 4) (from ND120_TANG20K_TOP.sys_clk)
     input  wire        stor_rst_n,
     input  wire        mem_start,
     input  wire        mem_we,

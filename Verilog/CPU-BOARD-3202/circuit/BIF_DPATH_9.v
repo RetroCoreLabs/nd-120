@@ -41,8 +41,8 @@ module BIF_DPATH_9 (
     input MWRITE_n,    //! Memory Write
     input PD1,         //! Power Down 1
     input PD3,         //! Power Down 3
-    input Q0_n,        //
-    input Q2_n,        //
+    input Q0_n,        //! State bits 0-2 (from BIF_BCTL_6.Q_2_0_n[0])
+    input Q2_n,        //! State bits 0-2 (from BIF_BCTL_6.Q_2_0_n[2])
     input RT_n,        //! RT_n - Return
     input SPEA,        //! SPEA - Signal PEA Load
     input SPES,        //! SPES - Signal PES Load

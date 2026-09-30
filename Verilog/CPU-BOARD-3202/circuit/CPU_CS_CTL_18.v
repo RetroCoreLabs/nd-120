@@ -10,24 +10,24 @@
 
 module CPU_CS_CTL_18 (
     // Input signals
-    input       BRK_n,
-    input [2:0] CC_3_1_n,
-    input       FETCH,
-    input       FORM_n,
-    input       LCS_n,
-    input       LUA12,
-    input [1:0] RF_1_0,
-    input       RWCS_n,
-    input       TERM_n,
-    input       WCA_n,
-    input       WCS_n,
+    input       BRK_n,  //! CPU Break Signal (same net as CPU_15.BRK_n)
+    input [2:0] CC_3_1_n,  //! Cache control bits 3:1 (from CPU_15.CC_3_1_n)
+    input       FETCH,  //! Fetch command (from CPU_CS_16.FETCH)
+    input       FORM_n,  //! Format instruction (from CPU_15.FORM_n)
+    input       LCS_n,  //! Load Control Store (Negated) (from CPU_CS_16.LCS_n)
+    input       LUA12,  //! Load Upper Address - 13-bit output for upper address bits of control store (same net as CPU_CS_16.LUA_12_0[12])
+    input [1:0] RF_1_0,  //! Selects which of the 4 16 bit's of the microcode to fetch from ROM (from CPU_PROC_32.RF_1_0)
+    input       RWCS_n,  //! Read/Write Control Store (low=write) (from CPU_CS_16.RWCS_n)
+    input       TERM_n,  //! Terminal signal (from CPU_15.TERM_n)
+    input       WCA_n,  //! Write Cache Address, controls writing to the cache address register (from CPU_MMU_24.WCA_n)
+    input       WCS_n,  //! Write Control Store (from CPU_PROC_32.WCS_n)
 
     // Output signals
-    output       ECSL_n,
-    output       ELOW_n,
-    output       EUPP_n,
-    output       EWCA_n,
-    output [3:0] EW_3_0_n,
+    output       ECSL_n,  //! When asserted (low), IDB 15:0 is connected to IDB 15:0. (to CPU_CS_TCV_20.ECSL_n)
+    output       ELOW_n,  //! Enable LOW chips (to CPU_CS_WCS_21_22.ELOW_n)
+    output       EUPP_n,  //! Enable UPPER chips (to CPU_CS_WCS_21_22.EUPP_n)
+    output       EWCA_n,  //! Enable Write Control Store Address - Active low signal to enable writing to control store address (to CPU_CS_16.EWCA_n)
+    output [3:0] EW_3_0_n,  //! Enable Word (4 bits, where the enabled word (0-3) has its bit set to 0. (to CPU_CS_TCV_20.EW_3_0_n)
     output [3:0] WU_3_0_n,
     output [3:0] WW_3_0_n
 );

@@ -10,11 +10,11 @@
 
 module BIF_DPATH_PPNLBD_14 (
     input sysclk,  //! System clock (used only for the FF-mode strobe edge-capture)
-    input [13:0] PPN_23_10,
-    input [ 9:0] CA_9_0,
+    input [13:0] PPN_23_10,  //! Physical Page Number (from BIF_DPATH_9.PPN_23_10)
+    input [ 9:0] CA_9_0,  //! Control Store Address (from BIF_DPATH_9.CA_9_0)
 
-    input EADR_n,
-    input ECREQ,
+    input EADR_n,  //! Enable External Address (from BIF_DPATH_9.EADDR_n)
+    input ECREQ,   //! Enable CPU Request (from BIF_DPATH_9.ECREQ)
 
     output [23:0] LBD_23_0_OUT
 );
