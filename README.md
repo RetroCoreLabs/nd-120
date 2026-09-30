@@ -36,8 +36,9 @@ you can log in and run programs.**
 - [Original Diagnostics](#-original-diagnostics)
 - [What the Cache Is Worth](#-what-the-cache-is-worth)
 - [Inside the Machine](#-inside-the-machine)
+- [About the ND-120](#about-the-nd-120)
 - [Documentation](#-documentation)
-- [Project Status](#-project-status)
+- [Status](#status)
 - [License](#-license)
 
 ---
@@ -281,6 +282,22 @@ places. All Verilog is in the [Verilog folder](Verilog/readme.md).
 
 ---
 
+## About the ND-120
+
+Norsk Data built the ND-100 range of 16-bit minicomputers. The ND-120 is the
+1988 CPU card for that range, print number 3202: it puts the processor into two
+gate arrays - the DELILAH CPU gate array and a decoder gate array - where the
+earlier ND-110 used discrete TTL chips. It runs the same instruction set as the
+ND-110, faster, and can address more memory. Its operating system is
+**SINTRAN III**.
+
+The board was designed by Lasse Bockelie and Chris Cherrington. Its original
+design documents survived, and that is what makes this rebuild possible: the
+machine and its operating system run again, on FPGA boards you can buy today.
+More on the card: [3202 on NDWiki](https://www.ndwiki.org/wiki/3202).
+
+---
+
 ## 📚 Documentation
 
 Paths in this repository are always relative to the repository root. Where a
@@ -311,7 +328,10 @@ checkouts.
 
 ---
 
-## 📊 Project Status
+## Status
+
+Latest release: **[`bitstreams-2026-09`](https://github.com/RetroCoreLabs/nd-120/releases)**
+(2 September 2026) - ready-built bitstreams for the MEGA65 and the MiSTer.
 
 ### ✅ Complete & Working
 
@@ -336,14 +356,6 @@ checkouts.
 2. The Cmod A7 SRAM bridge, so a small Xilinx board can run the OS
 
 The live task list is [Verilog/TODO.md](Verilog/TODO.md).
-
----
-
-## 📜 License
-
-[MIT](LICENSE) for the Verilog, Logisim and tools in this repository. The
-original design documents and manuals are Norsk Data material, kept here for
-preservation.
 
 ---
 
@@ -374,3 +386,11 @@ preservation.
 documents, running its own operating system on a hobby FPGA board.
 
 **Start exploring:** [Quick Start](#-quick-start) | [FPGA Boards](#-fpga-boards) | [Documentation](#-documentation)
+
+---
+
+## 📜 License
+
+[MIT](LICENSE) for the Verilog, Logisim and tools in this repository. The
+original design documents and manuals are Norsk Data material, kept here for
+preservation.
