@@ -31,8 +31,8 @@ module rate_meter #(
     //! between full and empty, which reads as noise. A real bargraph has lag.
     parameter integer PEAK_HOLD = 0
 ) (
-    input wire clk,
-    input wire rst_n,
+    input wire clk,      //! pixel clock (from nd120_console_mega65.clk and others)
+    input wire rst_n,    //! async reset, active low (from nd120_console_mega65.rst_n and others)
 
     input wire sample,   //! counted while high
 

@@ -121,14 +121,14 @@ module ND_WINCHESTER #(
     // strap: an unwired input floats and would read as 0 anyway.
     parameter IS_3038 = 0
 ) (
-    input wire sysclk,
-    input wire sys_rst_n,
+    input wire sysclk,                 //! CPU + bus + device domain (ND3202D sysclk/CLOCK_1/CLOCK_2) (from ND120_CORE.clk_cpu)
+    input wire sys_rst_n,              //! Active-low reset, from the board's power-on reset (from ND120_CORE.sys_rst_n)
 
     // Device bus (from ND_BUS_SLAVE) - IOX slave side
-    input  wire [15:0] iox_addr,
-    input  wire        iox_wr,
-    input  wire [15:0] iox_wdata,
-    input  wire        iox_rd,
+    input  wire [15:0] iox_addr,       //! captured IOX address (from ND_BUS_SLAVE.iox_addr)
+    input  wire        iox_wr,         //! 1-cycle write strobe (from ND_BUS_SLAVE.iox_wr)
+    input  wire [15:0] iox_wdata,      //! write data, valid with iox_wr (from ND_BUS_SLAVE.iox_wdata)
+    input  wire        iox_rd,         //! 1-cycle read strobe (from ND_BUS_SLAVE.iox_rd)
     output reg  [15:0] iox_rdata,
     output wire        iox_sel,         // 1 = this core owns the captured IOX address
 
@@ -153,8 +153,8 @@ module ND_WINCHESTER #(
     //! that measures WHERE a disc operation's ~1 s actually goes.
     output wire        dbg_active,
     output wire [3:0]  int_pending,
-    input  wire        ident_strobe,
-    input  wire [3:0]  ident_level,
+    input  wire        ident_strobe,   //! 1-cycle IDENT poll (from ND_BUS_SLAVE.ident_strobe)
+    input  wire [3:0]  ident_level,    //! binary 10..13, valid with ident_strobe (from ND_BUS_SLAVE.ident_level)
     input  wire        ident_grant_in,
     output wire        ident_grant_out,
     output wire        ident_hit,

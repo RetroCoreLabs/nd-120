@@ -74,7 +74,7 @@ module nd_storage_floppy_adapter #(
     parameter [1:0] DRIVE = 2'd0  // disk_drive value this instance serves
 ) (
     input wire clk_cpu,
-    input wire rst_n,
+    input wire rst_n,                   //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
 
     // Disk-image backend port (to ND_FLOPPY_DMA, pin-for-pin)
     input  wire        disk_req,        // 1-cycle pulse: move one sector

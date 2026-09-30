@@ -32,11 +32,11 @@ module cdc_byte (
     input  wire       src_rst_n,
     input  wire       src_valid,  //! one clock; ignored unless src_ready
     input  wire [7:0] src_data,
-    output wire       src_ready,
+    output wire       src_ready,  //! low while the previous byte is in flight (to terminal_top.byte_ready)
 
     // Destination domain
-    input  wire       dst_clk,
-    input  wire       dst_rst_n,
+    input  wire       dst_clk,    //! pixel clock (from nd120_console_mega65.clk and others)
+    input  wire       dst_rst_n,  //! async reset, active low (from nd120_console_mega65.rst_n and others)
     output reg        dst_valid,  //! one clock per byte
     output wire [7:0] dst_data,
     //! High when the destination can take a byte THIS clock. The byte is held

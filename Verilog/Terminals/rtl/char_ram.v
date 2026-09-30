@@ -33,7 +33,7 @@ module char_ram #(
     parameter integer ROWS  = 24,
     parameter integer AWIDTH = 11   //! ceil(log2(80*24 = 1920)) = 11
 ) (
-    input wire clk,
+    input wire clk,  //! pixel clock (from nd120_console_mega65.clk and others)
 
     // Port A (terminal_ctrl): write, plus the copy engine's read
     input  wire              we,

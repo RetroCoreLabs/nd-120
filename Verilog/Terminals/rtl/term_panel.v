@@ -60,8 +60,8 @@ module term_panel #(
     parameter integer ORIGIN_X2 = 160,
     parameter integer ORIGIN_Y2 = 440
 ) (
-    input wire clk,
-    input wire rst_n,
+    input wire clk,                //! pixel clock (from nd120_console_mega65.clk and others)
+    input wire rst_n,              //! async reset, active low (from nd120_console_mega65.rst_n and others)
 
     //! Raw pixel counters from the timing generator, and the mode.
     //!
@@ -70,14 +70,14 @@ module term_panel #(
     //! difference is deliberate and harmless: the panel occupies its own screen
     //! region, so nothing has to line up with the text grid pixel for pixel and
     //! the whole panel simply lands one pixel further right.
-    input wire [11:0] x,
-    input wire [11:0] y,
+    input wire [11:0] x,           //! visible pixel column, 0..H_VISIBLE-1 (only valid while de) (from vga_timing.x)
+    input wire [11:0] y,           //! visible pixel row,    0..V_VISIBLE-1 (only valid while de) (from vga_timing.y)
     input wire        mode,     //! 0 = 1x glyphs, 1 = 2x
     input wire        enable,   //! 0 = draw nothing at all
 
     //! One pulse per frame. EVERYTHING displayed is latched on it - see the
     //! frame-snapshot note below.
-    input wire        frame_tick,
+    input wire        frame_tick,  //! one pulse per frame, un-delayed (for blink) (from text_screen.frame_end)
 
     // ---- what the machine is doing -------------------------------------
     input wire [3:0] pil,          //! current program level, 0..15

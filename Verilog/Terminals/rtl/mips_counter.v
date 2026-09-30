@@ -31,7 +31,7 @@ module mips_counter #(
     parameter integer SUB_MAX  = 10000      //! fetches per 0.01-MIPS step
 ) (
     input wire clk,     //! CPU clock - the domain FETCH lives in
-    input wire rst_n,
+    input wire rst_n,   //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
     input wire fetch,   //! board FETCH, high for the whole fetch cycle
 
     //! {d3,d2,d1,d0} BCD: d3 d2 are the integer digits, d1 d0 the fraction.

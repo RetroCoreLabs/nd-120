@@ -38,13 +38,13 @@ module term_console_feed (
     //! Local echo, for a board with nothing behind the seam yet. A board that
     //! has a machine ties this off - the machine echoes, and a terminal that
     //! echoes as well shows every character twice.
-    input  wire       echo_valid,
+    input  wire       echo_valid,  //! tied to 0 (in nd120_console_mega65 and others)
     input  wire [7:0] echo_data,
 
     //! To terminal_top's byte port.
     output wire       term_valid,
     output wire [7:0] term_data,
-    input  wire       term_ready,
+    input  wire       term_ready,  //! low while the previous byte is in flight (from terminal_top.byte_ready)
 
     output wire banner_done  //! high once the startup message is on screen
 );

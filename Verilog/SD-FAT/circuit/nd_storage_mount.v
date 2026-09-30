@@ -105,16 +105,16 @@ module nd_storage_mount #(
     output reg         rd_run,       // 1 = release the reader's reset
     output reg         phase_write,  // 1 = sd_writer owns the SD pins
     output reg  [2:0]  cur_client,   // target_name/target_len mux select
-    input  wire [3:0]  card_stat,
-    input  wire        file_found,
-    input  wire        scan_done,
+    input  wire [3:0]  card_stat,   //! init step counter; >= 8 = ready (from sd_file_reader.card_stat)
+    input  wire        file_found,  //! level: target matched (found_* valid) (from sd_file_reader.file_found)
+    input  wire        scan_done,   //! sticky level: run finished (from sd_file_reader.scan_done)
     input  wire [31:0] found_size,
     input  wire [31:0] found_first_sector,
     input  wire [31:0] found_cluster,    // captured for the fatchk checker
     input  wire [7:0]  fs_cluster_size,  // captured for the fatchk checker
     input  wire [31:0] fs_fat0_sector,   // captured for the fatchk checker
     input  wire        fs_is_fat32,      // captured for the fatchk checker
-    input  wire        outen,
+    input  wire        outen,       //! 1-cycle pulse per file byte (from sd_file_reader.outen)
     input  wire [7:0]  outbyte,
 
     // ---- mem port (muxed onto the device port while mnt_busy) ----

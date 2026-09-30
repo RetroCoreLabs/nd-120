@@ -72,8 +72,8 @@ module terminal_ctrl_tdv #(
     parameter integer TAB_STOP = 8,
     parameter integer BLINK_FRAMES = 30
 ) (
-    input wire clk,
-    input wire rst_n,
+    input wire clk,  //! pixel clock (from nd120_console_mega65.clk and others)
+    input wire rst_n,  //! async reset, active low (from nd120_console_mega65.rst_n and others)
 
     input  wire       byte_valid,
     input  wire [7:0] byte_data,
@@ -85,16 +85,16 @@ module terminal_ctrl_tdv #(
     output wire [AWIDTH-1:0] ram_raddr2,
     input  wire [      15:0] ram_rdata2,
 
-    output reg  [7:0] top_row,
+    output reg  [7:0] top_row,  //! which stored row is displayed at the top (to text_screen.top_row)
     output reg  [7:0] cursor_col,
-    output reg  [7:0] cursor_row,
-    output wire       cursor_enable,
+    output reg  [7:0] cursor_row,  //! cursor position in SCREEN coordinates (to text_screen.cursor_row)
+    output wire       cursor_enable,  //! draw the cursor at all (to text_screen.cursor_enable)
     output reg        rev_screen,
     output wire       blink_on,
 
-    input  wire frame_end,
-    output reg  bell,
-    output reg  [3:0] leds,
+    input  wire frame_end,  //! one pulse per frame, un-delayed (for blink) (from text_screen.frame_end)
+    output reg  bell,  //! one pix_clk per BEL received (to terminal_top.bell)
+    output reg  [3:0] leds,  //! DECLL (CSI Ps q) - the VT100 keyboard lamps L1-L4 (to terminal_top.leds)
 
     //! Box-charset debug taps (01-SEP-2026): live s_g0_gfx state, and a
     //! STICKY latch set the first time ESC 6 (NDSS6/Box) is ever received

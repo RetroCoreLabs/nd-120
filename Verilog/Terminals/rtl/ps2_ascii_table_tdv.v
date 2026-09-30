@@ -33,7 +33,7 @@
 `default_nettype none
 
 module ps2_ascii_table_tdv (
-    input  wire [7:0] code,
+    input  wire [7:0] code,  //! the scancode itself (from ps2_decoder_tdv.code_data)
 
     //! 0 = US ANSI, 1 = Norwegian (NS 4551-1). Same table as ps2_ascii_table.v.
     input  wire       layout_no,

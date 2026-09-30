@@ -36,7 +36,7 @@ module term_banner (
     //! Into the terminal's byte port. Same valid/ready contract.
     output wire       valid,
     output wire [7:0] data,
-    input  wire       ready,
+    input  wire       ready,  //! low while the previous byte is in flight (from terminal_top.byte_ready)
 
     output reg done  //! high once the whole message has been accepted
 );

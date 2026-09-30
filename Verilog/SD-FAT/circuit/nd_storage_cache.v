@@ -118,8 +118,8 @@ module nd_storage_cache #(
     output reg              alloc_done,
 
     // ---- invalidate every line of one client -----------------------------
-    input  wire             inval_req,
-    input  wire [2:0]       inval_client,
+    input  wire             inval_req,      //! tied to 0 (in nd_storage)
+    input  wire [2:0]       inval_client,   //! tied to 0 (in nd_storage)
     output reg              inval_done
 );
 

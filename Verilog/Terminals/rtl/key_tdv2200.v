@@ -30,7 +30,7 @@ module key_tdv2200 (
     input wire rst_n,
 
     // From the keyboard decoder - strobes, no backpressure
-    input wire       key_valid,
+    input wire       key_valid,   //! one clock per character produced (from ps2_decoder_tdv.ascii_valid)
     input wire [7:0] key_data,
 
     // To the console UART TX

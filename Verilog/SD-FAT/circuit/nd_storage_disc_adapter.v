@@ -99,7 +99,7 @@ module nd_storage_disc_adapter #(
     parameter [15:0] GEO_SPT   = 16'd18
 ) (
     input wire clk_cpu,
-    input wire rst_n,
+    input wire rst_n,                   //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
 
     // Disk-image backend port (to ND_SMD, pin-for-pin)
     input  wire        disk_start,      // 1-cycle pulse: latch base position

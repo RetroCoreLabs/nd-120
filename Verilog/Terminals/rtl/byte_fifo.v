@@ -25,10 +25,10 @@
 module byte_fifo #(
     parameter integer DEPTH_LOG2 = 4  //! 16 bytes
 ) (
-    input wire clk,
-    input wire rst_n,
+    input wire clk,  //! pixel clock (from nd120_console_mega65.clk and others)
+    input wire rst_n,  //! async reset, active low (from nd120_console_mega65.rst_n and others)
 
-    input  wire       in_valid,
+    input  wire       in_valid,  //! one clock per byte (from cdc_byte.dst_valid)
     input  wire [7:0] in_data,
     output wire       in_ready,
 

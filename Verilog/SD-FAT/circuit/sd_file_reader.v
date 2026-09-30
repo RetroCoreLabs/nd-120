@@ -93,7 +93,7 @@ module sd_file_reader #(
     // and a 75 MB one, and - the reason it exists - it ends the run at a
     // CLEAN card boundary. Killing the reader mid-transfer instead leaves
     // the card streaming and the next user of the card fails.
-    input wire            no_stream,
+    input wire            no_stream,        //! tied to 1 (in nd_storage)
 
     // one pulse per reported root entry
     output reg             dir_entry_valid,
