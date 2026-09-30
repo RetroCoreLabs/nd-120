@@ -1,216 +1,161 @@
 # ND-120 Verilog TODO
 
-> Last updated: 28-AUG-2026. Newest entries are at the top; the "CURRENT PLAN -
-> 02-AUG-2026" section below keeps its own date and says who owns what.
+> Last updated: 28-SEP-2026. Open work only - finished items are deleted
+> (the record is in git history and `HISTORY.md`). Newest sections are near
+> the top.
 >
-> Standing context: **SINTRAN III boots on the Tang Nano 20K** (24-AUG-2026).
+> Standing context: **SINTRAN III boots on the Tang Nano 20K** (24-AUG-2026),
+> the Nexys 4 DDR (25-AUG-2026) and the MiSTer (02-SEP-2026).
 > The ERRFATAL / page-fault campaign is CLOSED (`ND3202D.v:533` bank decode).
 > The SD FAT-chain walk was fixed 24-AUG (boot 168 s -> 29.4 s, S3 cold
 > 235.8 s -> 13.2 s).
 
 ---
 
-## MiSTer port - 01-SEP-2026
+## Diagnostics that do not pass
 
-**Next:** find why the CPU never reaches OPCOM. The state of the hunt is
-written up in `docs/mister-microcode-loop.md`, including the annotated
-31-microinstruction loop the board is stuck in.
+- [ ] OPEN - DISC-TEMA J02 on the Winchester (IOX 500): `DU-DI-C` reports
+  `***ERROR*** DISC-74MB-1 Unit 0 / Hardware Status: 060010b / Controller
+  finished / Additional Status: 002000b / Memory address Register not as
+  expected`. The one known open diagnostic.
+  Known facts:
+  - Reproduces on the Tang AND in Verilator (same verdict on both).
+  - Verilator run: `cd Verilog/sim; make probe-wd USE_LATCHES=0
+    EXTRA_WD_DEFINES=-DND120_DEV_DELAY_TICKS=216000`, then
+    `ND-BUS-DEVICES/WINCHESTER/sim/wd_disctema.py` (about 50 minutes; recipe
+    in `Verilog/ND-BUS-DEVICES/README.md`). `ND120_DEV_DELAY_TICKS=216000` is
+    needed or DISC-TEMA dies with `Software Timeout` first (the 8 ms disc
+    delay is 800,000 cycles at the 100 MHz sim fallback vs 216,000 on the
+    27 MHz Tang).
+  - The transfer matches silicon operation-for-operation (silicon ops 22-35),
+    incl. the two-part memory-address readback `R+0 001000`, `R+0 000001`
+    (= 0o200000 + 512 words), which reads back correctly.
+  - Every register the card exposes matches the nd100x C model
+    access-for-access.
+  - NOT the IOX-write-zeroes-A bug (`BIF_DPATH_9.v:198-206`, fixed 06-AUG) -
+    that is a different defect.
+  - Not yet done: watch the card's internal memory-address register and the
+    DMA address in a waveform across the transfer (the probe build has
+    `--public-flat-rw` / `--vpi`). Use the same disc image on both sides
+    (the 06-AUG sim used WD0-M, the silicon capture WD0-L).
+  Record (deleted from the tree 28-SEP, kept in git at commit 202c606):
+  `Verilog/docs/HANDOFF-winchester-disc-tema-05-AUG.md` (sec 4: eleven
+  hypotheses eliminated on silicon - do not re-test them; sec 5: the silicon
+  trace) and `Verilog/docs/HANDOFF-winchester-verilator-06-AUG.md` (sec 4-7:
+  the Verilator run and its trace). Read with
+  `git show 202c606:Verilog/docs/<file>`.
 
-Measured on the board, all of it ruling something OUT:
-- CPU clock runs at exactly 20 MHz, a real PLL output on a global network;
-  reset released; 0 synthesis errors; timing clean.
-- `STERR` (002156) is NEVER entered and R2 is untouched - the self-test does
-  not fail.
-- Disabling the panel request (`TANG_NO_PAN`) removed a genuine spurious
-  interrupt (debug word 000005 -> 000000) and changed the loop by not one
-  address - the failure is not interrupt-driven.
-- MIPS reads 00.00 with `ND120_MIPS_TAP` built, so NO macro instructions are
-  being fetched: the loop is microcode-internal.
-- All 32 WCS MIFs match the canonical microcode - MiSTer runs exactly what
-  Nexys runs.
-- Verilator with MiSTer's RTL settings reaches the `#` prompt (see item 2
-  below for the caveat on that comparison).
+- [ ] OPEN, status unknown: paged store to logical 177777 reads back 0 (TPE
+  INSTCTION). 22-JUL-2026: under the ND-120/CX TPE-MON `INSTRUCTION`
+  diagnostic (INSTCTION C03), every memory WRITE to logical 177777 (the top
+  page, VPN 63) with PAGING on read back 0 (STA/STT/STX/MIN/STF/SBYT); the
+  same store with paging off worked. INSTRUCTION-B's MEMORY-REFERENCE area
+  passes 400/400, so the store data path is not the cause.
+  `CPU_MMU_PT_29_replay_tb.v` proves the page-table RAM stores and returns
+  VPN63 -> PPN o77 correctly. Not re-checked since: PAGING passes 11/11 on
+  Tang silicon after the PAL 44306A fix (30-JUL) and INSTRUCTION levels 1-9
+  pass on the Tang (31-JUL), but nothing records a clean TPE INSTCTION
+  memory-reference run, so whether this is fixed is UNKNOWN. To close: run TPE
+  INSTCTION to the memory-reference sub-test on a board or with
+  `sim/examples/tpe_instction_store_capture.py`.
 
-The live lead: `NOTI2` (001020) is an UNCONDITIONAL `T,RETURN`, and MACL calls
-`RIIE1` from 002026 with return address 002027 - the working sim returns
-there, the board goes to 001021, the next sequential address. Same for
-`CHKIT`, which returns to 001007 instead of the 2xxx caller. The
-microsubroutine stack itself works (PICFM's call/return is correct), so the
-question is why those particular returns take the wrong address.
+- [ ] OPEN - TPE "version too old". CONF and LOAD INSTR under TPE abort
+  "*** TPE version too old ***" though the required versions (B00/A02) are
+  older than the monitor's B01; `fpga/nexys4ddr/boardtests/tpe_boot.bt:3`
+  still says KNOWN OPEN BUG. Not re-checked since the panel clock became
+  default (29-AUG).
 
-Debug loop: `fpga/mister/tools/deploy_and_look.sh` flashes the board and pulls
-a screenshot back over ssh, so no one has to watch the monitor. Probes:
-`rtl/nd120_diag_print.v` (status line), `rtl/nd120_csa_trace.v` (the
-consecutive microcode trace - the once-a-second sample ALIASES and must not be
-read as a loop), `rtl/nd120_sterr_catch.v` (STERR + R2). All three have
-self-checking testbenches registered in `tests/run_all_tests.sh`; retire them
-with the `ND120_DIAG_PRINT` define once the CPU runs.
+- [ ] RUN (INSTRUCTION-B) is not proven: after the 14-JUL interrupt fixes it
+  reached LEVEL 13 / ARGUMENT `== END OF TEST ==` once in Verilator - one
+  area's end inside RUN's level loop, not the end of RUN. No error count was
+  recorded, no log committed, and RUN is in no gate.
 
-QUEUED, in order, once OPCOM is confirmed working on MiSTer:
-
-1. **Real main memory - the DE10-Nano's 128 MB SDRAM.** MiSTer is the only
-   target still on `MAIN_RAM_BLOCKRAM`, and `fpga/nexys4ddr/build.tcl:296-301`
-   already records why that backend was retired there: the BRAM banks hold far
-   less than the 4 MB `PAL_44446B` advertises, so everything above word
-   0o200000 in a bank ALIASES onto low memory, "which forbids SINTRAN". Nexys
-   keeps it only for A/B experiments. Nexys 4 DDR is the model to match.
-2. **WCS images: sim and hardware run different microcode, and no test
-   catches it** (found 01-SEP-2026). **DONE 02-SEP-2026.** Decided
-   (Ronny): boards preload the RAW PROM word, simulators the 2024 patch.
-   The patch is `A,6 -> A,0` in word 0o2002 = the master-clear wait loop's
-   outer count 64 -> 1 (a 64x shorter power-on wait, nothing else; decoded
-   in `Code/Microcode/gen_wcs_image.py`). `gen_wcs_image.py` now writes
-   `wcs/` (raw, boards) and `wcs-sim/` (`--sim`, for SKIP_WCS sim runs);
-   `Shared/support` is raw again; `tests/test-microcode-sync` now checks
-   every `wcs_*.hex` copy in the tree against the variant its directory
-   must hold (231 images, PASS).
-3. **Storage in the MiSTer OSD** - WD0-3 plus floppy image selection, via
-   `sys/sd_card.sv` presenting an OSD-mounted image as a virtual SPI SD card
-   to the existing SD-FAT/SPI stack, rather than writing `hps_io` block-device
-   glue.
-
-For 1 and 3 - main memory and storage - the PDP-11 MiSTer core is a useful
-SPEC ONLY - read it for the
-shape of the solution, never copy its code (Ronny, 31-AUG-2026; also a licence
-boundary, that core is not MIT and its terminal files are non-free).
-
----
-
-## Terminal core is a VT100 - 30-AUG-2026
-
-DONE: `Terminals/rtl/terminal_ctrl.v` rewritten as a plain VT100 (SINTRAN
-terminal type 6) - ESC/CSI parser, CUP/ED/EL, SGR, DECSTBM regions with a
-copy engine, DECOM/DECAWM/DECSCNM/DECTCEM, DECSC/DECRC, RIS, G0/G1 with DEC
-Special Graphics (font page 2, `font/make_font.py`). Geometry 80x24 (was the
-TDV's 80x25). New `byte_fifo.v` in front of the controller (a region scroll
-outlasts one 115200 byte time). Unit suite green; decision + state in
-`Terminals/README.md`.
-
-DONE same day: keyboard arrows are VT100 too - `Terminals/rtl/key_vt100.v`
-expands the decoder's new sequence markers into `ESC [ A/B/C/D/H` (FIFO'd, so
-3 bytes per keypress survive the UART); wired on the Nexys top, tested end to
-end in `terminal_console_tb.v`. MiSTer build 1 keeps raw bytes on its echo
-path (arrows inert there until build 2 has a UART).
-
-Also new: `fpga/nexys4ddr/flash.tcl` + Makefile targets - `make load` (JTAG,
-volatile) and `make flash` (QSPI, permanent); README documents build /
-release / flash.
-
-DONE 30-AUG: first synthesis, via the CACHEFIX session's cache build 8.
-Round 1 failed the 1080p pixel clock (139.7 MHz) by -0.328 ns on the
-cursor-move paths; fixed in two commits (191bdee defer the moves, e26f44b
-latch their operands) -> WNS +0.211 ns, all endpoints met. Flashed to the
-Nexys 06:22, exercised by TPE console traffic. Utilization delta vs the
-old terminal: +695 LUTs, +494 regs, +2.5 BRAM.
-
-Open:
-- Nobody has LOOKED at the VGA output or typed on the real keyboard since
-  the VT100 rewrite - the scancode table remains transcription-only.
+- [ ] OPEN - the `test-full` runSim golden console gate (Verilog/Makefile,
+  "runSim FF console vs golden") does not pass. Until commit c8cf73a it did
+  not even compile (`PINMISSING BAUD_9600` at ND120_TOP.v - the input was
+  never tied in the sim top). With that fixed, a run in a clean clone
+  (28-SEP-2026) prints the load lines and `#124002 0!`, then nothing: the
+  INSTRUCTION-B banner never comes and the `[instrumented] cycle budget
+  reached` stop never fires (ran 37 h at 100% CPU before it was stopped).
+  Not explained. Known differences from the golden recording: the clone has
+  no `FLOPPY.IMG` ("Unable to open file FLOPPY.IMG"; untracked test image),
+  and the log now also shows the `BPUN pre-deposit into RAM: DEBUG.BPUN`
+  line the golden predates. Next step: run the gate from a checkout that
+  has the untracked test images, and compare against the golden again.
 
 ---
 
-## Panel clock (MC68705 + MM58274) - 28-AUG-2026
+## Hidden bugs found by reading the code (not yet shown to bite)
 
-DONE: `CPU-BOARD-3202/circuit/PANCAL_68705_CLOCK.v` emulates the clock path of
-the panel processor (TRR PANC PFUNC 4-7 / TRA PANS: half-days since 1979 +
-seconds, read/write, STAT4/VAL handshake, text-command drain), wired into
-`IO_PANCAL_40.v` behind `ND120_PANEL_CLOCK`. Off by default (Tang is full):
-ON BY DEFAULT on the FPGA builds since 29-AUG-2026 - disable with
-`-NoPanelClock` on both boards (`gowin_build.ps1 -NoPanelClock`,
-Nexys `build.tcl -tclargs -NoPanelClock`). The sim
-harnesses still opt IN with `PANEL_CLOCK=1` (their default is unchanged so the
-golden traces and console stay comparable).
-Protocol taken from a fresh disassembly of the ROM; `Code/68705/U3/U3-COMPLETE.MD`
-corrected. Doc: `docs/panel-clock-68705.md`. Unit tests `test-pancal-clock(-ff)`
-registered and green.
+- [ ] **IO_37 IDB mux default ORs all sources.**
+  `CPU-BOARD-3202/circuit/IO_37.v:308`: `default: s_idb_mux =
+  s_idb_15_0_uart_out | s_idb_15_0_pancal_out | s_idb_15_0_reg_out |
+  {8'b0, s_idb_7_0_dcd_out};` - ORs all four IO_37 sources for every CSIDBS
+  code not listed, incl. `IDBS,ALU`; the mux's own comment says the OR-bus
+  "caused contamination". Candidate fix `default: s_idb_mux = 16'b0;` (the
+  explicit cases 16/37/20/21/26/35/27 cover all four sources; ECSR 24,
+  EPEA 12, EPES 13 come from MEM and BIF). Verified still present 28-SEP.
+- [ ] **TTL_74273 async clear commented out.** `Shared/support/TTL_74273.v:43`:
+  `always @(posedge CLK ) //or negedge CLR_n)` - the IOC register can only be
+  cleared by a CLEAR_n that coincides with a SIOC strobe; on a real 74273 the
+  pin is asynchronous. Untested. Verified still present 28-SEP.
+- [ ] **Unexplained: BINT10..13 -> IREQ[0..3].** `CGA_INTR_IRSRC.v` puts
+  BINT10..13 on IREQ[0..3], BINT15N on IREQ[15], IOXERR/PARERR/MOR/POWFAIL on
+  10..13; the tb header (`CGA_INTR_IRSRC_tb.v:34`) says "CHARACTERISED, not
+  judged". A 23-AUG PIL histogram refutes that BINT10..13 produce PIL 0..3, so
+  a remap exists that nobody has located. Read the drawing before touching it.
+- [ ] **ND_WINCHESTER irq outside the idle guard (question).**
+  `ND-BUS-DEVICES/WINCHESTER/circuit/ND_WINCHESTER.v:935` `s_irq <=
+  iox_wdata[0];` sits outside the `if (!s_active)` guard that line 934 applies
+  to `s_rft`, against the module's own section-4.1 comment. Not proven a bug.
+- [ ] **Verify on silicon: no phantom IOX devices / TOUT on unmapped IOX**
+  (old Issue B, 27-JUL): CONFIGURATION `run` saw every unmapped IOX device
+  answer 000000B; suspect drive-0-when-disabled keeps BDRY_n/IBDRY_n asserted
+  so TOUT/IOXERR never fire (`BIF_BCTL_BDRV_7.v:250-252`, `DECODE_DGA_POW.v`).
+  No fix commit found; indirect evidence it may be gone (INSTRUCTION
+  multi-level and PAGING 11 pass on silicon).
 
-PROVEN in Verilator 29-AUG-2026: TPE Monitor B01 (`1560&`) no longer prints
-"The clock is not updated" - it reads PFUNC 4-7 and gets the time. That needed
-two DGA fixes that had nothing to do with the panel clock and hid ALL panel
-commands (docs/panel-clock-68705.md, "Two DGA bugs"): `TRA PANS` returned 0 to
-A (EPANSN window, `DECODE_DGA_IDBS.v`), and `TRR PANC` never wrote the FIFO
-(LDPANC~ pulse vs XCLK, `DECODE_DGA.v`). Both are UNCONDITIONAL (not behind
-the define) - the microcode's own 0x0A ACTLV / 0x0D traffic now reaches the
-panel too. Not yet committed; instruction-verify regression running.
+---
 
-Open:
-- DONE 29-AUG on the Tang (fast20): SINTRAN takes the time from the panel
-  across a MACL and TPE boots without its clock warning. Still to do on Nexys:
-  the SINTRAN
-  `@UPDAT` / `@CLOCK` / `@DATCL` round trip on silicon.
+## MiSTer port
+
+SINTRAN III boots on the DE10-Nano (02-SEP-2026, `fpga/mister/README.md`).
+The microcode loop was the WCS read taking two clocks
+(`docs/mister-microcode-loop.md`). Open:
+
+1. **Strip the debug scaffolding.** Debug ports `XWRFB_DBG_19_0` and
+   `XCYC_DBG_7_0` threaded through `CGA.v`, `CYC_36.v`, `CPU_PROC_CGA_33.v`,
+   `CPU_PROC_32.v`, `CPU_15.v`, `ND3202D.v`, `ND120_CORE.v`, `ND120_TOP.v`;
+   probe modules `fpga/mister/rtl/nd120_diag_print.v`, `nd120_csa_trace.v`,
+   `nd120_sterr_catch.v` (KEEP `pll_cpu.v`); their testbenches and Makefile
+   targets (`fpga/mister/sim/Makefile`); and the probes in
+   `runSim/Run120.cpp`. After it: one Quartus build and a board check that
+   it still reaches `#`.
+2. **Four inferred latches** reported by Quartus (01-SEP-2026):
+   `ND_DMA_MASTER.v` (`s_pend_addr`, `s_pend_wdata`, `s_pend_wr`) and
+   `ND_WINCHESTER.v` (`s_rw_gate`). Not re-checked since.
+3. Storage board checks: `docs/PLAN-mister-storage.md`.
+
+---
+
+## Panel clock (MC68705 + MM58274) - open items
+
+The panel clock is emulated by `CPU-BOARD-3202/circuit/PANCAL_68705_CLOCK.v`
+(doc: `docs/panel-clock-68705.md`). Open:
+- Nexys: the SINTRAN `@UPDAT` / `@CLOCK` / `@DATCL` round trip on silicon
+  (done on the Tang, fast20, 29-AUG).
 - Host preset of the time at power-up (TIME_HALFDAYS/TIME_SECONDS are brought
   out of the module for it) - today the clock starts at 1979-01-01 00:00.
 - STAT3 idle pulse: the ROM pulses PB4 every ~3 ms while idle (0x0153); the
   Tang analysis 3f says it does not. Decide whether to model it (it is the
   same edge the old "conkick" manufactured, and that tripped the INTRQN lag).
-- Verilator `sim/ make test_nd120` and `runSim/ make compile` fail at HEAD with
-  82 `-Wall` warnings (IMPLICIT `DBG_PPN`/`DBG_PTW`/`PF_CAPTURED` in
-  `ND3202D.v` - ports declared under `ifdef MAIN_RAM_SDRAM`, assigned
-  unconditionally; `DBG_WDSTAGE` in `ND120_CORE.v`; PINMISSING `DBG_PTW_LVL`/
-  `DBG_PANEL` at `ND120_TOP.v:850`). Present since the 25-AUG squash
-  (`202c606`). The TPE run above was built with `-Wno-IMPLICIT -Wno-PINMISSING`
-  on the make line only; the tree itself needs the `ifdef` guards.
-
-## Test-gate backlog - 21-AUG-2026
-
-`make test` currently aborts in its two meta-gates before running a single
-functional test, for reasons that predate the IDB-ring work:
-
-- `tests/audit_testbenches.sh`: 4 orphan testbenches with no Makefile rule
-  and no registry entry - `CPU-BOARD-3202/circuit/sim/PT_stale_read_tvec_tb.v`,
-  `ND-BUS-DEVICES/WINCHESTER/sim/nd_winchester_boot_hang_tb.v`,
-  `ND-BUS-DEVICES/WINCHESTER/sim/nd_winchester_ticks_tb.v`,
-  `SD-FAT/sim/nd_storage_ticks_tb.v`.
-- `tests/tb_catalog.py`: 101 unregistered testbenches from the 21-AUG
-  committed testbench sweep (`TB_RESULT: FAIL 101 unregistered testbenches`).
-
-Decision 21-AUG (Ronny): leave as a backlog, burn down in its own session -
-register or delete each, do not baseline them away.
-
-BURNED DOWN 27-AUG-2026 (branch fpga-soak): 101 -> 5 unregistered. 100
-registry entries added, every one proven passing before registration; the
-4 orphans above are all registered too (PT_stale_read_tvec converted to a
-contract-pinning regression - lead=0 stale IS the contract). The 5 left,
-all measured, none baselined:
-  - CYC_STRETCH_STROBES_tb: measured 27-AUG - 39 of its 41 divergences are
-    the bench's own artifacts (inverted CYD/UCLK polarity, growing count
-    window, phase aliasing; WAIT1/WAIT2 tied 0 bypasses the real wait
-    states). The surviving fact: a stretched grant holds CYD, and WMAP_n
-    (CPU_MMU_24.v:256) is combinational off CYD, so PT RAMs rewrite every
-    sysclk of a freeze - MEASURED HARMLESS on silicon: the overlap probe
-    (DBG_PTW_LVL & MEM_HOLD, sticky+counter, panel digit 4 bit 2) stayed
-    0/0 across a full SINTRAN boot, and the wrong-PPN trap signature
-    (TVEC 3 at PIL>=8) did not fire in two armed full boots. The 25-AUG
-    wrong-PPN ERRFATAL is attributed to the stale-word cache bug fixed the
-    same evening. The bench needs a rewrite before it can gate (fixed
-    window, true polarities, board-real waits) - or retirement.
-  - CGA_MAC_pt_apt_selection_tb: FAILS 129/259 ("PT request selects
-    PCR[14:11]"); 17-AUG ERRFATAL-campaign probe, campaign closed by the
-    bank-decode fix - stale expectations vs real defect UNRESOLVED.
-  - CGA_TRAP_TVGEN_ptrace_tb: deliberately-red detector (early PT_15_9
-    release latches a false page fault), same family as the baselined
-    TVGEN race benches; register when the trap-vector timing is fixed.
-  - CGA_MAC_replay_tb: SKIP - needs a maccap_vectors.txt capture that has
-    never triggered.
-  - fpga/nexys4ddr/floppy-hw-test/sim tb: no Makefile in its dir; board
-    workstream.
-
-Also parked: `DELILAH-CPU/CGA/sim/ND120_PF_CAPTURE_tb.v` wires a port
-`c_pgs_at_read` that `ND120_PF_CAPTURE.v` does not have (elaboration error) -
-belonged to the ERRFATAL/PGS-capture investigation. **That investigation
-closed 24-AUG-2026** (bus bank-decode fix, `ND3202D.v:533`; SINTRAN III boots).
-`ND120_PF_CAPTURE.v` did gain `c_pgs_at_read` plus `evt_noperm`/`evt_fault`/
-`evt_any*` during the campaign, so this testbench should be re-checked - it may
-simply elaborate now.
 
 ---
 
-## CURRENT PLAN - 02-AUG-2026
-
-### Owned elsewhere - do NOT change these files here
+## Owned elsewhere (from the 02-AUG-2026 plan)
 
 **SMD disc controller (1540).** A separate session has taken over the SMD work
-from `docs/HANDOFF-smd-controller-01-AUG.md`, together with the Pi Pico C-code
+from the old SMD handoff (now the `ND_SMD.v` header), together with the Pi Pico C-code
 side that is running ground-truth tests to confirm the nd100x oracle is 100%
 correct. Off our plate:
 
@@ -221,40 +166,16 @@ correct. Off our plate:
   changing it means changing the adapter, `ND-BUS-DEVICES/SMD/sim/nd_smd_tb.v`
   and `process_verilog_smd()` in `simDevices/NDBus.cpp` together).
 
-What we already fixed and leave in place (all uncommitted, all verified in
-Verilator): the 8 ms `DELAY_TICKS` derived from the board clock in
-`ND120_CORE.v`, the boot-mode `+1`/`+7` writes, the first-fetch ready drop,
-status bit 11 as DMA channel error, and `ND120_MAX_CNT` in the
-`test-smd-boot` gate. Captured ground truth for the oracle side lives in
+Captured ground truth for the oracle side lives in
 `ND-BUS-DEVICES/SMD/sim/traces/`.
 
 **Ronny's, not ours to start:** the combined floppy+SCSI PCB question (onboard
 Z80, decodes both the 1560 floppy/streamer window and SCSI at 144300).
 
-### Waiting on Ronny
-
-1. **Commit approval** for the whole working tree: the SMD fixes above, the
-   testbench migration into per-module `sim/` folders plus the
-   `tests/run_all_tests.sh` registry entries, the `git mv`/`git rm` already
-   staged, and the Gowin place/route options in
-   `fpga/tang-nano-20k/gowin_build.tcl`.
-2. **Tang rebuild + flash.** Nothing above is on silicon; the flashed bitstream
-   predates all of it. Only silicon can say whether the residual "Disc unit not
-   ready" is the SD/image side (`020001`) or the DMA side (`024001`).
-
-### Ours, unblocked, in priority order
-
-1. **Finish the testbench campaign** (paused): `DECODE_DGA_COMM` is partially
-   written, `BIF_BCTL_6` not started, then Tier 6. Every new tb must print
-   `TB_RESULT: PASS` and be registered in `tests/run_all_tests.sh`.
-2. ~~The 3 failing sdram-bridge testbenches~~ **FIXED 4-AUG-2026** - stale
-   testbench, not an RTL defect; see the section below.
-3. Then the standing items further down this file, including the FPGA parity
-   hole that `test-memchain` turned out to be sitting on.
-
-Suite state 4-AUG-2026: the sdram-bridge three now pass. Note the runner is
-fail-fast, so a green run means "green up to the first failure" - to see
-everything, run past it deliberately.
+**Testbench campaign (paused 02-AUG):** `BIF_BCTL_6` has no testbench yet.
+`DECODE_DGA_COMM_tb` sits in `tests/tb_catalog.py` ORPHAN_BASELINE with its
+reason. Every new tb must print `TB_RESULT: PASS` and be registered in
+`tests/run_all_tests.sh`.
 
 ---
 
@@ -314,10 +235,13 @@ stale-ADDRESS-latch variant (a stale latch still holds the right address);
 the original evidence (`Verilog/docs/nd100-bus-dma.md` section 10.8) used a
 CHANGING-address burst.
 
-Task: extend the hammer in `Verilog/dmaSim/dma_p3_main.cpp` with an
-INCREMENTING-address mode (new env `ND120_DMA_HAMMER_INCR=1`; pre-seed RAM
-word=address so a stale latch returns a detectably wrong word; keep the fixed
-mode). Re-run the 2x2 at N>=512 per cell, strictly serial with `make clean`
+Step 1 is done: the hammer in `Verilog/dmaSim/dma_p3_main.cpp` has the
+INCREMENTING-address mode (`ND120_DMA_HAMMER_INCR=1`). With it, the deleted
+floppy handoff measured the shipping config CLEAN for changing-address bursts
+(512/512): "the missing ingredient was CPU contention, not the gap". The full
+2x2 and the MIN_GAP sweep below were not recorded.
+
+Still to do: re-run the 2x2 at N>=512 per cell, strictly serial with `make clean`
 between builds (MIN_GAP/EARLY_REREQ are compile-time via EXTRA_VDEFINES; no
 build-flags stamp in `Verilog/dmaSim/Makefile`). Also sweep MIN_GAP
 {0,1,2,4,8,16,32} at EARLY_REREQ=0. Then either correct the "load-bearing"
@@ -325,15 +249,11 @@ wording in the PLAN doc (note the 332ff8e correction, don't rewrite history;
 flag the pptx deck for its owner) or document the true minimum gap. Full
 task spec with guardrails: session memory `dma-min-gap-verify-task`.
 
-## LOW PRIO: RTC persistence - 6805 panel-processor / calendar clock emulation + ESP32 NTP time source
+## LOW PRIO: keep the wall-clock time across power-off (ESP32 NTP time source)
 
-Added 31-JUL-2026 (Ronny). Today the machine has no saved wall-clock: TPE
-reports "==TPE42=> The clock is not updated (display panel wrong or
-unexisting)". On the real ND-120 the calendar clock lives with the display
-panel's 6805 microcontroller; we need to emulate ENOUGH of the 6805 + RTC
-chip that the operating system can save the clock and restore it on boot.
+Added 31-JUL-2026 (Ronny). The panel clock is emulated now (see "Panel clock"
+above), but nothing keeps the time while the power is off.
 
-Constraints / design direction (part of the larger board plan):
 - The Tang Nano 20K has no RTC and no battery backup, so the FPGA alone
   cannot keep time across power-off. Align this task with the planned ESP32
   integration: the ESP32 tracks real time via network NTP and provides it to
@@ -343,35 +263,15 @@ Constraints / design direction (part of the larger board plan):
   minus a fixed number of years (exact scheme to be decided; leap-year
   alignment matters when picking the offset) - so the OS never sees a year
   that crashes it. The true date lives only on the ESP32 side.
-- Scope to work out when picked up: which 6805 panel registers/commands the
-  OS actually uses (save clock / read clock), where they surface in the
-  ND-120 I/O map, and the minimal emulation that satisfies both TPE and
-  SINTRAN. Full notes: session memory `rtc-6805-esp32-persistence-task`.
 
-## CLOSED 14-JUL-2026: interrupt status fence (Am2914) - now the RTL default
+## Logisim drawing fix needed: CGA_INTR status fence (regeneration hazard)
 
-The DELILAH interrupt system is a close Am2914 copy. Its **status register**
-(the fence that stops the interrupt just taken from being re-dispatched:
-"READ VECTOR auto-loads vector+1 into the Status Register") had never worked in
-our RTL - two transcription bugs in `CGA_INTR_CNTLR_VECGEN_STAT{,_SBIT}.v`
-(schematic p.87): the cell's vector-load NAND took GPE instead of DCDF, and the
-six SBIT instances (drawn WITHOUT pin names on the sheet) had four pins rotated.
-
-Both fixes are now **ON by default** in the RTL; the escape hatch that restores
-the old dead-fence behaviour is `ND120_INTR_STATUS_FENCE_OFF`, which no build
-defines. Validated in FF mode: self-test 0 execution-phase STERR, unit suite
-48/48, all 13 instruction-verify areas, and the `sim/` latch-vs-FF golden traces
-byte-identical. Ground truth came from the C# DELILAH-L PIC trace: vector+1
-loads on the winning chip only, and per-group DCDF (HIF/LOF) qualifies it.
-
-The follow-on `IIC: 11 - Memory Out of Range` misreport was a separate
-transcription bug - `CGA_INTR_CNTLR.v` swapped FIDBO bits 1 and 2 on the
-status-fence LDSTAT path, decoding an IOX error as MOR - fixed in commit
-`3acef36`. INSTRUCTION-B `RUN` now reaches its end of test.
-
-Still owed: the Logisim CGA_INTR sheet needs the same two corrections, since
-the schematic and the Verilog are maintained by hand and must agree. Full
-analysis: `docs/RUN-level14-livelock-analysis.md`.
+The Am2914 status-fence fixes of 14-JUL-2026 (`CGA_INTR_CNTLR_VECGEN_STAT{,_SBIT}.v`:
+the vector-load NAND took GPE instead of DCDF, and four SBIT pins were rotated;
+plus the FIDBO bit 1/2 swap in `CGA_INTR_CNTLR.v`, commit `3acef36`) are in the
+Verilog only. The Logisim CGA_INTR sheet needs the same corrections, since the
+schematic and the Verilog are maintained by hand and must agree. Analysis:
+`docs/RUN-level14-livelock-analysis.md`.
 
 ---
 
@@ -408,189 +308,68 @@ corrected, regenerating CGA_ALU_QREG.v reintroduces the bug.** Full analysis:
 
 ---
 
-## DONE 3-AUG-2026: parity is COMPUTED everywhere, never stored (policy)
+## OPEN: parity is never CHECKED
 
-Ronny's decision: **no FPGA target wastes memory storing parity, ever.** All
-five sheet-49 backends now drop DD[8]/DD[17] on write and regenerate them on
-read as odd parity (`~^data`, the Am29833A convention) - previously Tang
-regenerated, Basys3 returned a constant 0 (wrong for 128 of 256 byte values),
-and the other three stored. `RAM_PARITY_STORAGE` is deleted, so storage cannot
-be switched back on. Full table, rationale and gates: `docs/nd120-parity-
-analysis.md` section 6b. New gate `test-am29833a-parity` proves the polarity
-against the chip that checks it; the `test-memchain*` sweep writes deliberately
-wrong parity and demands correct parity back (teeth-proven: Q9 forced to 0
-fails 35 checks).
+Found 3-AUG-2026. Every read carries correct parity (computed, never stored -
+`docs/nd120-parity-analysis.md` section 6b), and `MEM_43.v:270` now passes the
+local parity error through (`assign LPERR_n = s_lperr_n;`). What is left:
 
-**What remains open below is the CHECKING side, which this did not touch.**
+- **`AM29833A.v:126`**: the error register is loaded only `else if
+  (!ReceiveMode)`. But `MEM_DATA_46.v:230-255` wires **T to the memory bus and
+  R to LBD**, so a memory READ is receive mode - the direction we care about
+  is exactly the one the model does not evaluate. The datasheet text quoted at
+  the top of `AM29833A.v` says the opposite: "In the receive mode, data and
+  parity are read at the T port, and the data is output at the R port along
+  with an /ERR flag showing the result of the parity test."
 
----
+This looks like a transcription error in the chip model, but changing a
+checker's semantics needs Ronny's call, together with a decision about what
+the CPU should DO with a real parity error (level 14 + IIC, PES/PEA - see
+`docs/nd120-parity-analysis.md` section 5). Until then FPGA memory is
+unprotected: correct parity in, no checking.
 
-## OPEN: parity is never CHECKED - two independent reasons
-
-Found 3-AUG-2026 while gating the policy above. Even now that every read
-carries correct parity, nothing can ever report a bad one:
-
-1. **`MEM_43.v:234`**: `assign LPERR_n = s_lperr_n | 1;` - "Always set to 1 to
-   avoid Parity Error. TODO: FIX! ?" The local parity error cannot reach the
-   CPU.
-2. **`AM29833A.v:126`**: the error register is loaded only `else if
-   (!ReceiveMode)`. But `MEM_DATA_46.v:230-255` wires **T to the memory bus and
-   R to LBD**, so a memory READ is receive mode - the direction we care about
-   is exactly the one the model does not evaluate. The datasheet text quoted at
-   the top of `AM29833A.v` says the opposite: "In the receive mode, data and
-   parity are read at the T port, and the data is output at the R port along
-   with an /ERR flag showing the result of the parity test."
-
-Point 2 looks like a transcription error in the chip model, but changing a
-checker's semantics needs Ronny's call, and the two must be fixed together with
-a decision about what the CPU should DO with a real parity error (level 14 +
-IIC, PES/PEA - see `docs/nd120-parity-analysis.md` section 5). Until then FPGA
-memory is unprotected: correct parity in, no checking.
+- [ ] Parity probe path: five items not done - see
+  `docs/nd120-parity-analysis.md` 6c.
 
 ---
 
-## SUPERSEDED 3-AUG-2026 (kept for the root-cause trail): FPGA memory has NO parity
+## Storage and devices - open items
 
-Root-caused 3-AUG-2026, out of the long-standing `test-memchain` "bit 8 drops"
-failure. That failure was the testbench over-asserting, and it is fixed; the
-hole it was sitting on is real and is still open.
-
-The 18-bit memory word is two lots of 8 data + 1 parity: data in `DD[7:0]` and
-`DD[16:9]`, **parity in `DD[8]` and `DD[17]`** - `MEM_DATA_46.v:239-242` and
-`:266-269` wire exactly those two bits to the AM29833A `PAR` / `PAR_OUT` pins
-(CHIP_1H low byte, CHIP_2H high byte).
-
-Two things are missing on the FPGA path, and each one alone makes parity dead:
-
-1. **Not stored.** `SIP1M9.v:92-105,141-145`: the `ramSize=3` BRAM path returns
-   `reg_Q9 <= 1'b0` unless `RAM_PARITY_STORAGE` is defined. Deliberate - one bit
-   per word still costs a whole RAMB18 per chip, 6 chips = 6 RAMB18 to hold
-   4 Kbit. This is the path Basys3 synthesizes. (Tang uses the SDRAM backend
-   instead, where `ND_SDRAM_PACK16` computes parity rather than storing it.)
-2. **Not reported.** `MEM_43.v:234`: `assign LPERR_n = s_lperr_n | 1;` -
-   "Always set to 1 to avoid Parity Error. TODO: FIX! ?" A local parity error
-   can never reach the CPU even when the bit IS stored.
-
-So the storage cut is only harmless because the checking was already disabled.
-Fixing this means both halves together: define `RAM_PARITY_STORAGE` (accepting
-the BRAM cost) AND make `LPERR_n` report, then decide what the CPU should do
-with a real parity error. Until then FPGA memory is unprotected, silently.
-
-`MEM_CHAIN_tb.v` now models the build choice instead of failing on it: a
-`STORE_MASK` expects all 18 bits for the BLOCKRAM and SIM backends (which do
-store parity) and clears bits 17 and 8 for the SIP1M9 FPGA path, so the data
-bits are still checked exactly and an unstored parity bit must read back 0.
-All three variants pass. Undo that mask the day parity storage comes back.
-
----
-
-## FIXED 4-AUG-2026: 3 sdram-bridge testbenches failed on committed code
-
-Found 3-AUG-2026, root-caused and fixed 4-AUG-2026. `make test` is fail-fast and
-had been aborting at `test-memchain`, which sits EARLIER in
-`tests/run_all_tests.sh` than these - so these three had been failing unseen
-behind it:
-
-```
-fpga/tang-nano-20k/sdram-bridge/sim :: test              (11 errors)
-fpga/tang-nano-20k/sdram-bridge/sim :: test-pack16       (9 errors)
-fpga/tang-nano-20k/sdram-bridge/sim :: test-storage-port (9 errors)
-```
-
-**The RTL was right; the testbench was stale.** Commit `81462c0` (23-JUL-2026,
-"Tang 4MB fix") changed which ND banks the bridge treats as populated, because
-the board decode PAL `PAL_44445B` wires the three 1M-word banks in PHYSICAL
-address order **BANK0, BANK2, BANK1**. So the two populated 1M regions are
-**BANK0 (phys 0-1M) and BANK2 (phys 1M-2M)**, and **BANK1 is the absent third
-bank** at phys 2M-3M (`MEM_RAM_49_SDRAM.v` lines 375-384). That fix is validated
-on silicon - it is what made the Tang report 4 MB instead of 2 MB.
-
-`mem_ram_49_sdram_tb.v` was last touched 11-JUL and still used the pre-fix map:
-banks 0/1 populated, bank 2 absent. Every failing check follows from that one
-mismatch - reads of BANK1 returned 0 (absent) where the tb expected written
-data, and the BANK2 "absent" access returned real data where the tb expected 0.
-The errors only LOOKED late because the soak repeats the same mismatch; the
-first three fire immediately after the directed writes.
-
-`test-pack16-part` passed throughout for the same reason: with
-`TB_PART_ROWS=1024` only BANK0 is inside the CPU partition, so tb and RTL agreed
-by accident on banks 1 and 2 both being unreachable.
-
-Fix: the tb now derives the physical bank index from the real map
-(`phys(bank) = (bank == 2)`), does its directed first/last-word writes on BANK0
-and BANK2, uses BANK1 as the unpopulated-bank case, and soaks over {0,2}. No RTL
-change. All four targets pass.
-
----
-
-## BUG: 400$ tape boot triggers a continuous level-12 interrupt storm
-
-The SD/FAT rewiring of the sim device path broke the tape byte feed: booting
-INSTRUCTION-B from tape with `400$` produces tens of thousands of
-"Generating/Clearing interrupt at level 12" cycles - the tape's level-12
-interrupt re-arms every cycle instead of one-per-byte. Tests still finish
-but runs crawl; the RUN command can't run at all. Full detail, repro, code
-map and acceptance criteria: `docs/BUG-tape400-sd-level12-storm.md`.
-Desired: run through the Verilog `ND_TAPE_400` fed by SD (one interrupt per
-byte); acceptable fallback = restore the C tape wiring behind a build define
-(like `VERILOG_TAPE`) so both variants stay buildable. Blocks the
-instruction-verify per-area pass/fail (needs INSTRUCTION-B's own
-`== END OF TEST ==` output, which the storm makes impractical).
-
----
-
-## SD-FAT stack - PROVEN ON HARDWARE 11-JUL-2026; nd_storage underway
-
-Hardware status: menu LIST/DUMP/CHECK/COPY/WRBLK1/speed tests all ran on
-the Tang against a real FAT32 card. A cold-start create bug destroyed the
-card's boot sector (root cause: sd_fat_rewrite S_DIR_W wrote the patched
-dir sector to the raw input instead of the internal register = CMD24 to
-sector 0); FIXED and now guarded by a permanent safety net (see the
-WRITE-PATH SAFETY POLICY in SD-FAT/README.md): illegal-sector assertion
-in the card models, boot-region byte-identity, fsck gates, cold-start
-first-command plans, big-geometry FAT32 gate. Bitstream with the fix
-built 11-JUL 12:05.
-
-Speed: hardware measured 137 KB/s (single-sector CMD24 at 2.7 MHz;
-per-sector card program busy dominates). Plan + ladder in
-docs/sd-speed-plan.md; rungs a (13.5 MHz) + b (CMD18/CMD25 multi-block
-in the MIT writer, menu 6/7 on bursts) in implementation.
-
-nd_storage (Ronny's spec docs/nd-storage-interface-spec.md; design +
-validation + status in docs/nd-storage-design.md /
-nd-storage-spec-validation.md): steps 1-3 of 10 done, gates
-test-nds-cdc/-engine/-write registered and green. Next: mount/preload,
-contiguity check, Verilator system gate, tape + floppy adapters,
-SDRAM board glue (partition decision; see also
-docs/nd120-parity-refactor-order.md - the parity refactor work order
-that upgrades the partition to 4 MB CPU + 4 MB storage).
-
-## OLD STATUS (superseded 11-JUL): built incl. WRITES, sims pass
-
-Reusable SD/FAT library in `SD-FAT/`: `sd_file_reader.v` (clean-room
-project MIT since 12-JUL-2026; runtime file name, dir-entry
-name/size/date/is-dir outputs, first-sector output, split sdcmd
-tristate, 13.5 MHz data phase) + CLEAN-ROOM `sd_writer.v`
-(CMD24, MIT, own unit tb `SD-FAT/sim :: test-writer`). Tang test project
-`fpga/tang-nano-20k/sd-fat-test/`: UART menu (9600 8N1, `#` prompt):
-1=LIST (size + DD-MMM-YYYY date + name, <DIR> entries), 2=DUMP BOOT.BPUN
-(hex/octal, byte-verified), 3=COPY BOOT.BPUN over pre-created TEST.TXT
-(in-place sector rewrite, Route B), 4=WRBLK1 (word[w]=w pattern into 1KW
-block 1 = sectors first+4..7, range-guarded), H=help; persistent `SD:`
-status; watchdogs everywhere. `make console` = interactive Verilator UART.
-Verilator system test verifies dump bytes, list columns, copy content and
-that WRBLK1 touched ONLY block 1. Bitstream builds (OSS flow).
-Block map convention: 1KW block N of contiguous file = 4 SD sectors at
-first_sector+4N (SD-FAT/README.md).
-
-Next actions:
-1. `make load` on the Tang, card from the README recipe -> acceptance
-   A3-A6 + menu 3/4 on real silicon.
-2. DONE 12-JUL-2026: the GPL vendoring question is moot - the reader was
-   replaced by a clean-room MIT implementation (whole SD-FAT library MIT).
-3. Milestone 2: ND_BUS_DEV_IF + TAPE_READER_400 against the Verilator bus
-   ports, then `$` boot from card (plan sections 8 and 10); floppy device
-   builds on the 1KW block map.
+- [ ] nd_storage clean-up: remove the dead M_LOAD path and s_slot_bytes from
+  SD-FAT/circuit/nd_storage_mount.v (frees an 8x32 FIFO, the byte packer and
+  counters), and the vestigial SLOTn_* parameters from nd_storage.v. See
+  docs/nd-storage-design.md 2.7.
+- [ ] nd_storage cache geometry (owner's call): the pool uses 1024 of 2048
+  region blocks (~2 MB unused). Options: accept, or CACHE_WAYS=3 /
+  CACHE_SETS=512 (1536 lines). See docs/nd-storage-design.md 2.7.
+- [ ] Silicon check left from the FAT-walk work (07-AUG): 400$ (BOOT.TAP on
+  the card) and 1560& DISC-TEMA on the SAME Tang bitstream after a power
+  cycle. (SINTRAN boots from the Winchester through the walker, but this pair
+  was never recorded.)
+- [ ] Decide: fold test-dma-rtl + test-dma-xcheck into make test-full
+  (+~24 min) or keep them on-demand like the floppy/SMD boot gates. Today: on
+  demand (Verilog/Makefile test-full has no DMA gate).
+- [ ] CONFIG-tool gate: make run-config exists (runSim/Makefile) but there is
+  no automated test-config-* gate asserting that CONFIGURATIO-C08 detects the
+  tape/floppy/SMD controllers.
+- [ ] Before driving real external ND-bus cards: prove in sim that the CPU
+  releases BD (all ones) whenever a DMA master owns the bus (assert
+  BD_23_0_n_OUT == all ones while OUTGRANT_n is given to a device), and re-run
+  the test-tristate netlist gate for any real pad work.
+- [ ] Disc delay model (owner's call): ND120_CORE.v models an 8 ms wall-clock
+  delay, so every clock variant and the 100 MHz sim fallback get different
+  cycle counts (see ND-BUS-DEVICES/README.md, Winchester in Verilator).
+- [ ] Filename selection UI (console command?) for multiple disc images.
+- [ ] Floppy DMA: absent-drive hang (review C2) - DISK_TIMEOUT watchdog exists
+  but defaults to 0 = off; M4 test mode latched and unused; M5 one
+  media-format input for all drives. See docs/floppy-review-findings.md.
+- [ ] `ND_FLOPPY_PIO.v:94` buffer still async-read (lines 171, 182) - needs
+  the sync-read treatment before any board build.
+- [ ] dmaSim rig: TPE prompt deaf in the rig only (LOW). Typed characters pile
+  up to an SC2661 overrun; silicon TPE input works. Probe left at
+  `IO_REG_41.v:277`.
+- [ ] Remove the Issue-F probe `ifdef PESDBG` block,
+  `CPU-BOARD-3202/circuit/BIF_BCTL_6.v:349` (inert unless -DPESDBG).
 
 ---
 
@@ -625,11 +404,10 @@ what anyone should do next, and two of them contradict comments in the tree:
    quality work now, not a blocker, and should be done to the full
    verification bar rather than in a hurry.
 
-Two gate-integrity defects found on the way, both verified and both worth
-fixing regardless of the ring: `tests/instruction-verify/run_area_test.sh:23-27`
-prints `TB_RESULT: PASS` and exits 0 when its golden is missing (and the
-goldens live OUTSIDE the repo), and `make -C sim compare` cannot fail because
-its diff sits in a `|| (echo ...)`.
+One gate-integrity defect found on the way and still open: `make -C sim
+compare` cannot fail because its diff sits in a `|| (echo ...)`. (The other one,
+`run_area_test.sh` printing PASS on a missing golden, was fixed 28-SEP-2026: it
+now FAILs.)
 
 ---
 
@@ -639,7 +417,8 @@ The ring documented at `DELILAH-CPU/CGA/circuit/CGA.v:700-745` stopped being a
 warning-count nuisance and became the thing that fails a build.
 
 **Measured on the Cmod A7 (`xc7a35t`), first build of those files:** fits the
-part easily at 11,493 of 20,800 LUTs, then **WNS -89.814 ns at 27 MHz**, 5133
+part easily at 5,285 of 20,800 LUTs (its own util.rpt; an "11,493" figure
+stood here and was wrong), then **WNS -89.814 ns at 27 MHz**, 5133
 of 18465 endpoints failing. From the routed checkpoint, **all 200 worst paths
 share one start and one end** - `CPU/CS/WCS/CHIP_21C` to
 `CPU/PROC/CGA/DELILAH/MAC/MAC_LA1025/R_LA_L`, 234 logic levels, 126.5 ns,
@@ -650,9 +429,13 @@ loop-breaking false paths**, naming the ring exactly:
 MAC/INTR -> back.
 
 **The number is a property of the netlist, not the machine.** The same RTL
-gives that path 58 logic levels on MEGA65 R6, 93 on R3, 7 on the Nexys at
-33.9 MHz, and 234 here; and it boots SINTRAN on the Tang, whose toolchain has
-no loop DRC at all. Two things follow:
+gives that path **31** logic levels on the Nexys at 45.45 MHz (MEASURED:
+fpga/nexys4ddr/timing-analysis/run_clk45/setup_paths_post_route.rpt:24) and
+234 here (MEASURED: fpga/cmod-a7-35t/top5_paths.rpt). The MEGA65 58/93
+figures are UNVERIFIED - no report in the tree backs them. A "7 on the
+Nexys" figure was written here on 04-SEP-2026 and was WRONG.
+The design also boots SINTRAN on the Tang, whose toolchain has no loop DRC
+at all. Two things follow:
 
 - **Lowering a clock does not fix it.** 126.5 ns would need the CPU under
   7.9 MHz. That fits the clock to a tool artifact.
@@ -701,7 +484,7 @@ Nexys proved on 22-AUG-2026 that groups leave the `nds_sync` handshake
 payloads untimed and corrupt floppy reads. **This trap has now cost three
 boards; it is written up in `docs/HANDOFF-cga-idb-ring-cut.md` section 9.**
 
-**Next: rebuild, then wire JP3 and boot.** Confirm a ground pin on JP3 against
+**Next: wire JP3 and boot.** Confirm a ground pin on JP3 against
 the board before wiring - the schematic extraction could not settle it, and a
 card with no shared ground fails exactly like a bad card.
 
@@ -719,60 +502,67 @@ Two things a reader should know before interpreting any result there:
   were the only way to prove the clock and programming chain before a full
   build existed. Keep them for when the board itself is the suspect.
 
-Detail: `fpga/qmtech-a35t/README.md`. The older
-`HANDOFF-qmtech-a35t-bringup.md` is superseded and says so at the top.
+Detail: `fpga/qmtech-a35t/README.md`; hardware facts in `fpga/qmtech-a35t/docs/board-notes.md`.
+
+---
+
+## Nexys 4 DDR - open items
+
+- **Full validation suite not run on the 01-SEP RTL** (13 instruction-verify
+  areas + unit suite + latch-vs-FF compare) - started twice on 01-SEP and
+  stopped for board work. UNVERIFIED whether it has run since.
+- **Nexys keyboard TX framing vs UART framing:** the PS/2 keyboard path sends
+  7 data bits + EVEN parity while the SC2661 runs 8N1, so the serial mirror
+  shows typed characters with bit 7 set (`d` -> 0o344). Cosmetic on the PC
+  side; look at it when `key_tdv2200.v`'s transmitter is next touched.
+- **ASYNC_REG hygiene** on the CDC-5/CDC-8 synchronizers incl. debug-panel
+  `sync_hold`/`sync_grb` (TIMING_CLOSURE_REPORT section 7 item 2) - not done.
+- **Re-read the synthesis log** for `ND_FLOPPY_DMA` 8-7137 set/reset priority
+  and the 22 deleted registers + `sd_writer` connections
+  (BUILD-WARNINGS-ANALYSIS sections 3-4); not re-checked since the floppy
+  rework.
+- **SD-config boot at 16.667 MHz** after the SD power-cycle fix - verified at
+  45 MHz only (old soak plan 1.5); SD-card WRITE at speed still unproven (1.6).
 
 ---
 
 ## Tang Nano 20K bring-up
 
-### Integrate the SDRAM controller as ND-120 main memory (Tang only)
+### OPEN: the OSS flow (yosys/nextpnr) does not fit the full CPU on the Tang
 
-The 8 MB embedded SDRAM is validated standalone
-(`fpga/tang-nano-20k/sdram-test/` - passes on hardware, full-8MB write+verify).
-Next: bridge the nand2mario controller behind the `MEM_RAM_49.v` interface
-(`AA_9_0`, `BANK0-2`, `RAS`/`CAS`, `MWRITE50_n`, `DD_17_0`), gated behind a
-Tang-only define (`TARGET_TANG20K` / `MAIN_RAM_SDRAM`) so Verilator and Basys3
-builds are completely unaffected. 8 MB of RAM available is acceptable.
+The open-source flow (yosys) maps the full CPU to 22,254-22,626 LUT4 against
+the 20,736 LUT4 on the GW2AR-18, so no legal placement exists: CI run
+33664876050 sat in the placer for 2 h, and local runs do the same (measured
+28-SEP-2026). The Gowin flow fits the same design. The full CPU did build
+with the OSS flow on 12-JUL-2026; what has grown since is not known.
 
-**Files**: `CPU-BOARD-3202/circuit/MEM_RAM_49.v`, `Shared/support/SIP1M9.v`,
-new adapter module under `fpga/tang-nano-20k/`.
+Bitstreams come from Gowin EDA; no bitstream is built in CI (the CI job
+`tang-oss` that tried was removed 30-SEP-2026). The work, if the OSS flow is
+wanted for the full CPU: find where the open-source synthesis spends the
+extra LUTs and fix that at the root, WITHOUT shrinking the design.
 
-**Design analysis done** (8-JUL-2026): the full protocol measurement (25k
-accesses traced), the per-board backend plan (replace the MEM_RAM_49 body per
-target instead of more SIP1M9 ifdefs), the 2x-clock SDRAM bridge design with
-timing budget, refresh strategy, and the 18-bit-in-32 word mapping (2 banks =
-4 MB) are documented in `docs/nd120-dram-memory.md`.
+Done so far (28-SEP-2026, branch `worktree-agent-a09183b55a25ca921`, commit
+263aad7 - NOT on main, needs the owner's decision): synthesis settings only,
+no RTL change - LUT4-only mapping with a size-first ABC script (-1580),
+`cmp2softlogic` (-393), `share -aggressive` (-126), `simplemap t:$buf` (the
+`$buf` cells yosys 0.69 leaves behind), family gw2a. LUT4 22254 -> 19790
+(95%), ALU 3880 -> 3114. It STILL does not place ("Unable to find legal
+placement"): nextpnr's GW2A model lets a flip-flop share a slot only with the
+LUT that drives it (about 2690 flip-flops fed from another flip-flop take a
+slot each) and each of the 278 LUT RAMs blocks a whole 8-LUT group - about
+22170 of 20736 slots. No equivalence check of the new netlist was run.
+Also: `gowin_build.ps1` turns `ND120_PANEL_CLOCK` on by default, the OSS
+Makefile never does (about 600 more slots if it did). Where the extra cost
+sat, OSS vs Gowin: the SD stack `u_engine` (+1606 LUT+ALU), the CPU gate
+array (+1343), the floppy (+481).
 
-**Bridge implemented and protocol-validated** (8-JUL-2026):
-`fpga/tang-nano-20k/sdram-bridge/` - `MEM_RAM_49_SDRAM.v` + `sdram18.v`, with
-a testbench that replays the measured protocol (2000-access soak, parity
-round-trip, refresh cadence) - PASSES.
+### Get a timing-clean Tang build above 20.25 MHz
 
-**Tang top-level built** (8-JUL-2026): `fpga/tang-nano-20k/` -
-`src/ND120_TANG20K_TOP.v` + rPLL (27/54 MHz) + cst/sdc + `nd120_tang20k.gprj`
-(247 files) + `gowin_build.tcl`/`.ps1` (gw_sh on the Windows host). SDRAM pins
-threaded through `MEM_43`/`ND3202D` under `ifdef MAIN_RAM_SDRAM` (Verilator
-regression-checked; full Tang file set elaborates under Verilator lint).
-**DUAL-TOOLCHAIN since 12-JUL-2026 (docs/tang20k-build-flows.md +
-worklog-2026-07-12-pack16-dual-toolchain.md):** the full CPU also builds
-with the OSS suite (`make [VARIANT=slow|crawl|full]` in
-fpga/tang-nano-20k/, PRIMARY flow; `make gowin` = backup). All three
-variant bitstreams built; nextpnr closes the FULL 27/54 MHz variant at
-clk_cpu Fmax 57.5 MHz (GowinSynthesis had measured 9.38 MHz - the number
-behind TANG_SLOW_BRINGUP). Remaining: `make load` on the board, compare
-boot against `docs/boot-golden-spec.md` on the 9600-baud console; if
-VARIANT=full boots on hardware, retire the slow-bringup default.
-
-### CPU clock above 27 MHz (after 27 MHz validation)
-
-The Tang's 27 MHz crystal is only the PLL reference - the `rPLL` can multiply
-it. Plan: **validate everything at 27 MHz first**, then raise the CPU/SDRAM
-clock via the rPLL. Data points: the vendored `gowin_rpll.v` has a ready-made
-54 MHz setting (commented out), the nand2mario controller's timing parameters
-are good to 66.7 MHz, and the factory LiteX SoC runs this SDRAM at 48 MHz
-CL-2. So 27 -> 54 MHz is the natural step (keep `BOARD_CLK_FREQ` and all
-UART/RTC counts derived from it, per the OPCOM speed fix).
+`fast20` (20.25 MHz) is the fastest timing-clean build (TNS 0, Fmax
+22.932 MHz, 31-AUG-2026). `full` (27 MHz) boots SINTRAN but Gowin reports 1667
+setup violations, so it is not a configuration to trust unattended. Keep
+`BOARD_CLK_FREQ` and all UART/RTC counts derived from the clock, per the OPCOM
+speed fix. Details: `fpga/tang-nano-20k/README.md`.
 
 ---
 
@@ -780,76 +570,31 @@ UART/RTC counts derived from it, per the OPCOM speed fix).
 
 ### CMOD A7-35T target (Digilent)
 
-> **ACTIVE since 13-JUL-2026 - the owner has the board.** First-version
-> build files landed in `fpga/cmod-a7-35t/` (BRAM main memory, CPU at
-> 27 MHz via the TARGET_CMOD_A7 MMCM branch, self-contained build.tcl +
-> Makefile, SD-Pmod wiring documented incl. the 3.3V/VU voltage rules).
-> **TODO: the pack16 SRAM bridge** - 512 KB / 256K-word main memory,
-> full detailed plan in `fpga/cmod-a7-35t/SRAM-BRIDGE-PLAN.md` (the old
-> 4-byte-access idea is INVALID per
-> `docs/basys3-memory-speed-validation.md`; pack16 is mandatory,
-> <= 33 MHz validated, est. 2-4 days).
->
-> (Origin note, superseded: board folder created 2026-07-08; downgraded
-> to research-only the same day on price - the owner has since acquired
-> one.)
+The owner has the board; build files are in `fpga/cmod-a7-35t/`. The first
+build misses timing on the CGA IDB ring (see "The ring as a board blocker"
+above) and the block-RAM memory ceiling is 24K words
+(`fpga/cmod-a7-35t/README.md`). Open:
 
-Same `xc7a35t-1cpg236` die as Basys3 in a DIP module: 20,800 LUT, 225 KB
-BRAM, **512 KB external SRAM (8-bit bus, 8 ns)**, 4 MB QSPI, USB-JTAG/UART,
-2 LEDs + 1 RGB, 2 buttons, one Pmod + 44 DIP I/O. Backend plan: start with
-`MAIN_RAM_BLOCKRAM` (raise `BANK_ADDR_BITS`; 225 KB BRAM minus WCS budget),
-later a `MEM_RAM_49_SRAM` backend for the 512 KB external SRAM (8-bit bus ->
-~4 byte-accesses per 18-bit word; needs its own protocol bridge like the
-SDRAM one). Reference manual:
-https://digilent.com/reference/programmable-logic/cmod-a7/reference-manual
-Demo: https://github.com/Digilent/Cmod-A7-35T-OOB (QSPI flash mx25l3273f).
+- **The pack16 SRAM bridge** - 512 KB / 256K-word main memory, full plan in
+  `fpga/cmod-a7-35t/SRAM-BRIDGE-PLAN.md` (the old 4-byte-access idea is
+  INVALID per `docs/basys3-memory-speed-validation.md`; pack16 is mandatory,
+  <= 33 MHz validated, est. 2-4 days).
 
-### SD-card block devices across all boards
+### SD-card storage on the Basys3 and Cmod A7
 
-Goal: floppy/HDD images from SD card (FAT filesystem) so the ND-120 can load
-software on every target:
-- **Basys3 + CMOD A7:** SD-card Pmod on the Pmod connector (same module,
-  same SPI-mode controller on both).
-- **Tang Nano 20K:** on-board microSD (TF) slot.
-- **MiSTer:** different route - images served by the ARM/Linux side (see
-  `fpga/mister/`).
-Shared piece: one SPI SD + FAT reader core (or soft-CPU-less FAT16/32
-reader) behind a common "block device" interface feeding the ND-120 I/O
-(floppy controller emulation). Design doc needed before implementation.
+Floppy/HDD images from an SD-card Pmod on the Pmod connector (same module,
+same SPI-mode controller on both). Basys3 Pmod pins: `docs/sd-bpun-device-plan.md`
+6.2 (unverified). Note the 24K-word memory ceiling on both boards.
 
 ---
 
 ## High Priority
-
-> Items raised when the self-test was still failing. The self-test itself is now
-> clean (0 execution-phase STERR visits, 13-JUL-2026); these entries are kept
-> because the underlying questions were never answered.
-
-### CPU_15: IDB output assignment
-
-Add assign of IDB out of `CPU_15` based on IDB out from PROC or CS. Also validate:
-
-- `s_rt_n` -- also output from `CPU_PROC_32`. Verify which source to use (PROC or PCB top module).
-- `s_rwcs_n` -- also output from `CPU_PROC_32`. Same question.
-
-**File**: `CPU-BOARD-3202/circuit/CPU_15.v`
 
 ### CPU_15: MMU/LAPA/STOC validation
 
 Previously marked as fixed but needs double-checking. IN/OUT signal assignments must be validated.
 
 **File**: `CPU-BOARD-3202/circuit/CPU_15.v`
-
-### AM29833A: Parity and error not implemented — RESOLVED (stale entry)
-
-**Stale as of 11-JUL-2026:** `Shared/support/AM29833A.v` has real parity
-logic (PAR_OUT = ~(^R) generate, 9-bit receive-side check register driving
-ERR_n; reviewed 22-MAR-2025; equivalence tb `test-am29833a`). And parity
-cannot be behind any self-test failure anyway: the microcode self-test
-never touches memory parity — all 8 subtests are CPU-core-only. Evidence
-with octal microcode references: `docs/nd120-parity-analysis.md`.
-
-**File**: `Shared/support/AM29833A.v`
 
 ---
 
@@ -865,12 +610,6 @@ assign PPN_23_10 = WCA_n ? 14'b0 : CPN_23_10;
 
 **File**: `CPU-BOARD-3202/circuit/CPU_MMU_WCA_31.v`
 
-### 3-state outputs: Verify all return 0 not z
-
-For FPGA, tri-state (`z`) doesn't work internally. Check that all "3-state" buffers output `0` when disabled, not `z`.
-
-**Relevant modules**: `TTL_74245`, `TTL_74244`, `TTL_74241`, `AM29841`, `AM29861A`
-
 ### Search for `TODO:` in code
 
 Periodic cleanup -- grep for `TODO:` comments and address remaining items.
@@ -882,12 +621,6 @@ Periodic cleanup -- grep for `TODO:` comments and address remaining items.
 ### CGA/MAC and CGA_MAC_FASTADD: Unit tests
 
 No dedicated unit tests. CPU self-test exercises these through the ALU path. Lower priority unless specific MAC bugs found.
-
-### Tang Nano: SPI flash for microcode ROM
-
-Gowin project has `` `ifdef GOWIN `` placeholder in `CPU_CS_PROM_19.v` but no SPI flash implementation yet. Needed for Tang Nano deployment.
-
-**File**: `CPU-BOARD-3202/circuit/CPU_CS_PROM_19.v`
 
 ### MEM_ADDR_44: Add test code
 
@@ -901,46 +634,47 @@ RAM works in simulation. For real FPGA hardware, the `DD_17_0` IN/OUT signals ma
 
 **File**: `CPU-BOARD-3202/circuit/MEM_RAM_49.v`
 
----
+### Tang build: fail on any TA1117 (P5 of plan-fix-unconstrained-clocks)
+Add a post-build check to `gowin_build.tcl` that greps the log for TA1117
+(unconstrained clock relationship) and fails loudly - the bug class must not
+come back silently. Also run the Vivado `check_timing` equivalent on the
+Basys3 build. Source: docs/plan-fix-unconstrained-clocks.md.
 
-## Completed
+### Delete SIP1M9.v / MEM_RAM_49.v once BLOCKRAM is proven on a Basys3 build
+Agreed 04-AUG-2026, deferred. The same change must port or archive
+`fpga/basys3/mem-test/basys3_mem_test_top.v` and
+`fpga/qmtech-a35t/mem-test/qmtech_mem_test_top.v`, retire `test-ram`, and
+drop the SIP variant of `test-memchain`. (`MAIN_RAM_SIP1M9` is selected by
+no build today.)
 
-| Item | Status |
-|------|--------|
-| `s_logisimNet`/`s_logisimBus` cleanup | Done -- dead PFIFC/PFIFD files deleted |
-| BusDriver16 | Validated working |
-| Static/Dynamic RAM refactoring for FPGA | IDT6168A BRAM fix done |
-| Bus Connectors A-B-C | All connected in ND3202D |
-| `s_acond_n` | Connected from `CGA_MIC_CONDREG` (was hardcoded to 1) |
-| `s_brk_n` | Connected through CGA TRAP/INTR path |
-| `s_inr_7_0` | Connected from `installation_number` via `INR_7_0` port |
-| MEM_ADEC_45, MEM_DATA_46, MEM_LBDIF_48 | Logisim naming cleaned up |
-| MEM_RAMC_50 | PAL chips connected |
-| Latch-to-FF migration | Complete -- see `verilog-remove-latch.md` |
-| LINT and latches | All latches converted to FFs with ifdef guards |
-| CPU_15 "disconnected" signals | Verified: `s_eccr` -> MEM_43, `s_ioni` -> IO_37, `s_rrf_n` -> CYC_36, `s_mreq_n` is input from CYC_36. All properly connected. |
+### Dead `_OLD_WAY_` code
+`CGA_MAC_APOS_INC.v`, `CGA_MIC_IINC.v` (and their tbs) hold `ifdef _OLD_WAY_`
+branches; the symbol is defined nowhere. Delete when convenient.
+
+### VERILATOR_SIM does three jobs
+It gates the harness bus ports, the sim RAM size and the fast UART under one
+symbol. Split only if one of them ever needs to change alone.
 
 ---
 
 ## Microcode-execution fidelity (added 10-JUL-2026)
 
-### Fix the JMP0-3 vectored-jump dispatch (CGA_MIC)
+### Static finding, unmeasured: CGA_CPU_ALU_CONTR GATES_49 mixes microword generations
 
-The microsequencer's vectored jump (`T,JMP0-3`, microword bit 25 VECT)
-always lands on the vector base: the low-4-bit OR (IR(0-3) or A-operand,
-selected by MIS0) never contributes. Blocks the 300$ serial binary
-loader (INCH polls IOX 302 but dispatches to the IOX 300 handler) and
-any microcode-issued vectored device I/O. Pre-existing (fails in latch
-mode too, first exercised 10-JUL). Full analysis + 2-minute sim repro:
-docs/serial-binload-300.md. Reference implementations to compare
-against (ASK before porting C# behavior - it may contain hacks):
-$ND_REPOS/ND110Compile/ND110CPU (Cpu.cs ~783 vector dispatch,
-~1310 LDIRV loads IR from the IDB - note our IRLATCH samples CD instead)
-and NorskData-Doc ND-06.031.1 Microprogrammer's Guide (bit 25 / MIS0).
+`CGA_CPU_ALU_CONTR.v` GATES_49 (~line 730) NANDs the REGISTERED `s_alui8`
+(executing word) with `s_gates1_out` = AND(CSALUM[1:0]) taken from the RAW,
+unregistered field (next word). The C# microcode emulator forms the
+"M set automatically" (ES) term from the executing word's ALUM and i8.
+Effect if real: during a shift-type word followed by an ALUM,IR word, CSTS[1]
+is forced (STS bit 7 reclocked, or a low-byte load when the word has
+STS,EA). Fix direction: register the ALUM==11 term through the same ALUCLK
+stage for the GATES_49 input only. Never measured; found by the July 2026
+BFILL static analysis (git history, docs/bfill-sts-static-analysis.md).
 
 ### Audit: microorder-by-microorder fidelity sweep
 
-The JMP0-3 find suggests a class: microorders that no current test
+The JMP0-3 hunt (parked by the owner 11-JUL-2026, docs/serial-binload-300.md)
+suggested a class: microorders that no current test
 exercises may be wrong or unimplemented, and could explain remaining
 macro-instruction bugs (this was written while the self-test was still
 failing; the self-test is clean since 13-JUL-2026). Plan: extract the
@@ -948,7 +682,7 @@ COMM/IDBS/condition decode tables from the Microprogrammer's Guide,
 diff against what CGA_MIC/CGA_DCD/DGA actually implement, and give each
 divergence a targeted unit test (the C# CPU at ND110Compile is a
 working oracle for expected behavior - verify against the guide before
-copying). Candidates to check first: vectored jumps (this bug), LDIRV
+copying). Candidates to check first: vectored jumps, LDIRV
 data source (IDB vs CD), MANIR/manual-IR flows, SCOND/hold-register
 condition pipeline, COMM decodes marked "changed" in the ND-110->ND-120
 delta (5, 36.2, 36.3).

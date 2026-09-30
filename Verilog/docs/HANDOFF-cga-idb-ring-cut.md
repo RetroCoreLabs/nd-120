@@ -2,9 +2,10 @@
 
 **Full path:** `Verilog/docs/HANDOFF-cga-idb-ring-cut.md`
 **Written:** 04-SEP-2026
-**Status:** ANALYSIS ONLY. No RTL has been changed. This document says what the
-ring is, why three previous attempts failed, what would actually work, and
-what must be proven before anyone commits a fix.
+**Status:** ANALYSIS. One RTL cut (A9, section 4) was made and REVERTED on
+06-SEP-2026; the ring is still in the RTL. This document says what the ring is,
+why the attempts failed, what would actually work, and what must be proven
+before anyone commits a fix.
 
 ---
 
@@ -29,12 +30,18 @@ logic levels, 126.5 ns, through the ALU, never touching main memory.
 That number is a property of the netlist, not of the machine. The same RTL
 gives the same path:
 
-| netlist | logic levels | delay |
-|---|---|---|
-| Nexys 4 DDR at 33.9 MHz | 7 | 6.8 ns |
-| MEGA65 R6 | 58 | 34 ns |
-| MEGA65 R3 | 93 | 57 ns |
-| Cmod A7 | 234 | 126.5 ns |
+| netlist | logic levels | delay | verified? |
+|---|---|---|---|
+| Nexys 4 DDR at 45.45 MHz | **31** | - | **YES** - `fpga/nexys4ddr/timing-analysis/run_clk45/setup_paths_post_route.rpt:24` |
+| QMTECH at 20 MHz | **49** | 45.4 ns | **YES** - `fpga/qmtech-a35t/timing.rpt:431` |
+| MEGA65 R6 | 58 | 34 ns | NO - prose only |
+| MEGA65 R3 | 93 | 57 ns | NO - prose only |
+| Cmod A7 | **234** | 126.5 ns | **YES** - `fpga/cmod-a7-35t/top5_paths.rpt` |
+
+**The row that used to sit at the top of this table said "Nexys 4 DDR at
+33.9 MHz | 7 | 6.8 ns". It was WRONG** - see section 3a. The Nexys report says
+31 levels. Everything written on top of that 7, here and elsewhere, has been
+re-checked and corrected.
 
 and it boots SINTRAN on the Tang, whose toolchain has no loop check at all.
 The MEGA65 R3 already paid for this: its CPU runs at 13.333 MHz because the
@@ -242,6 +249,44 @@ a matching LAA.
 
 ---
 
+## 3a. LOGIC-LEVEL FIGURES: what is measured and what is not
+
+**Corrected 07-SEP-2026 after a reader challenged the numbers, and they were
+right to.** The per-board logic-level counts quoted around this project were a
+mix of report readings and prose repeated until it looked like data. What each
+one actually rests on:
+
+| board | levels | source | verified |
+|---|---|---|---|
+| Nexys 4 DDR @ 45.45 MHz | **31** | `fpga/nexys4ddr/timing-analysis/run_clk45/setup_paths_post_route.rpt:24` | **YES** |
+| QMTECH @ 20 MHz | **49** | `fpga/qmtech-a35t/timing.rpt:431` | **YES** |
+| Cmod A7 @ 27 MHz | **234** | `fpga/cmod-a7-35t/top5_paths.rpt` (5 paths agree) | **YES** |
+| MEGA65 R6 | 58 | prose only - NOT in `fpga/mega65/docs/00-plan.md` | **NO** |
+| MEGA65 R3 | 93 | prose only - NOT in `fpga/mega65/docs/00-plan.md` | **NO** |
+
+**A figure of "7 levels on the Nexys" was written into three files on
+04-SEP-2026. It is WRONG.** The Nexys report says 31. The 7 came from a
+sentence, not a report, and was then quoted back as though measured.
+
+Why this matters beyond tidiness: the argument "the ring constraint takes the
+path from hundreds of levels to single digits, so the unconstrained boards are
+sitting on huge headroom" was built on that 7. With the real number, the
+constrained Nexys (31) and the unconstrained QMTECH (49) are much closer, and
+the gap is equally explainable by the different part (`xc7a100t` vs
+`xc7a35t`), different memory and different build config. **The claim that the
+QMTECH has large headroom is NOT supported by this data.**
+
+What survives: the Cmod's 234 is verified and is roughly 5x every other board,
+and the QMTECH and Cmod genuinely carry no ring constraint while the Nexys
+does (`fpga/nexys4ddr/nd120_timing.xdc:67-70`). Whether adding it helps is an
+open question that one build would settle.
+
+The 93-level figure is load-bearing in sections 7 and 9 below. Treat those
+passages as resting on an unverified number until someone reads it off a real
+MEGA65 R3 report.
+
+---
+
 ## 4. What has already been tried - do not repeat these
 
 | # | Change | Loops | WNS | Verdict | Recorded |
@@ -254,6 +299,69 @@ a matching LAA.
 | A6 | Explicit ordered false path in XDC | 19 auto-cuts remain | **+0.261** on the real build | SHIPPED, **Nexys only** | `268c61d`, `df8357d` |
 | A7 | `SKIP_WCS_LOAD` (Cmod) | n/a | -95.488 -> -89.814 | **not the cause**, 5.7 ns of 95 | `fpga/cmod-a7-35t/README.md` |
 | A8 | Lower the clock | n/a | needs <7.9 MHz | rejected as artifact-fitting | `TODO.md` |
+| A9 | **Cut it properly: a second output network FIDBI never enters** | n/a (Gowin) | Tang `fast20` CPU domain **0 -> 1064 failing endpoints**, Fmax **22.849 -> 18.994 MHz** | **REVERTED 06-SEP-2026** | below |
+
+### A9 - the cut that works in simulation and loses on the board
+
+The one restructuring that actually removes the cycle, built and measured, and
+then reverted because it costs too much. **Do not spend a second week
+rediscovering it.**
+
+What it was. FIDBI reaches the outgoing bus driver through `SI[5]` of the ALU
+output mux. Rewriting that mux as a `case` does NOT help - Vivado's and
+Gowin's loop checks are STRUCTURAL, they flag any combinational cycle and
+never look at enables, so the wire path is what matters and it was unchanged.
+Nor does gating FIDBO at the far end (`FIDBO_EXT = EFIDB ? 0 : FIDBO`): the
+gate's input cone still contains FIDBI.
+
+What does remove it is a SECOND copy of the output network that FIDBI never
+enters - same enables, same seven other sources, `SI[5]` tied low - with its
+result the only net wired to the outgoing driver. 16 `SEL8`/`SEL7` plus 16
+`MUX31LP`. The internal FIDBO keeps the pass-through, so MAC, INTR and MIC
+are untouched.
+
+It is exactly equivalent, and that is checkable without a golden model:
+
+    G_EXT(FIDBI = anything)  ===  G(FIDBI = 0)
+
+A bench on that spec passed **6368 checks, 0 errors, both build modes**, with
+4242 of them in the cycles where old and new genuinely differ. Every existing
+ALU bench passed unchanged (`test-alu-outmux` 101,236 checks), and the whole
+CPU still reached the OPCOM `#` prompt in Verilator.
+
+**Then the Tang killed it.** A/B on the same tree, same commit, one define
+apart (an `-IdbRingKeep` escape hatch built for exactly this):
+
+| Tang `fast20`, CPU clock `CLKOUTD` @ 20.25 MHz | ring CUT | ring KEPT |
+|---|---|---|
+| setup TNS | **-1819.731** | 0.000 |
+| failing endpoints | **1064** | 0 |
+| Fmax | **18.994 MHz** | 22.849 MHz |
+| logic levels on the critical path | 34 | 38 |
+
+The control reproduces the recorded baseline (22.849 against the 22.932 MHz
+of 31-AUG), so this is the change and not a week of drift.
+
+**The cause is NOT established.** Two candidates, neither confirmed:
+
+  - the 32 extra instances cost congestion on a part that is already nearly
+    full (20,736 LUT4), or
+  - the cut makes the analysis HONEST: with the ring present the tool must
+    break the loop to run STA, and the paths it disables to do that stop
+    being reported. On that reading the pre-cut "TNS 0.000" was partly
+    fiction and the -1819 ns was always there, unseen.
+
+The evidence is genuinely ambiguous and the report does not settle it: the
+cut build's own top-25 setup paths are ALL POSITIVE (worst +7.908 ns) while
+its summary claims -1819 ns over 1064 endpoints, and its report file is 58%
+larger than the control's. Fewer logic levels AND a lower Fmax is not what
+simply-more-logic looks like.
+
+**If anyone picks this up again, that ambiguity is the thing to resolve
+first, and it is worth resolving** - because if the second reading is right,
+every "timing-clean" number this project has recorded on a build containing
+the ring is an overstatement, on every board. Compare the count of analysed
+endpoints between the two builds before touching the RTL again.
 
 ### What `b3ee391` actually did
 
@@ -443,7 +551,7 @@ absence of errors - it is fail-fast); the STERR probe built with
 against `tests/instruction-verify/CAMPAIGN-STATUS.md`); Nexys at 45.45 MHz and
 MiSTer at 20 MHz both booting SINTRAN; a MEGA65 R3 build, which is the
 project's most sensitive ring measurement (93 levels / 57 ns) and should drop
-sharply if the fix works; and the 4-hour soak from `fpga/PLAN-fpga-soak.md`.
+sharply if the fix works; and the 4-hour soak recipe of 27-AUG-2026 (ESC console probes every 30 min, 8 over 4 h; see HISTORY.md 27-AUG; plan in git at c4896a4).
 
 **Record the `[DRC LUTLP-1]` count and the `Synth 8-326` list before and
 after.** That number is the change's stated purpose, and every prior attempt
@@ -489,7 +597,7 @@ constraint never took effect (see section 9).
   board.
 - **What the ring still costs** is honesty: while it exists, every Artix
   board's WNS is a floor rather than a guarantee, and a netlist can land
-  anywhere between 7 and 234 logic levels on the same source. The Cmod is the
+  anywhere between 31 and 234 logic levels on the same source (measured: Nexys 31, QMTECH 49, Cmod 234 - section 3a; the "7" was never measured). The Cmod is the
   proof that "anywhere" includes unusable.
 
 ## 9. A constraint trap this project keeps falling into

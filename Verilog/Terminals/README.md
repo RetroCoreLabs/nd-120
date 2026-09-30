@@ -11,10 +11,13 @@ missing is the piece in between: a terminal. That is what lives here.
 
 **First test rig: the Nexys 4 DDR**, not MiSTer or MEGA65 - it is the only
 board that today has a booting SINTRAN, a VGA connector AND a USB keyboard
-host all at once, so the terminal is the only new thing in the build. The
-plan it was built from, `Verilog/fpga/nexys4ddr/PLAN-vga-console.md`, was
-deleted as finished in commit c4896a4; read it with
-`git show c4896a4^:Verilog/fpga/nexys4ddr/PLAN-vga-console.md`.
+host all at once, so the terminal was the only new thing in the build.
+
+**That work is DONE.** The screen-and-keyboard console is built and running
+on the Nexys, the MiSTer and the MEGA65. There is no plan document to read:
+`fpga/nexys4ddr/PLAN-vga-console.md` was deleted in commit `c4896a4` because
+it was finished, and `docs/PLAN-vt100-terminal-core.md` says of itself that
+its stages are "history, not plan". This README is the current state.
 
 This folder is **board-independent RTL**. It knows nothing about MiSTer,
 MEGA65, Tang or Nexys. Each board supplies the two ends - a source of key
@@ -50,9 +53,9 @@ elaborated in the same build** - selected by `` `ifdef ND120_TERMINAL_VT100 ``
 in `terminal_top.v` and each board's top level (Nexys: `-VT100Terminal`
 build flag). Default is TDV2200 (type 93) since 31-AUG-2026: PED and LED are
 built for the Tandberg keyboard's own key set, not VT100 CSI input - see
-`docs/SPEC-tdv2200.md`. MiSTer forces VT100 explicitly
-(`fpga/mister/rtl/nd120_console_mister.v`) since its keyboard glue only
-wires the VT100 pair.
+`docs/SPEC-tdv2200.md`. The MiSTer runs TDV2200 too: its TDV keyboard path
+(`ps2_decoder_tdv` + `key_tdv2200`) was wired 02-SEP-2026, and
+`fpga/mister/rtl/nd120_console_mister.v` warns not to re-add the VT100 define.
 
 The keyboard is split in two on purpose. MiSTer's `hps_io` delivers scancodes
 that Linux has already framed, and the MEGA65 has a matrix behind a CPLD -
@@ -75,7 +78,11 @@ all, because the ROM returns 0x00 past the end and the sender stops there.
 | `font/` | character-generator ROM data + the script that builds it |
 | `docs/` | the plan and the spec notes |
 
-## The terminal is a VT100 - decided 30-AUG-2026
+## History: the VT100 decision of 30-AUG-2026 (reversed 31-AUG-2026)
+
+TDV2200 has been the default since 31-AUG-2026 (see the module table above).
+The text below is the 30-AUG reasoning, kept as a record; the "80x24" and "TDV
+build REMOVED" statements are no longer true of the default build.
 
 **Decision (Ronny): plain VT100, matching SINTRAN terminal type 6
 (`@SET-TERMINAL-TYPE <n> 6`), not TDV2200.** RetroTerm's own class hierarchy
@@ -149,8 +156,7 @@ Every set-2 code in `ps2_ascii_table.v` was cross-checked 30-AUG-2026 against
 two independent published references - the OSDev wiki set-2 table and Vetra
 Systems' translation table - and both agree with every entry, F7=0x83
 included. Scan code set 2 is a fixed standard, so the codes are settled by
-documentation. What still needs the real board (phase 3 of the deleted
-VGA-console plan, see above):
+documentation. What still needs checking on real hardware:
 that the Nexys USB-HID bridge behaves as the standard says, and the
 **Norwegian layout positions**, which come from RetroTerm's KBD-ND-246 grid
 rather than from any scancode standard - parentheses, colon, comma, full
@@ -183,11 +189,11 @@ Identical on every board. Only the ends differ:
 
 ## Where the specification comes from
 
-**RetroTerm** (its own repository, `$ND_REPOS/RetroTerm`) is Ronny's own MIT-licensed terminal
+**RetroTerm** (its own repository) is Ronny's own MIT-licensed terminal
 emulator and it already implements VT100, VT52, ECMA-48, TDV and Tektronix.
 That makes it a clean, unrestricted specification source - unlike PDP2011's
 VT100, whose files are non-commercial-only and cannot be touched (details in
-the plan). Verified paths, 27-AUG-2026:
+`docs/PLAN-vt100-terminal-core.md`, "The licensing finding"). Verified paths, 27-AUG-2026:
 
 - `src/RetroTerm.Core/Terminal/Emulators/` - `TerminalEmulatorBase.cs` (360 KB,
   the real behaviour), `VT100Emulator.cs`, `Vt52Emulator.cs`,

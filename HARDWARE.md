@@ -4,10 +4,9 @@ This document details the hardware components, specifications, and requirements 
 
 > **Provenance note (02-AUG-2026):** this document was drafted in September 2025.
 > The component and status tables below have been re-checked against the RTL.
-> The numeric timing, power, environmental and mechanical figures further down
-> have **not** been traced back to the original Norsk Data documentation - treat
-> them as unverified until someone confirms them against `NorskData-Doc/` or the
-> design documents.
+> The timing, power, environmental, mechanical, bus and expansion figures that
+> stood further down were never traced back to the original Norsk Data
+> documentation; they were removed on 28-SEP-2026 (still in git history).
 
 ## System Overview
 
@@ -35,7 +34,7 @@ The main CPU board contains all essential processing components in a single-boar
 |-----------|------|------|----------|---------|
 | **Microcode ROM** | 64KB | EPROM | Microinstruction storage | ✅ Dumped & implemented |
 | **Working Registers** | 32×16-bit | Static RAM | CPU register file | ✅ Implemented |
-| **Cache Memory** | Variable | Static RAM | MMU data cache | ⚠️ Implemented, never functionally validated |
+| **Cache Memory** | Variable | Static RAM | MMU data cache | ✅ Implemented; all 8 CACHE-1X0-A00 tests pass on the Nexys 4 DDR (31-AUG-2026) |
 | **Main Memory** | Up to 8MB | Dynamic RAM | System memory | ✅ Simulation (6MB) and SDRAM on Tang Nano 20K |
 
 ### DELILAH CPU Gate Array (CGA)
@@ -83,17 +82,7 @@ Programmable Array Logic providing various control functions.
 
 #### Implemented PALs
 
-| PAL ID | Function | Status |
-|--------|----------|---------|
-| **44302B** | Address decode | ✅ Converted |
-| **44303B** | Bus control | ✅ Converted |
-| **44304E** | Memory control | ✅ Converted |
-| **44305D** | I/O decode | ✅ Converted |
-| **44306A** | Interrupt control | ✅ Converted |
-| **44307C** | Clock generation | ✅ Converted |
-| **44310D** | Reset logic | ✅ Converted |
-| **44401B-44904B** | Various control | ✅ All converted |
-| **45001B-45009B** | System control | ✅ All converted |
+All PALs are converted from their PALASM listings: one file per chip in `Verilog/PAL/`, listings and scans in `DesignDocuments/PAL-Code/`, faithfulness check in `Verilog/PAL/PROVENANCE.md`.
 
 ### Support Chips
 
@@ -160,12 +149,7 @@ The hex address map that stood here was internally inconsistent (it labelled
 2KB ranges as 32KB) and is not reproduced. For the real control-store layout see
 `Verilog/mic-calculation.md` and the microcode listing under `Code/Microcode/`.
 
-**Microcode Fields**:
-- **ALU Control**: 9 bits (CSALUI[8:0])
-- **Register Select**: 4 bits (CSRASEL, CSRBSEL)
-- **Memory Control**: 5 bits (CSCOMM[4:0])
-- **Sequencing**: 16 bits (next address, conditions)
-- **Miscellaneous**: 30 bits (various control)
+**Microcode Fields**: see `Verilog/nd120-plan.md` for the 64-bit microword field table.
 
 ### Main Memory
 
@@ -191,100 +175,11 @@ any Norsk Data source and has been removed rather than left as fact. The authori
 per-device addresses are in the Norsk Data functional descriptions under
 `NorskData-Doc/`, and in the device models under `Verilog/ND-BUS-DEVICES/`.
 
-## Clock and Timing
+## FPGA boards
 
-### System Clocks
-
-| Clock | Frequency | Function |
-|-------|-----------|----------|
-| **MCLK** | 10-20 MHz | Master system clock |
-| **UCLK** | MCLK/2 | Microcode clock |
-| **MEMCLK** | Variable | Memory access clock |
-| **UART_CLK** | 1.8432 MHz | Serial communication |
-
-### Timing Constraints
-
-**Setup Times**:
-- **Data to Clock**: 10ns minimum
-- **Address to Memory**: 50ns minimum
-- **Control to Memory**: 20ns minimum
-
-**Hold Times**:
-- **Data after Clock**: 5ns minimum
-- **Address after Control**: 10ns minimum
-
-## Physical Implementation
-
-### FPGA Requirements
-
-#### Minimum Resources
-- **Logic Elements**: ~50,000 LEs
-- **Memory**: 2MB+ on-chip RAM
-- **I/O Pins**: 200+ pins
-- **Clock Networks**: 4+ global clocks
-
-#### Recommended FPGA Families
-- **Intel/Altera**: Cyclone V, Arria 10
-- **Xilinx**: Artix-7, Kintex-7
-- **Lattice**: ECP5, CrossLink-NX
-- **GoWin**: GW2A series
-
-### Development Boards
-
-#### Board Support In Tree
-
-Build flows live under `Verilog/fpga/<board>/`, see `Verilog/fpga/README.md`.
-
-| Board | FPGA | State |
-|-------|------|-------|
-| **Tang Nano 20K** | GoWin GW2AR-18 | **SINTRAN III boots on silicon (24-AUG-2026)**; SDRAM and SD/FAT storage proven |
-| **Basys3** | Xilinx Artix-7 `xc7a35t` | Synthesises, CPU boot did not work as of the last test. NOT re-tested since the 24-AUG-2026 bus bank-decode fix in `ND3202D.v:533`, which is shared board logic and could change this - the fix is untested here |
-| **QMTech A35T** | Xilinx Artix-7 `xc7a35t` + 32 MB SDRAM | **BITSTREAM BUILT 04-SEP-2026: timing met, WNS +4.645 ns at 20 MHz, 12,619 of 20,800 LUTs, 22 of 50 BRAM tiles.** Not yet run on the board. The one Artix-7 target with enough memory for SINTRAN (4 MB) |
-| **Cmod A7-35T** | Xilinx Artix-7 `xc7a35t` + 512 KB SRAM | First built 04-SEP-2026: fits the part easily (11,493 of 20,800 LUTs) but **misses timing, WNS -89.8 ns at 27 MHz**, on the CGA IDB combinational ring rather than on anything board-specific. No bitstream written. Its 512 KB SRAM upgrade would give 256K words, a quarter of a 2 MB machine - a test-program board, not a SINTRAN one |
-| **MiSTer (DE10-Nano)** | Intel Cyclone V SoC | Planned, not started |
-
-## Power Requirements
-
-### Original Hardware
-- **Supply Voltage**: +5V, +12V, -12V
-- **Power Consumption**: ~50W typical
-- **Cooling**: Forced air cooling required
-
-### FPGA Implementation
-- **Supply Voltage**: 3.3V, 1.2V (FPGA-dependent)
-- **Power Consumption**: 5-15W typical
-- **Cooling**: Heat sink sufficient
-
-## Environmental Specifications
-
-### Operating Conditions
-- **Temperature**: 0°C to +70°C
-- **Humidity**: 10% to 90% non-condensing
-- **Altitude**: Sea level to 3000m
-
-### Storage Conditions
-- **Temperature**: -40°C to +85°C
-- **Humidity**: 5% to 95% non-condensing
-
-## Mechanical Specifications
-
-### Original CPU Board
-- **Size**: Eurocard format (160×100mm)
-- **Connector**: DIN 41612 connector
-- **Mounting**: Standard card cage
-
-### Development Board Variations
-- **Form Factor**: Depends on target FPGA board
-- **Connectors**: USB, Ethernet, GPIO headers
-- **Mounting**: Standoffs or development kit housing
+Build flows live under `Verilog/fpga/<board>/`; the board list, status and limits are in `Verilog/fpga/README.md`.
 
 ## Interfaces
-
-### System Bus
-- **Width**: 16-bit data, 24-bit address
-- **Protocol**: Synchronous, master/slave
-- **Speed**: Up to 10 MHz
-- **Arbitration**: Fixed priority
 
 ### Serial Interface (UART)
 
@@ -356,26 +251,3 @@ which would shred the text. In the capture only 6 of 42 bytes came back as `?`, 
 the echo and the prompts. The framing mismatch is verified from this source file; the exact rate
 and clustering are not, and pinning them down would need a controlled capture.
 
-### Parallel Interface
-- **Width**: 8-bit bidirectional
-- **Protocol**: Centronics-compatible
-- **Speed**: Up to 1 MHz
-- **Handshaking**: ACK/BUSY signals
-
-## Expansion Capabilities
-
-### I/O Expansion
-- **Slots**: Up to 8 I/O boards
-- **Types**: Serial, parallel, network, storage
-- **Addressing**: Memory-mapped I/O
-
-### Memory Expansion
-- **Main Memory**: Expandable to 8MB
-- **Cache Memory**: Optional external cache
-- **Storage**: Floppy, hard disk interfaces
-
-### Peripheral Support
-- **Terminals**: Multiple serial terminals
-- **Printers**: Parallel and serial printers
-- **Networks**: Ethernet, token ring
-- **Storage**: Floppy disk, hard disk, tape

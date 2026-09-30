@@ -96,7 +96,7 @@ One row per RTL module in the three main areas. Coverage is measured, not assume
 | Module | Coverage | Testbench | in `make test` |
 |---|---|---|---|
 | `DELILAH-CPU/CGA/circuit/BusDriver16.v` | **DIRECT** | `BusDriver16_tb.v` | yes |
-| `DELILAH-CPU/CGA/circuit/CGA.v` | INDIRECT | named in `CPU_CS_RWCS_CYCLE_tb.v` (+95) | - |
+| `DELILAH-CPU/CGA/circuit/CGA.v` | INDIRECT | named in `CPU_CS_RWCS_CYCLE_tb.v` (+96) | - |
 | `DELILAH-CPU/CGA/circuit/ND120_PF_CAPTURE.v` | **DIRECT** | `ND120_PF_CAPTURE_tb.v` | yes |
 | `DELILAH-CPU/CGA_ALU/circuit/CGA_ALU.v` | **DIRECT** | `CGA_ALU_tb.v` | yes |
 | `DELILAH-CPU/CGA_ALU/circuit/CGA_ALU_ARG.v` | **DIRECT** | `CGA_ALU_ARG_tb.v` | yes |

@@ -32,8 +32,12 @@ with them, both found on the first run and both now fixed in `build.tcl`:
    was written. Fixed by passing `SD-FAT/circuit` and `Shared/support` to
    `synth_design -include_dirs`, as the Nexys and MEGA65 builds already do.
 2. **Timing, badly, and NOT for the reason it first looked like.** With the
-   includes fixed the design placed and routed at a comfortable **11,493 of
-   20,800 LUTs and 26.5 of 50 block RAM tiles**, then **missed timing by
+   includes fixed the design placed and routed at a comfortable **5,285 of
+   20,800 LUTs (25.4%) and 2,494 of 41,600 registers** - MEASURED from its own
+   `util.rpt`, which is the CPU plus block-RAM memory and nothing else; for
+   scale the Nexys hierarchical report puts the whole ND-120 CPU board at
+   3,186 LUTs / 1,879 FFs. A figure of "11,493 LUTs and 26.5 of 50 block RAM
+   tiles" stood here and was WRONG. It then **missed timing by
    95.488 ns at 27 MHz** - 5133 of 18465 endpoints failing. The Inter Clock
    Table was EMPTY, so the clock groups were working.
 
@@ -55,11 +59,41 @@ with them, both found on the first run and both now fixed in `build.tcl`:
    FIDBO -> MAC/INTR -> back.
 
    **So the 234-level path is where Vivado happened to cut a loop, not a real
-   microcycle.** The same RTL gives this path 58 levels in the MEGA65 R6
-   netlist and 93 in the R3 (`fpga/mega65/docs/00-plan.md`), 7 levels on the
-   Nexys at 33.9 MHz, and 234 here. It also boots SINTRAN on the Tang, whose
-   toolchain has no loop DRC at all. **A lower clock does not fix this**: at
-   126.5 ns the CPU would have to run under 7.9 MHz, and that is fitting the
+   microcycle.** Per-board logic levels on the comparable path, with what each
+   figure actually rests on:
+
+   | board | levels | verified |
+   |---|---|---|
+   | Nexys 4 DDR @ 45.45 MHz | **31** | YES - `fpga/nexys4ddr/timing-analysis/run_clk45/setup_paths_post_route.rpt:24` |
+   | QMTECH @ 20 MHz | **49** | YES - `fpga/qmtech-a35t/timing.rpt:431` |
+   | Cmod A7 @ 27 MHz | **234** | YES - `top5_paths.rpt`, 5 paths agree |
+   | MEGA65 R6 | 58 | NO - prose only |
+   | MEGA65 R3 | 93 | NO - prose only |
+
+   **A "7 levels on the Nexys" figure stood here from 04-SEP-2026 and was
+   WRONG** - it came from a sentence, not a report. Anything argued on top of
+   it (notably "the constrained boards have huge headroom") does not follow
+   from the real numbers. See `docs/HANDOFF-cga-idb-ring-cut.md` section 3a.
+
+   This design also boots SINTRAN on the Tang, whose
+   toolchain has no loop DRC at all. **A lower clock does not fix this - now
+   MEASURED, not estimated (07-SEP-2026).** The same build at 13.5 MHz
+   (`build.tcl -tclargs -slowclk`):
+
+   | | 27 MHz | 13.5 MHz |
+   |---|---|---|
+   | clock period | 37.037 ns | 74.074 ns |
+   | WNS | -89.814 ns | **-48.963 ns** |
+   | **data path delay** | **126.536 ns** | **122.594 ns** |
+   | **logic levels** | **234** | **232** |
+
+   Halving the clock moved the path by 2 levels and 4 ns. The slack improved
+   only because the period doubled; Vivado snips the loop in the same place
+   either way, and the module breakdown of the two paths is the same ring
+   (`OUTMUX_IDBS` 96 hops in BOTH builds, `ALU_RALU/MUXQ3` 34 in both). So
+   **the target clock does not steer the loop-break** - that hypothesis is
+   dead, and at 122.6 ns the CPU would have to run under 8.2 MHz, which is
+   fitting the
    clock to an artifact rather than to the machine. The fix is to break the
    ring in RTL, and CGA.v:734-737 says what would work and records three
    attempts that were measured WORSE.
@@ -82,7 +116,7 @@ report_timing -max_paths 50 -slack_lesser_than 0 -file paths.rpt
 measured anywhere. This is a test-program board plus an SD card unless that
 measurement says otherwise.
 
-## First build: ND-120 CPU on BRAM at 27 MHz
+## Build configuration: ND-120 CPU on BRAM at 27 MHz (misses timing - see Status)
 
 Same configuration as the Basys3 build (FPGA_FF_MODE, MAIN_RAM_BLOCKRAM) but
 self-contained (no Vivado GUI project) and clocked at 27 MHz. **The microcode
@@ -158,6 +192,70 @@ straight into JA. Wiring (Pmod pin -> JA pin -> FPGA pin, from
   which is also the wrapper template for a Cmod SD test build (swap the
   MMCM input for 12 MHz, pins from the table above).
 
+## Main-memory ceiling - MEASURED 07-SEP-2026
+
+**Neither this board nor the Basys3 can host the 64K words that standalone
+test programs want. The realistic ceiling is 24K words** - a third of what
+is needed - and getting beyond that means removing working parts of the
+CPU, which is not a real option. This is a capacity fact, not a timing one,
+and it is entirely separate from the CGA IDB ring problem: fixing the ring
+would not add a single word.
+
+The XC7A35T has **50 block-RAM tiles (~1,800 Kbit)**. Main memory is stored
+16 bits wide with parity regenerated on read (`MEM_RAM_49_BLOCKRAM.v:110`),
+so roughly **32 Kbit usable per tile**.
+
+Measured from the Cmod's own `util.rpt` after the 04-SEP build - and note
+`SKIP_WCS_LOAD` is already on, so the microcode PROM's ROM arrays are
+already out of the netlist (`CPU_CS_PROM_19.v:43`) and cost nothing:
+
+```
+Block RAM Tiles   26.5 of 50 used   ->  23.5 free
+```
+
+Two defines set the size, both already plumbed, no RTL work:
+`ND120_BLOCKRAM_ADDR_BITS` (words per bank, default 12) and
+`ND120_BLOCKRAM_BANK_SLOTS` (default 4, but **only 3 slots are ever
+addressable**, so the default wastes a quarter of the array - the MiSTer
+sets 3, and the source comment records that this alone "turned a 64K-word
+bank into does not fit").
+
+| `ADDR_BITS` | slots | usable words | tiles needed | fits in the 23.5 free? |
+|---|---|---|---|---|
+| 12 (today) | 4 | 12 K | 8 | - |
+| 13 | 3 | **24 K** | 12 | **yes - this is the real ceiling** |
+| 14 | 3 | 48 K | 24 | no - half a tile short |
+| 14 | 4 | 48 K | 32 | no |
+
+**So the usable ceiling is 24K words, with the machine intact.** Two defines
+and a rebuild, no RTL work.
+
+**Do not "solve" this by deleting parts of the CPU.** 48 KW is half a tile
+short and 64 KW needs main memory plus the WCS to be the ONLY things on
+BRAM - which means taking out the MMU cache and whatever else. That is not
+a trade worth making: the cache is part of the machine under test, and a
+CPU with its cache stripped out is not a test of that CPU. Those rows are
+recorded as arithmetic, NOT as options.
+
+(`docs/basys3-memory-speed-validation.md` section 4.1 reaches the same place
+from the other direction - "64 KW only with SKIP_WCS_LOAD and nothing else
+growing". "Nothing else growing" turns out to mean "nothing else at all".)
+
+**NOT VERIFIED, and the table is arithmetic from one measured tile count -
+no build has been run at any of these settings.** The only way to know is
+to set the defines and read `util.rpt`.
+
+**The Basys3 is UNMEASURED.** Same die, same 50 tiles, and it also defaults
+to `SKIP_WCS_LOAD` (`basys3/vivado_build.tcl:225`) - but its free tile count
+has never been read. The "~1,044 Kbit BRAM, dominated by the duplicated
+microcode PROM + WCS" line in its README PREDATES that default and must not
+be used for capacity planning.
+
+**Neither board can ever run SINTRAN**, at any setting: 2M words x 18 bit is
+36 Mbit, twenty times the whole chip's BRAM. These are OPCOM, self-test and
+small-standalone-program boards. The QMTECH (same die, 32 MB SDRAM) is the
+board for anything larger.
+
 ## TODO: 512 KB SRAM main memory (pack16 bridge)
 
 Full detailed plan: [`SRAM-BRIDGE-PLAN.md`](SRAM-BRIDGE-PLAN.md) - the
@@ -166,12 +264,6 @@ sheet-49 backend design (`MAIN_RAM_SRAM`), cycle-by-cycle timing at
 invalidated at any frequency), testbench and acceptance gates. Estimated
 2-4 days. Upgrades main memory from ~24 KB BRAM to **256K words (512 KB)**
 and frees BRAM.
-
-Original research capture below (kept for reference):
-
-**Historical note (superseded 13-JUL-2026):** this board was originally
-downgraded to research-only vs the Tang Nano 20K on price/function; the
-owner has since acquired one, so the port is live.
 
 ## Why this board
 
@@ -278,26 +370,8 @@ Online (from the resource center, <https://digilent.com/reference/programmable-l
 - Purchase (2026-07-08): Farnell Norway, **1039 NOK** -
   <https://no.farnell.com/digilent/410-328-35t/development-board-artix-7-fpga/dp/2614574>
 
-## Plan (from `Verilog/TODO.md`, to be expanded here)
-
-1. **Backend phase 1 - BRAM:** start with `MAIN_RAM_BLOCKRAM` (raise
-   `BANK_ADDR_BITS`; 225 KB BRAM minus the WCS budget). Gets the board booting
-   with the least new code.
-2. **Backend phase 2 - external SRAM:** a `MEM_RAM_49_SRAM` backend for the
-   512 KB SRAM. 8-bit bus means ~4 byte-accesses per 18-bit ND word (2 data
-   bytes + parity) - needs its own protocol bridge like the Tang SDRAM one
-   (`../tang-nano-20k/sdram-bridge/`), validated testbench-first against the
-   measured ND-120 DRAM protocol (`../../docs/nd120-dram-memory.md` section 6).
-3. **SD-card block device:** SD-card Pmod on the Pmod connector - shares the
-   SPI-mode SD + FAT reader core planned for Basys3 (see `Verilog/TODO.md`,
-   "SD-card block devices across all boards").
-
-Prerequisite, as for every board: the board-independent clock-enable /
-FF-mode work must boot first (see [`../README.md`](../README.md), "Shared
-context").
-
 ## See also
 
 - [`../README.md`](../README.md) - all FPGA targets
 - [`../basys3/README.md`](../basys3/README.md) - same FPGA part, same Vivado flow
-- `Verilog/TODO.md` - "Future boards / peripherals" section (origin of this plan)
+- `Verilog/TODO.md` - "Future boards / peripherals" section (open Cmod work)

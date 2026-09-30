@@ -82,11 +82,16 @@ tests: [docs/board-notes.md](docs/board-notes.md).
 The build is done; everything left is physical.
 
 1. **Confirm a ground pin on JP3 with a meter** against the JTAG header's GND
-   - see the caution in the wiring section. Do this before anything is wired.
-2. Wire the console and the SD Pmod to JP3 (pin table in "Wiring the console
-   and the SD Pmod to JP3" below).
+   - see the ground section of [`../QUICKSTART-qmtech-a35t.md`](../QUICKSTART-qmtech-a35t.md).
+   Do this before anything is wired.
+2. Wire the console and the SD Pmod to JP3 (pin table in the quickstart,
+   section 1).
 3. `make load` with the Platform Cable USB II on the JTAG header, or program
    the existing `nd120_qmtech.bit` from the Vivado Hardware Manager.
+   `make load` needs `ND120_VIVADO` and `ND120_BUILD_DIR` in `local.mk` at the
+   repository root (run `python3 configure.py` once; see
+   [CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings));
+   the bitstream lands in `$ND120_BUILD_DIR/qmtech-a35t/`.
 4. Press ENTER on the console - OPCOM should answer with no card present at
    all. That is the smoke test; only then trust the card wiring.
 5. Boot from the same SD card the Tang and Nexys use: `20500&`.
@@ -106,67 +111,6 @@ cd Verilog/fpga && ./stage-release.sh nd120_qmtech_a35t_20MHz_115200.bit
 ```
 
 The canonical name lives in [`../release-manifest.txt`](../release-manifest.txt).
-
-### Resource estimate - NOT MEASURED
-
-Scaled from the Nexys build's hierarchical report
-(`../nexys4ddr/timing-analysis/run_clk33_9/utilization_hierarchical.rpt`),
-which is the same CPU and the same storage stack on the same fabric:
-
-| block | Nexys LUTs | here |
-|---|---|---|
-| whole Nexys machine | 19,681 | |
-| DDR2 controller | 3,329 | gone - SDRAM bridge instead, much smaller |
-| TDV2200 terminal | 1,158 | gone - console is a plain UART |
-| remainder + bridge | ~15,200 | of **20,800** on this part |
-
-Block RAM is the comfortable half: the Nexys spends 66 RAMB36 on its DDR2
-cache, which goes away, and the Tang runs this same configuration in 738 Kbit
-against the 1,800 Kbit here. `SKIP_WCS_LOAD` drops the microcode PROM as well.
-
-**A real measurement on the same die, 04-SEP-2026:** the Cmod A7 build (this
-CPU with block-RAM main memory, no storage stack, no terminal, and the
-microcode PROM still in the netlist) placed and routed at **11,493 of 20,800
-LUTs and 26.5 of 50 block RAM tiles** on `xc7a35t`. Adding the storage stack
-costs roughly 6,800 LUTs by the Nexys hierarchy, less the ~1,800 that
-`SDFAT_NO_LFN` strips; block-RAM main memory and the microcode PROM come off.
-That lands close to the scaled figure above but with less room than it
-suggests, so **treat the fit as open until `util_synth.rpt` says otherwise.**
-
-The levers if it does overflow, cheapest first: `SDFAT_NO_LFN` is already on;
-`-tclargs -nopanelclock` (costs the SINTRAN time-of-day); turning the CPU's
-own cache off in the top level (`CACHE_SW`); dropping the floppy or the
-Winchester from `INCLUDE_*`.
-
-### Timing: what the Cmod run says to expect
-
-The same Cmod run **missed timing by 95.488 ns at 27 MHz** with the microcode
-PROM in the netlist: 5133 of 18465 endpoints failing, worst path 233 logic
-levels and 132 ns ending at the PROM's own data register. The Inter Clock
-Table was empty, so that was real logic depth, not a constraint problem.
-
-This build uses `SKIP_WCS_LOAD` from the start for the same reasons the Tang
-and Nexys do, but **be warned that it is not what fixed the Cmod, and the Cmod
-is not fixed.** Preloading the microcode there bought 5.7 ns of 95. The real
-cause, read off the routed checkpoint, is the **CGA IDB combinational ring**
-(`DELILAH-CPU/CGA/circuit/CGA.v:700-745`): the design has genuine
-combinational loops, Vivado breaks them where it likes, and where it breaks
-decides the reported critical path. All 200 worst paths in the Cmod netlist
-share one start and one end, 234 logic levels; the SAME RTL gives that path
-58 levels on MEGA65 R6, 93 on R3, and 7 on the Nexys.
-
-**So a timing failure here may say more about the netlist than the design.**
-If the first synthesis misses at 20 MHz, read in this order:
-
-1. **Inter Clock Table.** Non-empty means a crossing is being timed that the
-   clock groups should have excluded - a constraint bug, fix it here.
-2. **`[DRC LUTLP-1]` count and the auto-inserted `Synth 8-326` false paths.**
-   If the worst path runs through `ALU_OUTMUX/OUTMUX_IDBS` or ends in
-   `MAC_LA1025`, it is the ring, and lowering the clock is fitting the clock
-   to an artifact rather than to the machine.
-3. Only if it is neither: real depth, and a lower CPU clock is the answer.
-   Change the MMCM in the top level and `BOARD_CLK_FREQ` together, or they
-   disagree about every derived count.
 
 ## Files
 
@@ -221,192 +165,25 @@ projects with full pin XDCs under `Software/`).
   3. OPCOM TX/RX on header pins to an external 3.3 V USB-serial adapter -
      put those pins in the XDC from day one.
 
-## Loading the bitstream onto the board
+## Loading, wiring and the console test
 
-**A user-facing walkthrough of all of this - wiring, programming, first boot,
-troubleshooting - is [`../QUICKSTART-qmtech-a35t.md`](../QUICKSTART-qmtech-a35t.md).**
-This section is the developer's short form.
+Wiring (JP3 table + ground check), JTAG loading and the console test:
+[`../QUICKSTART-qmtech-a35t.md`](../QUICKSTART-qmtech-a35t.md) - that file is
+the one copy.
 
-**JTAG is the only way in, and it is volatile.** The Mini USB socket is power
-only (the vendor manual says so in section 2.1), there is no SD-card
-configuration path like the Nexys has, and no `.mcs`/SPI-flash flow is written
-for this board yet - `make flash` deliberately fails rather than pretending.
-So every power cycle needs a re-program. It takes seconds.
+Developer notes that are not in the quickstart:
 
-Connect a **Xilinx Platform Cable USB II** to the 6-pin JTAG header J1.
-Pin order and the flying-lead colours are in the vendor manual section 2.2.4,
-Figure 2-3 (`docs/QMTECH_XC7A35T_SDRAM-User_Manual_V01.pdf`) - the header
-carries VREF and GND besides TCK/TDO/TDI/TMS. Power the board over Mini USB;
-LED **D2** lights when the 3.3 V rail is up.
-
-```
-# from Verilog/fpga/qmtech-a35t/, Vivado on the Windows host:
-vivado -mode batch -source build.tcl                    # build + program over JTAG
-vivado -mode batch -source build.tcl -tclargs -noburn   # build only, no board needed
-```
-
-From WSL: `make load` (build + program) or `make` (build only) - the Makefile
-delegates through `powershell.exe`, using `ND120_VIVADO` and the build folder
-`ND120_BUILD_DIR` from `local.mk` at the repository root (written by `python3
-configure.py`; see
-[CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings)).
-Everything the build writes goes to `$ND120_BUILD_DIR/qmtech-a35t/`. To program a bitstream that is already
-built, use the Vivado Hardware Manager: *Open Target -> Auto Connect*, the
-board must enumerate as **`xc7a35t`**, then *Program Device*. LED **D3**
-(`FPGA_DONE`) lights on success. The free **Vivado Lab Tools** is enough for
-that - no full Vivado licence needed just to load a release bitstream.
-
-The programming block at the end of `build.tcl` is a plain
-`open_hw_manager` / `connect_hw_server` / `open_hw_target` sequence against
-`get_hw_devices xc7a35t*`, so it works with any cable Vivado recognises, not
-only the Platform Cable.
-
-## Wiring the console and the SD Pmod to JP3
-
-Neither is a plug-in job: JP3 is a 2x25 2.54 mm header, not a Pmod connector,
-so the SD Pmod goes on jumper wires. Pin numbering and the FPGA pins behind it
-are in [`nd120_qmtech.xdc`](nd120_qmtech.xdc). JP3's schematic net names are
-`IO_<pin>`, so the net name IS the FPGA pin.
-
-| what | JP3 pin | FPGA pin | other end |
-|---|---|---|---|
-| console: FPGA -> adapter RX | 5 | F18 | adapter **RX** |
-| console: adapter TX -> FPGA | 6 | G17 | adapter **TX** |
-| card CLK / SCK | 7 | E18 | Pmod 4 |
-| card CMD / MOSI | 8 | F17 | Pmod 2 |
-| card DAT0 / MISO | 9 | D18 | Pmod 3 |
-| card DAT1 | 10 | E17 | Pmod 7 |
-| card DAT2 | 11 | C17 | Pmod 8 |
-| card DAT3 / CS | 12 | C18 | Pmod 1 |
-| 3V3 | 2 | (power rail) | Pmod 6 or 12 |
-| ground | see below | | Pmod 5 or 11, and the adapter GND |
-
-The Pmod column is the Digilent Pmod MicroSD / Pmod SD mapping taken from
-[`../cmod-a7-35t/README.md`](../cmod-a7-35t/README.md), where the same module
-plugs straight into connector JA: 1 = ~CS/DAT3, 2 = MOSI/CMD, 3 = MISO/DAT0,
-4 = SCK, 5 and 11 = GND, 6 and 12 = VCC (3.3 V), 7 = DAT1, 8 = DAT2,
-9 = card detect (unused by the stack), 10 = unused. Check it against the
-module's own datasheet before wiring - a wrong VCC pin costs a card.
-
-The same mapping drawn out, because a table of sixteen numbers is easy to
-mis-transcribe onto sixteen wires:
-
-```
-   QMTECH JP3  (2x25)                      Digilent Pmod MicroSD / Pmod SD (2x6)
-   pin 1 is marked on the silkscreen       pin 1 is marked on the board
-
-        odd        even                    +------------------------------+
-      +------+   +------+                  |  1    2    3    4    5    6  |
-   1  | 5V   |   | 3V3  |  2 ----------,   | ~CS  MOSI MISO SCK  GND  VCC |
-      +------+   +------+              |   |                              |
-   3  | GND? |   | GND? |  4  <-- meter|   |  7    8    9   10   11   12  |
-      +------+   +------+     these    |   | DAT1 DAT2  CD   NC  GND  VCC |
-   5  | F18  |   | G17  |  6   four    |   +------------------------------+
-      +------+   +------+              |
-   7  | E18  |   | F17  |  8           |
-      +------+   +------+              |
-   9  | D18  |   | E17  | 10           |
-      +------+   +------+              |
-  11  | C17  |   | C18  | 12           |
-      +------+   +------+              |
-  13  |  .   |   |  .   | 14           |
-       ......      ......              |
-  21  | GND? |   | GND? | 22  <-- and  |
-      +------+   +------+       these  |
-       ......      ......              |
-  49  |  .   |   |  .   | 50           |
-      +------+   +------+              |
-                                       |
-   JP3 pin 2  (3V3) --------------------'-------------> Pmod pin 6   VCC
-
-   JP3 pin 7   E18  ------------------------------->  Pmod pin 4   SCK
-   JP3 pin 8   F17  ------------------------------->  Pmod pin 2   MOSI / CMD
-   JP3 pin 9   D18  <-------------------------------  Pmod pin 3   MISO / DAT0
-   JP3 pin 10  E17  <------------------------------>  Pmod pin 7   DAT1
-   JP3 pin 11  C17  <------------------------------>  Pmod pin 8   DAT2
-   JP3 pin 12  C18  ------------------------------->  Pmod pin 1   ~CS / DAT3
-   JP3 ground  ????  ------------------------------>  Pmod pin 5   GND
-
-                          ... and the console adapter:
-
-   JP3 pin 5   F18  ------------------------------->  adapter  RX
-   JP3 pin 6   G17  <-------------------------------  adapter  TX
-   JP3 ground  ????  ------------------------------>  adapter  GND
-```
-
-`--->` is the FPGA driving, `<---` the FPGA listening, `<-->` a line that goes
-both ways (unused in 1-bit mode, still wired). **The console pair crosses
-over** - the FPGA's transmit goes to the adapter's receive; getting that
-backwards gives a silent terminal with everything else looking healthy.
-
-The drawing puts odd pins on the left because that is how the schematic lists
-them; find the **pin 1 marker on the silkscreen** and count from there rather
-than trusting left/right, on both connectors. Counting from the wrong end puts
-5 V where 3V3 was meant.
-
-Two cautions, and one thing still not verified:
-
-- **JP3 pin 1 is the USB 5 V rail and pin 2 is 3V3, on both headers.** Do not
-  put a signal on either. The card runs from pin 2.
-- **The first build uses 1-bit mode** (`USE_4BIT(0)` in the top level), so
-  only CLK, CMD and DAT0 carry traffic. DAT1 and DAT2 still need their
-  pull-ups and DAT3 doubles as the card's chip select during initialisation,
-  which is why all four are wired. Going to 4-bit later is a parameter flip,
-  not a rewiring job - but change one variable at a time: the Tang's 4-bit
-  attempt failed on 24-AUG-2026 because the bit clock and the bus width were
-  changed together, and it took a separate experiment to tell which broke it.
-- **NOT VERIFIED: which JP3 pin is ground.** Extracting the schematic's text
-  (`pdftotext -layout` on `docs/QMTECH_XC7A15T_35T_50T_CSG325_SDRAM_V1.pdf`)
-  gives an I/O net name for every JP3 pin from 5 to 50 **except pins 3, 4, 21
-  and 22**, which is what makes those four the ground candidates - but the
-  extraction loses the power-pin labels, so that is an inference and is
-  recorded here as one.
-
-  **The cheap way to settle it: the 6-pin JTAG header J1 has a GND pin.**
-  Meter in continuity mode, one probe there, the other on JP3 pin 3, 4, 21,
-  22. Do it before wiring: a card powered from 3V3 with no shared ground
-  simply does not respond, and that failure looks exactly like a bad card, a
-  bad image, or broken RTL.
-
-Keep the jumper wires short. These are 20 MHz-class signals on flying leads
-with no ground plane between them; if the card is unreliable, wire length is
-the first suspect and a ground wire run alongside the card bundle helps.
-
-## Testing the console
-
-The console is the CPU's own emulated SC2661 serial pins, brought straight out
-to JP3 - the same console the Tang and the Nexys have, minus their on-board
-USB-UART. Use a **3.3 V** USB-to-serial adapter.
-
-**Settings: 115200 baud, 7 data bits, EVEN parity, 1 stop bit, no flow
-control.**
-
-```
-picocom -b 115200 -y e -d 7 -p 1 /dev/ttyUSB0
-```
-
-**Why 7E1 when `SC2661_UART.v` says 8N1 - both are right, and this has cost
-time before.** The wire framing is genuinely 8 data bits, no parity, one stop
-bit: the emulated chip has no mode-register decode and cannot do anything
-else. SINTRAN then puts an EVEN **software** parity bit in bit 7 of its early
-boot text (measured on the MiSTer, 02-SEP-2026: CR = 0o215, space = 0o240,
-'4' = 0o264). Setting the host terminal to 7E1 strips that bit and the text
-comes out clean; 8N1 shows the banner with stray high-bit characters. The
-`115200 8N1` comment in [`nd120_qmtech.xdc`](nd120_qmtech.xdc) describes the
-wire, not the terminal setting to use.
-
-Test in this order - each step proves one thing, and the first needs no card:
-
-1. **Press ENTER.** OPCOM answers. That proves the bitstream loaded, the CPU
-   runs, the clock is right, and both console wires are on the right pins.
-2. **`20500&`** boots from the Winchester image. UPPERCASE only, and type at
-   a human pace: OPCOM silently drops characters typed faster than ~0.3 s
-   apart and answers `?`, which reads as a machine fault and is not one.
-3. SINTRAN's banner and the Watchdog line follow.
-
-Card images go in the FAT32 root with 8.3 names - `BOOT.TAP`, `WD0.IMG`,
-`FLOPPY1.IMG` - because `SDFAT_NO_LFN` strips long-filename parsing from this
-build to save ~1800 LUTs.
+- `make flash` deliberately fails: no `.mcs`/SPI-flash flow is written for
+  this board yet, so programming is JTAG only and volatile.
+- The programming block at the end of `build.tcl` is a plain
+  `open_hw_manager` / `connect_hw_server` / `open_hw_target` sequence against
+  `get_hw_devices xc7a35t*`, so it works with any cable Vivado recognises,
+  not only the Platform Cable.
+- The build uses 1-bit SD mode (`USE_4BIT(0)` in the top level). Going to
+  4-bit later is a parameter flip, not a rewiring job - but change one
+  variable at a time: the Tang's 4-bit attempt failed on 24-AUG-2026 because
+  the bit clock and the bus width were changed together, and it took a
+  separate experiment to tell which broke it.
 
 ## The 16-bit bridge and the disc cache - the one design constraint here
 
@@ -452,7 +229,7 @@ the 2048 the mode currently maps. `sdram-bridge/sim/mem_ram_49_sdram_tb.v`
 3. Port of the standalone [`../basys3/mem-test/`](../basys3/README.md).
    *(written, passes its testbench, never run)*
 4. Full ND-120 build: SDRAM main memory, SD storage, serial console.
-   *(written 04-SEP-2026, lints clean, NEVER BUILT - start here)*
+   *(built 04-SEP-2026, timing met WNS +4.645 ns, never run on the board - start here)*
 5. Restore the disc cache by extending the 16-bit bridge mode, if disc speed
    turns out to matter. *(not started - see the section above)*
 
