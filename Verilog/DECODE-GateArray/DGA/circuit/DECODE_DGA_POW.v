@@ -31,7 +31,7 @@ module DECODE_DGA_POW (
     input sysclk,      // System clock (for F595 synchronous RS latch on FPGA)
     input sys_rst_n,   // FPGA system reset (active-low): forces latches to idle, pulses CLEAR
     // Inputs
-    input BDRY50N,
+    input BDRY50N,    //! Bus Data Ready (Delayed 50ns) (from BIF_5.BDRY50_n)
     input CLOSC,        //! Clear Oscillator signal (From IO_DCD_38) - High briefly at power-on then 0
     input CLRTIN,       //! Clear Real Time Clock
     input CONTINUEN,    //! Continue Enable

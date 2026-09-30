@@ -23,32 +23,32 @@ module DECODE_DGA (
     /*******************************************************************************
    ** The inputs are defined here                                                **
    *******************************************************************************/
-    input       XBDN,
-    input       XBRN,
-    input       XCLK,
+    input       XBDN,         //! Bus Data Ready (Delayed 50ns) (from BIF_5.BDRY50_n)
+    input       XBRN,         //! CPU Break Signal (from CPU_15.BRK_n)
+    input       XCLK,         //! Main system clock (same net as CPU_15.CLK)
     input       XCLO,
-    input       XCON,
-    input [4:0] XCO_4_0,
-    input       XDAN,
+    input       XCON,         //! Input signal from "C PLUG", signal B15 - CONTINUE_n (from ND3202D.CONTINUE_n)
+    input [4:0] XCO_4_0,      //! Control Store Command (5 bits) (from IO_37.CSCOMM_4_0)
+    input       XDAN,         //! Data Present (from BIF_5.DAP_n)
     input       XEFN,
-    input       XEON,
+    input       XEON,         //! Enable output register file (same net as CPU_15.EORF_n)
     input       XHIN,
-    input [4:0] XID_4_0,
+    input [4:0] XID_4_0,      //! Control Store IDB Source (5 bits) (from IO_37.CSIDBS_4_0)
 
-    input       XLCN,
-    input       XLON,
-    input       XLSH,
-    input [1:0] XMI_1_0,
-    input       XPOI,
+    input       XLCN,         //! Load control store (same net as CPU_15.LCS_n)
+    input       XLON,         //! Input signal from "C PLUG", signal B12 - LOAD_n (from ND3202D.LOAD_n)
+    input       XLSH,         //! Latch Shadow signal (from CPU_15.LSHADOW)
+    input [1:0] XMI_1_0,      //! Control Store MIS signal (2 bits) (from IO_37.CSMIS_1_0)
+    input       XPOI,         //! Memory Protection ON, PONI=1 (from IO_DCD_38.PONI)
     input       XPOW,
     input       XPWC,
     input       XRMN,
     input       XRTO,
-    input       XS5N,
-    input [1:0] XST_4_3,
-    input       XTES,
-    input       XTON,
-    input       XUCK,
+    input       XS5N,         //! SEL5MS if active will trigger RTC after 5 ms, not 20ms) (from ND3202D.SEL5MS_n)
+    input [1:0] XST_4_3,      //! Status bits 4 and 3 from PANEL/CALENDAR CPU 68705 (from IO_DCD_38.STAT_4_3)
+    input       XTES,         //! tied to 0 (in IO_DCD_38)
+    input       XTON,         //! Input signal from "C PLUG", signal B16 - STOP_n (from ND3202D.STOP_n)
+    input       XUCK,         //! Microcode clock (same net as CPU_15.UCLK)
 
 
     input [7:0] XIDB_7_0_IN,  // Merged XIB_7_4 and XI_3_0_I
@@ -66,53 +66,53 @@ module DECODE_DGA (
    *******************************************************************************/
     output [7:0] XA_7_0, // output set from internal AD_7_0 when RMM_n is low(external signal XRMN)
     //output [7:0] XA_7_0_C, // Not used (its a copy of the signal RMM_n but negated)
-    output XC10,
+    output XC10,              //! Cache address bit 10 (to CPU_15.CA10)
     output XCLN,
-    output XCRN,
-    output XCSN,
-    output XDON,
-    output XDTN,
-    output XDVN,
+    output XCRN,              //! Cache clear (to CPU_15.CCLR_n)
+    output XCSN,              //! Enable control store read (to CPU_15.ECSR_n)
+    output XDON,              //! Enable data out (to CPU_15.EDO_n)
+    output XDTN,              //! Data transfer (to CPU_15.DT_n)
+    output XDVN,              //! DGA access qualifier (DECODE_DGA_COMM A227, arrives as XDVN) - not the CGA's VACC (to IO_DCD_38.DVACC_n)
     output XECR,
     output XEMN,
     output XEPN,
-    output XESN,
-    output XEUN,
+    output XESN,              //! Enable store overflow (to CPU_15.ESTOF_n)
+    output XEUN,              //! Chip Enable UART (to IO_UART_42.CEUART_n)
     output XFEC,
-    output XFMI,
-    output XFON,
+    output XFMI,              //! Cache fetch miss (to CPU_15.FMISS)
+    output XFON,              //! Format instruction (to CPU_15.FORM_n)
     output XFUN,
-    output XION,
+    output XION,              //! Enable I/O Read (to IO_UART_42.EIOR_n)
     //output [3:0] XI_3_0_C,
     //output [3:0] XI_3_0_O,
     output XLHN,
     output XMCL,
-    output XMRN,
+    output XMRN,              //! Memory request (to CPU_15.MREQ_n)
     output XOCN,
     output XPAN,
     output XPEN,
-    output XPFN,
-    output XPIN,
-    output XPNN,
+    output XPFN,              //! Power failure detected (to CPU_15.POWFAIL_n)
+    output XPIN,              //! Enable memory parity interrupt disable (to CPU_15.EMPID_n)
+    output XPNN,              //! Page address not valid (to CPU_15.PAN_n)
     output XPSC,
     output XPSN,
     output XRFN,
     output XRIN,
     output XRQN,
-    output XRTN,
-    output XRUN,
+    output XRTN,              //! Reset trap (to CPU_15.RT_n)
+    output XRUN,              //! Read UART (HIGH=Write UART) (to IO_UART_42.RUART_n)
     output XRWN,
-    output XSCN,
+    output XSCN,              //! Store overflow check (to CPU_15.STOC_n)
     output XSHN,
     output XSSN,
-    output XSTP,
+    output XSTP,              //! Output-signal to "C PLUG", signal B14 RUN~ (driven by Stop flip-flop: low while CPU is running) (to ND3202D.RUN_n)
     output XSWN,
     output XTEO,
     output XTOT,
     output XTRN,
     output XVAL,
-    output XWHN,
-    output XWRI
+    output XWHN,              //! Write cache hit memory (to CPU_15.WCHIM_n)
+    output XWRI               //! Write cycle active (to CPU_15.WRITE)
 );
 
   /*******************************************************************************

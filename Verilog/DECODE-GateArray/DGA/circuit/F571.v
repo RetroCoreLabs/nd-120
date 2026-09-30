@@ -12,7 +12,7 @@ module F571 (
     input A,
     input D0,
     input D1,
-    input ENB_N,
+    input ENB_N,  //! tied to 0 (in DECODE_DGA_COMM, DECODE_DGA_POW)
 
     output Y
 );
