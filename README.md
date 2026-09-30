@@ -13,6 +13,20 @@ boards you can buy today.
 
 ---
 
+## 🔍 Explore the Design
+
+| | |
+|---|---|
+| 🌳 **[Module hierarchy](Verilog/HIERARCHY.md)** | What sits inside what - the whole machine as a tree you can fold open, for the simulation and for every FPGA board, made from a real yosys elaboration |
+| 🧩 **[All modules](Verilog/MODULES.md)** | Every one of the ~400 modules, grouped by area. Each page has the module's symbol, a **schematic drawn from the Verilog** (every sub-module box links to its page), the ports, and the **Verilog source** |
+| 🔌 **[Boards](Verilog/fpga/README.md)** | The FPGA boards - Tang Nano 20K, Nexys 4 DDR, MiSTer, MEGA65 and more - with a quick start for each |
+| 📐 **[Design notes](Verilog/docs/README.md)** | How the machine works and why it is built the way it is |
+
+A good first page: the **[CPU gate array](Verilog/DELILAH-CPU/CGA/circuit/doc/CGA.md)**, then
+follow the boxes in its schematic down to the ALU.
+
+---
+
 ## 🎉 **SINTRAN III runs on real hardware**
 
 **The machine boots SINTRAN III from a Winchester disc image on an SD card, and
@@ -29,6 +43,7 @@ you can log in and run programs.**
 
 ## 📋 Table of Contents
 
+- [Explore the Design](#-explore-the-design)
 - [Overview](#-overview)
 - [Quick Start](#-quick-start)
 - [FPGA Boards](#-fpga-boards)
@@ -314,6 +329,9 @@ More on the card: [3202 on NDWiki](https://www.ndwiki.org/wiki/3202).
 
 ## 📚 Documentation
 
+All of it is also on the docs site, **<https://retrocorelabs.github.io/nd-120/>**, with a page
+tree on the left and search.
+
 Paths in this repository are always relative to the repository root. Where a
 document points at one of the *other* ND repositories, it writes
 `$ND_REPOS/<repo>/...` - set `ND_REPOS` to the folder that holds your ND
@@ -335,7 +353,7 @@ checkouts.
 | Topic | Documentation |
 |-------|---------------|
 | **FPGA boards** | [Verilog/fpga/README.md](Verilog/fpga/README.md) |
-| **Verilog modules** | [Verilog/MODULES.md](Verilog/MODULES.md) - one page per module: description, ports and symbol |
+| **Verilog modules** | [Verilog/MODULES.md](Verilog/MODULES.md) - one page per module: description, symbol, schematic drawn from the Verilog, ports and source |
 | **Module hierarchy** | [Verilog/HIERARCHY.md](Verilog/HIERARCHY.md) - what sits inside what, for the simulation and every FPGA board, from a yosys elaboration |
 | **Build options** | [Verilog/docs/build-defines.md](Verilog/docs/build-defines.md) |
 | **Design notes** | [Verilog/docs/README.md](Verilog/docs/README.md) |

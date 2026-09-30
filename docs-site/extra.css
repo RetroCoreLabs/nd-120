@@ -1,0 +1,63 @@
+/* ND-120 docs site - small additions to the Material theme. */
+
+/* The module tree on Verilog/HIERARCHY.md: nested lists with <details>.
+   Material draws a bare <details> as a boxed note; in the tree it must be a
+   plain line with a fold triangle. */
+.md-typeset ul.hier,
+.md-typeset ul.hier ul {
+  list-style: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 1.1em;
+}
+.md-typeset ul.hier li {
+  margin: 0.1em 0;
+}
+.md-typeset ul.hier li > details {
+  border: none;
+  box-shadow: none;
+  background: none;
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  overflow: visible;
+}
+.md-typeset ul.hier li > details > summary {
+  background: none;
+  border: none;
+  padding: 0 0 0 1.1em;
+  font-weight: normal;
+  cursor: pointer;
+}
+.md-typeset ul.hier li > details > summary::before {
+  /* the fold triangle, left of the name */
+  left: 0;
+  top: 0.3em;
+  width: 0.9em;
+  height: 0.9em;
+  background-color: var(--md-default-fg-color--light);
+  transform: rotate(0deg);
+}
+.md-typeset ul.hier li > details[open] > summary::before {
+  transform: rotate(90deg);
+}
+.md-typeset ul.hier li > details > summary::after {
+  display: none;
+}
+.md-typeset ul.hier li:not(:has(> details)) {
+  padding-left: 1.1em;
+}
+
+/* Schematic pictures: never wider than the page; the full-size picture is
+   one click away (it links to itself). */
+.md-typeset img[src$=".svg"] {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  background: #ffffff;
+}
+
+/* The fold-out Verilog source block on each module page. */
+.md-typeset details > summary {
+  cursor: pointer;
+}

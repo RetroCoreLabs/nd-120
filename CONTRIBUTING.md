@@ -148,7 +148,7 @@ make check-config                             # the same as --check, from any Ma
 ```
 
 What `configure.py` does: finds `vivado`, `gw_sh` (Gowin), `quartus_sh`, oss-cad-suite and
-w64devkit on the `PATH` and in the usual install folders (from WSL it also looks on the Windows
+w64devkit and `netlistsvg` on the `PATH` and in the usual install folders (from WSL it also looks on the Windows
 drives), reports `verilator`, `iverilog`, `yosys`, `python3`, `make` and `git`; asks only for what
 it could not find, plus the build folder and `ND_REPOS`; writes `local.mk`; runs
 `git submodule update --init`; makes the microcode preload images (`Code/Microcode/gen_wcs_image.py`
@@ -180,6 +180,7 @@ simulator targets need none of them.
 | `ND120_QUARTUS` | the Quartus `bin` folder | nothing yet (the MiSTer build runs Quartus in Docker) | no |
 | `ND120_OSS_CAD_SUITE` | the oss-cad-suite folder | Tang Makefile (OSS flow), `Verilog/ND-120-Yosys/synh.bat`, BUS-IF gate example | no (else the tools from `PATH`) |
 | `ND120_W64DEVKIT` | the w64devkit folder | BUS-IF gate Windows example | no |
+| `ND120_NETLISTSVG` | the `netlistsvg` program (npm, installed outside the repository) | `Verilog/tests/gen_schematics.py`: the module schematics | no (else `netlistsvg` from `PATH`; without it the schematics are not redrawn) |
 | `ND_REPOS` | the folder holding the sibling ND checkouts (`ND110Compile`, `RetroTerm`, `NDDeviceCore`, ...) | `Verilog/tests/instruction-verify/` (golden traces, listings), `Verilog/sim/compare_boot.py` | for `make test-instr` |
 | `ND120_ILA_CSV` | an ILA capture exported from Vivado as CSV (`iladata.csv`) | `Verilog/sim/analyze_ila.py`, `compare_boot.py` | for those scripts |
 | `ND120_ORACLE_DIR` | where long trace captures are kept (too big to commit) | Tang capture scripts, `Verilog/sim/Makefile` | no |
@@ -193,6 +194,47 @@ build became a non-project flow; `configure.py` keeps it only if you set it.
 commit into that folder, runs `configure.py --non-interactive` there with the same tool settings
 but a build folder inside the clone, and runs the board's build target in the clone. It proves the
 build needs nothing outside the repository. It never runs by itself.
+
+---
+
+## The module docs and the docs site
+
+The docs site, <https://retrocorelabs.github.io/nd-120/>, is built from the Markdown in this
+repository by [MkDocs](https://www.mkdocs.org/) with the Material theme. The settings are in
+`docs-site/mkdocs.yml`; `.github/workflows/jekyll-gh-pages.yml` builds and publishes it on every
+push to `main` (the site only - no synthesis, no bitstreams).
+
+**The module pages, the hierarchy and the site's page tree are generated, locally, and committed.**
+One command, in WSL or Linux, from `Verilog/`:
+
+```bash
+python3 tests/gen_module_docs.py        # yosys: $YOSYS, else ~/oss-cad-suite/bin/yosys
+```
+
+Use the system `python3` (it needs Pillow): do not `source ~/oss-cad-suite/environment` first,
+because that puts oss-cad-suite's own Python, which has no Pillow, ahead of it on the `PATH`.
+
+It writes every module page (`<folder>/doc/<Module>.md`, with the symbol picture, the schematic
+`<Module>.svg` and the Verilog source), `Verilog/MODULES.md`, `Verilog/HIERARCHY.md` and
+`docs-site/nav.yml` (the left-hand page tree). The schematics need `netlistsvg`
+(`ND120_NETLISTSVG`, see the table above). Install it outside the repository:
+
+```bash
+mkdir -p ~/tools/netlistsvg && cd ~/tools/netlistsvg && npm install netlistsvg
+python3 configure.py --set ND120_NETLISTSVG=$HOME/tools/netlistsvg/node_modules/.bin/netlistsvg
+```
+
+**Build the site locally** before pushing a docs change, in a Python venv outside the repository.
+`--strict` fails on any broken link, the same as the published build:
+
+```bash
+python3 -m venv ~/venvs/nd120-site
+~/venvs/nd120-site/bin/pip install -r docs-site/requirements.txt
+~/venvs/nd120-site/bin/mkdocs build --strict -f docs-site/mkdocs.yml -d ~/nd120-site-out
+```
+
+MkDocs does not allow the output folder inside the docs folder, and the docs folder is the whole
+repository, so the output (`-d`) always goes outside the checkout.
 
 ---
 

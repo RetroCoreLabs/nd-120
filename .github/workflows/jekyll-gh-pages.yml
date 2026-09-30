@@ -1,5 +1,14 @@
-# Sample workflow for building and deploying a Jekyll site to GitHub Pages
-name: Deploy Jekyll with GitHub Pages dependencies preinstalled
+# Builds the docs site (https://retrocorelabs.github.io/nd-120/) with MkDocs
+# and the Material theme, and publishes it on GitHub Pages.
+#
+# The SITE only: no synthesis, no bitstreams, no simulation. The module pages,
+# the schematics, HIERARCHY.md and the page tree (docs-site/nav.yml) are made
+# locally by Verilog/tests/gen_module_docs.py and committed; this job only
+# turns the committed Markdown into HTML.
+#
+# The file keeps its old name (it used to run Jekyll) so the Pages settings
+# and the run history that point at it stay as they are.
+name: Docs site (MkDocs) on GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -27,16 +36,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+        # no submodules: the MEGA65 framework (Verilog/fpga/mega65/m2m) is
+        # not part of the site (docs-site/mkdocs.yml exclude_docs)
         uses: actions/checkout@v7
       - name: Setup Pages
         uses: actions/configure-pages@v6
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
-          source: ./
-          destination: ./_site
+          python-version: "3.12"
+      - name: Install MkDocs (pinned versions)
+        run: pip install -r docs-site/requirements.txt
+      - name: Build the site
+        # --strict: a broken link fails the build instead of publishing it.
+        # MkDocs will not write the site inside its docs folder, and the docs
+        # folder is the whole repository, so the output goes next to it.
+        run: mkdocs build --strict -f docs-site/mkdocs.yml -d "${{ runner.temp }}/site"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ runner.temp }}/site
 
   # Deployment job
   deploy:
