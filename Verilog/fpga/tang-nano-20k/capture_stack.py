@@ -4,7 +4,7 @@
 # TANG_GRANT_CAPTURE dumps 512 hex words over the console. With the current
 # probe word (s_cap_src = CSA_12_0), the dump tells us WHERE the STACK microcode
 # stalls (the octal microcode address), the same first step used for the boot hang.
-# Full path: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/capture_stack.py
+# Repo path: Verilog/fpga/tang-nano-20k/capture_stack.py
 import serial, time, sys
 
 s = serial.Serial("/dev/ttyUSB1", 115200, timeout=0.5)

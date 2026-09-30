@@ -2,7 +2,7 @@
 # (BACKUP toolchain; the primary flow is the OSS suite via `make` in this
 #  dir - see README.md "Two build flows")
 #
-#   cd E:\Dev\Repos\Ronny\nd-120\Verilog\fpga\tang-nano-20k
+#   cd Verilog\fpga\tang-nano-20k        (inside your checkout)
 #   .\gowin_build.ps1 [-Variant slow|crawl|full] [-Gao] [-PfCapture] [-PcHistory] [-JplCapture] [-NoPanelClock] [-Cache]
 #
 # -Cache builds WITH the CPU cache (suppresses ND120_NO_CACHE via
@@ -57,12 +57,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$gwsh = "C:\Utils\Gowin\Gowin_V1.9.10.02_x64\IDE\bin\gw_sh.exe"
-if (-not (Test-Path $gwsh)) {
-    Write-Error "gw_sh.exe not found at $gwsh - adjust the path in this script."
+$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+# gw_sh: ND120_GOWIN (environment or Verilog/fpga/local.mk - copy
+# local.mk.example), else gw_sh.exe on PATH. No install path is written here.
+. (Join-Path $here "..\paths.ps1")
+$gwsh = Resolve-ND120Tool -Var "ND120_GOWIN" -Names @("gw_sh.exe", "gw_sh")
+if (-not $gwsh) {
+    Write-Error "gw_sh.exe not found - set ND120_GOWIN in Verilog/fpga/local.mk (see local.mk.example) or put gw_sh.exe on PATH."
 }
 
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $wcs  = Join-Path $here "..\..\..\Code\Microcode\wcs"
 if (-not (Test-Path (Join-Path $wcs "wcs_16C.hex"))) {
     Write-Error "WCS preload images not found in $wcs - run Code/Microcode/gen_wcs_image.py first."

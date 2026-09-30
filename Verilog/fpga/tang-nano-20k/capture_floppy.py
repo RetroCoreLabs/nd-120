@@ -5,7 +5,7 @@
 # error if the floppy isn't ready (e.g. the contiguity checker rejected a
 # fragmented FLOPPY1.IMG at mount). This is the floppy-only Tang build
 # (TANG_FLOPPY; no tape / no 400$).
-# Full path: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/capture_floppy.py
+# Repo path: Verilog/fpga/tang-nano-20k/capture_floppy.py
 import serial, time, sys
 
 s = serial.Serial("/dev/ttyUSB1", 115200, timeout=0.5)

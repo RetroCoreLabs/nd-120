@@ -3,7 +3,7 @@
 # tang_validate.py - drive the INSTRUCTION-B validator on the Tang Nano 20K
 #
 # Full path:
-#   /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/tang_validate.py
+#   Verilog/fpga/tang-nano-20k/tang_validate.py  (repo-relative)
 #
 # WHAT IT DOES
 #   Talks to the running ND-120 on the Tang Nano 20K over the OPCOM console

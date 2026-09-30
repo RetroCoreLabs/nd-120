@@ -29,6 +29,11 @@
 # Selection is via TANG_VARIANT_* pre-defines consumed by src/tang20k_defines.v
 # - no file editing, both toolchains use the same mechanism.
 
+# Local paths (ND120_GOWIN for `make gowin`) from ../local.mk - copy
+# ../local.mk.example. ../paths.mk loads it and passes it on to
+# gowin_build.ps1 (through WSLENV from WSL).
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+
 # auto-add the oss-cad-suite tools to PATH when present
 OSS_CAD ?= $(HOME)/oss-cad-suite
 ifneq ($(wildcard $(OSS_CAD)/bin),)

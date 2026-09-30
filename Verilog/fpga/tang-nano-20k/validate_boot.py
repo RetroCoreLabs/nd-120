@@ -4,7 +4,7 @@
 # PASS = the program actually runs and prints its banner ("INSTRUCTION" / "PROGRAM
 # NUMBER" etc.) => the STZ->CONT jump now resolves => no wedge at 06000.
 # FAIL = silence / no program output => still hung.
-# Full absolute path: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/validate_boot.py
+# Repo path: Verilog/fpga/tang-nano-20k/validate_boot.py
 import serial, time, sys
 
 PORT = "/dev/ttyUSB1"

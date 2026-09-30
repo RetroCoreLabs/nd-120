@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # Definitive PIL step-trace on the Tang (grant-fix verification), NO free-run.
-#   /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/scratch_piltrace.py
+#   Verilog/fpga/tang-nano-20k/scratch_piltrace.py  (repo-relative)
 # Sets P to the cold-start entry (20 octal, the autoload start) and SINGLE-STEPS
 # through the cold start watching PIL. Stepping is controlled - it cannot wedge
 # the console the way `261.` free-run-to-breakpoint does. Guards the verdict so
 # it never claims "holds" on missing (?) readings.
-import serial, time, re, sys
+import serial, time, re, sys, os
 
-LOG = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/piltrace.log"
+LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "piltrace.log")   # next to this script
 out = open(LOG, "w")
 def say(*a):
     m=" ".join(str(x) for x in a); print(m); out.write(m+"\n"); out.flush()

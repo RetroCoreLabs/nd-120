@@ -1219,7 +1219,7 @@ module ND120_TANG20K_TOP (
   //        -> ENPT (map the page in) -> resume
   // Our machine produces faults with NO disc read, so the question is whether
   // it ever reaches those routines at all. From the microcode listing
-  // (/mnt/e/Dev/Ronny/nd120uc/source/nd-120-delilah.uc):
+  // (the nd120uc repository, source/nd-120-delilah.uc):
   //     CLPT = CSA 0o5705,  ENPT = CSA 0o5706,  CLPT1 = 0o4071, CLPT3 = 0o4115
   //
   // NOTE 0o5705 = 3013 decimal - that needs TWELVE bits. The previous record

@@ -1,6 +1,6 @@
 # ND120 Tang Nano 20K - attach the board's FTDI to WSL (Windows PowerShell)
 #
-#   cd E:\Dev\Repos\Ronny\nd-120\Verilog\fpga\tang-nano-20k
+#   cd Verilog\fpga\tang-nano-20k        (inside your checkout)
 #   .\tang_usb.ps1
 #
 # WHY THIS EXISTS

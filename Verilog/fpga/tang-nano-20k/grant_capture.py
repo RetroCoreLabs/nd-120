@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Grant-capture reader + decoder for the Tang masked-level-10 probe.
-#   /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/grant_capture.py
+#   Verilog/fpga/tang-nano-20k/grant_capture.py  (repo-relative)
 #
 # Companion to scratch_piltrace.py. Requires a bitstream built with
 # `define TANG_GRANT_CAPTURE (see src/tang20k_defines.v). That build repurposes
@@ -23,10 +23,10 @@
 # ~0.07 s/char pacing; a killed run leaves the parser mid-examine (ESC+CRs
 # recover, else btn1); after the on-chip dump seizes TX the OPCOM console is
 # dead until the next btn1 - that is EXPECTED (the CPU has wedged at level 10).
-import serial, time, re, sys
+import serial, time, re, sys, os
 
 PORT = "/dev/ttyUSB1"
-LOG  = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/grant_capture.log"
+LOG  = os.path.join(os.path.dirname(os.path.abspath(__file__)), "grant_capture.log")   # next to this script
 out  = open(LOG, "w")
 def say(*a):
     m = " ".join(str(x) for x in a); print(m); out.write(m + "\n"); out.flush()

@@ -8,7 +8,7 @@
 # Unlike stack/byte-string (soak loops) and the memory test (stale-state), a reboot
 # is a genuine event, so this is the symptom most likely to be a REAL bug.
 # Requires the board freshly power-cycled (clean SDRAM) so 400$ boots correctly.
-# Full path: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/capture_seg.py
+# Repo path: Verilog/fpga/tang-nano-20k/capture_seg.py
 import serial, time, sys
 
 s = serial.Serial("/dev/ttyUSB1", 115200, timeout=0.5)

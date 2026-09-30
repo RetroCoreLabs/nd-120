@@ -3,7 +3,7 @@
 capture_trap3.py - drive the Tang Nano 20K through the PAGING test-3 eject and
 decode the TANG_TRAP_CAPTURE analyzer dump (Issue D root-cause probe).
 
-Full path: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/capture_trap3.py
+Repo path: Verilog/fpga/tang-nano-20k/capture_trap3.py
 
 Prereq: bitstream built with `define TANG_TRAP_CAPTURE (src/tang20k_defines.v)
 and SRAM-loaded (make load-gowin). Board on /dev/ttyUSB1 @ 9600 8N1.

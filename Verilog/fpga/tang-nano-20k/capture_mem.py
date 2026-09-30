@@ -5,7 +5,7 @@
 # on-chip TANG_GRANT_CAPTURE dumps 512 CSA samples so we see WHERE the memory-test
 # microcode stalls. No 400$ / INSTRUCTION-B needed - this is pure OPCOM.
 # Requires the board freshly Master-Cleared (btn1) so it is at the '#' prompt.
-# Full path: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/fpga/tang-nano-20k/capture_mem.py
+# Repo path: Verilog/fpga/tang-nano-20k/capture_mem.py
 import serial, time, sys
 
 BANK = sys.argv[1] if len(sys.argv) > 1 else "0"   # bank number to test

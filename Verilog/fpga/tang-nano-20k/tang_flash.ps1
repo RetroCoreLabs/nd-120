@@ -1,6 +1,6 @@
 # ND120 Tang Nano 20K - program the board (Windows PowerShell)
 #
-#   cd E:\Dev\Repos\Ronny\nd-120\Verilog\fpga\tang-nano-20k
+#   cd Verilog\fpga\tang-nano-20k        (inside your checkout)
 #   .\tang_flash.ps1              # permanent write into the board's flash
 #   .\tang_flash.ps1 -Sram        # volatile SRAM load (gone on power-off)
 #   .\tang_flash.ps1 -Build       # run gowin_build.ps1 first, then flash
