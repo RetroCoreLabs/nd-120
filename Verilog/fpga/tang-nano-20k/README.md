@@ -143,8 +143,8 @@ which nextpnr-himbaechel gowin_pack openFPGALoader
 ```
 (Lighter alternative for a yosys-only fit check: `pip install yowasp-yosys`.)
 
-The full CPU builds with this flow since 12-JUL-2026; see
-[Two build flows](#two-build-flows) below.
+The full CPU built with this flow on 12-JUL-2026, but it no longer fits: see
+[Two build flows](#two-build-flows) below. Use Gowin EDA for a bitstream.
 
 **OSS flow + embedded SDRAM:** nextpnr does **not** auto-connect the on-package
 SDRAM the way Gowin EDA does with the magic `O_sdram_*`/`IO_sdram_dq` port names -
@@ -188,8 +188,15 @@ What the OSS flow needed (all under `` `ifdef YOSYS ``, other flows untouched):
 6. On the Windows drive a WSL compile now and then misses a just-written
    file ("No such file or directory"); re-run.
 
-The full-CPU OSS place-and-route is slow: CI job `tang-oss` runs it only on
-`bitstreams-*` tags with a 300-minute limit (two runs died at 120 min).
+**The full CPU no longer fits with the OSS flow** (measured 28-SEP-2026 with
+the oss-cad-suite CI downloads): yosys maps it to 22254-22626 LUT4 against
+20736 on the chip (107-109%), so nextpnr cannot place it - older suites sit in
+the placer until they are stopped (CI run 33664876050: 2 h), newer ones stop
+at once with `no BELs remaining`. No timeout fixes that. Gowin EDA fits the
+same design (it maps it differently), so bitstreams come from Gowin. The CI
+job `tang-oss` stays red until the OSS flow fits; synthesis-setting work that
+brings it to 19790 LUT4 but still does not place is recorded in
+`Verilog/TODO.md` (tang-oss item).
 
 ## Full ND-120 build
 
@@ -482,7 +489,9 @@ analysed in [`BSRAM-BUDGET.md`](BSRAM-BUDGET.md), not implemented.
   2 KB storage sector buffer 1. Main memory is in SDRAM (0 BSRAM); the CPU
   register file is LUT RAM. Reclaiming 8 WCS blocks: `BSRAM-BUDGET.md` Part 1.
 - LUT: the SD-FAT/storage stack roughly doubled the LUT count (42% -> 88%
-  on 16-JUL); `sd_file_reader` alone was about 8930 LUTs. The FAT reader is
+  on 16-JUL); `sd_file_reader` alone was about 8930 LUTs. By 28-SEP-2026 the
+  OSS synthesis of the full CPU needs 107-109% LUT4 and no longer places
+  (see "Two build flows"); the Gowin flow still fits. The FAT reader is
   shared by all devices, so another device adapter is cheap (~176 LUTs).
 - Levers, with measured or estimated savings: `SDFAT_NO_LFN` (~1800 LUT,
   in use), mount-time contiguity checker (~1177 LUT, retired as a default

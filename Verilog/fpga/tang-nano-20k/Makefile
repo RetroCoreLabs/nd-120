@@ -1,7 +1,13 @@
 # ND-120 on Tang Nano 20K - DUAL-TOOLCHAIN build (see README.md "Two build flows")
 #
-# PRIMARY: OSS CAD Suite (yosys + nextpnr-himbaechel + gowin_pack), Linux/WSL
-# BACKUP:  Gowin EDA (gw_sh on the Windows host via gowin_build.ps1)
+# Gowin EDA (gw_sh on the Windows host via gowin_build.ps1) is the flow that
+#   builds the full-CPU bitstream today - every variant incl. fast20, and the
+#   released Tang bitstreams.
+# OSS CAD Suite (yosys + nextpnr-himbaechel + gowin_pack), Linux/WSL, built
+#   the full CPU on 12-JUL-2026 but no longer places it: with the storage
+#   stack in, synthesis needs 22254-22626 LUT4 of 20736 (107-109%, measured
+#   28-SEP-2026 with the CI's oss-cad-suite). `make check` (netlist gates)
+#   still runs on it, in CI too. See README.md "Two build flows".
 #
 # Both flows compile the SAME ordered file list (nd120_tang20k.gprj) with the
 # SAME defines file first (src/tang20k_defines.v) - one source of truth.
