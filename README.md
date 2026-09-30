@@ -321,6 +321,7 @@ checkouts.
 | Topic | Documentation |
 |-------|---------------|
 | **FPGA boards** | [Verilog/fpga/README.md](Verilog/fpga/README.md) |
+| **Verilog modules** | [Verilog/MODULES.md](Verilog/MODULES.md) - one page per module: description, ports and symbol |
 | **Build options** | [Verilog/docs/build-defines.md](Verilog/docs/build-defines.md) |
 | **Design notes** | [Verilog/docs/README.md](Verilog/docs/README.md) |
 | **Design documents** | [DesignDocuments/Readme.md](DesignDocuments/Readme.md) |
