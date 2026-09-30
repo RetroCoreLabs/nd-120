@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1305.0" height="2216.0" viewBox="-80.0 -80.0 1305.0 2216.0"><style>svg {
+<svg xmlns="http://www.w3.org/2000/svg" width="1265.0" height="2234.0" viewBox="-80.0 -80.0 1265.0 2234.0"><style>svg {
     stroke:#000;
     fill:none;
   }
@@ -22,568 +22,472 @@
 a:hover rect { fill: #e3f2fd; }
 a { cursor: pointer; }
 </style>
-<rect x="-80.0" y="-80.0" width="1305.0" height="2216.0" fill="#ffffff" /><g transform="translate(113,1959)" id="cell_$not$CGA_MIC_CONDREG.v:84$10470"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_CONDREG.v:84$10470" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_CONDREG.v:84$10470" /><g /><g /></g>
-<g transform="translate(827.5,1368.5)" id="cell_$not$CGA_MIC_CONDREG.v:87$10471"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_CONDREG.v:87$10471" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_CONDREG.v:87$10471" /><g /><g /></g>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT0 (SCAN_FF_EN) - open its page</title><g transform="translate(827.3333333333334,22)" id="cell_CSBIT0"><text x="15" y="-4" class="nodelabel cell_CSBIT0">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT0" /><g transform="translate(0,10)" id="port_CSBIT0~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT0~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">D</text></g><g transform="translate(0,50)" id="port_CSBIT0~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">EN</text></g><g transform="translate(0,70)" id="port_CSBIT0~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">TE</text></g><g transform="translate(0,90)" id="port_CSBIT0~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">TI</text></g><g transform="translate(0,110)" id="port_CSBIT0~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT0~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT0">Q</text></g><g transform="translate(30,30)" id="port_CSBIT0~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT0">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT1 (SCAN_FF_EN) - open its page</title><g transform="translate(827.3333333333334,328)" id="cell_CSBIT1"><text x="15" y="-4" class="nodelabel cell_CSBIT1">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT1" /><g transform="translate(0,10)" id="port_CSBIT1~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT1~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">D</text></g><g transform="translate(0,50)" id="port_CSBIT1~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">EN</text></g><g transform="translate(0,70)" id="port_CSBIT1~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">TE</text></g><g transform="translate(0,90)" id="port_CSBIT1~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">TI</text></g><g transform="translate(0,110)" id="port_CSBIT1~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT1~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT1">Q</text></g><g transform="translate(30,30)" id="port_CSBIT1~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT1">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT10 (SCAN_FF_EN) - open its page</title><g transform="translate(827.3333333333334,645)" id="cell_CSBIT10"><text x="15" y="-4" class="nodelabel cell_CSBIT10">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT10" /><g transform="translate(0,10)" id="port_CSBIT10~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT10~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">D</text></g><g transform="translate(0,50)" id="port_CSBIT10~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">EN</text></g><g transform="translate(0,70)" id="port_CSBIT10~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">TE</text></g><g transform="translate(0,90)" id="port_CSBIT10~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">TI</text></g><g transform="translate(0,110)" id="port_CSBIT10~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT10~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT10">Q</text></g><g transform="translate(30,30)" id="port_CSBIT10~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT10">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT11 (SCAN_FF_EN) - open its page</title><g transform="translate(827.3333333333334,1006)" id="cell_CSBIT11"><text x="15" y="-4" class="nodelabel cell_CSBIT11">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT11" /><g transform="translate(0,10)" id="port_CSBIT11~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT11~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">D</text></g><g transform="translate(0,50)" id="port_CSBIT11~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">EN</text></g><g transform="translate(0,70)" id="port_CSBIT11~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">TE</text></g><g transform="translate(0,90)" id="port_CSBIT11~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">TI</text></g><g transform="translate(0,110)" id="port_CSBIT11~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT11~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT11">Q</text></g><g transform="translate(30,30)" id="port_CSBIT11~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT11">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT2 (SCAN_FF_EN) - open its page</title><g transform="translate(827.3333333333334,175)" id="cell_CSBIT2"><text x="15" y="-4" class="nodelabel cell_CSBIT2">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT2" /><g transform="translate(0,10)" id="port_CSBIT2~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT2~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">D</text></g><g transform="translate(0,50)" id="port_CSBIT2~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">EN</text></g><g transform="translate(0,70)" id="port_CSBIT2~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">TE</text></g><g transform="translate(0,90)" id="port_CSBIT2~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">TI</text></g><g transform="translate(0,110)" id="port_CSBIT2~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT2~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT2">Q</text></g><g transform="translate(30,30)" id="port_CSBIT2~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT2">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT3 (SCAN_FF_EN) - open its page</title><g transform="translate(827.3333333333334,1214)" id="cell_CSBIT3"><text x="15" y="-4" class="nodelabel cell_CSBIT3">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT3" /><g transform="translate(0,10)" id="port_CSBIT3~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT3~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">D</text></g><g transform="translate(0,50)" id="port_CSBIT3~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">EN</text></g><g transform="translate(0,70)" id="port_CSBIT3~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">TE</text></g><g transform="translate(0,90)" id="port_CSBIT3~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">TI</text></g><g transform="translate(0,110)" id="port_CSBIT3~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT3~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT3">Q</text></g><g transform="translate(30,30)" id="port_CSBIT3~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT3">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT4 (SCAN_FF_EN) - open its page</title><g transform="translate(356,880.5)" id="cell_CSBIT4"><text x="15" y="-4" class="nodelabel cell_CSBIT4">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT4" /><g transform="translate(0,10)" id="port_CSBIT4~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT4~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">D</text></g><g transform="translate(0,50)" id="port_CSBIT4~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">EN</text></g><g transform="translate(0,70)" id="port_CSBIT4~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">TE</text></g><g transform="translate(0,90)" id="port_CSBIT4~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">TI</text></g><g transform="translate(0,110)" id="port_CSBIT4~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT4~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT4">Q</text></g><g transform="translate(30,30)" id="port_CSBIT4~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT4">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT5 (SCAN_FF_EN) - open its page</title><g transform="translate(356,1077.5)" id="cell_CSBIT5"><text x="15" y="-4" class="nodelabel cell_CSBIT5">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT5" /><g transform="translate(0,10)" id="port_CSBIT5~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT5~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">D</text></g><g transform="translate(0,50)" id="port_CSBIT5~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">EN</text></g><g transform="translate(0,70)" id="port_CSBIT5~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">TE</text></g><g transform="translate(0,90)" id="port_CSBIT5~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">TI</text></g><g transform="translate(0,110)" id="port_CSBIT5~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT5~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT5">Q</text></g><g transform="translate(30,30)" id="port_CSBIT5~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT5">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT6 (SCAN_FF_EN) - open its page</title><g transform="translate(356,1521)" id="cell_CSBIT6"><text x="15" y="-4" class="nodelabel cell_CSBIT6">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT6" /><g transform="translate(0,10)" id="port_CSBIT6~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT6~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">D</text></g><g transform="translate(0,50)" id="port_CSBIT6~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">EN</text></g><g transform="translate(0,70)" id="port_CSBIT6~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">TE</text></g><g transform="translate(0,90)" id="port_CSBIT6~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">TI</text></g><g transform="translate(0,110)" id="port_CSBIT6~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT6~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT6">Q</text></g><g transform="translate(30,30)" id="port_CSBIT6~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT6">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT7 (SCAN_FF_EN) - open its page</title><g transform="translate(682.25,1620)" id="cell_CSBIT7"><text x="15" y="-4" class="nodelabel cell_CSBIT7">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT7" /><g transform="translate(0,10)" id="port_CSBIT7~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT7~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">D</text></g><g transform="translate(0,50)" id="port_CSBIT7~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">EN</text></g><g transform="translate(0,70)" id="port_CSBIT7~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">TE</text></g><g transform="translate(0,90)" id="port_CSBIT7~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">TI</text></g><g transform="translate(0,110)" id="port_CSBIT7~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT7~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT7">Q</text></g><g transform="translate(30,30)" id="port_CSBIT7~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT7">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT8 (SCAN_FF_EN) - open its page</title><g transform="translate(827.3333333333334,798)" id="cell_CSBIT8"><text x="15" y="-4" class="nodelabel cell_CSBIT8">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT8" /><g transform="translate(0,10)" id="port_CSBIT8~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT8~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">D</text></g><g transform="translate(0,50)" id="port_CSBIT8~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">EN</text></g><g transform="translate(0,70)" id="port_CSBIT8~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">TE</text></g><g transform="translate(0,90)" id="port_CSBIT8~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">TI</text></g><g transform="translate(0,110)" id="port_CSBIT8~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT8~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT8">Q</text></g><g transform="translate(30,30)" id="port_CSBIT8~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT8">QN</text></g></g></a>
-<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT9 (SCAN_FF_EN) - open its page</title><g transform="translate(827.3333333333334,492)" id="cell_CSBIT9"><text x="15" y="-4" class="nodelabel cell_CSBIT9">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT9" /><g transform="translate(0,10)" id="port_CSBIT9~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT9~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">D</text></g><g transform="translate(0,50)" id="port_CSBIT9~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">EN</text></g><g transform="translate(0,70)" id="port_CSBIT9~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">TE</text></g><g transform="translate(0,90)" id="port_CSBIT9~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">TI</text></g><g transform="translate(0,110)" id="port_CSBIT9~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT9~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT9">Q</text></g><g transform="translate(30,30)" id="port_CSBIT9~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT9">QN</text></g></g></a>
-<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_1 (NAND_GATE) - open its page</title><g transform="translate(827,1620)" id="cell_GATES_1"><text x="15" y="-4" class="nodelabel cell_GATES_1">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_1" /><g transform="translate(0,10)" id="port_GATES_1~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input1</text></g><g transform="translate(0,30)" id="port_GATES_1~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input2</text></g><g transform="translate(30,10)" id="port_GATES_1~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_1">result</text></g></g></a>
-<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_2 (AND_GATE) - open its page</title><g transform="translate(497,1773)" id="cell_GATES_2"><text x="15" y="-4" class="nodelabel cell_GATES_2">AND_GATE</text><rect width="30" height="40" class="cell_GATES_2" /><g transform="translate(0,10)" id="port_GATES_2~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input1</text></g><g transform="translate(0,30)" id="port_GATES_2~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input2</text></g><g transform="translate(30,10)" id="port_GATES_2~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_2">result</text></g></g></a>
-<a href="../../../../Shared/logisim/doc/XNOR_GATE_ONEHOT.md"><title>GATES_3 (XNOR_GATE_ONEHOT) - open its page</title><g transform="translate(682,1773)" id="cell_GATES_3"><text x="15" y="-4" class="nodelabel cell_GATES_3">XNOR_GATE_ONEHOT</text><rect width="30" height="40" class="cell_GATES_3" /><g transform="translate(0,10)" id="port_GATES_3~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input1</text></g><g transform="translate(0,30)" id="port_GATES_3~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input2</text></g><g transform="translate(30,10)" id="port_GATES_3~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_3">result</text></g></g></a>
-<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_4 (NAND_GATE) - open its page</title><g transform="translate(827,1841)" id="cell_GATES_4"><text x="15" y="-4" class="nodelabel cell_GATES_4">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_4" /><g transform="translate(0,10)" id="port_GATES_4~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input1</text></g><g transform="translate(0,30)" id="port_GATES_4~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input2</text></g><g transform="translate(30,10)" id="port_GATES_4~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_4">result</text></g></g></a>
-<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_5 (NAND_GATE) - open its page</title><g transform="translate(982,1841)" id="cell_GATES_5"><text x="15" y="-4" class="nodelabel cell_GATES_5">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_5" /><g transform="translate(0,10)" id="port_GATES_5~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input1</text></g><g transform="translate(0,30)" id="port_GATES_5~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input2</text></g><g transform="translate(30,10)" id="port_GATES_5~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_5">result</text></g></g></a>
-<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_6 (AND_GATE) - open its page</title><g transform="translate(497,1861)" id="cell_GATES_6"><text x="15" y="-4" class="nodelabel cell_GATES_6">AND_GATE</text><rect width="30" height="40" class="cell_GATES_6" /><g transform="translate(0,10)" id="port_GATES_6~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_6">input1</text></g><g transform="translate(0,30)" id="port_GATES_6~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_6">input2</text></g><g transform="translate(30,10)" id="port_GATES_6~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_6">result</text></g></g></a>
-<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_7 (NAND_GATE) - open its page</title><g transform="translate(682,1861)" id="cell_GATES_7"><text x="15" y="-4" class="nodelabel cell_GATES_7">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_7" /><g transform="translate(0,10)" id="port_GATES_7~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_7">input1</text></g><g transform="translate(0,30)" id="port_GATES_7~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_7">input2</text></g><g transform="translate(30,10)" id="port_GATES_7~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_7">result</text></g></g></a>
-<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_8 (NAND_GATE) - open its page</title><g transform="translate(497,1685)" id="cell_GATES_8"><text x="15" y="-4" class="nodelabel cell_GATES_8">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_8" /><g transform="translate(0,10)" id="port_GATES_8~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_8">input1</text></g><g transform="translate(0,30)" id="port_GATES_8~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_8">input2</text></g><g transform="translate(30,10)" id="port_GATES_8~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_8">result</text></g></g></a>
-<g transform="translate(107,2024)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
-<g transform="translate(107,1904)" id="cell_MCLK_EN"><text x="15" y="-4" class="nodelabel cell_MCLK_EN">MCLK_EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MCLK_EN" /><g /></g>
-<g transform="translate(12,1451.5)" id="cell_CSBIT_11_0"><text x="15" y="-4" class="nodelabel cell_CSBIT_11_0">CSBIT_11_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CSBIT_11_0" /><g /></g>
-<g transform="translate(12,1959)" id="cell_CSSCOND"><text x="15" y="-4" class="nodelabel cell_CSSCOND">CSSCOND</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CSSCOND" /><g /></g>
-<g transform="translate(356,1861.5)" id="cell_LCSN"><text x="15" y="-4" class="nodelabel cell_LCSN">LCSN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LCSN" /><g /></g>
-<g transform="translate(107,1421.5)" id="cell_MCLK"><text x="15" y="-4" class="nodelabel cell_MCLK">MCLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MCLK" /><g /></g>
-<g transform="translate(1085,1841.5)" id="cell_ACONDN"><text x="15" y="-4" class="nodelabel cell_ACONDN">ACONDN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_ACONDN" /><g /></g>
-<g transform="translate(1085,145.5)" id="cell_FS_6_3"><text x="15" y="-4" class="nodelabel cell_FS_6_3">FS_6_3</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FS_6_3" /><g /></g>
-<g transform="translate(1085,615.5)" id="cell_LCC_3_0"><text x="15" y="-4" class="nodelabel cell_LCC_3_0">LCC_3_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_LCC_3_0" /><g /></g>
-<g transform="translate(1085,1378.5)" id="cell_TSEL_3_0"><text x="15" y="-4" class="nodelabel cell_TSEL_3_0">TSEL_3_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_TSEL_3_0" /><g /></g>
-<g transform="translate(988.75,135)" id="cell_$join$,20,21,22,23,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
-<g transform="translate(988.75,605)" id="cell_$join$,24,25,26,27,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
-<g transform="translate(988.75,1368)" id="cell_$join$,28,29,30,31,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
-<g transform="translate(132,1473.5)" id="cell_$split$,4,5,6,7,8,9,10,11,12,13,14,15,"><rect width="5" height="240" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g><g transform="translate(4,30)"><text x="5" y="-4">1</text></g><g transform="translate(4,50)"><text x="5" y="-4">10</text></g><g transform="translate(4,70)"><text x="5" y="-4">11</text></g><g transform="translate(4,90)"><text x="5" y="-4">2</text></g><g transform="translate(4,110)"><text x="5" y="-4">3</text></g><g transform="translate(4,130)"><text x="5" y="-4">4</text></g><g transform="translate(4,150)"><text x="5" y="-4">5</text></g><g transform="translate(4,170)"><text x="5" y="-4">6</text></g><g transform="translate(4,190)"><text x="5" y="-4">7</text></g><g transform="translate(4,210)"><text x="5" y="-4">8</text></g><g transform="translate(4,230)"><text x="5" y="-4">9</text></g></g>
-<line x1="40" x2="113" y1="1969" y2="1969" class="net_16"><title>CSSCOND</title></line>
-<line x1="528" x2="575" y1="1695.5" y2="1695.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
-<line x1="575" x2="575" y1="1695.5" y2="1378.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
-<circle cx="575" cy="1695.5" r="2" style="fill:#000" class="net_33" />
-<line x1="575" x2="827.5" y1="1378.5" y2="1378.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
-<line x1="528" x2="575" y1="1695.5" y2="1695.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
-<line x1="575" x2="575" y1="1695.5" y2="1891.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
-<line x1="575" x2="682" y1="1891.5" y2="1891.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="50.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="760" y1="50.5" y2="50.5" class="net_18"><title>MCLK</title></line>
-<line x1="760" x2="760" y1="50.5" y2="32.5" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="1431.5" r="2" style="fill:#000" class="net_18" />
-<line x1="760" x2="827.3333333333334" y1="32.5" y2="32.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="356.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="780" y1="356.5" y2="356.5" class="net_18"><title>MCLK</title></line>
-<line x1="780" x2="780" y1="356.5" y2="338.5" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="356.5" r="2" style="fill:#000" class="net_18" />
-<line x1="780" x2="827.3333333333334" y1="338.5" y2="338.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="673.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="780" y1="673.5" y2="673.5" class="net_18"><title>MCLK</title></line>
-<line x1="780" x2="780" y1="673.5" y2="655.5" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="673.5" r="2" style="fill:#000" class="net_18" />
-<line x1="780" x2="827.3333333333334" y1="655.5" y2="655.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="1034.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="770" y1="1034.5" y2="1034.5" class="net_18"><title>MCLK</title></line>
-<line x1="770" x2="770" y1="1034.5" y2="1016.5" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="1034.5" r="2" style="fill:#000" class="net_18" />
-<line x1="770" x2="827.3333333333334" y1="1016.5" y2="1016.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="203.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="780" y1="203.5" y2="203.5" class="net_18"><title>MCLK</title></line>
-<line x1="780" x2="780" y1="203.5" y2="185.5" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="203.5" r="2" style="fill:#000" class="net_18" />
-<line x1="780" x2="827.3333333333334" y1="185.5" y2="185.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="1242.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="780" y1="1242.5" y2="1242.5" class="net_18"><title>MCLK</title></line>
-<line x1="780" x2="780" y1="1242.5" y2="1224.5" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="1242.5" r="2" style="fill:#000" class="net_18" />
-<line x1="780" x2="827.3333333333334" y1="1224.5" y2="1224.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="891" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="891" r="2" style="fill:#000" class="net_18" />
-<line x1="299" x2="356" y1="891" y2="891" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="1088" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="1088" r="2" style="fill:#000" class="net_18" />
-<line x1="299" x2="356" y1="1088" y2="1088" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="1531.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="356" y1="1531.5" y2="1531.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="605" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="605" x2="605" y1="1431.5" y2="1630.5" class="net_18"><title>MCLK</title></line>
-<line x1="605" x2="682.25" y1="1630.5" y2="1630.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="826.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="780" y1="826.5" y2="826.5" class="net_18"><title>MCLK</title></line>
-<line x1="780" x2="780" y1="826.5" y2="808.5" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="826.5" r="2" style="fill:#000" class="net_18" />
-<line x1="780" x2="827.3333333333334" y1="808.5" y2="808.5" class="net_18"><title>MCLK</title></line>
-<line x1="135" x2="299" y1="1431.5" y2="1431.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="299" y1="1431.5" y2="520.5" class="net_18"><title>MCLK</title></line>
-<line x1="299" x2="760" y1="520.5" y2="520.5" class="net_18"><title>MCLK</title></line>
-<line x1="760" x2="760" y1="520.5" y2="502.5" class="net_18"><title>MCLK</title></line>
-<circle cx="299" cy="520.5" r="2" style="fill:#000" class="net_18" />
-<line x1="760" x2="827.3333333333334" y1="502.5" y2="502.5" class="net_18"><title>MCLK</title></line>
-<line x1="136.5" x2="136.5" y1="1483.5" y2="1451.5" class="net_4"><title>CSBIT_11_0[0]</title></line>
-<line x1="136.5" x2="159" y1="1451.5" y2="1451.5" class="net_4"><title>CSBIT_11_0[0]</title></line>
-<line x1="159" x2="159" y1="1451.5" y2="61.5" class="net_4"><title>CSBIT_11_0[0]</title></line>
-<line x1="159" x2="760" y1="61.5" y2="61.5" class="net_4"><title>CSBIT_11_0[0]</title></line>
-<line x1="760" x2="760" y1="61.5" y2="52.5" class="net_4"><title>CSBIT_11_0[0]</title></line>
-<line x1="760" x2="827.3333333333334" y1="52.5" y2="52.5" class="net_4"><title>CSBIT_11_0[0]</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="72.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="1914" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="827.3333333333334" y1="72.5" y2="72.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="378.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="378.5" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="827.3333333333334" y1="378.5" y2="378.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="695.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="695.5" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="827.3333333333334" y1="695.5" y2="695.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="1056.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="1056.5" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="827.3333333333334" y1="1056.5" y2="1056.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="225.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="225.5" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="827.3333333333334" y1="225.5" y2="225.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="1264.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="1264.5" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="827.3333333333334" y1="1264.5" y2="1264.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="931" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="931" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="356" y1="931" y2="931" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="1128" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="1128" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="356" y1="1128" y2="1128" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="1571.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="1571.5" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="356" y1="1571.5" y2="1571.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="605" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="605" x2="605" y1="1914" y2="1670.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="605" x2="682.25" y1="1670.5" y2="1670.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="848.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="848.5" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="827.3333333333334" y1="848.5" y2="848.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="135" x2="269" y1="1914" y2="1914" class="net_3"><title>MCLK_EN</title></line>
-<line x1="269" x2="269" y1="1914" y2="542.5" class="net_3"><title>MCLK_EN</title></line>
-<circle cx="269" cy="542.5" r="2" style="fill:#000" class="net_3" />
-<line x1="269" x2="827.3333333333334" y1="542.5" y2="542.5" class="net_3"><title>MCLK_EN</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="181.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="760" y1="181.5" y2="181.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="760" x2="760" y1="181.5" y2="92.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="1969" r="2" style="fill:#000" class="net_32" />
-<line x1="760" x2="827.3333333333334" y1="92.5" y2="92.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="449" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="760" y1="449" y2="449" class="net_32"><title>s_cscond_n</title></line>
-<line x1="760" x2="760" y1="449" y2="398.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="449" r="2" style="fill:#000" class="net_32" />
-<line x1="760" x2="827.3333333333334" y1="398.5" y2="398.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="804.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="760" y1="804.5" y2="804.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="760" x2="760" y1="804.5" y2="715.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="804.5" r="2" style="fill:#000" class="net_32" />
-<line x1="760" x2="827.3333333333334" y1="715.5" y2="715.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="1220.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="760" y1="1220.5" y2="1220.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="760" x2="760" y1="1220.5" y2="1076.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="1220.5" r="2" style="fill:#000" class="net_32" />
-<line x1="760" x2="827.3333333333334" y1="1076.5" y2="1076.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="334.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="760" y1="334.5" y2="334.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="760" x2="760" y1="334.5" y2="245.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="334.5" r="2" style="fill:#000" class="net_32" />
-<line x1="760" x2="827.3333333333334" y1="245.5" y2="245.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="1335" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="760" y1="1335" y2="1335" class="net_32"><title>s_cscond_n</title></line>
-<line x1="760" x2="760" y1="1335" y2="1284.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="1335" r="2" style="fill:#000" class="net_32" />
-<line x1="760" x2="827.3333333333334" y1="1284.5" y2="1284.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="951" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="951" r="2" style="fill:#000" class="net_32" />
-<line x1="279" x2="356" y1="951" y2="951" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="1148" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="1148" r="2" style="fill:#000" class="net_32" />
-<line x1="279" x2="356" y1="1148" y2="1148" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="1591.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="1591.5" r="2" style="fill:#000" class="net_32" />
-<line x1="279" x2="356" y1="1591.5" y2="1591.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="615" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="615" x2="615" y1="1969" y2="1690.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="615" x2="682.25" y1="1690.5" y2="1690.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="859.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="760" y1="859.5" y2="859.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="760" x2="760" y1="859.5" y2="868.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="859.5" r="2" style="fill:#000" class="net_32" />
-<line x1="760" x2="827.3333333333334" y1="868.5" y2="868.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="138" x2="279" y1="1969" y2="1969" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="279" y1="1969" y2="651.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="279" x2="760" y1="651.5" y2="651.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="760" x2="760" y1="651.5" y2="562.5" class="net_32"><title>s_cscond_n</title></line>
-<circle cx="279" cy="651.5" r="2" style="fill:#000" class="net_32" />
-<line x1="760" x2="827.3333333333334" y1="562.5" y2="562.5" class="net_32"><title>s_cscond_n</title></line>
-<line x1="858.3333333333334" x2="905" y1="32.5" y2="32.5" class="net_20"><title>FS_6_3[0]</title></line>
-<line x1="905" x2="905" y1="32.5" y2="155" class="net_20"><title>FS_6_3[0]</title></line>
-<line x1="905" x2="780" y1="155" y2="155" class="net_20"><title>FS_6_3[0]</title></line>
-<line x1="780" x2="780" y1="155" y2="112.5" class="net_20"><title>FS_6_3[0]</title></line>
-<line x1="780" x2="827.3333333333334" y1="112.5" y2="112.5" class="net_20"><title>FS_6_3[0]</title></line>
-<line x1="858.3333333333334" x2="905" y1="32.5" y2="32.5" class="net_20"><title>FS_6_3[0]</title></line>
-<line x1="905" x2="905" y1="32.5" y2="145.5" class="net_20"><title>FS_6_3[0]</title></line>
-<circle cx="905" cy="145.5" r="2" style="fill:#000" class="net_20" />
-<line x1="905" x2="988.75" y1="145.5" y2="145.5" class="net_20"><title>FS_6_3[0]</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="192.5" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="770" y1="192.5" y2="192.5" class="net_2"><title>sysclk</title></line>
-<line x1="770" x2="770" y1="192.5" y2="132.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="2034" r="2" style="fill:#000" class="net_2" />
-<line x1="770" x2="827.3333333333334" y1="132.5" y2="132.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="460" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="770" y1="460" y2="460" class="net_2"><title>sysclk</title></line>
-<line x1="770" x2="770" y1="460" y2="438.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="460" r="2" style="fill:#000" class="net_2" />
-<line x1="770" x2="827.3333333333334" y1="438.5" y2="438.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="815.5" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="770" y1="815.5" y2="815.5" class="net_2"><title>sysclk</title></line>
-<line x1="770" x2="770" y1="815.5" y2="755.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="815.5" r="2" style="fill:#000" class="net_2" />
-<line x1="770" x2="827.3333333333334" y1="755.5" y2="755.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="1231.5" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="770" y1="1231.5" y2="1231.5" class="net_2"><title>sysclk</title></line>
-<line x1="770" x2="770" y1="1231.5" y2="1116.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="1231.5" r="2" style="fill:#000" class="net_2" />
-<line x1="770" x2="827.3333333333334" y1="1116.5" y2="1116.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="345.5" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="770" y1="345.5" y2="345.5" class="net_2"><title>sysclk</title></line>
-<line x1="770" x2="770" y1="345.5" y2="285.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="345.5" r="2" style="fill:#000" class="net_2" />
-<line x1="770" x2="827.3333333333334" y1="285.5" y2="285.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="1346" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="770" y1="1346" y2="1346" class="net_2"><title>sysclk</title></line>
-<line x1="770" x2="770" y1="1346" y2="1324.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="1346" r="2" style="fill:#000" class="net_2" />
-<line x1="770" x2="827.3333333333334" y1="1324.5" y2="1324.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="991" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="991" r="2" style="fill:#000" class="net_2" />
-<line x1="289" x2="356" y1="991" y2="991" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="1188" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="1188" r="2" style="fill:#000" class="net_2" />
-<line x1="289" x2="356" y1="1188" y2="1188" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="1631.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="1631.5" r="2" style="fill:#000" class="net_2" />
-<line x1="289" x2="356" y1="1631.5" y2="1631.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="635" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="635" x2="635" y1="2034" y2="1730.5" class="net_2"><title>sysclk</title></line>
-<line x1="635" x2="682.25" y1="1730.5" y2="1730.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="1023.5" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="760" y1="1023.5" y2="1023.5" class="net_2"><title>sysclk</title></line>
-<line x1="760" x2="760" y1="1023.5" y2="908.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="1023.5" r="2" style="fill:#000" class="net_2" />
-<line x1="760" x2="827.3333333333334" y1="908.5" y2="908.5" class="net_2"><title>sysclk</title></line>
-<line x1="135" x2="289" y1="2034" y2="2034" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="289" y1="2034" y2="662.5" class="net_2"><title>sysclk</title></line>
-<line x1="289" x2="770" y1="662.5" y2="662.5" class="net_2"><title>sysclk</title></line>
-<line x1="770" x2="770" y1="662.5" y2="602.5" class="net_2"><title>sysclk</title></line>
-<circle cx="289" cy="662.5" r="2" style="fill:#000" class="net_2" />
-<line x1="770" x2="827.3333333333334" y1="602.5" y2="602.5" class="net_2"><title>sysclk</title></line>
-<line x1="137" x2="169" y1="1504" y2="1504" class="net_5"><title>CSBIT_11_0[1]</title></line>
-<line x1="169" x2="169" y1="1504" y2="367.5" class="net_5"><title>CSBIT_11_0[1]</title></line>
-<line x1="169" x2="760" y1="367.5" y2="367.5" class="net_5"><title>CSBIT_11_0[1]</title></line>
-<line x1="760" x2="760" y1="367.5" y2="358.5" class="net_5"><title>CSBIT_11_0[1]</title></line>
-<line x1="760" x2="827.3333333333334" y1="358.5" y2="358.5" class="net_5"><title>CSBIT_11_0[1]</title></line>
-<line x1="858.3333333333334" x2="925" y1="338.5" y2="338.5" class="net_21"><title>FS_6_3[1]</title></line>
-<line x1="925" x2="925" y1="338.5" y2="461" class="net_21"><title>FS_6_3[1]</title></line>
-<line x1="925" x2="780" y1="461" y2="461" class="net_21"><title>FS_6_3[1]</title></line>
-<line x1="780" x2="780" y1="461" y2="418.5" class="net_21"><title>FS_6_3[1]</title></line>
-<line x1="780" x2="827.3333333333334" y1="418.5" y2="418.5" class="net_21"><title>FS_6_3[1]</title></line>
-<line x1="858.3333333333334" x2="925" y1="338.5" y2="338.5" class="net_21"><title>FS_6_3[1]</title></line>
-<line x1="925" x2="925" y1="338.5" y2="165.5" class="net_21"><title>FS_6_3[1]</title></line>
-<circle cx="925" cy="338.5" r="2" style="fill:#000" class="net_21" />
-<line x1="925" x2="988.75" y1="165.5" y2="165.5" class="net_21"><title>FS_6_3[1]</title></line>
-<line x1="137" x2="189" y1="1524" y2="1524" class="net_14"><title>CSBIT_11_0[10]</title></line>
-<line x1="189" x2="189" y1="1524" y2="684.5" class="net_14"><title>CSBIT_11_0[10]</title></line>
-<line x1="189" x2="760" y1="684.5" y2="684.5" class="net_14"><title>CSBIT_11_0[10]</title></line>
-<line x1="760" x2="760" y1="684.5" y2="675.5" class="net_14"><title>CSBIT_11_0[10]</title></line>
-<line x1="760" x2="827.3333333333334" y1="675.5" y2="675.5" class="net_14"><title>CSBIT_11_0[10]</title></line>
-<line x1="858.3333333333334" x2="905" y1="655.5" y2="655.5" class="net_26"><title>LCC_3_0[2]</title></line>
-<line x1="905" x2="905" y1="655.5" y2="778" class="net_26"><title>LCC_3_0[2]</title></line>
-<line x1="905" x2="780" y1="778" y2="778" class="net_26"><title>LCC_3_0[2]</title></line>
-<line x1="780" x2="780" y1="778" y2="735.5" class="net_26"><title>LCC_3_0[2]</title></line>
-<circle cx="905" cy="655.5" r="2" style="fill:#000" class="net_26" />
-<line x1="780" x2="827.3333333333334" y1="735.5" y2="735.5" class="net_26"><title>LCC_3_0[2]</title></line>
-<line x1="858.3333333333334" x2="988.75" y1="655.5" y2="655.5" class="net_26"><title>LCC_3_0[2]</title></line>
-<line x1="137" x2="209" y1="1544" y2="1544" class="net_15"><title>CSBIT_11_0[11]</title></line>
-<line x1="209" x2="209" y1="1544" y2="1045.5" class="net_15"><title>CSBIT_11_0[11]</title></line>
-<line x1="209" x2="760" y1="1045.5" y2="1045.5" class="net_15"><title>CSBIT_11_0[11]</title></line>
-<line x1="760" x2="760" y1="1045.5" y2="1036.5" class="net_15"><title>CSBIT_11_0[11]</title></line>
-<line x1="760" x2="827.3333333333334" y1="1036.5" y2="1036.5" class="net_15"><title>CSBIT_11_0[11]</title></line>
-<line x1="858.3333333333334" x2="925" y1="1016.5" y2="1016.5" class="net_27"><title>LCC_3_0[3]</title></line>
-<line x1="925" x2="925" y1="1016.5" y2="1139" class="net_27"><title>LCC_3_0[3]</title></line>
-<line x1="925" x2="780" y1="1139" y2="1139" class="net_27"><title>LCC_3_0[3]</title></line>
-<line x1="780" x2="780" y1="1139" y2="1096.5" class="net_27"><title>LCC_3_0[3]</title></line>
-<circle cx="925" cy="1016.5" r="2" style="fill:#000" class="net_27" />
-<line x1="780" x2="827.3333333333334" y1="1096.5" y2="1096.5" class="net_27"><title>LCC_3_0[3]</title></line>
-<line x1="858.3333333333334" x2="989.25" y1="1016.5" y2="1016.5" class="net_27"><title>LCC_3_0[3]</title></line>
-<line x1="989.25" x2="989.25" y1="1016.5" y2="676" class="net_27"><title>LCC_3_0[3]</title></line>
-<line x1="137" x2="179" y1="1564" y2="1564" class="net_6"><title>CSBIT_11_0[2]</title></line>
-<line x1="179" x2="179" y1="1564" y2="214.5" class="net_6"><title>CSBIT_11_0[2]</title></line>
-<line x1="179" x2="760" y1="214.5" y2="214.5" class="net_6"><title>CSBIT_11_0[2]</title></line>
-<line x1="760" x2="760" y1="214.5" y2="205.5" class="net_6"><title>CSBIT_11_0[2]</title></line>
-<line x1="760" x2="827.3333333333334" y1="205.5" y2="205.5" class="net_6"><title>CSBIT_11_0[2]</title></line>
-<line x1="858.3333333333334" x2="905" y1="185.5" y2="185.5" class="net_22"><title>FS_6_3[2]</title></line>
-<line x1="905" x2="905" y1="185.5" y2="308" class="net_22"><title>FS_6_3[2]</title></line>
-<line x1="905" x2="780" y1="308" y2="308" class="net_22"><title>FS_6_3[2]</title></line>
-<line x1="780" x2="780" y1="308" y2="265.5" class="net_22"><title>FS_6_3[2]</title></line>
-<circle cx="905" cy="185.5" r="2" style="fill:#000" class="net_22" />
-<line x1="780" x2="827.3333333333334" y1="265.5" y2="265.5" class="net_22"><title>FS_6_3[2]</title></line>
-<line x1="858.3333333333334" x2="988.75" y1="185.5" y2="185.5" class="net_22"><title>FS_6_3[2]</title></line>
-<line x1="137" x2="229" y1="1584" y2="1584" class="net_7"><title>CSBIT_11_0[3]</title></line>
-<line x1="229" x2="229" y1="1584" y2="1253.5" class="net_7"><title>CSBIT_11_0[3]</title></line>
-<line x1="229" x2="760" y1="1253.5" y2="1253.5" class="net_7"><title>CSBIT_11_0[3]</title></line>
-<line x1="760" x2="760" y1="1253.5" y2="1244.5" class="net_7"><title>CSBIT_11_0[3]</title></line>
-<line x1="760" x2="827.3333333333334" y1="1244.5" y2="1244.5" class="net_7"><title>CSBIT_11_0[3]</title></line>
-<line x1="858.3333333333334" x2="935" y1="1224.5" y2="1224.5" class="net_23"><title>FS_6_3[3]</title></line>
-<line x1="935" x2="935" y1="1224.5" y2="1347" class="net_23"><title>FS_6_3[3]</title></line>
-<line x1="935" x2="780" y1="1347" y2="1347" class="net_23"><title>FS_6_3[3]</title></line>
-<line x1="780" x2="780" y1="1347" y2="1304.5" class="net_23"><title>FS_6_3[3]</title></line>
-<line x1="780" x2="827.3333333333334" y1="1304.5" y2="1304.5" class="net_23"><title>FS_6_3[3]</title></line>
-<line x1="858.3333333333334" x2="935" y1="1224.5" y2="1224.5" class="net_23"><title>FS_6_3[3]</title></line>
-<line x1="935" x2="935" y1="1224.5" y2="595" class="net_23"><title>FS_6_3[3]</title></line>
-<line x1="935" x2="989.25" y1="595" y2="595" class="net_23"><title>FS_6_3[3]</title></line>
-<circle cx="935" cy="1224.5" r="2" style="fill:#000" class="net_23" />
-<line x1="989.25" x2="989.25" y1="595" y2="206" class="net_23"><title>FS_6_3[3]</title></line>
-<line x1="137" x2="199" y1="1604" y2="1604" class="net_8"><title>CSBIT_11_0[4]</title></line>
-<line x1="199" x2="199" y1="1604" y2="911" class="net_8"><title>CSBIT_11_0[4]</title></line>
-<line x1="199" x2="356" y1="911" y2="911" class="net_8"><title>CSBIT_11_0[4]</title></line>
-<line x1="387" x2="440" y1="891" y2="891" class="net_34"><title>s_csbit4_q</title></line>
-<line x1="440" x2="440" y1="891" y2="1013.5" class="net_34"><title>s_csbit4_q</title></line>
-<line x1="440" x2="309" y1="1013.5" y2="1013.5" class="net_34"><title>s_csbit4_q</title></line>
-<line x1="309" x2="309" y1="1013.5" y2="971" class="net_34"><title>s_csbit4_q</title></line>
-<circle cx="440" cy="1013.5" r="2" style="fill:#000" class="net_34" />
-<line x1="309" x2="356" y1="971" y2="971" class="net_34"><title>s_csbit4_q</title></line>
-<line x1="387" x2="440" y1="891" y2="891" class="net_34"><title>s_csbit4_q</title></line>
-<line x1="440" x2="440" y1="891" y2="1715.5" class="net_34"><title>s_csbit4_q</title></line>
-<line x1="440" x2="497" y1="1715.5" y2="1715.5" class="net_34"><title>s_csbit4_q</title></line>
-<line x1="137" x2="219" y1="1624" y2="1624" class="net_9"><title>CSBIT_11_0[5]</title></line>
-<line x1="219" x2="219" y1="1624" y2="1108" class="net_9"><title>CSBIT_11_0[5]</title></line>
-<line x1="219" x2="356" y1="1108" y2="1108" class="net_9"><title>CSBIT_11_0[5]</title></line>
-<line x1="387" x2="430" y1="1088" y2="1088" class="net_35"><title>s_csbit5_q</title></line>
-<line x1="430" x2="430" y1="1088" y2="1210.5" class="net_35"><title>s_csbit5_q</title></line>
-<line x1="430" x2="309" y1="1210.5" y2="1210.5" class="net_35"><title>s_csbit5_q</title></line>
-<line x1="309" x2="309" y1="1210.5" y2="1168" class="net_35"><title>s_csbit5_q</title></line>
-<circle cx="430" cy="1210.5" r="2" style="fill:#000" class="net_35" />
-<line x1="309" x2="356" y1="1168" y2="1168" class="net_35"><title>s_csbit5_q</title></line>
-<line x1="387" x2="430" y1="1088" y2="1088" class="net_35"><title>s_csbit5_q</title></line>
-<line x1="430" x2="430" y1="1088" y2="1891.5" class="net_35"><title>s_csbit5_q</title></line>
-<line x1="430" x2="497" y1="1891.5" y2="1891.5" class="net_35"><title>s_csbit5_q</title></line>
-<line x1="137" x2="259" y1="1644" y2="1644" class="net_10"><title>CSBIT_11_0[6]</title></line>
-<line x1="259" x2="259" y1="1644" y2="1551.5" class="net_10"><title>CSBIT_11_0[6]</title></line>
-<line x1="259" x2="356" y1="1551.5" y2="1551.5" class="net_10"><title>CSBIT_11_0[6]</title></line>
-<line x1="387" x2="410" y1="1531.5" y2="1531.5" class="net_36"><title>s_csbit6_q</title></line>
-<line x1="410" x2="410" y1="1531.5" y2="1654" class="net_36"><title>s_csbit6_q</title></line>
-<line x1="410" x2="309" y1="1654" y2="1654" class="net_36"><title>s_csbit6_q</title></line>
-<line x1="309" x2="309" y1="1654" y2="1611.5" class="net_36"><title>s_csbit6_q</title></line>
-<circle cx="410" cy="1654" r="2" style="fill:#000" class="net_36" />
-<line x1="309" x2="356" y1="1611.5" y2="1611.5" class="net_36"><title>s_csbit6_q</title></line>
-<line x1="387" x2="410" y1="1531.5" y2="1531.5" class="net_36"><title>s_csbit6_q</title></line>
-<line x1="410" x2="410" y1="1531.5" y2="1803.5" class="net_36"><title>s_csbit6_q</title></line>
-<line x1="410" x2="497" y1="1803.5" y2="1803.5" class="net_36"><title>s_csbit6_q</title></line>
-<line x1="137" x2="605" y1="1664" y2="1664" class="net_11"><title>CSBIT_11_0[7]</title></line>
-<line x1="605" x2="605" y1="1664" y2="1650.5" class="net_11"><title>CSBIT_11_0[7]</title></line>
-<line x1="605" x2="682.25" y1="1650.5" y2="1650.5" class="net_11"><title>CSBIT_11_0[7]</title></line>
-<line x1="713.25" x2="760" y1="1630.5" y2="1630.5" class="net_37"><title>s_csbit7_q</title></line>
-<line x1="760" x2="760" y1="1630.5" y2="1753" class="net_37"><title>s_csbit7_q</title></line>
-<line x1="760" x2="625" y1="1753" y2="1753" class="net_37"><title>s_csbit7_q</title></line>
-<line x1="625" x2="625" y1="1753" y2="1710.5" class="net_37"><title>s_csbit7_q</title></line>
-<line x1="625" x2="682.25" y1="1710.5" y2="1710.5" class="net_37"><title>s_csbit7_q</title></line>
-<line x1="137" x2="249" y1="1684" y2="1684" class="net_12"><title>CSBIT_11_0[8]</title></line>
-<line x1="249" x2="249" y1="1684" y2="837.5" class="net_12"><title>CSBIT_11_0[8]</title></line>
-<line x1="249" x2="760" y1="837.5" y2="837.5" class="net_12"><title>CSBIT_11_0[8]</title></line>
-<line x1="760" x2="760" y1="837.5" y2="828.5" class="net_12"><title>CSBIT_11_0[8]</title></line>
-<line x1="760" x2="827.3333333333334" y1="828.5" y2="828.5" class="net_12"><title>CSBIT_11_0[8]</title></line>
-<line x1="858.3333333333334" x2="925" y1="808.5" y2="808.5" class="net_24"><title>LCC_3_0[0]</title></line>
-<line x1="925" x2="925" y1="808.5" y2="931" class="net_24"><title>LCC_3_0[0]</title></line>
-<line x1="925" x2="780" y1="931" y2="931" class="net_24"><title>LCC_3_0[0]</title></line>
-<line x1="780" x2="780" y1="931" y2="888.5" class="net_24"><title>LCC_3_0[0]</title></line>
-<line x1="780" x2="827.3333333333334" y1="888.5" y2="888.5" class="net_24"><title>LCC_3_0[0]</title></line>
-<line x1="858.3333333333334" x2="925" y1="808.5" y2="808.5" class="net_24"><title>LCC_3_0[0]</title></line>
-<line x1="925" x2="925" y1="808.5" y2="615.5" class="net_24"><title>LCC_3_0[0]</title></line>
-<circle cx="925" cy="808.5" r="2" style="fill:#000" class="net_24" />
-<line x1="925" x2="988.75" y1="615.5" y2="615.5" class="net_24"><title>LCC_3_0[0]</title></line>
-<line x1="136.5" x2="136.5" y1="1704.5" y2="1884" class="net_13"><title>CSBIT_11_0[9]</title></line>
-<line x1="136.5" x2="239" y1="1884" y2="1884" class="net_13"><title>CSBIT_11_0[9]</title></line>
-<line x1="239" x2="239" y1="1884" y2="531.5" class="net_13"><title>CSBIT_11_0[9]</title></line>
-<line x1="239" x2="760" y1="531.5" y2="531.5" class="net_13"><title>CSBIT_11_0[9]</title></line>
-<line x1="760" x2="760" y1="531.5" y2="522.5" class="net_13"><title>CSBIT_11_0[9]</title></line>
-<line x1="760" x2="827.3333333333334" y1="522.5" y2="522.5" class="net_13"><title>CSBIT_11_0[9]</title></line>
-<line x1="858.3333333333334" x2="905" y1="502.5" y2="502.5" class="net_25"><title>LCC_3_0[1]</title></line>
-<line x1="905" x2="905" y1="502.5" y2="625" class="net_25"><title>LCC_3_0[1]</title></line>
-<line x1="905" x2="780" y1="625" y2="625" class="net_25"><title>LCC_3_0[1]</title></line>
-<line x1="780" x2="780" y1="625" y2="582.5" class="net_25"><title>LCC_3_0[1]</title></line>
-<circle cx="905" cy="625" r="2" style="fill:#000" class="net_25" />
-<line x1="780" x2="827.3333333333334" y1="582.5" y2="582.5" class="net_25"><title>LCC_3_0[1]</title></line>
-<line x1="858.3333333333334" x2="905" y1="502.5" y2="502.5" class="net_25"><title>LCC_3_0[1]</title></line>
-<line x1="905" x2="905" y1="502.5" y2="635.5" class="net_25"><title>LCC_3_0[1]</title></line>
-<line x1="905" x2="988.75" y1="635.5" y2="635.5" class="net_25"><title>LCC_3_0[1]</title></line>
-<line x1="384" x2="450" y1="1871.5" y2="1871.5" class="net_17"><title>LCSN</title></line>
-<line x1="450" x2="450" y1="1871.5" y2="1420.5" class="net_17"><title>LCSN</title></line>
-<line x1="450" x2="770" y1="1420.5" y2="1420.5" class="net_17"><title>LCSN</title></line>
-<line x1="770" x2="770" y1="1420.5" y2="1630.5" class="net_17"><title>LCSN</title></line>
-<circle cx="450" cy="1871.5" r="2" style="fill:#000" class="net_17" />
-<line x1="770" x2="827" y1="1630.5" y2="1630.5" class="net_17"><title>LCSN</title></line>
-<line x1="384" x2="450" y1="1871.5" y2="1871.5" class="net_17"><title>LCSN</title></line>
-<line x1="450" x2="450" y1="1871.5" y2="1783.5" class="net_17"><title>LCSN</title></line>
-<circle cx="450" cy="1783.5" r="2" style="fill:#000" class="net_17" />
-<line x1="450" x2="497" y1="1783.5" y2="1783.5" class="net_17"><title>LCSN</title></line>
-<line x1="384" x2="497" y1="1871.5" y2="1871.5" class="net_17"><title>LCSN</title></line>
-<line x1="384" x2="450" y1="1871.5" y2="1871.5" class="net_17"><title>LCSN</title></line>
-<line x1="450" x2="450" y1="1871.5" y2="1695.5" class="net_17"><title>LCSN</title></line>
-<circle cx="450" cy="1695.5" r="2" style="fill:#000" class="net_17" />
-<line x1="450" x2="497" y1="1695.5" y2="1695.5" class="net_17"><title>LCSN</title></line>
-<line x1="713.25" x2="827" y1="1650.5" y2="1650.5" class="net_38"><title>s_csbit7_qn</title></line>
-<line x1="528" x2="682" y1="1783.5" y2="1783.5" class="net_30"><title>TSEL_3_0[2]</title></line>
-<line x1="528" x2="595" y1="1783.5" y2="1783.5" class="net_30"><title>TSEL_3_0[2]</title></line>
-<line x1="595" x2="595" y1="1783.5" y2="1409.5" class="net_30"><title>TSEL_3_0[2]</title></line>
-<line x1="595" x2="905" y1="1409.5" y2="1409.5" class="net_30"><title>TSEL_3_0[2]</title></line>
-<line x1="905" x2="905" y1="1409.5" y2="1418.5" class="net_30"><title>TSEL_3_0[2]</title></line>
-<circle cx="595" cy="1783.5" r="2" style="fill:#000" class="net_30" />
-<line x1="905" x2="988.75" y1="1418.5" y2="1418.5" class="net_30"><title>TSEL_3_0[2]</title></line>
-<line x1="528" x2="585" y1="1871.5" y2="1871.5" class="net_29"><title>TSEL_3_0[1]</title></line>
-<line x1="585" x2="585" y1="1871.5" y2="1803.5" class="net_29"><title>TSEL_3_0[1]</title></line>
-<circle cx="585" cy="1871.5" r="2" style="fill:#000" class="net_29" />
-<circle cx="585" cy="1803.5" r="2" style="fill:#000" class="net_29" />
-<line x1="585" x2="682" y1="1803.5" y2="1803.5" class="net_29"><title>TSEL_3_0[1]</title></line>
-<line x1="528" x2="682" y1="1871.5" y2="1871.5" class="net_29"><title>TSEL_3_0[1]</title></line>
-<line x1="528" x2="585" y1="1871.5" y2="1871.5" class="net_29"><title>TSEL_3_0[1]</title></line>
-<line x1="585" x2="585" y1="1871.5" y2="1398.5" class="net_29"><title>TSEL_3_0[1]</title></line>
-<line x1="585" x2="988.75" y1="1398.5" y2="1398.5" class="net_29"><title>TSEL_3_0[1]</title></line>
-<line x1="713" x2="760" y1="1783.5" y2="1783.5" class="net_39"><title>s_gates3_out</title></line>
-<line x1="760" x2="760" y1="1783.5" y2="1851.5" class="net_39"><title>s_gates3_out</title></line>
-<line x1="760" x2="827" y1="1851.5" y2="1851.5" class="net_39"><title>s_gates3_out</title></line>
-<line x1="713" x2="827" y1="1871.5" y2="1871.5" class="net_40"><title>s_gates7_out</title></line>
-<line x1="858" x2="982" y1="1851.5" y2="1851.5" class="net_41"><title>s_gates4_out</title></line>
-<line x1="858" x2="905" y1="1630.5" y2="1630.5" class="net_31"><title>TSEL_3_0[3]</title></line>
-<line x1="905" x2="905" y1="1630.5" y2="1871.5" class="net_31"><title>TSEL_3_0[3]</title></line>
-<circle cx="905" cy="1630.5" r="2" style="fill:#000" class="net_31" />
-<line x1="905" x2="982" y1="1871.5" y2="1871.5" class="net_31"><title>TSEL_3_0[3]</title></line>
-<line x1="858" x2="989.25" y1="1630.5" y2="1630.5" class="net_31"><title>TSEL_3_0[3]</title></line>
-<line x1="989.25" x2="989.25" y1="1630.5" y2="1439" class="net_31"><title>TSEL_3_0[3]</title></line>
-<line x1="1013" x2="1085" y1="1851.5" y2="1851.5" class="net_19"><title>ACONDN</title></line>
-<line x1="994.75" x2="1085" y1="155.5" y2="155.5" class="net_20,21,22,23"><title>FS_6_3</title></line>
-<line x1="994.75" x2="1085" y1="625.5" y2="625.5" class="net_24,25,26,27"><title>LCC_3_0</title></line>
-<line x1="994.75" x2="1085" y1="1388.5" y2="1388.5" class="net_28,29,30,31"><title>TSEL_3_0</title></line>
-<line x1="852.5" x2="988.75" y1="1378.5" y2="1378.5" class="net_28"><title>TSEL_3_0[0]</title></line>
-<line x1="40" x2="132.5" y1="1461.5" y2="1461.5" class="net_4,5,6,7,8,9,10,11,12,13,14,15"><title>CSBIT_11_0</title></line>
-<line x1="132.5" x2="132.5" y1="1461.5" y2="1493.5" class="net_4,5,6,7,8,9,10,11,12,13,14,15"><title>CSBIT_11_0</title></line>
-<line x1="858.3333333333334" x2="1060" y1="52.5" y2="52.5" class="net_" />
-<circle cx="1060" cy="522.5" r="2" style="fill:#000" class="net_" />
-<line x1="1060" x2="1060" y1="52.5" y2="522.5" class="net_" />
-<line x1="858.3333333333334" x2="915" y1="358.5" y2="358.5" class="net_" />
-<circle cx="915" cy="358.5" r="2" style="fill:#000" class="net_" />
-<line x1="915" x2="1060" y1="358.5" y2="522.5" class="net_" />
-<line x1="858.3333333333334" x2="915" y1="675.5" y2="675.5" class="net_" />
-<circle cx="915" cy="675.5" r="2" style="fill:#000" class="net_" />
-<line x1="915" x2="1060" y1="675.5" y2="522.5" class="net_" />
-<line x1="858.3333333333334" x2="915" y1="1036.5" y2="1036.5" class="net_" />
-<line x1="915" x2="1060" y1="1036.5" y2="522.5" class="net_" />
-<line x1="858.3333333333334" x2="915" y1="205.5" y2="205.5" class="net_" />
-<circle cx="915" cy="522.5" r="2" style="fill:#000" class="net_" />
-<line x1="915" x2="1060" y1="205.5" y2="522.5" class="net_" />
-<line x1="858.3333333333334" x2="905" y1="1244.5" y2="1244.5" class="net_" />
-<line x1="905" x2="905" y1="1244.5" y2="1357" class="net_" />
-<line x1="905" x2="1060" y1="1357" y2="1357" class="net_" />
-<circle cx="905" cy="1357" r="2" style="fill:#000" class="net_" />
-<line x1="1060" x2="1060" y1="1357" y2="522.5" class="net_" />
-<line x1="387" x2="450" y1="911" y2="911" class="net_" />
-<line x1="450" x2="450" y1="911" y2="471" class="net_" />
-<line x1="450" x2="915" y1="471" y2="471" class="net_" />
-<circle cx="450" cy="911" r="2" style="fill:#000" class="net_" />
-<circle cx="915" cy="471" r="2" style="fill:#000" class="net_" />
-<line x1="915" x2="1060" y1="471" y2="522.5" class="net_" />
-<line x1="387" x2="450" y1="1108" y2="1108" class="net_" />
-<line x1="450" x2="450" y1="1108" y2="471" class="net_" />
-<line x1="450" x2="915" y1="471" y2="471" class="net_" />
-<line x1="915" x2="1060" y1="471" y2="522.5" class="net_" />
-<line x1="387" x2="420" y1="1551.5" y2="1551.5" class="net_" />
-<line x1="420" x2="420" y1="1551.5" y2="1357" class="net_" />
-<line x1="420" x2="1060" y1="1357" y2="1357" class="net_" />
-<line x1="1060" x2="1060" y1="1357" y2="522.5" class="net_" />
-<line x1="858.3333333333334" x2="915" y1="828.5" y2="828.5" class="net_" />
-<circle cx="915" cy="828.5" r="2" style="fill:#000" class="net_" />
-<line x1="915" x2="1060" y1="828.5" y2="522.5" class="net_" />
-<line x1="858.3333333333334" x2="1060" y1="522.5" y2="522.5" class="net_" />
-<text x="140.0" y="1641.0" class="netlabel">CSBIT_11_0[6]</text>
-<text x="140.0" y="1661.0" class="netlabel">CSBIT_11_0[7]</text>
-<text x="252.0" y="834.5" class="netlabel">CSBIT_11_0[8]</text>
-<text x="242.0" y="528.5" class="netlabel">CSBIT_11_0[9]</text>
-<text x="192.0" y="681.5" class="netlabel">CSBIT_11_0[10]</text>
-<text x="212.0" y="1042.5" class="netlabel">CSBIT_11_0[11]</text>
-<text x="43.0" y="1966.0" class="netlabel">CSSCOND</text>
-<text x="453.0" y="1417.5" class="netlabel">LCSN</text>
-<text x="302.0" y="353.5" class="netlabel">MCLK</text>
-<text x="1016.0" y="1848.5" class="netlabel">ACONDN</text>
-<text x="138.0" y="2031.0" class="netlabel">sysclk</text>
-<text x="783.0" y="152.0" class="netlabel">FS_6_3[0]</text>
-<text x="997.8" y="152.5" class="netlabel">FS_6_3</text>
-<text x="783.0" y="458.0" class="netlabel">FS_6_3[1]</text>
-<text x="861.3" y="182.5" class="netlabel">FS_6_3[2]</text>
-<text x="783.0" y="1344.0" class="netlabel">FS_6_3[3]</text>
-<text x="783.0" y="928.0" class="netlabel">LCC_3_0[0]</text>
-<text x="997.8" y="622.5" class="netlabel">LCC_3_0</text>
-<text x="783.0" y="622.0" class="netlabel">LCC_3_0[1]</text>
-<text x="861.3" y="652.5" class="netlabel">LCC_3_0[2]</text>
-<text x="783.0" y="1136.0" class="netlabel">LCC_3_0[3]</text>
-<text x="855.5" y="1375.5" class="netlabel">TSEL_3_0[0]</text>
-<text x="997.8" y="1385.5" class="netlabel">TSEL_3_0</text>
-<text x="588.0" y="1395.5" class="netlabel">TSEL_3_0[1]</text>
-<text x="272.0" y="69.5" class="netlabel">MCLK_EN</text>
-<text x="598.0" y="1406.5" class="netlabel">TSEL_3_0[2]</text>
-<text x="861.0" y="1627.5" class="netlabel">TSEL_3_0[3]</text>
-<text x="282.0" y="178.5" class="netlabel">s_cscond_n</text>
-<text x="578.0" y="1375.5" class="netlabel">s_tsel_3_0_n_out</text>
-<text x="312.0" y="1010.5" class="netlabel">s_csbit4_q</text>
-<text x="312.0" y="1207.5" class="netlabel">s_csbit5_q</text>
-<text x="312.0" y="1651.0" class="netlabel">s_csbit6_q</text>
-<text x="628.0" y="1750.0" class="netlabel">s_csbit7_q</text>
-<text x="716.2" y="1647.5" class="netlabel">s_csbit7_qn</text>
-<text x="763.0" y="1848.5" class="netlabel">s_gates3_out</text>
-<text x="162.0" y="58.5" class="netlabel">CSBIT_11_0[0]</text>
-<text x="43.0" y="1458.5" class="netlabel">CSBIT_11_0</text>
-<text x="716.0" y="1868.5" class="netlabel">s_gates7_out</text>
-<text x="861.0" y="1848.5" class="netlabel">s_gates4_out</text>
-<text x="172.0" y="364.5" class="netlabel">CSBIT_11_0[1]</text>
-<text x="182.0" y="211.5" class="netlabel">CSBIT_11_0[2]</text>
-<text x="232.0" y="1250.5" class="netlabel">CSBIT_11_0[3]</text>
-<text x="202.0" y="908.0" class="netlabel">CSBIT_11_0[4]</text>
-<text x="222.0" y="1105.0" class="netlabel">CSBIT_11_0[5]</text>
+<rect x="-80.0" y="-80.0" width="1265.0" height="2234.0" fill="#ffffff" /><g transform="translate(113,1094)" id="cell_$not$CGA_MIC_CONDREG.v:84$10470"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_CONDREG.v:84$10470" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_CONDREG.v:84$10470" /><g /><g /></g>
+<g transform="translate(787.5,1574.5)" id="cell_$not$CGA_MIC_CONDREG.v:87$10471"><path d="M0,0 L0,20 L20,10 Z" class="cell_$not$CGA_MIC_CONDREG.v:87$10471" /><circle cx="23" cy="10" r="3" class="cell_$not$CGA_MIC_CONDREG.v:87$10471" /><g /><g /></g>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT0 (SCAN_FF_EN) - open its page</title><g transform="translate(787.25,752.5)" id="cell_CSBIT0"><text x="15" y="-4" class="nodelabel cell_CSBIT0">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT0" /><g transform="translate(0,10)" id="port_CSBIT0~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT0~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">D</text></g><g transform="translate(0,50)" id="port_CSBIT0~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">EN</text></g><g transform="translate(0,70)" id="port_CSBIT0~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">TE</text></g><g transform="translate(0,90)" id="port_CSBIT0~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">TI</text></g><g transform="translate(0,110)" id="port_CSBIT0~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT0">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT0~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT0">Q</text></g><g transform="translate(30,30)" id="port_CSBIT0~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT0">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT1 (SCAN_FF_EN) - open its page</title><g transform="translate(787.25,905.5)" id="cell_CSBIT1"><text x="15" y="-4" class="nodelabel cell_CSBIT1">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT1" /><g transform="translate(0,10)" id="port_CSBIT1~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT1~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">D</text></g><g transform="translate(0,50)" id="port_CSBIT1~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">EN</text></g><g transform="translate(0,70)" id="port_CSBIT1~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">TE</text></g><g transform="translate(0,90)" id="port_CSBIT1~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">TI</text></g><g transform="translate(0,110)" id="port_CSBIT1~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT1">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT1~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT1">Q</text></g><g transform="translate(30,30)" id="port_CSBIT1~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT1">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT10 (SCAN_FF_EN) - open its page</title><g transform="translate(787.25,446.5)" id="cell_CSBIT10"><text x="15" y="-4" class="nodelabel cell_CSBIT10">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT10" /><g transform="translate(0,10)" id="port_CSBIT10~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT10~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">D</text></g><g transform="translate(0,50)" id="port_CSBIT10~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">EN</text></g><g transform="translate(0,70)" id="port_CSBIT10~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">TE</text></g><g transform="translate(0,90)" id="port_CSBIT10~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">TI</text></g><g transform="translate(0,110)" id="port_CSBIT10~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT10">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT10~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT10">Q</text></g><g transform="translate(30,30)" id="port_CSBIT10~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT10">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT11 (SCAN_FF_EN) - open its page</title><g transform="translate(787.25,599.5)" id="cell_CSBIT11"><text x="15" y="-4" class="nodelabel cell_CSBIT11">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT11" /><g transform="translate(0,10)" id="port_CSBIT11~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT11~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">D</text></g><g transform="translate(0,50)" id="port_CSBIT11~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">EN</text></g><g transform="translate(0,70)" id="port_CSBIT11~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">TE</text></g><g transform="translate(0,90)" id="port_CSBIT11~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">TI</text></g><g transform="translate(0,110)" id="port_CSBIT11~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT11">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT11~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT11">Q</text></g><g transform="translate(30,30)" id="port_CSBIT11~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT11">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT2 (SCAN_FF_EN) - open its page</title><g transform="translate(787.25,1058.5)" id="cell_CSBIT2"><text x="15" y="-4" class="nodelabel cell_CSBIT2">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT2" /><g transform="translate(0,10)" id="port_CSBIT2~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT2~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">D</text></g><g transform="translate(0,50)" id="port_CSBIT2~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">EN</text></g><g transform="translate(0,70)" id="port_CSBIT2~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">TE</text></g><g transform="translate(0,90)" id="port_CSBIT2~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">TI</text></g><g transform="translate(0,110)" id="port_CSBIT2~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT2">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT2~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT2">Q</text></g><g transform="translate(30,30)" id="port_CSBIT2~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT2">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT3 (SCAN_FF_EN) - open its page</title><g transform="translate(787.25,1266.5)" id="cell_CSBIT3"><text x="15" y="-4" class="nodelabel cell_CSBIT3">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT3" /><g transform="translate(0,10)" id="port_CSBIT3~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT3~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">D</text></g><g transform="translate(0,50)" id="port_CSBIT3~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">EN</text></g><g transform="translate(0,70)" id="port_CSBIT3~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">TE</text></g><g transform="translate(0,90)" id="port_CSBIT3~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">TI</text></g><g transform="translate(0,110)" id="port_CSBIT3~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT3">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT3~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT3">Q</text></g><g transform="translate(30,30)" id="port_CSBIT3~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT3">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT4 (SCAN_FF_EN) - open its page</title><g transform="translate(356,1594)" id="cell_CSBIT4"><text x="15" y="-4" class="nodelabel cell_CSBIT4">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT4" /><g transform="translate(0,10)" id="port_CSBIT4~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT4~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">D</text></g><g transform="translate(0,50)" id="port_CSBIT4~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">EN</text></g><g transform="translate(0,70)" id="port_CSBIT4~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">TE</text></g><g transform="translate(0,90)" id="port_CSBIT4~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">TI</text></g><g transform="translate(0,110)" id="port_CSBIT4~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT4">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT4~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT4">Q</text></g><g transform="translate(30,30)" id="port_CSBIT4~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT4">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT5 (SCAN_FF_EN) - open its page</title><g transform="translate(356,1234)" id="cell_CSBIT5"><text x="15" y="-4" class="nodelabel cell_CSBIT5">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT5" /><g transform="translate(0,10)" id="port_CSBIT5~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT5~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">D</text></g><g transform="translate(0,50)" id="port_CSBIT5~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">EN</text></g><g transform="translate(0,70)" id="port_CSBIT5~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">TE</text></g><g transform="translate(0,90)" id="port_CSBIT5~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">TI</text></g><g transform="translate(0,110)" id="port_CSBIT5~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT5">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT5~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT5">Q</text></g><g transform="translate(30,30)" id="port_CSBIT5~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT5">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT6 (SCAN_FF_EN) - open its page</title><g transform="translate(356,1747)" id="cell_CSBIT6"><text x="15" y="-4" class="nodelabel cell_CSBIT6">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT6" /><g transform="translate(0,10)" id="port_CSBIT6~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT6~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">D</text></g><g transform="translate(0,50)" id="port_CSBIT6~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">EN</text></g><g transform="translate(0,70)" id="port_CSBIT6~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">TE</text></g><g transform="translate(0,90)" id="port_CSBIT6~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">TI</text></g><g transform="translate(0,110)" id="port_CSBIT6~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT6">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT6~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT6">Q</text></g><g transform="translate(30,30)" id="port_CSBIT6~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT6">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT7 (SCAN_FF_EN) - open its page</title><g transform="translate(622.25,1879.5)" id="cell_CSBIT7"><text x="15" y="-4" class="nodelabel cell_CSBIT7">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT7" /><g transform="translate(0,10)" id="port_CSBIT7~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT7~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">D</text></g><g transform="translate(0,50)" id="port_CSBIT7~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">EN</text></g><g transform="translate(0,70)" id="port_CSBIT7~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">TE</text></g><g transform="translate(0,90)" id="port_CSBIT7~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">TI</text></g><g transform="translate(0,110)" id="port_CSBIT7~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT7">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT7~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT7">Q</text></g><g transform="translate(30,30)" id="port_CSBIT7~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT7">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT8 (SCAN_FF_EN) - open its page</title><g transform="translate(787.25,140.5)" id="cell_CSBIT8"><text x="15" y="-4" class="nodelabel cell_CSBIT8">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT8" /><g transform="translate(0,10)" id="port_CSBIT8~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT8~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">D</text></g><g transform="translate(0,50)" id="port_CSBIT8~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">EN</text></g><g transform="translate(0,70)" id="port_CSBIT8~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">TE</text></g><g transform="translate(0,90)" id="port_CSBIT8~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">TI</text></g><g transform="translate(0,110)" id="port_CSBIT8~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT8">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT8~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT8">Q</text></g><g transform="translate(30,30)" id="port_CSBIT8~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT8">QN</text></g></g></a>
+<a href="../../../../Shared/ndlib/doc/SCAN_FF_EN.md"><title>CSBIT9 (SCAN_FF_EN) - open its page</title><g transform="translate(787.25,293.5)" id="cell_CSBIT9"><text x="15" y="-4" class="nodelabel cell_CSBIT9">SCAN_FF_EN</text><rect width="30" height="120" class="cell_CSBIT9" /><g transform="translate(0,10)" id="port_CSBIT9~CLK"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">CLK</text></g><g transform="translate(0,30)" id="port_CSBIT9~D"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">D</text></g><g transform="translate(0,50)" id="port_CSBIT9~EN"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">EN</text></g><g transform="translate(0,70)" id="port_CSBIT9~TE"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">TE</text></g><g transform="translate(0,90)" id="port_CSBIT9~TI"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">TI</text></g><g transform="translate(0,110)" id="port_CSBIT9~sysclk"><text x="-3" y="-4" class="inputPortLabel cell_CSBIT9">sysclk</text></g><g transform="translate(30,10)" id="port_CSBIT9~Q"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT9">Q</text></g><g transform="translate(30,30)" id="port_CSBIT9~QN"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_CSBIT9">QN</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_1 (NAND_GATE) - open its page</title><g transform="translate(787,1879.5)" id="cell_GATES_1"><text x="15" y="-4" class="nodelabel cell_GATES_1">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_1" /><g transform="translate(0,10)" id="port_GATES_1~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input1</text></g><g transform="translate(0,30)" id="port_GATES_1~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_1">input2</text></g><g transform="translate(30,10)" id="port_GATES_1~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_1">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_2 (AND_GATE) - open its page</title><g transform="translate(477,1727)" id="cell_GATES_2"><text x="15" y="-4" class="nodelabel cell_GATES_2">AND_GATE</text><rect width="30" height="40" class="cell_GATES_2" /><g transform="translate(0,10)" id="port_GATES_2~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input1</text></g><g transform="translate(0,30)" id="port_GATES_2~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_2">input2</text></g><g transform="translate(30,10)" id="port_GATES_2~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_2">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/XNOR_GATE_ONEHOT.md"><title>GATES_3 (XNOR_GATE_ONEHOT) - open its page</title><g transform="translate(622,1398)" id="cell_GATES_3"><text x="15" y="-4" class="nodelabel cell_GATES_3">XNOR_GATE_ONEHOT</text><rect width="30" height="40" class="cell_GATES_3" /><g transform="translate(0,10)" id="port_GATES_3~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input1</text></g><g transform="translate(0,30)" id="port_GATES_3~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_3">input2</text></g><g transform="translate(30,10)" id="port_GATES_3~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_3">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_4 (NAND_GATE) - open its page</title><g transform="translate(787,1466)" id="cell_GATES_4"><text x="15" y="-4" class="nodelabel cell_GATES_4">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_4" /><g transform="translate(0,10)" id="port_GATES_4~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input1</text></g><g transform="translate(0,30)" id="port_GATES_4~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_4">input2</text></g><g transform="translate(30,10)" id="port_GATES_4~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_4">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_5 (NAND_GATE) - open its page</title><g transform="translate(942,1859.5)" id="cell_GATES_5"><text x="15" y="-4" class="nodelabel cell_GATES_5">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_5" /><g transform="translate(0,10)" id="port_GATES_5~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input1</text></g><g transform="translate(0,30)" id="port_GATES_5~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_5">input2</text></g><g transform="translate(30,10)" id="port_GATES_5~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_5">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/AND_GATE.md"><title>GATES_6 (AND_GATE) - open its page</title><g transform="translate(477,1486)" id="cell_GATES_6"><text x="15" y="-4" class="nodelabel cell_GATES_6">AND_GATE</text><rect width="30" height="40" class="cell_GATES_6" /><g transform="translate(0,10)" id="port_GATES_6~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_6">input1</text></g><g transform="translate(0,30)" id="port_GATES_6~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_6">input2</text></g><g transform="translate(30,10)" id="port_GATES_6~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_6">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_7 (NAND_GATE) - open its page</title><g transform="translate(622,1486)" id="cell_GATES_7"><text x="15" y="-4" class="nodelabel cell_GATES_7">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_7" /><g transform="translate(0,10)" id="port_GATES_7~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_7">input1</text></g><g transform="translate(0,30)" id="port_GATES_7~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_7">input2</text></g><g transform="translate(30,10)" id="port_GATES_7~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_7">result</text></g></g></a>
+<a href="../../../../Shared/logisim/doc/NAND_GATE.md"><title>GATES_8 (NAND_GATE) - open its page</title><g transform="translate(477,1574)" id="cell_GATES_8"><text x="15" y="-4" class="nodelabel cell_GATES_8">NAND_GATE</text><rect width="30" height="40" class="cell_GATES_8" /><g transform="translate(0,10)" id="port_GATES_8~input1"><text x="-3" y="-4" class="inputPortLabel cell_GATES_8">input1</text></g><g transform="translate(0,30)" id="port_GATES_8~input2"><text x="-3" y="-4" class="inputPortLabel cell_GATES_8">input2</text></g><g transform="translate(30,10)" id="port_GATES_8~result"><text x="5" y="-4" style="fill:#000; stroke:none" class="cell_GATES_8">result</text></g></g></a>
+<g transform="translate(107,1159)" id="cell_sysclk"><text x="15" y="-4" class="nodelabel cell_sysclk">sysclk</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_sysclk" /><g /></g>
+<g transform="translate(107,1039)" id="cell_MCLK_EN"><text x="15" y="-4" class="nodelabel cell_MCLK_EN">MCLK_EN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MCLK_EN" /><g /></g>
+<g transform="translate(12,52)" id="cell_CSBIT_11_0"><text x="15" y="-4" class="nodelabel cell_CSBIT_11_0">CSBIT_11_0</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CSBIT_11_0" /><g /></g>
+<g transform="translate(12,1094)" id="cell_CSSCOND"><text x="15" y="-4" class="nodelabel cell_CSSCOND">CSSCOND</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_CSSCOND" /><g /></g>
+<g transform="translate(356,1529)" id="cell_LCSN"><text x="15" y="-4" class="nodelabel cell_LCSN">LCSN</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_LCSN" /><g /></g>
+<g transform="translate(107,22)" id="cell_MCLK"><text x="15" y="-4" class="nodelabel cell_MCLK">MCLK</text><path d="M0,0 L0,20 L15,20 L30,10 L15,0 Z" class="cell_MCLK" /><g /></g>
+<g transform="translate(1045,1860)" id="cell_ACONDN"><text x="15" y="-4" class="nodelabel cell_ACONDN">ACONDN</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_ACONDN" /><g /></g>
+<g transform="translate(1045,1029)" id="cell_FS_6_3"><text x="15" y="-4" class="nodelabel cell_FS_6_3">FS_6_3</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_FS_6_3" /><g /></g>
+<g transform="translate(1045,417)" id="cell_LCC_3_0"><text x="15" y="-4" class="nodelabel cell_LCC_3_0">LCC_3_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_LCC_3_0" /><g /></g>
+<g transform="translate(1045,1982.5)" id="cell_TSEL_3_0"><text x="15" y="-4" class="nodelabel cell_TSEL_3_0">TSEL_3_0</text><path d="M30,0 L30,20 L15,20 L0,10 L15,0 Z" class="cell_TSEL_3_0" /><g /></g>
+<g transform="translate(948.75,1018.5)" id="cell_$join$,20,21,22,23,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
+<g transform="translate(948.75,406.5)" id="cell_$join$,24,25,26,27,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
+<g transform="translate(948.75,1972)" id="cell_$join$,28,29,30,31,"><rect width="5" height="80" class="splitjoinBody" /><g /><g transform="translate(0,10)"><text x="-3" y="-4" class="inputPortLabel">0</text></g><g transform="translate(0,30)"><text x="-3" y="-4" class="inputPortLabel">1</text></g><g transform="translate(0,50)"><text x="-3" y="-4" class="inputPortLabel">2</text></g><g transform="translate(0,70)"><text x="-3" y="-4" class="inputPortLabel">3</text></g></g>
+<g transform="translate(132,74)" id="cell_$split$,4,5,6,7,8,9,10,11,12,13,14,15,"><rect width="5" height="240" class="splitjoinBody" /><g /><g transform="translate(4,10)"><text x="5" y="-4">0</text></g><g transform="translate(4,30)"><text x="5" y="-4">1</text></g><g transform="translate(4,50)"><text x="5" y="-4">10</text></g><g transform="translate(4,70)"><text x="5" y="-4">11</text></g><g transform="translate(4,90)"><text x="5" y="-4">2</text></g><g transform="translate(4,110)"><text x="5" y="-4">3</text></g><g transform="translate(4,130)"><text x="5" y="-4">4</text></g><g transform="translate(4,150)"><text x="5" y="-4">5</text></g><g transform="translate(4,170)"><text x="5" y="-4">6</text></g><g transform="translate(4,190)"><text x="5" y="-4">7</text></g><g transform="translate(4,210)"><text x="5" y="-4">8</text></g><g transform="translate(4,230)"><text x="5" y="-4">9</text></g></g>
+<line x1="40" x2="113" y1="1104" y2="1104" class="net_16"><title>CSSCOND</title></line>
+<line x1="508" x2="787.5" y1="1584.5" y2="1584.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
+<line x1="508" x2="575" y1="1584.5" y2="1584.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
+<line x1="575" x2="575" y1="1584.5" y2="1516.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
+<circle cx="575" cy="1584.5" r="2" style="fill:#000" class="net_33" />
+<line x1="575" x2="622" y1="1516.5" y2="1516.5" class="net_33"><title>s_tsel_3_0_n_out</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="763" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="763" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="787.25" y1="763" y2="763" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="916" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="916" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="787.25" y1="916" y2="916" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="457" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="457" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="787.25" y1="457" y2="457" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="610" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="610" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="787.25" y1="610" y2="610" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="1027" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="730" y1="1027" y2="1027" class="net_18"><title>MCLK</title></line>
+<line x1="730" x2="730" y1="1027" y2="1069" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="1027" r="2" style="fill:#000" class="net_18" />
+<line x1="730" x2="787.25" y1="1069" y2="1069" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="1180" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="730" y1="1180" y2="1180" class="net_18"><title>MCLK</title></line>
+<line x1="730" x2="730" y1="1180" y2="1277" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="1180" r="2" style="fill:#000" class="net_18" />
+<line x1="730" x2="787.25" y1="1277" y2="1277" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="1604.5" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="1604.5" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="356" y1="1604.5" y2="1604.5" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="1244.5" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="1244.5" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="356" y1="1244.5" y2="1244.5" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="1757.5" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="1757.5" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="356" y1="1757.5" y2="1757.5" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="1890" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="622.25" y1="1890" y2="1890" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="151" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="151" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="787.25" y1="151" y2="151" class="net_18"><title>MCLK</title></line>
+<line x1="135" x2="299" y1="32" y2="32" class="net_18"><title>MCLK</title></line>
+<line x1="299" x2="299" y1="32" y2="304" class="net_18"><title>MCLK</title></line>
+<circle cx="299" cy="304" r="2" style="fill:#000" class="net_18" />
+<line x1="299" x2="787.25" y1="304" y2="304" class="net_18"><title>MCLK</title></line>
+<line x1="136.5" x2="136.5" y1="84" y2="52" class="net_4"><title>CSBIT_11_0[0]</title></line>
+<line x1="136.5" x2="259" y1="52" y2="52" class="net_4"><title>CSBIT_11_0[0]</title></line>
+<line x1="259" x2="259" y1="52" y2="783" class="net_4"><title>CSBIT_11_0[0]</title></line>
+<line x1="259" x2="787.25" y1="783" y2="783" class="net_4"><title>CSBIT_11_0[0]</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="803" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="1049" r="2" style="fill:#000" class="net_3" />
+<circle cx="289" cy="803" r="2" style="fill:#000" class="net_3" />
+<line x1="289" x2="787.25" y1="803" y2="803" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="956" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="956" r="2" style="fill:#000" class="net_3" />
+<line x1="289" x2="787.25" y1="956" y2="956" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="497" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="497" r="2" style="fill:#000" class="net_3" />
+<line x1="289" x2="787.25" y1="497" y2="497" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="650" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="650" r="2" style="fill:#000" class="net_3" />
+<line x1="289" x2="787.25" y1="650" y2="650" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="710" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="710" x2="710" y1="1049" y2="1109" class="net_3"><title>MCLK_EN</title></line>
+<line x1="710" x2="787.25" y1="1109" y2="1109" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="1202" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="710" y1="1202" y2="1202" class="net_3"><title>MCLK_EN</title></line>
+<line x1="710" x2="710" y1="1202" y2="1317" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="1202" r="2" style="fill:#000" class="net_3" />
+<line x1="710" x2="787.25" y1="1317" y2="1317" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="1644.5" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="1644.5" r="2" style="fill:#000" class="net_3" />
+<line x1="289" x2="356" y1="1644.5" y2="1644.5" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="1284.5" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="1284.5" r="2" style="fill:#000" class="net_3" />
+<line x1="289" x2="356" y1="1284.5" y2="1284.5" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="1797.5" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="1797.5" r="2" style="fill:#000" class="net_3" />
+<line x1="289" x2="356" y1="1797.5" y2="1797.5" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="1930" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="622.25" y1="1930" y2="1930" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="191" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="787.25" y1="191" y2="191" class="net_3"><title>MCLK_EN</title></line>
+<line x1="135" x2="289" y1="1049" y2="1049" class="net_3"><title>MCLK_EN</title></line>
+<line x1="289" x2="289" y1="1049" y2="344" class="net_3"><title>MCLK_EN</title></line>
+<circle cx="289" cy="344" r="2" style="fill:#000" class="net_3" />
+<line x1="289" x2="787.25" y1="344" y2="344" class="net_3"><title>MCLK_EN</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="823" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="1104" r="2" style="fill:#000" class="net_32" />
+<circle cx="279" cy="823" r="2" style="fill:#000" class="net_32" />
+<line x1="279" x2="787.25" y1="823" y2="823" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="976" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="976" r="2" style="fill:#000" class="net_32" />
+<line x1="279" x2="787.25" y1="976" y2="976" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="517" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="517" r="2" style="fill:#000" class="net_32" />
+<line x1="279" x2="787.25" y1="517" y2="517" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="670" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="670" r="2" style="fill:#000" class="net_32" />
+<line x1="279" x2="787.25" y1="670" y2="670" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="700" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="700" x2="700" y1="1104" y2="1129" class="net_32"><title>s_cscond_n</title></line>
+<line x1="700" x2="787.25" y1="1129" y2="1129" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="1213" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="700" y1="1213" y2="1213" class="net_32"><title>s_cscond_n</title></line>
+<line x1="700" x2="700" y1="1213" y2="1337" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="1213" r="2" style="fill:#000" class="net_32" />
+<line x1="700" x2="787.25" y1="1337" y2="1337" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="1664.5" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="1664.5" r="2" style="fill:#000" class="net_32" />
+<line x1="279" x2="356" y1="1664.5" y2="1664.5" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="1304.5" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="1304.5" r="2" style="fill:#000" class="net_32" />
+<line x1="279" x2="356" y1="1304.5" y2="1304.5" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="1817.5" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="1817.5" r="2" style="fill:#000" class="net_32" />
+<line x1="279" x2="356" y1="1817.5" y2="1817.5" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="1950" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="622.25" y1="1950" y2="1950" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="211" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="787.25" y1="211" y2="211" class="net_32"><title>s_cscond_n</title></line>
+<line x1="138" x2="279" y1="1104" y2="1104" class="net_32"><title>s_cscond_n</title></line>
+<line x1="279" x2="279" y1="1104" y2="364" class="net_32"><title>s_cscond_n</title></line>
+<circle cx="279" cy="364" r="2" style="fill:#000" class="net_32" />
+<line x1="279" x2="787.25" y1="364" y2="364" class="net_32"><title>s_cscond_n</title></line>
+<line x1="818.25" x2="875" y1="763" y2="763" class="net_20"><title>FS_6_3[0]</title></line>
+<line x1="875" x2="875" y1="763" y2="885.5" class="net_20"><title>FS_6_3[0]</title></line>
+<line x1="875" x2="740" y1="885.5" y2="885.5" class="net_20"><title>FS_6_3[0]</title></line>
+<line x1="740" x2="740" y1="885.5" y2="843" class="net_20"><title>FS_6_3[0]</title></line>
+<circle cx="875" cy="885.5" r="2" style="fill:#000" class="net_20" />
+<line x1="740" x2="787.25" y1="843" y2="843" class="net_20"><title>FS_6_3[0]</title></line>
+<line x1="818.25" x2="875" y1="763" y2="763" class="net_20"><title>FS_6_3[0]</title></line>
+<line x1="875" x2="875" y1="763" y2="1029" class="net_20"><title>FS_6_3[0]</title></line>
+<line x1="875" x2="948.75" y1="1029" y2="1029" class="net_20"><title>FS_6_3[0]</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="863" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="1169" r="2" style="fill:#000" class="net_2" />
+<circle cx="269" cy="863" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="787.25" y1="863" y2="863" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="1016" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="1016" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="787.25" y1="1016" y2="1016" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="557" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="557" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="787.25" y1="557" y2="557" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="710" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="710" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="787.25" y1="710" y2="710" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="787.25" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="1377" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="1377" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="787.25" y1="1377" y2="1377" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="1704.5" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="1704.5" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="356" y1="1704.5" y2="1704.5" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="1344.5" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="1344.5" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="356" y1="1344.5" y2="1344.5" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="1857.5" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="1857.5" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="356" y1="1857.5" y2="1857.5" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="1990" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="622.25" y1="1990" y2="1990" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="251" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="787.25" y1="251" y2="251" class="net_2"><title>sysclk</title></line>
+<line x1="135" x2="269" y1="1169" y2="1169" class="net_2"><title>sysclk</title></line>
+<line x1="269" x2="269" y1="1169" y2="404" class="net_2"><title>sysclk</title></line>
+<circle cx="269" cy="404" r="2" style="fill:#000" class="net_2" />
+<line x1="269" x2="787.25" y1="404" y2="404" class="net_2"><title>sysclk</title></line>
+<line x1="137" x2="239" y1="104.5" y2="104.5" class="net_5"><title>CSBIT_11_0[1]</title></line>
+<line x1="239" x2="239" y1="104.5" y2="936" class="net_5"><title>CSBIT_11_0[1]</title></line>
+<line x1="239" x2="787.25" y1="936" y2="936" class="net_5"><title>CSBIT_11_0[1]</title></line>
+<line x1="818.25" x2="865" y1="916" y2="916" class="net_21"><title>FS_6_3[1]</title></line>
+<line x1="865" x2="865" y1="916" y2="1038.5" class="net_21"><title>FS_6_3[1]</title></line>
+<line x1="865" x2="740" y1="1038.5" y2="1038.5" class="net_21"><title>FS_6_3[1]</title></line>
+<line x1="740" x2="740" y1="1038.5" y2="996" class="net_21"><title>FS_6_3[1]</title></line>
+<circle cx="865" cy="1038.5" r="2" style="fill:#000" class="net_21" />
+<line x1="740" x2="787.25" y1="996" y2="996" class="net_21"><title>FS_6_3[1]</title></line>
+<line x1="818.25" x2="865" y1="916" y2="916" class="net_21"><title>FS_6_3[1]</title></line>
+<line x1="865" x2="865" y1="916" y2="1049" class="net_21"><title>FS_6_3[1]</title></line>
+<line x1="865" x2="948.75" y1="1049" y2="1049" class="net_21"><title>FS_6_3[1]</title></line>
+<line x1="137" x2="249" y1="124.5" y2="124.5" class="net_14"><title>CSBIT_11_0[10]</title></line>
+<line x1="249" x2="249" y1="124.5" y2="477" class="net_14"><title>CSBIT_11_0[10]</title></line>
+<line x1="249" x2="787.25" y1="477" y2="477" class="net_14"><title>CSBIT_11_0[10]</title></line>
+<line x1="818.25" x2="865" y1="457" y2="457" class="net_26"><title>LCC_3_0[2]</title></line>
+<line x1="865" x2="865" y1="457" y2="579.5" class="net_26"><title>LCC_3_0[2]</title></line>
+<line x1="865" x2="740" y1="579.5" y2="579.5" class="net_26"><title>LCC_3_0[2]</title></line>
+<line x1="740" x2="740" y1="579.5" y2="537" class="net_26"><title>LCC_3_0[2]</title></line>
+<circle cx="865" cy="457" r="2" style="fill:#000" class="net_26" />
+<line x1="740" x2="787.25" y1="537" y2="537" class="net_26"><title>LCC_3_0[2]</title></line>
+<line x1="818.25" x2="948.75" y1="457" y2="457" class="net_26"><title>LCC_3_0[2]</title></line>
+<line x1="137" x2="229" y1="144.5" y2="144.5" class="net_15"><title>CSBIT_11_0[11]</title></line>
+<line x1="229" x2="229" y1="144.5" y2="630" class="net_15"><title>CSBIT_11_0[11]</title></line>
+<line x1="229" x2="787.25" y1="630" y2="630" class="net_15"><title>CSBIT_11_0[11]</title></line>
+<line x1="818.25" x2="865" y1="610" y2="610" class="net_27"><title>LCC_3_0[3]</title></line>
+<line x1="865" x2="865" y1="610" y2="732.5" class="net_27"><title>LCC_3_0[3]</title></line>
+<line x1="865" x2="740" y1="732.5" y2="732.5" class="net_27"><title>LCC_3_0[3]</title></line>
+<line x1="740" x2="740" y1="732.5" y2="690" class="net_27"><title>LCC_3_0[3]</title></line>
+<circle cx="865" cy="610" r="2" style="fill:#000" class="net_27" />
+<line x1="740" x2="787.25" y1="690" y2="690" class="net_27"><title>LCC_3_0[3]</title></line>
+<line x1="818.25" x2="949.25" y1="610" y2="610" class="net_27"><title>LCC_3_0[3]</title></line>
+<line x1="949.25" x2="949.25" y1="610" y2="477.5" class="net_27"><title>LCC_3_0[3]</title></line>
+<line x1="137" x2="219" y1="164.5" y2="164.5" class="net_6"><title>CSBIT_11_0[2]</title></line>
+<line x1="219" x2="219" y1="164.5" y2="1038" class="net_6"><title>CSBIT_11_0[2]</title></line>
+<line x1="219" x2="720" y1="1038" y2="1038" class="net_6"><title>CSBIT_11_0[2]</title></line>
+<line x1="720" x2="720" y1="1038" y2="1089" class="net_6"><title>CSBIT_11_0[2]</title></line>
+<line x1="720" x2="787.25" y1="1089" y2="1089" class="net_6"><title>CSBIT_11_0[2]</title></line>
+<line x1="818.25" x2="865" y1="1069" y2="1069" class="net_22"><title>FS_6_3[2]</title></line>
+<line x1="865" x2="865" y1="1069" y2="1191.5" class="net_22"><title>FS_6_3[2]</title></line>
+<line x1="865" x2="740" y1="1191.5" y2="1191.5" class="net_22"><title>FS_6_3[2]</title></line>
+<line x1="740" x2="740" y1="1191.5" y2="1149" class="net_22"><title>FS_6_3[2]</title></line>
+<circle cx="865" cy="1069" r="2" style="fill:#000" class="net_22" />
+<line x1="740" x2="787.25" y1="1149" y2="1149" class="net_22"><title>FS_6_3[2]</title></line>
+<line x1="818.25" x2="948.75" y1="1069" y2="1069" class="net_22"><title>FS_6_3[2]</title></line>
+<line x1="137" x2="209" y1="184.5" y2="184.5" class="net_7"><title>CSBIT_11_0[3]</title></line>
+<line x1="209" x2="209" y1="184.5" y2="1191" class="net_7"><title>CSBIT_11_0[3]</title></line>
+<line x1="209" x2="720" y1="1191" y2="1191" class="net_7"><title>CSBIT_11_0[3]</title></line>
+<line x1="720" x2="720" y1="1191" y2="1297" class="net_7"><title>CSBIT_11_0[3]</title></line>
+<line x1="720" x2="787.25" y1="1297" y2="1297" class="net_7"><title>CSBIT_11_0[3]</title></line>
+<line x1="818.25" x2="865" y1="1277" y2="1277" class="net_23"><title>FS_6_3[3]</title></line>
+<line x1="865" x2="865" y1="1277" y2="1399.5" class="net_23"><title>FS_6_3[3]</title></line>
+<line x1="865" x2="740" y1="1399.5" y2="1399.5" class="net_23"><title>FS_6_3[3]</title></line>
+<line x1="740" x2="740" y1="1399.5" y2="1357" class="net_23"><title>FS_6_3[3]</title></line>
+<circle cx="865" cy="1277" r="2" style="fill:#000" class="net_23" />
+<line x1="740" x2="787.25" y1="1357" y2="1357" class="net_23"><title>FS_6_3[3]</title></line>
+<line x1="818.25" x2="949.25" y1="1277" y2="1277" class="net_23"><title>FS_6_3[3]</title></line>
+<line x1="949.25" x2="949.25" y1="1277" y2="1089.5" class="net_23"><title>FS_6_3[3]</title></line>
+<line x1="137" x2="199" y1="204.5" y2="204.5" class="net_8"><title>CSBIT_11_0[4]</title></line>
+<line x1="199" x2="199" y1="204.5" y2="1624.5" class="net_8"><title>CSBIT_11_0[4]</title></line>
+<line x1="199" x2="356" y1="1624.5" y2="1624.5" class="net_8"><title>CSBIT_11_0[4]</title></line>
+<line x1="387" x2="410" y1="1604.5" y2="1604.5" class="net_34"><title>s_csbit4_q</title></line>
+<line x1="410" x2="410" y1="1604.5" y2="1727" class="net_34"><title>s_csbit4_q</title></line>
+<line x1="410" x2="309" y1="1727" y2="1727" class="net_34"><title>s_csbit4_q</title></line>
+<line x1="309" x2="309" y1="1727" y2="1684.5" class="net_34"><title>s_csbit4_q</title></line>
+<circle cx="410" cy="1604.5" r="2" style="fill:#000" class="net_34" />
+<line x1="309" x2="356" y1="1684.5" y2="1684.5" class="net_34"><title>s_csbit4_q</title></line>
+<line x1="387" x2="477" y1="1604.5" y2="1604.5" class="net_34"><title>s_csbit4_q</title></line>
+<line x1="137" x2="189" y1="224.5" y2="224.5" class="net_9"><title>CSBIT_11_0[5]</title></line>
+<line x1="189" x2="189" y1="224.5" y2="1264.5" class="net_9"><title>CSBIT_11_0[5]</title></line>
+<line x1="189" x2="356" y1="1264.5" y2="1264.5" class="net_9"><title>CSBIT_11_0[5]</title></line>
+<line x1="387" x2="430" y1="1244.5" y2="1244.5" class="net_35"><title>s_csbit5_q</title></line>
+<line x1="430" x2="430" y1="1244.5" y2="1367" class="net_35"><title>s_csbit5_q</title></line>
+<line x1="430" x2="309" y1="1367" y2="1367" class="net_35"><title>s_csbit5_q</title></line>
+<line x1="309" x2="309" y1="1367" y2="1324.5" class="net_35"><title>s_csbit5_q</title></line>
+<circle cx="430" cy="1367" r="2" style="fill:#000" class="net_35" />
+<line x1="309" x2="356" y1="1324.5" y2="1324.5" class="net_35"><title>s_csbit5_q</title></line>
+<line x1="387" x2="430" y1="1244.5" y2="1244.5" class="net_35"><title>s_csbit5_q</title></line>
+<line x1="430" x2="430" y1="1244.5" y2="1516.5" class="net_35"><title>s_csbit5_q</title></line>
+<line x1="430" x2="477" y1="1516.5" y2="1516.5" class="net_35"><title>s_csbit5_q</title></line>
+<line x1="137" x2="179" y1="244.5" y2="244.5" class="net_10"><title>CSBIT_11_0[6]</title></line>
+<line x1="179" x2="179" y1="244.5" y2="1777.5" class="net_10"><title>CSBIT_11_0[6]</title></line>
+<line x1="179" x2="356" y1="1777.5" y2="1777.5" class="net_10"><title>CSBIT_11_0[6]</title></line>
+<line x1="387" x2="410" y1="1757.5" y2="1757.5" class="net_36"><title>s_csbit6_q</title></line>
+<line x1="410" x2="410" y1="1757.5" y2="1880" class="net_36"><title>s_csbit6_q</title></line>
+<line x1="410" x2="309" y1="1880" y2="1880" class="net_36"><title>s_csbit6_q</title></line>
+<line x1="309" x2="309" y1="1880" y2="1837.5" class="net_36"><title>s_csbit6_q</title></line>
+<circle cx="410" cy="1757.5" r="2" style="fill:#000" class="net_36" />
+<line x1="309" x2="356" y1="1837.5" y2="1837.5" class="net_36"><title>s_csbit6_q</title></line>
+<line x1="387" x2="477" y1="1757.5" y2="1757.5" class="net_36"><title>s_csbit6_q</title></line>
+<line x1="137" x2="159" y1="264.5" y2="264.5" class="net_11"><title>CSBIT_11_0[7]</title></line>
+<line x1="159" x2="159" y1="264.5" y2="1910" class="net_11"><title>CSBIT_11_0[7]</title></line>
+<line x1="159" x2="622.25" y1="1910" y2="1910" class="net_11"><title>CSBIT_11_0[7]</title></line>
+<line x1="653.25" x2="700" y1="1890" y2="1890" class="net_37"><title>s_csbit7_q</title></line>
+<line x1="700" x2="700" y1="1890" y2="2012.5" class="net_37"><title>s_csbit7_q</title></line>
+<line x1="700" x2="575" y1="2012.5" y2="2012.5" class="net_37"><title>s_csbit7_q</title></line>
+<line x1="575" x2="575" y1="2012.5" y2="1970" class="net_37"><title>s_csbit7_q</title></line>
+<line x1="575" x2="622.25" y1="1970" y2="1970" class="net_37"><title>s_csbit7_q</title></line>
+<line x1="137" x2="169" y1="284.5" y2="284.5" class="net_12"><title>CSBIT_11_0[8]</title></line>
+<line x1="169" x2="169" y1="284.5" y2="171" class="net_12"><title>CSBIT_11_0[8]</title></line>
+<line x1="169" x2="787.25" y1="171" y2="171" class="net_12"><title>CSBIT_11_0[8]</title></line>
+<line x1="818.25" x2="875" y1="151" y2="151" class="net_24"><title>LCC_3_0[0]</title></line>
+<line x1="875" x2="875" y1="151" y2="273.5" class="net_24"><title>LCC_3_0[0]</title></line>
+<line x1="875" x2="740" y1="273.5" y2="273.5" class="net_24"><title>LCC_3_0[0]</title></line>
+<line x1="740" x2="740" y1="273.5" y2="231" class="net_24"><title>LCC_3_0[0]</title></line>
+<circle cx="875" cy="273.5" r="2" style="fill:#000" class="net_24" />
+<line x1="740" x2="787.25" y1="231" y2="231" class="net_24"><title>LCC_3_0[0]</title></line>
+<line x1="818.25" x2="875" y1="151" y2="151" class="net_24"><title>LCC_3_0[0]</title></line>
+<line x1="875" x2="875" y1="151" y2="417" class="net_24"><title>LCC_3_0[0]</title></line>
+<line x1="875" x2="948.75" y1="417" y2="417" class="net_24"><title>LCC_3_0[0]</title></line>
+<line x1="136.5" x2="136.5" y1="305" y2="324" class="net_13"><title>CSBIT_11_0[9]</title></line>
+<line x1="136.5" x2="787.25" y1="324" y2="324" class="net_13"><title>CSBIT_11_0[9]</title></line>
+<line x1="818.25" x2="865" y1="304" y2="304" class="net_25"><title>LCC_3_0[1]</title></line>
+<line x1="865" x2="865" y1="304" y2="426.5" class="net_25"><title>LCC_3_0[1]</title></line>
+<line x1="865" x2="740" y1="426.5" y2="426.5" class="net_25"><title>LCC_3_0[1]</title></line>
+<line x1="740" x2="740" y1="426.5" y2="384" class="net_25"><title>LCC_3_0[1]</title></line>
+<circle cx="865" cy="426.5" r="2" style="fill:#000" class="net_25" />
+<line x1="740" x2="787.25" y1="384" y2="384" class="net_25"><title>LCC_3_0[1]</title></line>
+<line x1="818.25" x2="865" y1="304" y2="304" class="net_25"><title>LCC_3_0[1]</title></line>
+<line x1="865" x2="865" y1="304" y2="437" class="net_25"><title>LCC_3_0[1]</title></line>
+<line x1="865" x2="948.75" y1="437" y2="437" class="net_25"><title>LCC_3_0[1]</title></line>
+<line x1="384" x2="420" y1="1539" y2="1539" class="net_17"><title>LCSN</title></line>
+<line x1="420" x2="420" y1="1539" y2="1706" class="net_17"><title>LCSN</title></line>
+<line x1="420" x2="710" y1="1706" y2="1706" class="net_17"><title>LCSN</title></line>
+<line x1="710" x2="710" y1="1706" y2="1890" class="net_17"><title>LCSN</title></line>
+<circle cx="420" cy="1539" r="2" style="fill:#000" class="net_17" />
+<circle cx="420" cy="1706" r="2" style="fill:#000" class="net_17" />
+<line x1="710" x2="787" y1="1890" y2="1890" class="net_17"><title>LCSN</title></line>
+<line x1="384" x2="420" y1="1539" y2="1539" class="net_17"><title>LCSN</title></line>
+<line x1="420" x2="420" y1="1539" y2="1737.5" class="net_17"><title>LCSN</title></line>
+<line x1="420" x2="477" y1="1737.5" y2="1737.5" class="net_17"><title>LCSN</title></line>
+<line x1="384" x2="420" y1="1539" y2="1539" class="net_17"><title>LCSN</title></line>
+<line x1="420" x2="420" y1="1539" y2="1496.5" class="net_17"><title>LCSN</title></line>
+<line x1="420" x2="477" y1="1496.5" y2="1496.5" class="net_17"><title>LCSN</title></line>
+<line x1="384" x2="420" y1="1539" y2="1539" class="net_17"><title>LCSN</title></line>
+<line x1="420" x2="420" y1="1539" y2="1584.5" class="net_17"><title>LCSN</title></line>
+<circle cx="420" cy="1584.5" r="2" style="fill:#000" class="net_17" />
+<line x1="420" x2="477" y1="1584.5" y2="1584.5" class="net_17"><title>LCSN</title></line>
+<line x1="653.25" x2="787" y1="1910" y2="1910" class="net_38"><title>s_csbit7_qn</title></line>
+<line x1="508" x2="555" y1="1737.5" y2="1737.5" class="net_30"><title>TSEL_3_0[2]</title></line>
+<line x1="555" x2="555" y1="1737.5" y2="1408.5" class="net_30"><title>TSEL_3_0[2]</title></line>
+<circle cx="555" cy="1737.5" r="2" style="fill:#000" class="net_30" />
+<line x1="555" x2="622" y1="1408.5" y2="1408.5" class="net_30"><title>TSEL_3_0[2]</title></line>
+<line x1="508" x2="555" y1="1737.5" y2="1737.5" class="net_30"><title>TSEL_3_0[2]</title></line>
+<line x1="555" x2="555" y1="1737.5" y2="2022.5" class="net_30"><title>TSEL_3_0[2]</title></line>
+<line x1="555" x2="948.75" y1="2022.5" y2="2022.5" class="net_30"><title>TSEL_3_0[2]</title></line>
+<line x1="508" x2="565" y1="1496.5" y2="1496.5" class="net_29"><title>TSEL_3_0[1]</title></line>
+<line x1="565" x2="565" y1="1496.5" y2="1428.5" class="net_29"><title>TSEL_3_0[1]</title></line>
+<circle cx="565" cy="1496.5" r="2" style="fill:#000" class="net_29" />
+<line x1="565" x2="622" y1="1428.5" y2="1428.5" class="net_29"><title>TSEL_3_0[1]</title></line>
+<line x1="508" x2="622" y1="1496.5" y2="1496.5" class="net_29"><title>TSEL_3_0[1]</title></line>
+<line x1="508" x2="565" y1="1496.5" y2="1496.5" class="net_29"><title>TSEL_3_0[1]</title></line>
+<line x1="565" x2="565" y1="1496.5" y2="1695" class="net_29"><title>TSEL_3_0[1]</title></line>
+<line x1="565" x2="875" y1="1695" y2="1695" class="net_29"><title>TSEL_3_0[1]</title></line>
+<line x1="875" x2="875" y1="1695" y2="2002.5" class="net_29"><title>TSEL_3_0[1]</title></line>
+<line x1="875" x2="948.75" y1="2002.5" y2="2002.5" class="net_29"><title>TSEL_3_0[1]</title></line>
+<line x1="653" x2="700" y1="1408.5" y2="1408.5" class="net_39"><title>s_gates3_out</title></line>
+<line x1="700" x2="700" y1="1408.5" y2="1476.5" class="net_39"><title>s_gates3_out</title></line>
+<line x1="700" x2="787" y1="1476.5" y2="1476.5" class="net_39"><title>s_gates3_out</title></line>
+<line x1="653" x2="787" y1="1496.5" y2="1496.5" class="net_40"><title>s_gates7_out</title></line>
+<line x1="818" x2="895" y1="1476.5" y2="1476.5" class="net_41"><title>s_gates4_out</title></line>
+<line x1="895" x2="895" y1="1476.5" y2="1870" class="net_41"><title>s_gates4_out</title></line>
+<line x1="895" x2="942" y1="1870" y2="1870" class="net_41"><title>s_gates4_out</title></line>
+<line x1="818" x2="942" y1="1890" y2="1890" class="net_31"><title>TSEL_3_0[3]</title></line>
+<line x1="818" x2="865" y1="1890" y2="1890" class="net_31"><title>TSEL_3_0[3]</title></line>
+<line x1="865" x2="865" y1="1890" y2="2062" class="net_31"><title>TSEL_3_0[3]</title></line>
+<line x1="865" x2="949.25" y1="2062" y2="2062" class="net_31"><title>TSEL_3_0[3]</title></line>
+<circle cx="865" cy="1890" r="2" style="fill:#000" class="net_31" />
+<line x1="949.25" x2="949.25" y1="2062" y2="2043" class="net_31"><title>TSEL_3_0[3]</title></line>
+<line x1="973" x2="1045" y1="1870" y2="1870" class="net_19"><title>ACONDN</title></line>
+<line x1="954.75" x2="1045" y1="1039" y2="1039" class="net_20,21,22,23"><title>FS_6_3</title></line>
+<line x1="954.75" x2="1045" y1="427" y2="427" class="net_24,25,26,27"><title>LCC_3_0</title></line>
+<line x1="954.75" x2="1045" y1="1992.5" y2="1992.5" class="net_28,29,30,31"><title>TSEL_3_0</title></line>
+<line x1="812.5" x2="885" y1="1584.5" y2="1584.5" class="net_28"><title>TSEL_3_0[0]</title></line>
+<line x1="885" x2="885" y1="1584.5" y2="1982.5" class="net_28"><title>TSEL_3_0[0]</title></line>
+<line x1="885" x2="948.75" y1="1982.5" y2="1982.5" class="net_28"><title>TSEL_3_0[0]</title></line>
+<line x1="40" x2="132.5" y1="62" y2="62" class="net_4,5,6,7,8,9,10,11,12,13,14,15"><title>CSBIT_11_0</title></line>
+<line x1="132.5" x2="132.5" y1="62" y2="94" class="net_4,5,6,7,8,9,10,11,12,13,14,15"><title>CSBIT_11_0</title></line>
+<text x="182.0" y="1774.5" class="netlabel">CSBIT_11_0[6]</text>
+<text x="162.0" y="1907.0" class="netlabel">CSBIT_11_0[7]</text>
+<text x="172.0" y="168.0" class="netlabel">CSBIT_11_0[8]</text>
+<text x="139.5" y="321.0" class="netlabel">CSBIT_11_0[9]</text>
+<text x="252.0" y="474.0" class="netlabel">CSBIT_11_0[10]</text>
+<text x="232.0" y="627.0" class="netlabel">CSBIT_11_0[11]</text>
+<text x="43.0" y="1101.0" class="netlabel">CSSCOND</text>
+<text x="423.0" y="1703.0" class="netlabel">LCSN</text>
+<text x="302.0" y="760.0" class="netlabel">MCLK</text>
+<text x="976.0" y="1867.0" class="netlabel">ACONDN</text>
+<text x="138.0" y="1166.0" class="netlabel">sysclk</text>
+<text x="743.0" y="882.5" class="netlabel">FS_6_3[0]</text>
+<text x="957.8" y="1036.0" class="netlabel">FS_6_3</text>
+<text x="743.0" y="1035.5" class="netlabel">FS_6_3[1]</text>
+<text x="821.2" y="1066.0" class="netlabel">FS_6_3[2]</text>
+<text x="821.2" y="1274.0" class="netlabel">FS_6_3[3]</text>
+<text x="743.0" y="270.5" class="netlabel">LCC_3_0[0]</text>
+<text x="957.8" y="424.0" class="netlabel">LCC_3_0</text>
+<text x="743.0" y="423.5" class="netlabel">LCC_3_0[1]</text>
+<text x="821.2" y="454.0" class="netlabel">LCC_3_0[2]</text>
+<text x="821.2" y="607.0" class="netlabel">LCC_3_0[3]</text>
+<text x="815.5" y="1581.5" class="netlabel">TSEL_3_0[0]</text>
+<text x="957.8" y="1989.5" class="netlabel">TSEL_3_0</text>
+<text x="568.0" y="1692.0" class="netlabel">TSEL_3_0[1]</text>
+<text x="138.0" y="1046.0" class="netlabel">MCLK_EN</text>
+<text x="558.0" y="2019.5" class="netlabel">TSEL_3_0[2]</text>
+<text x="821.0" y="1887.0" class="netlabel">TSEL_3_0[3]</text>
+<text x="141.0" y="1101.0" class="netlabel">s_cscond_n</text>
+<text x="511.0" y="1581.5" class="netlabel">s_tsel_3_0_n_out</text>
+<text x="312.0" y="1724.0" class="netlabel">s_csbit4_q</text>
+<text x="312.0" y="1364.0" class="netlabel">s_csbit5_q</text>
+<text x="312.0" y="1877.0" class="netlabel">s_csbit6_q</text>
+<text x="578.0" y="2009.5" class="netlabel">s_csbit7_q</text>
+<text x="656.2" y="1907.0" class="netlabel">s_csbit7_qn</text>
+<text x="703.0" y="1473.5" class="netlabel">s_gates3_out</text>
+<text x="262.0" y="780.0" class="netlabel">CSBIT_11_0[0]</text>
+<text x="43.0" y="59.0" class="netlabel">CSBIT_11_0</text>
+<text x="656.0" y="1493.5" class="netlabel">s_gates7_out</text>
+<text x="821.0" y="1473.5" class="netlabel">s_gates4_out</text>
+<text x="242.0" y="933.0" class="netlabel">CSBIT_11_0[1]</text>
+<text x="222.0" y="1035.0" class="netlabel">CSBIT_11_0[2]</text>
+<text x="212.0" y="1188.0" class="netlabel">CSBIT_11_0[3]</text>
+<text x="202.0" y="1621.5" class="netlabel">CSBIT_11_0[4]</text>
+<text x="192.0" y="1261.5" class="netlabel">CSBIT_11_0[5]</text>
 </svg>

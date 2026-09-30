@@ -244,6 +244,18 @@ def module_json(mod, name):
         for k in list(c.get("connections", {})):
             c["connections"][k] = unz(c["connections"][k])
     n_z_wires = len(zbits)
+    # A port left open in the code (`.QCN()`) comes out of yosys with NO
+    # bits. netlistsvg names a wire after its bit numbers, so every empty
+    # port in a module got the same name and was drawn as ONE wire joining
+    # all the unused outputs to each other - a connection the code does not
+    # have (seen on CGA_ALU_STS: R41P_EN QCN "wired" to SCAN_FF_EN Q, and on
+    # 48 more pages, 30-SEP-2026). Each open port gets a bit of its own that
+    # nothing else uses: the pin is drawn, with no wire to anywhere.
+    for c in m.get("cells", {}).values():
+        for k in list(c.get("connections", {})):
+            if not c["connections"][k]:
+                top_bit[0] += 1
+                c["connections"][k] = [top_bit[0]]
     # a named wire tied to z: its bits must be numbers too, or netlistsvg
     # refuses the module (a new number joins it to nothing)
     for nn in m.get("netnames", {}).values():
