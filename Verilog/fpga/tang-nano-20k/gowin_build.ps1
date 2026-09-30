@@ -59,13 +59,11 @@ $ErrorActionPreference = "Stop"
 
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# gw_sh: ND120_GOWIN (environment or Verilog/fpga/local.mk - copy
-# local.mk.example), else gw_sh.exe on PATH. No install path is written here.
+# gw_sh: ND120_GOWIN (environment, or local.mk at the repository root -
+# python3 configure.py writes it). No install path is written here. A missing
+# or wrong value stops here, before any work, with the one message naming it.
 . (Join-Path $here "..\paths.ps1")
-$gwsh = Resolve-ND120Tool -Var "ND120_GOWIN" -Names @("gw_sh.exe", "gw_sh")
-if (-not $gwsh) {
-    Write-Error "gw_sh.exe not found - set ND120_GOWIN in Verilog/fpga/local.mk (see local.mk.example) or put gw_sh.exe on PATH."
-}
+$gwsh = Resolve-ND120Tool -Var "ND120_GOWIN" -Target "gowin_build.ps1"
 
 $wcs  = Join-Path $here "..\..\..\Code\Microcode\wcs"
 if (-not (Test-Path (Join-Path $wcs "wcs_16C.hex"))) {

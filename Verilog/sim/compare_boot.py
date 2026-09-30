@@ -10,14 +10,22 @@ import sys
 import re
 import os
 
+# Local settings: the environment first, then local.mk at the repository
+# root (written by configure.py - see CONTRIBUTING.md "Local settings").
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")))
+import configure  # noqa: E402
+
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def _need_env(name, what):
-    """Read a location outside this repository from the environment; stop with a clear message if unset."""
-    value = os.environ.get(name)
+    """Read a location outside this repository: the environment first, then
+    local.mk at the repository root; stop with a clear message if unset."""
+    value = configure.setting_path(name)
     if not value:
-        sys.exit("compare_boot.py: set %s to %s" % (name, what))
+        sys.exit("compare_boot.py: %s is not set - it names %s.\n"
+                 "  Fix: from the repository root run   python3 configure.py --set %s=<value>\n"
+                 "  See CONTRIBUTING.md \"Local settings\"." % (name, what, name))
     return value
 
 

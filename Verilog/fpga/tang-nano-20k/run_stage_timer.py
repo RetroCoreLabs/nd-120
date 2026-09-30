@@ -9,7 +9,10 @@ import re, sys, time, serial
 
 PORT = "/dev/ttyUSB1"
 import os
-LOG = os.path.join(os.environ.get("ND120_ORACLE_DIR", "/tmp"), "stage_timer_run.log")
+# ND120_ORACLE_DIR: the environment, else local.mk at the repository root.
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..")))
+import configure  # noqa: E402
+LOG = os.path.join(configure.setting_path("ND120_ORACLE_DIR", "/tmp"), "stage_timer_run.log")
 GAP = 0.30
 
 s = serial.Serial(PORT, 115200, bytesize=serial.SEVENBITS,

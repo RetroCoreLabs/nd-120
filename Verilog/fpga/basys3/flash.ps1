@@ -3,26 +3,20 @@
 #        .\flash.ps1 -Quick       (JTAG only, volatile, fast)
 
 #
-# Paths: ND120_BASYS3_PROJECT (the Vivado project folder, required) and
-# ND120_VIVADO (else vivado.bat on PATH), from Verilog/fpga/local.mk or the
-# environment - see Verilog/fpga/local.mk.example.
+# Paths: ND120_BASYS3_PROJECT (the Vivado project folder) and ND120_VIVADO,
+# both required, from local.mk at the repository root (python3 configure.py
+# writes it) or the environment - see local.mk.example.
 
 param(
-    # Empty = take ND120_VIVADO, else vivado.bat on PATH (see Verilog/fpga/paths.ps1).
+    # Empty = take ND120_VIVADO (see Verilog/fpga/paths.ps1).
     [string]$VivadoPath = "",
     [switch]$Quick
 )
 
 . (Join-Path $PSScriptRoot "..\paths.ps1")
 
-$VivadoPath = Resolve-ND120Tool -Given $VivadoPath -Var "ND120_VIVADO" -Names @("vivado.bat", "vivado")
-if (-not $VivadoPath) {
-    Write-Error "Vivado not found - set ND120_VIVADO in Verilog/fpga/local.mk or pass -VivadoPath"
-    exit 1
-}
-
-$ProjectDir = Get-ND120Required -Var "ND120_BASYS3_PROJECT" -What "the folder holding the Basys3 Vivado project ND3202D.xpr"
-if (-not $ProjectDir) { exit 1 }
+$VivadoPath = Resolve-ND120Tool -Given $VivadoPath -Var "ND120_VIVADO" -Target "flash.ps1"
+$ProjectDir = Get-ND120Required -Var "ND120_BASYS3_PROJECT" -Target "flash.ps1"
 $BitFile = Join-Path $ProjectDir "output\ND120_TOP.bit"
 if (-not (Test-Path $BitFile)) {
     Write-Error "No bitstream found at $BitFile - run a build first"

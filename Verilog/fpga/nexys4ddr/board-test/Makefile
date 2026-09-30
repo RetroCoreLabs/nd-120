@@ -4,18 +4,19 @@
 #   make build  build only (no board needed)
 #   make clean  remove build outputs
 #
-# Vivado path: ND120_VIVADO from ../../local.mk (copy ../../local.mk.example),
-# else vivado on the Windows PATH; make VIVADO=... overrides for one run.
+# Vivado path: ND120_VIVADO from local.mk at the repository root (python3
+# configure.py writes it); make VIVADO=... overrides for one run.
 
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../paths.mk
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../../paths.mk
 
-VIVADO ?= $(or $(ND120_VIVADO),vivado)
 CMD     = cmd.exe /c
 
 all:
+	@$(call nd120_require,$(ND120_NEED_VIVADO),make all)
 	$(CMD) "$(VIVADO)" -mode batch -source build.tcl
 
 build:
+	@$(call nd120_require,$(ND120_NEED_VIVADO),make build)
 	$(CMD) "$(VIVADO)" -mode batch -source build.tcl -tclargs -noburn
 
 clean:

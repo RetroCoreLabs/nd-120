@@ -199,6 +199,12 @@ def setting(name, default=None):
     return v if v else default
 
 
+def setting_path(name, default=None):
+    """setting(name) as a path this host can open (see host_path)."""
+    v = setting(name)
+    return host_path(v) if v else default
+
+
 def host_path(value):
     """Turn a stored path into one this host can open.
 
@@ -515,15 +521,26 @@ def require_message(names, problems, local_mk_exists, target=None):
     return "\n".join(lines)
 
 
-def require(names, target=None, stream=sys.stderr):
+def require(items, target=None, stream=sys.stderr):
     """Check the settings a target needs BEFORE it does any work. Prints the
-    block and returns 2 when something is wrong; creates the build folder."""
+    block and returns 2 when something is wrong; creates the build folder.
+
+    items are NAMEs (value from the environment, then local.mk) or NAME=VALUE
+    (the value the caller already worked out - paths.mk passes make's own
+    value this way, and an empty VALUE means the setting is missing)."""
     lm_exists = os.path.exists(LOCAL_MK)
     lm = read_local_mk() if lm_exists else {}
     problems = []
     values = {}
-    for n in names:
-        v = os.environ.get(n, "").strip() or lm.get(n, "")
+    names = []
+    for it in items:
+        if "=" in it:
+            n, v = it.split("=", 1)
+            n, v = n.strip(), v.strip()
+        else:
+            n = it.strip()
+            v = os.environ.get(n, "").strip() or lm.get(n, "")
+        names.append(n)
         values[n] = v
         if not v:
             problems.append(("missing", n, ""))
@@ -783,6 +800,9 @@ def main(argv=None):
                     help="do not run git submodule update --init")
     ap.add_argument("--no-setup", action="store_true",
                     help="only write local.mk; skip submodules, microcode and build folder")
+    ap.add_argument("--get", metavar="NAME",
+                    help="print one setting as this shell opens it (environment first, "
+                         "then local.mk); prints nothing and exits 1 when it is not set")
     ap.add_argument("--require", nargs="+", metavar="NAME",
                     help=argparse.SUPPRESS)   # used by paths.mk before a target runs
     ap.add_argument("--for", dest="target", help=argparse.SUPPRESS)
@@ -790,6 +810,14 @@ def main(argv=None):
 
     if a.require:
         return require(a.require, a.target)
+    if a.get:
+        v = setting(a.get)
+        if not v:
+            return 1
+        # A Windows program stays a Windows path: from WSL it is started
+        # through powershell.exe/cmd.exe, which need that form.
+        print(v if is_windows_tool(v) else host_path(v))
+        return 0
     if a.check:
         return check()
 

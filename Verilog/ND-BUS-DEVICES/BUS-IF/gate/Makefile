@@ -9,10 +9,14 @@
 # suite the perl `verilator` wrapper is broken - use the real binary + its
 # bundled python + w64devkit gcc (ND120_OSS_CAD_SUITE and ND120_W64DEVKIT name
 # the folders those two are installed in; ND_REPOS the folder that holds the
-# other ND checkouts):
+# other ND checkouts - all three from local.mk at the repository root, written
+# by python3 configure.py, or the environment):
 #   export VERILATOR_ROOT=$ND120_OSS_CAD_SUITE/share/verilator
 #   export PATH="$ND120_OSS_CAD_SUITE/lib:$ND120_W64DEVKIT/bin:$ND120_OSS_CAD_SUITE/bin:$PATH"
-#   make VERILATOR=verilator_bin.exe NDDEVICECORE=$ND_REPOS/NDModulE/lib/NDDeviceCore
+#   make VERILATOR=verilator_bin.exe NDDEVICECORE='$(ND_REPOS)/NDModulE/lib/NDDeviceCore'
+# (the single quotes keep $(ND_REPOS) for make, which takes it from local.mk.)
+
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../../paths.mk
 
 VERILATOR ?= verilator
 

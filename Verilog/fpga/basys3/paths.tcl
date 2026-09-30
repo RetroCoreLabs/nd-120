@@ -9,11 +9,11 @@
 # drive letter or checkout location is written anywhere.
 #
 # The one path OUTSIDE the repository is the Basys3 Vivado GUI project (the
-# folder holding ND3202D.xpr). It comes from the environment variable
-# ND120_BASYS3_PROJECT, taken from the environment or, when it is not set
-# there, from Verilog/fpga/local.mk (copy local.mk.example to local.mk and
-# fill it in - this file reads it, so the Vivado console needs nothing
-# extra). To point one console session somewhere else:
+# folder holding ND3202D.xpr). It comes from ND120_BASYS3_PROJECT, taken from
+# the environment or, when it is not set there, from local.mk at the
+# repository root (written by configure.py; ../paths.tcl reads it, so the
+# Vivado console needs nothing extra). To point one console session
+# somewhere else:
 #   set ::env(ND120_BASYS3_PROJECT) {<folder holding ND3202D.xpr>}
 #
 # Variables this file sets (all prefixed b3_ so they cannot collide with a
@@ -32,35 +32,13 @@ set b3_verilog_dir [file normalize [file join $b3_here .. ..]]
 set b3_logdir      [file join $b3_here logs]
 file mkdir $b3_logdir
 
-# A script started straight from the Vivado console has not been through make,
-# so read Verilog/fpga/local.mk here as well. Only plain "NAME := value" lines
-# for ND120_* / ND_REPOS are taken, and a value already in the environment wins.
-set b3_localmk [file join $b3_here .. local.mk]
-if {[file exists $b3_localmk]} {
-    set _fh [open $b3_localmk r]
-    foreach _line [split [read $_fh] "\n"] {
-        if {[regexp {^\s*(ND120_[A-Za-z0-9_]+|ND_REPOS)\s*[:?]?=(.*)$} $_line -> _name _val]} {
-            set _val [string trim $_val]
-            if {![info exists ::env($_name)] || $::env($_name) eq ""} {
-                set ::env($_name) $_val
-            }
-        }
-    }
-    close $_fh
-    unset -nocomplain _fh _line _name _val
-}
+# Shared helpers: reads local.mk at the repository root (the environment
+# wins), and stops with the one "missing setting" message.
+source [file join $b3_here .. paths.tcl]
 
-if {![info exists ::env(ND120_BASYS3_PROJECT)] || [string trim $::env(ND120_BASYS3_PROJECT)] eq ""} {
-    puts "ERROR: ND120_BASYS3_PROJECT is not set."
-    puts "       It must name the folder that holds the Basys3 Vivado project ND3202D.xpr."
-    puts "       Copy Verilog/fpga/local.mk.example to Verilog/fpga/local.mk and set it there,"
-    puts "       or set it in the environment."
-    # error, not exit: exit would close a Vivado GUI session that sourced this.
-    # In batch mode the uncaught error ends the run.
-    error "ND120_BASYS3_PROJECT is not set - see Verilog/fpga/local.mk.example"
-}
+nd120_require ND120_BASYS3_PROJECT "the Basys3 scripts"
 
-set b3_project_dir [file normalize $::env(ND120_BASYS3_PROJECT)]
+set b3_project_dir [file normalize [nd120_host_path [nd120_setting ND120_BASYS3_PROJECT]]]
 set b3_output_dir  [file join $b3_project_dir output]
 set b3_routed_dcp  [file join $b3_project_dir ND3202D.runs impl_1 ND120_TOP_routed.dcp]
 set b3_bit         [file join $b3_output_dir ND120_TOP.bit]

@@ -12,6 +12,10 @@
 # community image raetro/quartus:17.0 carries that version, so nothing has to
 # be installed on the host. Run it from WSL (Linux paths, docker socket).
 
+# Local settings: local.mk at the repository root (python3 configure.py writes
+# it). `make check-config` shows every setting.
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
+
 SHELL := /bin/bash
 .DELETE_ON_ERROR:
 

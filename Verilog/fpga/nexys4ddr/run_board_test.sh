@@ -20,9 +20,9 @@
 #   ./run_board_test.sh sintran_boot
 #
 # Requirements: the Windows host runs Vivado, COM11 free.
-# Vivado path and licence: ND120_VIVADO and ND120_VIVADO_LICENSE, from the
-# environment or ../local.mk (copy ../local.mk.example). ND120_VIVADO unset =
-# vivado on the Windows PATH; ND120_VIVADO_LICENSE unset = the Windows user
+# Vivado path and licence: ND120_VIVADO (required) and ND120_VIVADO_LICENSE,
+# from the environment or local.mk at the repository root (python3
+# configure.py writes it). ND120_VIVADO_LICENSE unset = the Windows user
 # (then machine) XILINXD_LICENSE_FILE.
 # The runner NEVER fights for the port: if COM11 is held (a human at the
 # console), it reports port-busy and exits without touching anything.
@@ -39,15 +39,14 @@ STAMP=$(date +%Y%m%d-%H%M%S)
 OUT="boardtest-results/${NAME}-${STAMP}"
 mkdir -p "$OUT"
 
-# Local paths: take ND120_* / ND_REPOS from ../local.mk unless the
-# environment already holds them. Plain "NAME := value" lines only.
-if [ -f ../local.mk ]; then
-    while IFS= read -r kv; do
-        name=${kv%%=*}; val=${kv#*=}
-        [ -z "${!name:-}" ] && export "$name=$val"
-    done < <(sed -n -E 's/\r$//; s/^[[:space:]]*(ND120_[A-Za-z0-9_]+|ND_REPOS)[[:space:]]*[:?]?=[[:space:]]*(.*[^[:space:]])[[:space:]]*$/\1=\2/p' ../local.mk)
-fi
-VIVADO_EXE="${ND120_VIVADO:-vivado}"
+# Local settings: the environment first, then local.mk at the repository
+# root - configure.py does the reading (and checks before any work), so the
+# rule and the message are the same as make's.
+ROOT="$(cd ../../../.. && pwd)"
+python3 "$ROOT/configure.py" --require ND120_VIVADO --for "run_board_test.sh" || exit 2
+ND120_VIVADO="${ND120_VIVADO:-$(python3 "$ROOT/configure.py" --get ND120_VIVADO)}"
+ND120_VIVADO_LICENSE="${ND120_VIVADO_LICENSE:-$(python3 "$ROOT/configure.py" --get ND120_VIVADO_LICENSE)}"
+VIVADO_EXE="$ND120_VIVADO"
 HERE_WIN=$(wslpath -w "$(pwd)")
 if [ -n "${ND120_VIVADO_LICENSE:-}" ]; then
     LIC_PS="\$env:XILINXD_LICENSE_FILE='${ND120_VIVADO_LICENSE}'"

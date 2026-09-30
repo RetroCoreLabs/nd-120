@@ -5,7 +5,8 @@
 # Boots INSTRUCTION-B (400$ papertape), types the AREA command, records the
 # golden-format trace and compares it against the ND-110 reference:
 #   $ND_REPOS/ND110Compile/traces/TRACE-INSTRUCTION-VERIFY-<AREA>.md
-# ND_REPOS is the folder that holds the other ND checkouts; it must be set.
+# ND_REPOS is the folder that holds the other ND checkouts; it must be set,
+# in the environment or in local.mk at the repository root (configure.py).
 # Prints "TB_RESULT: PASS" only when the comparator reports equivalence.
 #
 # Heavy gate (~15 min sim): invoked from `make test-instr-<area>` /
@@ -16,9 +17,15 @@ set -u
 AREA="${1:?usage: run_area_test.sh <AREA>}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUNSIM="$HERE/../../runSim"
+# The environment wins; else local.mk at the repository root, read by
+# configure.py (the same rule every other reader follows).
+if [ -z "${ND_REPOS:-}" ]; then
+    ND_REPOS="$(python3 "$HERE/../../../configure.py" --get ND_REPOS 2>/dev/null)"
+fi
 if [ -z "${ND_REPOS:-}" ]; then
     echo "FAIL: ND_REPOS is not set - it names the folder that holds the"
     echo "      ND110Compile checkout, where the ND-110 golden traces live."
+    echo "      Fix: from the repository root run   python3 configure.py --set ND_REPOS=<folder>"
     echo "TB_RESULT: FAIL (ND_REPOS not set - area NOT tested)"
     exit 1
 fi

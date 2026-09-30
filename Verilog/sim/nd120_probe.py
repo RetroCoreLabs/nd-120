@@ -71,10 +71,12 @@ def _to_wsl_path(p):
 
 
 # The sim/ directory as seen from INSIDE WSL (so we can cd there and use relative
-# BPUN paths). Overridable via ND120_SIM_WSLDIR. The default is this file's own
-# folder, translated to its WSL form, so no machine path is written here.
-DEFAULT_WSLDIR = os.environ.get(
-    "ND120_SIM_WSLDIR", _to_wsl_path(_HERE))
+# BPUN paths). Overridable via ND120_SIM_WSLDIR (the environment, else local.mk
+# at the repository root). The default is this file's own folder, translated
+# to its WSL form, so no machine path is written here.
+sys.path.insert(0, os.path.normpath(os.path.join(_HERE, "..", "..")))
+import configure  # noqa: E402
+DEFAULT_WSLDIR = configure.setting("ND120_SIM_WSLDIR") or _to_wsl_path(_HERE)
 
 
 def _line_fields(line):

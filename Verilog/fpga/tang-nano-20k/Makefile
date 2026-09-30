@@ -29,13 +29,17 @@
 # Selection is via TANG_VARIANT_* pre-defines consumed by src/tang20k_defines.v
 # - no file editing, both toolchains use the same mechanism.
 
-# Local paths (ND120_GOWIN for `make gowin`) from ../local.mk - copy
-# ../local.mk.example. ../paths.mk loads it and passes it on to
-# gowin_build.ps1 (through WSLENV from WSL).
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+# Local settings (ND120_GOWIN for `make gowin`, ND120_OSS_CAD_SUITE for the
+# OSS flow) come from local.mk at the repository root - python3 configure.py
+# writes it. paths.mk loads it and passes it on to gowin_build.ps1 (through
+# WSLENV from WSL). `make check-config` shows every setting.
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 
-# auto-add the oss-cad-suite tools to PATH when present
-OSS_CAD ?= $(HOME)/oss-cad-suite
+# auto-add the oss-cad-suite tools to PATH when present: ND120_OSS_CAD_SUITE
+# (local.mk), else the default install folder ~/oss-cad-suite. make OSS_CAD=...
+# still overrides both for one run. When none of them exists the tools come
+# from PATH (the CI runner installs yosys that way).
+OSS_CAD ?= $(or $(call nd120_hostpath,$(ND120_OSS_CAD_SUITE)),$(HOME)/oss-cad-suite)
 ifneq ($(wildcard $(OSS_CAD)/bin),)
 export PATH := $(OSS_CAD)/bin:$(PATH)
 endif
@@ -156,6 +160,7 @@ check: | $(BUILD)
 
 # ---- Gowin EDA flow (backup; Windows host) ---------------------------------
 gowin:
+	@$(call nd120_require,ND120_GOWIN,make gowin)
 	$(PS) gowin_build.ps1 -Variant $(VARIANT)
 
 # ---- programming ------------------------------------------------------------

@@ -1,16 +1,15 @@
-# Generic Vivado batch runner - no vivado-on-PATH needed when ND120_VIVADO is
-# set (Verilog/fpga/local.mk); logs go to .\logs\.
+# Generic Vivado batch runner - Vivado comes from ND120_VIVADO (local.mk at
+# the repository root, written by configure.py); logs go to .\logs\.
 # Usage:  .\run_tcl.ps1 exp_slowclk.tcl
 #         .\run_tcl.ps1 timing_explore.tcl
 param(
     [Parameter(Mandatory=$true)][string]$Tcl,
-    # Empty = take ND120_VIVADO, else vivado.bat on PATH (see Verilog/fpga/paths.ps1).
+    # Empty = take ND120_VIVADO (see Verilog/fpga/paths.ps1).
     [string]$VivadoPath = ""
 )
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-. (Join-Path $ScriptDir "..\paths.ps1")   # reads Verilog/fpga/local.mk (ND120_BASYS3_PROJECT reaches the Tcl through the environment)
-$VivadoPath = Resolve-ND120Tool -Given $VivadoPath -Var "ND120_VIVADO" -Names @("vivado.bat", "vivado")
-if (-not $VivadoPath) { Write-Error "Vivado not found - set ND120_VIVADO in Verilog/fpga/local.mk or pass -VivadoPath"; exit 1 }
+. (Join-Path $ScriptDir "..\paths.ps1")   # reads local.mk at the repository root (ND120_BASYS3_PROJECT reaches the Tcl through the environment)
+$VivadoPath = Resolve-ND120Tool -Given $VivadoPath -Var "ND120_VIVADO" -Target "run_tcl.ps1"
 $TclPath = if (Test-Path $Tcl) { (Resolve-Path $Tcl).Path } else { Join-Path $ScriptDir $Tcl }
 $LogDir = Join-Path $ScriptDir "logs"
 if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir -Force | Out-Null }

@@ -6,11 +6,11 @@
 #   .\vivado_build.ps1 -ReuseSynth     # skip the ~1h resynth, reuse existing synth_1 checkpoint (impl only)
 #   .\vivado_build.ps1 -LintOnly       # run the linter only
 #
-# Prerequisites: Vivado installed, and Verilog/fpga/local.mk made from
-# local.mk.example. Paths come from there (or from the environment):
+# Prerequisites: Vivado installed, and local.mk at the repository root
+# (python3 configure.py - or py configure.py - writes it). Paths come from
+# there (or from the environment, which wins):
 #   ND120_BASYS3_PROJECT  folder holding the Vivado project ND3202D.xpr (required)
-#   ND120_VIVADO          vivado.bat; -VivadoPath overrides it, and when
-#                         neither is given vivado.bat on PATH is used
+#   ND120_VIVADO          vivado.bat (required); -VivadoPath overrides it
 #   ND120_VIVADO_LICENSE  licence file list; used when XILINXD_LICENSE_FILE
 #                         is not already set in this process
 #
@@ -21,7 +21,7 @@
 #   * All output is logged to .\logs\  (see paths printed at start/end).
 
 param(
-    # Empty = take ND120_VIVADO, else vivado.bat on PATH (see Verilog/fpga/paths.ps1).
+    # Empty = take ND120_VIVADO (see Verilog/fpga/paths.ps1).
     [string]$VivadoPath = "",
     [switch]$LintOnly,
     # Reuse the existing synth_1 checkpoint instead of a fresh ~1h synthesis.
@@ -34,7 +34,7 @@ param(
 
 $ErrorActionPreference = "Continue"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-# Shared path helpers: reads Verilog/fpga/local.mk into the environment.
+# Shared path helpers: reads local.mk at the repository root into the environment.
 . (Join-Path $ScriptDir "..\paths.ps1")
 $RepoRoot  = (Resolve-Path (Join-Path $ScriptDir "..\..\..")).Path   # the checkout this script sits in
 $TclScript = Join-Path $ScriptDir "vivado_build.tcl"
@@ -62,21 +62,16 @@ Write-Host "   Vivado log : $VivadoLog" -ForegroundColor Cyan
 Write-Host "   PS console : $PsLog" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
-# Check Vivado exists: -VivadoPath, else ND120_VIVADO, else vivado.bat on PATH.
-$VivadoPath = Resolve-ND120Tool -Given $VivadoPath -Var "ND120_VIVADO" -Names @("vivado.bat", "vivado")
+# Check the settings before any work: -VivadoPath, else ND120_VIVADO; the
+# project folder. A missing one stops here with the one message naming it.
 if (-not $VivadoPath) {
-    Write-Error "Vivado not found. Set ND120_VIVADO in Verilog/fpga/local.mk, pass -VivadoPath, or put vivado.bat on PATH."
-    Stop-Transcript | Out-Null
-    exit 1
+    Assert-ND120Settings -Tools @("ND120_VIVADO") -Names @("ND120_BASYS3_PROJECT") -Target "vivado_build.ps1"
 }
+$VivadoPath = Resolve-ND120Tool -Given $VivadoPath -Var "ND120_VIVADO" -Target "vivado_build.ps1"
 
 # Copy microcode hex files to Vivado project directory
 # (Verilog uses $readmemh with relative paths; Vivado runs from the project dir)
-$VivadoProjectDir = Get-ND120Required -Var "ND120_BASYS3_PROJECT" -What "the folder holding the Basys3 Vivado project ND3202D.xpr"
-if (-not $VivadoProjectDir) {
-    Stop-Transcript | Out-Null
-    exit 1
-}
+$VivadoProjectDir = Get-ND120Required -Var "ND120_BASYS3_PROJECT" -Target "vivado_build.ps1"
 $OutDir           = Join-Path $VivadoProjectDir "output"
 $MicrocodeDir     = Join-Path $RepoRoot "Code\Microcode"
 $HexFiles = @("AM27256_45132L.hex", "AM27256_45133L.hex")
@@ -127,7 +122,7 @@ Write-Host "Copied $($WcsFiles.Count) WCS preload images -> $WcsDestDir (SKIP_WC
 # Read the value from the user environment at runtime - do not hard-code a
 # licence path here, it is machine-specific. If the variable is already set in
 # this process (a normal Windows shell), leave it alone. ND120_VIVADO_LICENSE
-# (Verilog/fpga/local.mk) is tried first, then the user, then the machine value.
+# (local.mk at the repository root) is tried first, then the user, then the machine value.
 # ---------------------------------------------------------------------------
 if (-not $env:XILINXD_LICENSE_FILE) {
     $userLic = $env:ND120_VIVADO_LICENSE

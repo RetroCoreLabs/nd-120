@@ -4,22 +4,24 @@
 #   make build      build only (no board needed)
 #   make clean      remove build outputs
 #
-# Vivado path: ND120_VIVADO from ../local.mk (copy ../local.mk.example), else
-# vivado on the Windows PATH; override for one run with
+# Vivado path: ND120_VIVADO from local.mk at the repository root (python3
+# configure.py writes it); override for one run with
 #   make VIVADO="<your Vivado install>\bin\vivado.bat"
+# Each target checks the settings it needs first; make check-config shows them.
 # From a Windows shell, run the tcl directly instead:
 #   cd Verilog\fpga\cmod-a7-35t        (inside your checkout)
 #   vivado -mode batch -source build.tcl [-tclargs -noburn]
 
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 
-VIVADO ?= $(or $(ND120_VIVADO),vivado)
 CMD     = cmd.exe /c
 
 all:
+	@$(call nd120_require,$(ND120_NEED_VIVADO),make all)
 	$(CMD) "$(VIVADO)" -mode batch -source build.tcl
 
 build:
+	@$(call nd120_require,$(ND120_NEED_VIVADO),make build)
 	$(CMD) "$(VIVADO)" -mode batch -source build.tcl -tclargs -noburn
 
 clean:

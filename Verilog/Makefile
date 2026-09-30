@@ -54,6 +54,14 @@
 #                    string to the nd_lineprinter core at 0430 and polls
 #                    its status register. PASS = the exact bytes landed in
 #                    the sim capture backend. ~12 min (one compile + run).
+#
+#   make check-config  what the local settings are (local.mk at the
+#                    repository root, written by python3 configure.py) and
+#                    what is missing. `make test` needs none of them; the
+#                    targets that do (test-instr needs ND_REPOS) check first
+#                    and stop with a message naming the setting.
+
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
 
 .PHONY: test-audit verify-devicecore-c-only test-demodma test-floppy-core-iox test-floppy-core-boot test-tape-core test test-full test-tape test-dma-rtl test-dma-xcheck test-floppy-boot test-floppy-stdin test-smd-boot test-instr test-democore
 
@@ -524,6 +532,7 @@ INSTR_AREAS = ARGUMENT STACK BYTE-STRING MEMORY-REFERENCE SEQUENCE \
 # `make test-instr-<AREA>` runs one area; `make test-instr` runs the full
 # validated sweep (~1.5h). test-full runs only ARGUMENT as a smoke gate.
 test-instr-%:
+	@$(call nd120_require,ND_REPOS,make test-instr-$*)
 	@echo "==== system gate: instruction-verify $* vs ND-110 golden ===="
 	bash tests/instruction-verify/run_area_test.sh $* | tee /tmp/nd120_iverify_$*_gate.log
 	grep -q "TB_RESULT: PASS" /tmp/nd120_iverify_$*_gate.log

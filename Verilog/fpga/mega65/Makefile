@@ -11,15 +11,14 @@
 # desk, so `load`/`flash` do not exist as actions: the deliverable is the
 # .cor a friend copies to an SD card and flashes from the MEGA65's own menu.
 #
-# Vivado path: $VIVADO, else ND120_VIVADO from ../local.mk (copy
-# ../local.mk.example), else vivado on the Windows PATH. The framework's own
+# Vivado path: make VIVADO=..., else ND120_VIVADO from local.mk at the
+# repository root (python3 configure.py writes it). The framework's own
 # projects were written by 2022.2 (m2m/CORE/CORE-R6.xpr) - build.tcl reads
 # the sources directly and never opens those projects.
 
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 
 BOARD  ?= r6
-VIVADO ?= $(or $(ND120_VIVADO),vivado)
 QNICE   = m2m/M2M/QNICE
 
 # The .cor packer: MEGA65's `coretool` (mega65-tools, GPL-3.0 - fetched, not
@@ -40,10 +39,14 @@ CORETOOL        = tools/coretool.py
 CORE_NAME  ?= ND-120 SINTRAN III
 CORE_VER   ?= $(shell cat build/$(BOARD)/banner_stamp.txt 2>/dev/null || echo unknown)
 
-all: rom
+# The settings are checked before the firmware ROM is built.
+all: check-settings-vivado rom
 	@mkdir -p build/$(BOARD)
 	cmd.exe /c "$(VIVADO) -mode batch -source build.tcl -log build\\$(BOARD)\\vivado.log -nojournal -tclargs board $(BOARD)"
 	$(MAKE) cor BOARD=$(BOARD)
+
+check-settings-vivado:
+	@$(call nd120_require,$(ND120_NEED_VIVADO),make all)
 
 # Pack the bitstream for the chosen revision. --target names the model byte;
 # coretool also checks the FPGA part inside the .bit against it.
@@ -88,4 +91,4 @@ flash load:
 clean:
 	rm -rf build
 
-.PHONY: all cor rom toolchain load flash clean
+.PHONY: all cor rom toolchain load flash clean check-settings-vivado

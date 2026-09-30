@@ -14,11 +14,18 @@ import os
 import re
 import sys
 
-# The listing lives in the sibling ND110Compile repository, found through the
-# ND_REPOS environment variable (the folder that holds the other ND checkouts).
-DEFAULT_SRC = (os.path.join(os.environ["ND_REPOS"], "ND110Compile", "ND110Compile",
+# Local settings: the environment first, then local.mk at the repository
+# root (written by configure.py - see CONTRIBUTING.md "Local settings").
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..")))
+import configure  # noqa: E402
+
+# The listing lives in the sibling ND110Compile repository, found through
+# ND_REPOS (the folder that holds the other ND checkouts): the environment,
+# else local.mk at the repository root.
+_ND_REPOS = configure.setting_path("ND_REPOS")
+DEFAULT_SRC = (os.path.join(_ND_REPOS, "ND110Compile", "ND110Compile",
                             "uCode", "ND-120-DELILAH-K.LISTING.TXT")
-               if os.environ.get("ND_REPOS") else None)
+               if _ND_REPOS else None)
 LINE_RE = re.compile(r"^(\d{4,})\s\s([0-7]{6})\s\s(.*)$")
 LABEL_RE = re.compile(r"^\s*([A-Z][A-Z0-9]*)\s*:(?!=)")
 ORIGIN_RE = re.compile(r"^\s*([0-7]+)\s*/")

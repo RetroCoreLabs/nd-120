@@ -8,6 +8,11 @@ import csv
 import os
 import sys
 
+# Local settings: the environment first, then local.mk at the repository
+# root (written by configure.py - see CONTRIBUTING.md "Local settings").
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")))
+import configure  # noqa: E402
+
 def parse_ila_csv(filepath):
     """Parse Vivado ILA CSV, return list of dicts with key signals."""
     rows = []
@@ -37,12 +42,13 @@ def find_col(col_map, *patterns):
     return None, None
 
 def main():
-    # The capture is the CSV Vivado exports from the ILA (impl_1/iladata.csv in
-    # the Vivado project). Give it as the first argument, or name it with the
-    # environment variable ND120_ILA_CSV.
-    filepath = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("ND120_ILA_CSV")
+    # The capture is the CSV Vivado exports from the ILA (iladata.csv). Give it
+    # as the first argument, or name it with ND120_ILA_CSV (environment, or
+    # local.mk at the repository root - python3 configure.py --set ...).
+    filepath = sys.argv[1] if len(sys.argv) > 1 else configure.setting_path("ND120_ILA_CSV")
     if not filepath:
-        sys.exit("analyze_ila.py: give the ILA CSV as the first argument, or set ND120_ILA_CSV")
+        sys.exit("analyze_ila.py: give the ILA CSV as the first argument, or set ND120_ILA_CSV\n"
+                 "  (python3 configure.py --set ND120_ILA_CSV=<file>, from the repository root)")
 
     header, rows, col_map = parse_ila_csv(filepath)
 

@@ -30,10 +30,16 @@ import os
 import re
 import sys
 
-# The listings live in the sibling ND110Compile repository, found through the
-# ND_REPOS environment variable (the folder that holds the other ND checkouts):
+# Local settings: the environment first, then local.mk at the repository
+# root (written by configure.py - see CONTRIBUTING.md "Local settings").
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..")))
+import configure  # noqa: E402
+
+# The listings live in the sibling ND110Compile repository, found through
+# ND_REPOS (the folder that holds the other ND checkouts; the environment,
+# else local.mk at the repository root):
 #   $ND_REPOS/ND110Compile/ND110Compile/uCode/<listing>
-ND_REPOS = os.environ.get("ND_REPOS")
+ND_REPOS = configure.setting_path("ND_REPOS")
 
 
 def _nd110compile_listing(name):

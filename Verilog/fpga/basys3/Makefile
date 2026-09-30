@@ -10,27 +10,36 @@
 # Windows host). On Windows, call the .ps1 scripts directly:
 #   .\vivado_build.ps1 [-ReuseSynth] [-Program] ; .\flash.ps1 [-Quick]
 #
-# Local paths (Vivado project folder, vivado.bat, licence) come from
-# ../local.mk - copy ../local.mk.example. ../paths.mk loads it and passes the
-# variables on to the PowerShell wrappers (through WSLENV from WSL).
+# Local settings (Vivado project folder, vivado.bat, licence) come from
+# local.mk at the repository root - python3 configure.py writes it. paths.mk
+# there loads it and passes the variables on to the PowerShell wrappers
+# (through WSLENV from WSL). Each target checks the settings it needs first;
+# `make check-config` shows them all.
 
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 
 PS =powershell.exe -NoProfile -ExecutionPolicy Bypass -File
 
+ND120_B3_NEEDS = ND120_VIVADO ND120_BASYS3_PROJECT
+
 all:
+	@$(call nd120_require,$(ND120_B3_NEEDS),make all)
 	$(PS) vivado_build.ps1
 
 reuse:
+	@$(call nd120_require,$(ND120_B3_NEEDS),make reuse)
 	$(PS) vivado_build.ps1 -ReuseSynth
 
 load:
+	@$(call nd120_require,$(ND120_B3_NEEDS),make load)
 	$(PS) flash.ps1 -Quick
 
 flash:
+	@$(call nd120_require,$(ND120_B3_NEEDS),make flash)
 	$(PS) flash.ps1
 
 lint:
+	@$(call nd120_require,$(ND120_B3_NEEDS),make lint)
 	$(PS) vivado_build.ps1 -LintOnly
 
 .PHONY: all reuse load flash lint
