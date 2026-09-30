@@ -59,7 +59,7 @@ module nd_ddr2_storage #(
     output reg         mem_done,
 
     // ---- controller side (ui_clk), wired to nd_ddr2_port ----
-    input  wire          ui_clk,
+    input  wire          ui_clk,  //! 75 MHz - the domain of every port signal below (from nd_ddr2_port.ui_clk)
     input  wire          ui_rst,
     output reg           req_valid,
     output reg           req_we,

@@ -75,7 +75,7 @@
 `default_nettype none
 
 module m65_keys_to_ps2 (
-    input wire clk,
+    input wire clk,                  //! pixel clock, 40.000 MHz for 800x600@60 (from nd120_console_mega65.clk)
     input wire rst_n,  //! async reset, active low
 
     //! The framework's scan, in this clock domain.
@@ -83,10 +83,10 @@ module m65_keys_to_ps2 (
     input wire       key_pressed_n,  //! 0 = key `key_num` is down (debounced)
 
     //! To ps2_decoder_tdv. One event per clock at most.
-    output reg       code_valid,
-    output reg [7:0] code_data,
-    output reg       code_release,
-    output reg       code_extended
+    output reg       code_valid,     //! strobe, one clock (to ps2_decoder_tdv.code_valid)
+    output reg [7:0] code_data,      //! the scancode itself (to ps2_decoder_tdv.code_data)
+    output reg       code_release,   //! this was a key RELEASE (F0 seen) (to ps2_decoder_tdv.code_release)
+    output reg       code_extended   //! this had the E0 prefix (to ps2_decoder_tdv.code_extended)
 );
 
   //--------------------------------------------------------------------------

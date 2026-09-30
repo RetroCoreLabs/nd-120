@@ -77,7 +77,7 @@ module MEM_RAM_49_SDRAM #(
     input sysclk,     // OSC-domain clock (unused internally; kept for symmetry)
     input sys_rst_n,  // System reset
 
-    input [9:0] AA_9_0,
+    input [9:0] AA_9_0,             //! 10 bits of LBD (including parity in bit 10)- 10 bit input to MEM/RAM (from MEM_ADDR_44.AA_9_0)
     input       BANK0,
     /* verilator lint_off UNUSEDSIGNAL */
     input       BANK1,  // absent third 1M bank (phys 2M-3M); not populated here

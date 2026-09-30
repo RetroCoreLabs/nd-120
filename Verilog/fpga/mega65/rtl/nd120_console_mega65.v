@@ -62,15 +62,15 @@ module nd120_console_mega65 #(
 
     //! The machine seam. Bytes from the ND-120's console UART come in here;
     //! keystrokes go back out. Unused in B1.
-    input  wire       cpu_byte_valid,
+    input  wire       cpu_byte_valid,  //! one clock per received byte (from console_uart_rx.byte_valid)
     input  wire [7:0] cpu_byte_data,
     output wire       cpu_byte_ready,
 
     //! Operator panel, threaded straight to terminal_top (see
     //! nd120_console_mister.v for the field meanings). B1: all constant 0.
     input wire        panel_enable,
-    input wire [ 3:0] panel_pil,
-    input wire [15:0] panel_actlv,
+    input wire [ 3:0] panel_pil,  //! Processor interrupt level (for debug capture) (from ND120_CORE.PIL)
+    input wire [15:0] panel_actlv,  //! ACTIVE LEVEL word from the panel processor (from ND120_CORE.PANEL_ACTLV)
     input wire [15:0] panel_mips,
     input wire        panel_cpu_red,
     input wire        panel_cpu_green,
@@ -87,8 +87,8 @@ module nd120_console_mega65 #(
 
     //! Keystrokes to the machine, after the key_tdv2200 expander. kbd_ready
     //! is the console UART TX's idle flag; B1 ties it high.
-    input  wire       kbd_ready,
-    output wire       kbd_valid,
+    input  wire       kbd_ready,  //! high when idle (from console_uart_tx.ready)
+    output wire       kbd_valid,  //! one clock; ignored unless ready (to console_uart_tx.byte_valid)
     output wire [7:0] kbd_data,
 
     //! Video, in the framework's shape. `de` is kept for testbenches.

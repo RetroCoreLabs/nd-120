@@ -323,7 +323,7 @@ module ND120_CORE #(
      *  backend toggle-CDCs it into clk2x.               *
      ***************************************************/
     ,
-    input  wire        stor_clk,
+    input  wire        stor_clk,    //! 27 MHz crystal (pin 4) (from ND120_TANG20K_TOP.sys_clk)
     input  wire        stor_rst_n,
     input  wire        mem_start,
     input  wire        mem_we,

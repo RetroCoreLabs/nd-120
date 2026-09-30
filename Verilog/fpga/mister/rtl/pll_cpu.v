@@ -37,7 +37,7 @@
 
 module pll_cpu (
     input  wire refclk,   //! 50 MHz board clock (CLK_50M)
-    input  wire rst,
+    input  wire rst,      //! tied to 0 (in emu)
     output wire outclk_0, //! 20 MHz, the ND-120 CPU/bus/device domain
     //! SDRAM main memory (01-SEP-2026): the sheet-49 bridge MEM_RAM_49_SDRAM
     //! runs on a 2x clock that must be EDGE-ALIGNED with the CPU clock - it

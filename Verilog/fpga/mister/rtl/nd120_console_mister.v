@@ -88,8 +88,8 @@ module nd120_console_mister #(
     //! no CPU, so every field would have been a constant; the board (not
     //! this module) decides whether it is on, via the OSD.
     input wire        panel_enable,
-    input wire [ 3:0] panel_pil,
-    input wire [15:0] panel_actlv,
+    input wire [ 3:0] panel_pil,  //! Processor interrupt level (for debug capture) (from ND120_CORE.PIL)
+    input wire [15:0] panel_actlv,  //! ACTIVE LEVEL word from the panel processor (from ND120_CORE.PANEL_ACTLV)
     input wire [15:0] panel_mips,
     input wire        panel_cpu_red,     //! CPU board LED[0] - MACL in progress
     input wire        panel_cpu_green,   //! CPU board LED[1] - init complete (self-test passed)
@@ -108,7 +108,7 @@ module nd120_console_mister #(
     //! function/cursor key is already its full ESC[nn_ sequence). kbd_ready is
     //! the console UART TX's idle flag - the expander only emits while it is
     //! high, exactly as on the Nexys (nd120_nexys4ddr_top.v CONSOLE_TX.ready).
-    input  wire       kbd_ready,
+    input  wire       kbd_ready,  //! high when idle (from console_uart_tx.ready)
     output wire       kbd_valid,  //! one clock per byte to the machine, gated by kbd_ready
     output wire [7:0] kbd_data,
 

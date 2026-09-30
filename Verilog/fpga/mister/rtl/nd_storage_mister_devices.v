@@ -48,16 +48,16 @@
 module nd_storage_mister_devices #(
     parameter integer BYTE_SWAP = 1     // see nd_storage_hps
 ) (
-    input  wire clk_cpu,
-    input  wire rst_cpu_n,
-    input  wire clk_sys,
-    input  wire rst_sys_n,
+    input  wire clk_cpu,  //! 20 MHz, the ND-120 CPU/bus/device domain (from pll_cpu.outclk_0)
+    input  wire rst_cpu_n,  //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
+    input  wire clk_sys,  //! pixel clock, 40.000 MHz for 800x600@60 (same net as nd120_console_mister.clk)
+    input  wire rst_sys_n,  //! async reset, active low, in the pixel domain (same net as nd120_console_mister.rst_n)
 
     // ---- ND_TAPE_400 byte source port (pin-for-pin) ----
-    input  wire       byte_req,
-    output wire       byte_valid,
+    input  wire       byte_req,  //! pulse: fetch next tape byte (from ND120_CORE.TAPE_BYTE_REQ)
+    output wire       byte_valid,  //! pulse: TAPE_BYTE_DATA is the byte (to ND120_CORE.TAPE_BYTE_VALID)
     output wire [7:0] byte_data,
-    input  wire       source_rewind,
+    input  wire       source_rewind,  //! pulse: rewind the tape source (from ND120_CORE.TAPE_REWIND)
     // sticky tape diagnostic - see nd_storage_tape_adapter's header: the
     // ND-400 reader has no register for "no image", so it is published here
     output wire       TDISK_FAULT,
@@ -83,10 +83,10 @@ module nd_storage_mister_devices #(
     input  wire        WDISK_START,
     input  wire        WDISK_REQ,
     input  wire        WDISK_WR,
-    input  wire [15:0] WDISK_BLKADDR1,
+    input  wire [15:0] WDISK_BLKADDR1,  //! head b15-8, sector b7-0 (from ND_WINCHESTER.disk_blkaddr1)
     input  wire [15:0] WDISK_BLKADDR2,
-    input  wire [ 2:0] WDISK_UNIT,
-    input  wire [10:0] WDISK_WORDCOUNT,
+    input  wire [ 2:0] WDISK_UNIT,  //! only bit 0 is used - two units (from ND_WINCHESTER.disk_unit)
+    input  wire [10:0] WDISK_WORDCOUNT,  //! words in the current chunk (from ND_WINCHESTER.disk_wordcount)
     output wire        WDISK_DONE,
     output wire        WDISK_ERR,
     output wire [ 3:0] WDISK_ERR_CODE,

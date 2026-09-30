@@ -91,8 +91,8 @@ module nd_storage_hps #(
     parameter integer BYTE_SWAP = 1    // 1: HPS little-endian <-> ND big-endian
 ) (
     // ---- client ports (clk_cpu domain, flattened; spec section 4) ----
-    input  wire                    clk_cpu,
-    input  wire                    rst_cpu_n,
+    input  wire                    clk_cpu,  //! 20 MHz, the ND-120 CPU/bus/device domain (from pll_cpu.outclk_0)
+    input  wire                    rst_cpu_n,  //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
     input  wire [N_CLIENTS-1:0]    open_req,
     output wire [N_CLIENTS-1:0]    open_ok,
     output wire [N_CLIENTS-1:0]    open_err,
@@ -110,8 +110,8 @@ module nd_storage_hps #(
     input  wire [N_CLIENTS*16-1:0] buf_rdata,
 
     // ---- hps_io block interface (clk_sys domain) ----
-    input  wire                    clk_sys,
-    input  wire                    rst_sys_n,
+    input  wire                    clk_sys,  //! pixel clock, 40.000 MHz for 800x600@60 (same net as nd120_console_mister.clk)
+    input  wire                    rst_sys_n,  //! async reset, active low, in the pixel domain (same net as nd120_console_mister.rst_n)
     input  wire [N_CLIENTS-1:0]    img_mounted,
     input  wire                    img_readonly,
     input  wire [63:0]             img_size,

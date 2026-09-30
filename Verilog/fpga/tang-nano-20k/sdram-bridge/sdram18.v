@@ -82,9 +82,9 @@ module sdram18
     output reg  [3:0] SDRAM_DQM,
 
     // Logic side interface
-    input             clk,
+    input             clk,          //! 2x sysclk, same PLL, edge-aligned (from MEM_43.clk2x)
     input             clk_sdram,    // phase shifted from clk (normally 180-degrees)
-    input             resetn,
+    input             resetn,       //! System reset (from MEM_RAM_49_SDRAM.sys_rst_n)
     input             rd,           // command: read
     input             wr,           // command: write
     input             refresh,      // command: auto refresh, once per ~15 us

@@ -77,18 +77,18 @@ module MEM_RAM_49_DDR2 #(
     parameter WFIFO_LOG2 = 2
 ) (
     // Sheet-49 interface (same as MEM_RAM_49)
-    input wire sysclk,
-    input wire sys_rst_n,
+    input wire sysclk,       //! System clock in FPGA (from MEM_43.sysclk)
+    input wire sys_rst_n,    //! System reset in FPGA (from MEM_43.sys_rst_n)
 
-    input wire [9:0] AA_9_0,
+    input wire [9:0] AA_9_0,  //! 10 bits of LBD (including parity in bit 10)- 10 bit input to MEM/RAM (from MEM_ADDR_44.AA_9_0)
     input wire       BANK0,
     input wire       BANK1,  // absent third 1M bank: never stored, reads 0
     input wire       BANK2,  // 2nd populated 1M bank (phys 1M-2M)
 
-    input wire CAS,
-    input wire RAS,
+    input wire CAS,          //! Column Address Strobe (from MEM_RAMC_50.CAS)
+    input wire RAS,          //! Row Address Strobe (from MEM_RAMC_50.RAS)
 
-    input wire MWRITE50_n,
+    input wire MWRITE50_n,   //! Memory Write (Delayed 50ns) (from MEM_LBDIF_48.MWRITE50_n)
 
     input  wire [17:0] DD_17_0_IN,
     output wire [17:0] DD_17_0_OUT,
@@ -97,7 +97,7 @@ module MEM_RAM_49_DDR2 #(
 
     //! Freeze request to the two registered control PALs (PAL_44803A,
     //! PAL_44902A via MEM_RAMC_50.MEM_HOLD). High = hold their state.
-    output wire MEM_HOLD,
+    output wire MEM_HOLD,    //! Freeze both control PALs (MAIN_RAM_DDR2 cache-miss (to MEM_RAMC_50.MEM_HOLD)
 
     // DDR2 client port (ui_clk domain) - wired to nd_ddr2_arb at the top
     input  wire         ui_clk,

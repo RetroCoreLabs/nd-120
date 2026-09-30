@@ -45,8 +45,8 @@ module nd_storage_vdrives #(
     parameter integer N_CLIENTS = 5    // = vdrives VDNUM; slot n = client n
 ) (
     // ---- client ports (clk_cpu domain, flattened; spec section 4) ----
-    input  wire                    clk_cpu,
-    input  wire                    rst_cpu_n,
+    input  wire                    clk_cpu,        //! 20 MHz (from nd120_mega65_machine.clk_cpu)
+    input  wire                    rst_cpu_n,      //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
     input  wire [N_CLIENTS-1:0]    open_req,
     output wire [N_CLIENTS-1:0]    open_ok,
     output wire [N_CLIENTS-1:0]    open_err,

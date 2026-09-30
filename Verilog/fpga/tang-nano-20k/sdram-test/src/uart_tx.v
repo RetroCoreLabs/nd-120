@@ -13,8 +13,8 @@ module uart_tx #(
     // Clock cycles per bit. 27 MHz / 115200 baud = 234 (-0.16% error)
     parameter DELAY_FRAMES = 234
 ) (
-    input clk,
-    input rst_n,
+    input clk,             //! 2x clk_cpu, same PLL, edge-aligned (same net as ND120_CORE.clk2x)
+    input rst_n,           //! Active-low reset, from the board's power-on reset (same net as ND120_CORE.sys_rst_n)
 
     input [7:0] tx_data,   // byte to transmit
     input       tx_valid,  // 1-cycle pulse: latch tx_data and start (only when tx_busy=0)

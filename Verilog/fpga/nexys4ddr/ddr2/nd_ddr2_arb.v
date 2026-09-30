@@ -37,7 +37,7 @@
 module nd_ddr2_arb #(
     parameter WDOG_BITS = 16   // sticky dbg_stuck after 2^WDOG_BITS cycles
 ) (
-    input wire ui_clk,
+    input wire ui_clk,                  //! 75 MHz - the domain of every port signal below (from nd_ddr2_port.ui_clk)
     input wire ui_rst,
 
     // client A: main memory
