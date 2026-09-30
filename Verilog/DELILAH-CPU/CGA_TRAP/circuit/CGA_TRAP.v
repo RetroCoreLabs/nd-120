@@ -22,7 +22,7 @@ module CGA_TRAP (
     input FTRAPN,   //! tied to 1 (in CGA)
     input INDN,     //! IND negated (from CGA_DCD.INDN)
     input INTRQN,   //! Interrupt Request, active low (from CGA_INTR.INTRQN)
-    input PANN,     //! Parity Error, active low (from CPU_PROC_CGA_33.PAN_n)
+    input PANN,     //! Panel interrupt request, active low (from CPU_PROC_CGA_33.PAN_n)
     input [1:0] PCR_1_0,  //! Program Counter Register bits 15 to 0 (from CGA_MAC.PCR_15_0[1:0])
     input PONI,     //! Memory Protection ON, PONI=1 (same net as CGA.XPONI)
     input [6:0] PT_15_9,  //! Page Table bits (from CPU_PROC_CGA_33.PT_15_9)

@@ -87,7 +87,7 @@ module IO_37(
    output       MREQ_n,     //! Memory request (to CPU_15.MREQ_n)
    output [15:0] PANEL_ACTLV,   //! the panel processor's ACTIVE LEVEL word (IO_PANCAL_40)
    output       OSC,
-   output       PAN_n,      //! Page address not valid (to CPU_15.PAN_n)
+   output       PAN_n,      //! Panel interrupt request, active low (from IO_DCD_38.PAN_n)
    output       PA_n,
    output       POWFAIL_n,  //! Power failure detected (to CPU_15.POWFAIL_n)
    output       PS_n,

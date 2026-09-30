@@ -36,7 +36,7 @@ module CPU_PROC_CGA_33 (
     input        MCLK,        //! Microcycle clock (= TERM outside RWCS, stretched during RWCS)
     input        MOR_n,       //! Memory Out of Range, active low
     input        MR_n,        //! Memory Read, active low
-    input        PAN_n,       //! Parity Error, active low
+    input        PAN_n,       //! Panel interrupt request, active low (to CGA_INTR.PANN)
     input        PARERR_n,    //! Parity Error, active low
     input        POWFAIL_n,   //! Power Fail, active low
     input [ 6:0] PT_15_9,     //! Page Table bits

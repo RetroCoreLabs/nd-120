@@ -71,7 +71,7 @@ module IO_DCD_38 (
     output MREQ_n,   //! Memory request (to CPU_15.MREQ_n)
     output OSC,
     output PANOSC,
-    output PAN_n,    //! Page address not valid (to CPU_15.PAN_n)
+    output PAN_n,    //! Panel interrupt request, active low (from the DGA, DECODE_DGA_POW.PANN)
     output [7:0] PA_7_0,  //! Data from FIFO in DGA (to IO_PANCAL_40.PA_7_0)
     output PA_n,
     output POWFAIL_n,  //! Power failure detected (to CPU_15.POWFAIL_n)

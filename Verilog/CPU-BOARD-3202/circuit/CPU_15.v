@@ -55,7 +55,7 @@ module CPU_15 (
     input       MAP_n,        //! MAP Opcode - microsequencer loads next micro-address from the opcode mapper; last microinstruction of every macro instruction (active low)
     input       MOR_n,        //! Memory Error
     input       MR_n,         //! Memory read
-    input       PAN_n,        //! Page address not valid
+    input       PAN_n,        //! Panel interrupt request, active low (from IO_37.PAN_n)
     input       PARERR_n,     //! Parity error
     input       PD1,          //! Phase detector 1
     input       PD2,          //! Phase detector 2
