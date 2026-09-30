@@ -4,24 +4,6 @@ Complete documentation of the ND-120 CPU boot sequence, covering hardware reset,
 
 ---
 
-## Table of Contents
-
-1. [Reset Entry Point](#1-reset-entry-point)
-2. [Power-On Clear and CLEAR_n Pulse](#2-power-on-clear-and-clear_n-pulse)
-3. [MR_n Generation via Sync Pipeline](#3-mr_n-generation-via-sync-pipeline)
-4. [Microcode Load — LCS_n and the PROM→WCS Copy](#4-microcode-load--lcs_n-and-the-promwcs-copy)
-5. [CPU Starts Executing](#5-cpu-starts-executing)
-6. [STP Latch and Run Control](#6-stp-latch-and-run-control)
-7. [RTC Timer and Panel Interrupt](#7-rtc-timer-and-panel-interrupt)
-8. [CPU Self-Test (SELFT / MACL2)](#8-cpu-self-test-selft--macl2)
-9. [Microcode Scratchpad Semantics](#9-microcode-scratchpad-semantics)
-10. [SIOC LED Signals](#10-sioc-led-signals)
-11. [OPCOM and Post-Boot State](#11-opcom-and-post-boot-state)
-12. [Simulation vs FPGA Timing](#12-simulation-vs-fpga-timing)
-13. [Signal Reference](#13-signal-reference)
-
----
-
 ## 1. Reset Entry Point
 
 ### FPGA

@@ -22,20 +22,6 @@ machine to a working state without guessing. Every section gives:
 
 ---
 
-## Contents
-
-- [1. Host environment](#1-host-environment)
-- [2. Simulation and lint (the daily tools)](#2-simulation-and-lint-the-daily-tools)
-- [3. FPGA vendor toolchains, per board](#3-fpga-vendor-toolchains-per-board)
-- [4. Programming and serial access](#4-programming-and-serial-access)
-- [5. Documentation and diagram generation](#5-documentation-and-diagram-generation)
-- [6. Test execution](#6-test-execution)
-- [7. Optional tools, and the honest case for skipping them](#7-optional-tools-and-the-honest-case-for-skipping-them)
-- [8. One-shot setup script](#8-one-shot-setup-script)
-- [9. This machine's configuration](#9-this-machines-configuration)
-
----
-
 ## 1. Host environment
 
 The work is driven from **Linux / WSL2 with bash**. The vendor FPGA tools run
