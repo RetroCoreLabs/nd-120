@@ -470,7 +470,6 @@ nav:
       - "Colour standard for ND-120 documentation and generated diagrams": "Verilog/docs/COLOR-STANDARDS.md"
       - "Floppy stack review (12-JUL-2026) - open items only": "Verilog/docs/floppy-review-findings.md"
       - "Floppy/Streamer controller 3106/3112 \u2014 verified register spec (ND-11.021.01)": "Verilog/docs/floppy-3112-register-spec-ND-11.021.md"
-      - "HANDOFF - SC2661 UART overrun fix, blocked on WSL": "Verilog/docs/HANDOFF-sc2661-overrun-fix.md"
       - "HANDOFF \u2014 floppy PIO (3027) controller: C and C# defects": "Verilog/docs/HANDOFF-floppy-pio-c-and-csharp-fixes.md"
       - "HANDOFF: cutting the CGA IDB combinational ring": "Verilog/docs/HANDOFF-cga-idb-ring-cut.md"
       - "HW timing model vs our Verilog - designer's notes": "Verilog/docs/hw-timing-vs-verilog.md"
@@ -510,7 +509,6 @@ nav:
       - "The Back-Wiring PROM (installation number) \u2014 mechanism, and how to bake it into a bitstream": "Verilog/docs/backwiring-prom-installation-number.md"
       - "The ND-120 cache: status, root causes and how to test it": "Verilog/docs/CACHE-STATUS.md"
       - "USB flash-drive storage for the ND-120 boards: feasibility, options, effort": "Verilog/docs/usb-storage-options.md"
-      - "Worklog 2026-08-31 - VT100 terminal, keyboard, and the SC2661 overrun bug": "Verilog/docs/worklog-2026-08-31-vt100-terminal-uart-overrun.md"
       - "Older notes in Verilog/":
           - "ND-120 microword field layout and CPU signal names": "Verilog/nd120-plan.md"
           - "ND-120 FPGA Boot Sequence": "Verilog/boot-sequence.md"

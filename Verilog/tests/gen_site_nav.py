@@ -49,6 +49,24 @@ def rel(path):
     return os.path.relpath(path, ROOT).replace(os.sep, "/")
 
 
+_TRACKED = None
+
+
+def tracked(path):
+    """True when git tracks the file. The menu may only name files a clean
+    clone has: the site is built from a fresh checkout, and one untracked
+    note in a working tree (a handoff from another session) made the
+    strict build stop on the first try (30-SEP-2026)."""
+    global _TRACKED
+    if _TRACKED is None:
+        import subprocess
+        r = subprocess.run(["git", "-C", ROOT, "ls-files", "-z"], capture_output=True)
+        if r.returncode != 0:
+            sys.exit("gen_site_nav: git ls-files failed - run from inside the checkout")
+        _TRACKED = set(p for p in r.stdout.decode("utf-8", "replace").split("\0") if p)
+    return rel(path) in _TRACKED
+
+
 def title_of(path, fallback=None):
     """The first '# ' heading of a Markdown file, without Markdown marks.
     Front matter (--- ... ---) with a title: is used when there is one."""
@@ -80,7 +98,8 @@ def title_of(path, fallback=None):
 def md_files(folder):
     """The .md files directly in a folder, sorted by name, README first."""
     try:
-        names = sorted(f for f in os.listdir(folder) if f.endswith(".md"))
+        names = sorted(f for f in os.listdir(folder)
+                       if f.endswith(".md") and tracked(os.path.join(folder, f)))
     except OSError:
         return []
     names.sort(key=lambda f: (f.lower() != "readme.md", f.lower()))
@@ -93,7 +112,7 @@ def item(title, path):
 
 def exists(*parts):
     p = os.path.join(ROOT, *parts)
-    return p if os.path.exists(p) else None
+    return p if os.path.exists(p) and tracked(p) else None
 
 
 def boards_section():
@@ -102,7 +121,8 @@ def boards_section():
     if exists("Verilog", "fpga", "README.md"):
         out.append(item("Boards overview", os.path.join(fpga, "README.md")))
     quick = [os.path.join(fpga, f) for f in sorted(os.listdir(fpga))
-             if f.startswith("QUICKSTART-") and f.endswith(".md")]
+             if f.startswith("QUICKSTART-") and f.endswith(".md")
+             and tracked(os.path.join(fpga, f))]
     if quick:
         out.append({"Quick starts": [item(title_of(q), q) for q in quick]})
     boards = [d for d in os.listdir(fpga)
@@ -117,7 +137,8 @@ def boards_section():
                         [item("Overview" if os.path.basename(f).lower() == "readme.md"
                               else title_of(f), f) for f in files]})
     rel_notes = [os.path.join(fpga, f) for f in sorted(os.listdir(fpga))
-                 if f.startswith("RELEASE") and f.endswith(".md")]
+                 if f.startswith("RELEASE") and f.endswith(".md")
+                 and tracked(os.path.join(fpga, f))]
     if rel_notes:
         out.append({"Releases": [item(title_of(r), r) for r in rel_notes]})
     return out
@@ -137,7 +158,7 @@ def design_notes_section():
     top = [os.path.join(VROOT, n) for n in
            ("nd120-plan.md", "boot-sequence.md", "cycle_clock.md", "mic-calculation.md",
             "SignalReport.md", "OWNERSHIP.md")]
-    top = [t for t in top if os.path.exists(t)]
+    top = [t for t in top if os.path.exists(t) and tracked(t)]
     if top:
         out.append({"Older notes in Verilog/": [item(title_of(t), t) for t in top]})
     return out
