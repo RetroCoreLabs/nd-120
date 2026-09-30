@@ -8,29 +8,39 @@
 #   make sim               run the mem-test iverilog testbench
 #   make lint              Verilator lint of the full design (fast, no Vivado)
 #   make clean             remove generated bitstreams/reports
+#   make check-config      show the local settings and what is missing
+#   make fresh-build ND120_FRESH_DIR=<empty folder>
+#                          clone this commit there, configure it, run `make` in
+#                          the clone - proves the build needs nothing outside the repo
 #
 # The full build (build.tcl in this directory) was written 04-SEP-2026 and has
 # NEVER BEEN RUN. The two stage tests predate it and have never run on the
 # board either - see HANDOFF-qmtech-a35t-bringup.md.
 #
 # Vivado runs on the Windows host; from WSL this delegates via powershell.exe.
-# Vivado path: ND120_VIVADO from ../local.mk (copy ../local.mk.example), else
-# vivado on the Windows PATH. On Windows, run the tcl directly:
-#   cd Verilog\fpga\qmtech-a35t        (inside your checkout)
-#   vivado -mode batch -source build.tcl [-tclargs -noburn]
+# Everything the builds write goes to $(ND120_BUILD_DIR)/qmtech-a35t/ (the stage
+# tests to .../qmtech-a35t/<test>/), and Vivado is started there.
+# Vivado path: ND120_VIVADO, build folder: ND120_BUILD_DIR, both from local.mk
+# at the repository root (python3 configure.py writes it); each target checks
+# them first. On Windows, run the tcl directly (it reads local.mk too):
+#   vivado -mode batch -source <checkout>\Verilog\fpga\qmtech-a35t\build.tcl [-tclargs -noburn]
 
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+ND120_BOARD := qmtech-a35t
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 
-VIVADO ?= $(or $(ND120_VIVADO),vivado)
-PS   = powershell.exe -NoProfile -ExecutionPolicy Bypass -Command
 TEST = mem-test
+
+# A stage test's build.tcl, started in <build>/qmtech-a35t/<test>.
+qm_test = $(call nd120_run,$(VIVADO),$(ND120_BOARD_DIR)/$(TEST),-mode batch -source '$(call nd120_toolpath,$(VIVADO),$(CURDIR)/$(TEST)/build.tcl)' -log vivado.log -journal vivado.jou$(if $(1), -tclargs $(1)))
 
 # ---- full ND-120 build -----------------------------------------------------
 all:
-	$(PS) "& '$(VIVADO)' -mode batch -source build.tcl -tclargs -noburn"
+	@$(call nd120_require,$(ND120_VIVADO_NEEDS),make all)
+	$(call nd120_vivado,build.tcl,-noburn)
 
 load:
-	$(PS) "& '$(VIVADO)' -mode batch -source build.tcl"
+	@$(call nd120_require,$(ND120_VIVADO_NEEDS),make load)
+	$(call nd120_vivado,build.tcl)
 
 flash:
 	@echo "flash: not implemented for qmtech-a35t yet (JTAG-volatile only;"
@@ -79,10 +89,12 @@ lint:
 
 # ---- stage tests (led-test, mem-test) --------------------------------------
 test:
-	cd $(TEST) && $(PS) "& '$(VIVADO)' -mode batch -source build.tcl -tclargs skip_program"
+	@$(call nd120_require,$(ND120_VIVADO_NEEDS),make test)
+	$(call qm_test,skip_program)
 
 test-load:
-	cd $(TEST) && $(PS) "& '$(VIVADO)' -mode batch -source build.tcl"
+	@$(call nd120_require,$(ND120_VIVADO_NEEDS),make test-load)
+	$(call qm_test)
 
 sim:
 	cd mem-test/sim && iverilog -g2012 -DNO_MMCM -o tb qmtech_mem_test_tb.v \
@@ -92,7 +104,9 @@ sim:
 	    ../../../../CPU-BOARD-3202/circuit/MEM_RAM_49.v \
 	    ../../../../Shared/support/SIP1M9.v && vvp tb
 
+# The build folder, plus what builds from before 30-SEP-2026 left here.
 clean:
+	$(nd120_clean_board)
 	rm -f nd120_qmtech.bit util.rpt util_synth.rpt timing.rpt \
 	      wcs_*.hex AM27256_4513*.hex vivado*.jou vivado*.log build.log
 	rm -f led-test/*.bit led-test/*.rpt mem-test/*.bit mem-test/*.rpt \

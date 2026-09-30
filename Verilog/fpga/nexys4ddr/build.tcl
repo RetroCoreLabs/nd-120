@@ -3,8 +3,9 @@
 # Template: the Basys3 build (fpga/basys3/vivado_build.tcl) - same defines,
 # same source set, same "fail loudly on negative slack" gate. The one
 # deliberate difference: no out-of-repo .xpr GUI project (the Basys3 flow
-# drives the project named by ND120_BASYS3_PROJECT). Everything here is in-memory and lives in
-# the repo, the way fpga/cmod-a7-35t/build.tcl already does it.
+# drove one until 30-SEP-2026; it is a non-project flow now too). Everything
+# here is in-memory and lives in the repo, the way fpga/cmod-a7-35t/build.tcl
+# already does it.
 #
 #   vivado -mode batch -source build.tcl                       # build + JTAG program
 #   vivado -mode batch -source build.tcl -tclargs -noburn      # build only
@@ -19,6 +20,12 @@
 set part xc7a100tcsg324-1
 set srcdir [file dirname [file normalize [info script]]]
 set vroot  [file normalize [file join $srcdir .. ..]]   ;# Verilog/
+# Everything this build writes - copied microcode, the generated banner ROM,
+# util/timing reports, the timing-analysis/run_clk<N>/ folders, bitstream,
+# probes file and Vivado's .Xil - goes to $ND120_BUILD_DIR/nexys4ddr (local.mk
+# at the repository root, written by configure.py). Never into this folder.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir nexys4ddr "Nexys 4 DDR build.tcl"]
 
 ########################################################################
 # CPU clock selection
@@ -154,17 +161,18 @@ puts "CPU clock: divider $mmcm_div -> BOARD_CLK_FREQ $board_clk Hz"
 # comparison against the original machine's behaviour.
 set skip_wcs [expr {[lsearch $argv "-promload"] < 0}]
 
-cd $srcdir
+cd $outdir
 
 if {$skip_wcs} {
     # $readmemh("wcs_*.hex") resolves against Vivado's working directory
+    # (the build folder)
     set wcs_src [file normalize [file join $vroot .. Code Microcode wcs]]
     set wcs_files [glob -nocomplain [file join $wcs_src wcs_*.hex]]
     if {[llength $wcs_files] != 33} {
         puts "ERROR: expected 33 WCS images in $wcs_src, found [llength $wcs_files]"
         exit 1
     }
-    foreach f $wcs_files { file copy -force $f [file join $srcdir [file tail $f]] }
+    foreach f $wcs_files { file copy -force $f [file join $outdir [file tail $f]] }
     puts "WCS preload: [llength $wcs_files] images copied (SKIP_WCS_LOAD)."
 } else {
     set uc [file join $vroot .. Code Microcode]
@@ -173,7 +181,7 @@ if {$skip_wcs} {
             puts "ERROR: microcode image missing: [file join $uc $hex]"
             exit 1
         }
-        file copy -force [file join $uc $hex] [file join $srcdir $hex]
+        file copy -force [file join $uc $hex] [file join $outdir $hex]
     }
     puts "-promload: microcode PROM images copied (2 files)."
 }
@@ -274,7 +282,7 @@ if {$vga_console} {
         set _cache "cache on (sw4 up = off)"
     }
     set config "Nexys 4 DDR - $_mhz MHz - $_cache"
-    set _gen [file join $srcdir build term_banner_rom.v]
+    set _gen [file join $outdir build term_banner_rom.v]
     file mkdir [file dirname $_gen]
     if {[catch {exec python [file join $vroot Terminals font make_banner.py] $stamp $_gen $config} _e]} {
         if {[catch {exec python3 [file join $vroot Terminals font make_banner.py] $stamp $_gen $config} _e2]} {
@@ -733,18 +741,18 @@ if {[lsearch $argv "physopt"] >= 0} {
 }
 
 
-report_utilization    -file [file join $srcdir util.rpt]
-report_timing_summary -file [file join $srcdir timing.rpt]
+report_utilization    -file [file join $outdir util.rpt]
+report_timing_summary -file [file join $outdir timing.rpt]
 
 # --- post-route analysis battery (clock-up campaign, 26-AUG-2026) ---
 # Every run leaves its full evidence set in timing-analysis/run_clk<sel>[_N]/
 # without ever overwriting a previous run. Placed BEFORE the WNS gate so a
 # failing frequency candidate still yields its reports. The checkpoint lets
 # any later report be regenerated without a rebuild (open_checkpoint).
-set _rundir [file join $srcdir timing-analysis run_clk$clk_sel]
+set _rundir [file join $outdir timing-analysis run_clk$clk_sel]
 set _sfx 1
 while {[file exists $_rundir]} {
-    set _rundir [file join $srcdir timing-analysis run_clk${clk_sel}_$_sfx]
+    set _rundir [file join $outdir timing-analysis run_clk${clk_sel}_$_sfx]
     incr _sfx
 }
 file mkdir $_rundir
@@ -781,13 +789,13 @@ if {$wns < 0} {
     exit 1
 }
 
-set bit [file join $srcdir nd120_nexys4ddr.bit]
+set bit [file join $outdir nd120_nexys4ddr.bit]
 # The .ltx names the ILA probes for the hardware manager. Every flag that
 # builds a debug core must be listed here or the capture comes back as
 # probe0..probeN with no names - ilacache was missed on its first build.
 if {[lsearch $argv "ila"] >= 0 || [lsearch $argv "ilaslim"] >= 0 ||
     [lsearch $argv "ilacache"] >= 0} {
-    write_debug_probes -force [file join $srcdir nd120_nexys4ddr.ltx]
+    write_debug_probes -force [file join $outdir nd120_nexys4ddr.ltx]
 }
 write_bitstream -force $bit
 puts "BITSTREAM: $bit"

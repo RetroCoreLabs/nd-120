@@ -95,7 +95,10 @@ vivado -mode batch -source build.tcl                  # build + JTAG program
 vivado -mode batch -source build.tcl -tclargs -noburn # build only
 ```
 (or `make` / `make build` from WSL - Vivado path: `ND120_VIVADO` in
-`../local.mk`, copied from `../local.mk.example`; unset = `vivado` on PATH.)
+`local.mk` at the repository root, written by `python3 configure.py`; the
+build folder `ND120_BUILD_DIR` too - everything the build writes goes to
+`$ND120_BUILD_DIR/cmod-a7-35t/`. See
+[CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings).)
 
 - **Clocking - how 27 MHz comes from the 12 MHz crystal:** the
   `TARGET_CMOD_A7` branch in

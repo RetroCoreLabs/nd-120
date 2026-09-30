@@ -246,8 +246,11 @@ vivado -mode batch -source build.tcl -tclargs -noburn   # build only, no board n
 ```
 
 From WSL: `make load` (build + program) or `make` (build only) - the Makefile
-delegates through `powershell.exe`, using `ND120_VIVADO` from `../local.mk`
-(copy `../local.mk.example`) or, unset, `vivado` on the Windows PATH. To program a bitstream that is already
+delegates through `powershell.exe`, using `ND120_VIVADO` and the build folder
+`ND120_BUILD_DIR` from `local.mk` at the repository root (written by `python3
+configure.py`; see
+[CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings)).
+Everything the build writes goes to `$ND120_BUILD_DIR/qmtech-a35t/`. To program a bitstream that is already
 built, use the Vivado Hardware Manager: *Open Target -> Auto Connect*, the
 board must enumerate as **`xc7a35t`**, then *Program Device*. LED **D3**
 (`FPGA_DONE`) lights on success. The free **Vivado Lab Tools** is enough for

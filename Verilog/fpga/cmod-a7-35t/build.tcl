@@ -1,6 +1,6 @@
 # ND-120 on Cmod A7-35T - self-contained in-memory Vivado flow
-# (mem-test/sd-fat-test pattern: no .xpr project needed, unlike the Basys3
-# main build which drives a GUI project outside the repo).
+# (mem-test/sd-fat-test pattern: no .xpr project needed - the Basys3 main
+# build drove a GUI project outside the repo until 30-SEP-2026).
 #
 #   vivado -mode batch -source build.tcl                    # build + JTAG program
 #   vivado -mode batch -source build.tcl -tclargs -noburn   # build only
@@ -15,6 +15,11 @@
 set part xc7a35tcpg236-1
 set srcdir [file dirname [file normalize [info script]]]
 set vroot  [file normalize [file join $srcdir .. ..]]   ;# Verilog/
+# Everything this build writes - copied microcode, reports, routed checkpoint,
+# bitstream, and Vivado's .Xil - goes to $ND120_BUILD_DIR/cmod-a7-35t (local.mk
+# at the repository root, written by configure.py). Never into this folder.
+source [file join $srcdir .. paths.tcl]
+set outdir [nd120_board_dir cmod-a7-35t "Cmod A7 build.tcl"]
 
 # ---- microcode ------------------------------------------------------------
 # WCS PRELOAD IS THE DEFAULT since 04-SEP-2026, matching the Tang, the Nexys
@@ -37,28 +42,30 @@ set vroot  [file normalize [file join $srcdir .. ..]]   ;# Verilog/
 set skip_wcs [expr {[lsearch $argv "-promload"] < 0}]
 if {$skip_wcs} {
     # $readmemh("wcs_*.hex") resolves against Vivado's working directory in
-    # this in-memory flow, so the images are copied next to this script.
+    # this in-memory flow, so the images are copied into the build folder
+    # and Vivado works there.
     set wcs_src   [file normalize [file join $vroot .. Code Microcode wcs]]
     set wcs_files [glob -nocomplain [file join $wcs_src wcs_*.hex]]
     if {[llength $wcs_files] != 33} {
         puts "ERROR: expected 33 WCS images in $wcs_src, found [llength $wcs_files]"
         exit 1
     }
-    foreach f $wcs_files { file copy -force $f [file join $srcdir [file tail $f]] }
-    cd $srcdir
+    foreach f $wcs_files { file copy -force $f [file join $outdir [file tail $f]] }
+    cd $outdir
     puts "WCS preload: [llength $wcs_files] images copied (SKIP_WCS_LOAD)."
 } else {
     # Microcode PROM images: $readmemh("AM27256_4513xL.hex") in CPU_CS_PROM_19.v
-    # resolves against Vivado's working directory - copy them next to us and cd.
+    # resolves against Vivado's working directory - copy them to the build
+    # folder and cd there.
     set uc [file join $vroot .. Code Microcode]
     foreach hex {AM27256_45132L.hex AM27256_45133L.hex} {
         if {![file exists [file join $uc $hex]]} {
             puts "ERROR: microcode image missing: [file join $uc $hex]"
             exit 1
         }
-        file copy -force [file join $uc $hex] [file join $srcdir $hex]
+        file copy -force [file join $uc $hex] [file join $outdir $hex]
     }
-    cd $srcdir
+    cd $outdir
     puts "-promload: microcode PROM images copied (2 files)."
 }
 
@@ -122,8 +129,8 @@ opt_design
 place_design
 route_design
 
-report_utilization    -file [file join $srcdir util.rpt]
-report_timing_summary -file [file join $srcdir timing.rpt]
+report_utilization    -file [file join $outdir util.rpt]
+report_timing_summary -file [file join $outdir timing.rpt]
 
 # Save the routed checkpoint BEFORE the timing gate. A build that misses
 # timing exits below, and without this there is nothing left to interrogate:
@@ -132,7 +139,7 @@ report_timing_summary -file [file join $srcdir timing.rpt]
 # cost a second hour-long run. Open it with:
 #   open_checkpoint nd120_cmod_routed.dcp
 #   report_timing -max_paths 50 -slack_lesser_than 0 -file paths.rpt
-write_checkpoint -force [file join $srcdir nd120_cmod_routed.dcp]
+write_checkpoint -force [file join $outdir nd120_cmod_routed.dcp]
 
 # Fail loudly on negative slack - a 27 MHz miss must not be flashed silently
 set wns [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]
@@ -144,7 +151,7 @@ if {$wns < 0} {
     exit 1
 }
 
-set bit [file join $srcdir nd120_cmod.bit]
+set bit [file join $outdir nd120_cmod.bit]
 write_bitstream -force $bit
 puts "BITSTREAM: $bit"
 

@@ -158,27 +158,35 @@ Programming transport per board: Basys3 and Cmod A7 = onboard USB-JTAG;
 Tang Nano 20K = `openFPGALoader` from WSL (usbipd-attached) or the Gowin
 programmer GUI; QMTECH = Xilinx Platform Cable USB II on the JTAG header.
 
-### Local paths: copy local.mk.example to local.mk
+### Local settings: run configure.py once
 
 No build script names a folder on anybody's machine. Paths inside the repo
 are worked out from each script's own location; paths outside it are
-variables you set once in `Verilog/fpga/local.mk` (untracked - copy
-[`local.mk.example`](local.mk.example), which explains each one):
+settings in `local.mk` at the repository root, which
+`python3 configure.py` (`py configure.py` from a Windows shell) writes: it
+finds the tools, asks for what it cannot find, and remembers the answers. The
+table of every setting - what it is, what reads it, whether it is required -
+is in [CONTRIBUTING.md - Local settings](../../CONTRIBUTING.md#local-settings);
+[`local.mk.example`](../../local.mk.example) explains each one too. The board
+builds need `ND120_BUILD_DIR` (where builds go) and the vendor tool
+(`ND120_VIVADO`, or `ND120_GOWIN` for the Tang's Gowin flow).
 
-| Variable | What | If unset |
-|----------|------|----------|
-| `ND120_VIVADO` | `vivado.bat` | `vivado` on the Windows PATH |
-| `ND120_VIVADO_LICENSE` | licence file list for `XILINXD_LICENSE_FILE` | the Windows user/machine value |
-| `ND120_GOWIN` | Gowin `gw_sh.exe` | `gw_sh.exe` on PATH |
-| `ND120_OSS_CAD` | Windows oss-cad-suite folder (`../ND-120-Yosys/synh.bat`) | `yosys` on PATH |
-| `ND120_BASYS3_PROJECT` | folder holding the Basys3 `ND3202D.xpr` | Basys3 scripts stop with an error |
+Every board Makefile includes [`paths.mk`](../../paths.mk) at the repository
+root, which loads `local.mk` and exports the values (also through `WSLENV`,
+so `powershell.exe` / `cmd.exe` started from WSL see them). The PowerShell
+scripts read `local.mk` through [`paths.ps1`](paths.ps1) and the Tcl scripts
+through [`paths.tcl`](paths.tcl), so running a script by hand needs nothing
+more. A value in the environment wins over `local.mk`; `make VIVADO=...`
+still overrides the Vivado path for one run. Each target checks the settings
+it needs before doing any work and names what is missing; `make
+check-config` in any board folder shows them all.
 
-Every board Makefile includes [`paths.mk`](paths.mk), which loads `local.mk`
-and exports the values (also through `WSLENV`, so `powershell.exe` /
-`cmd.exe` started from WSL see them). The PowerShell scripts read `local.mk`
-through [`paths.ps1`](paths.ps1) and the Basys3 Tcl scripts through
-[`basys3/paths.tcl`](basys3/paths.tcl), so running a script by hand needs
-nothing more. `make VIVADO=...` still overrides the Vivado path for one run.
+**Where builds go:** every board writes everything - bitstream, reports,
+timing-analysis runs, checkpoints, copied microcode, Vivado's log, journal and
+`.Xil` - to `$ND120_BUILD_DIR/<board>/`, never into this tree. **`make
+fresh-build ND120_FRESH_DIR=<empty folder>`** in a board folder clones the
+current commit there, configures it with a build folder inside the clone and
+builds it - the proof that a build needs nothing outside the repository.
 
 ## Shared context (applies to all boards)
 
