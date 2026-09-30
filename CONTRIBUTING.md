@@ -104,6 +104,28 @@ make -C Verilog/tests test-docs-check    # this repository's dead-link gate (run
 > a per-user location. The Vivado TCL scripts are the one known exception: they run on the
 > Windows host and name its folders.
 
+### Paths in scripts and build files
+
+No script, Makefile, GTKWave save file or comment names a folder on one particular machine.
+`make -C Verilog/tests test-no-machine-paths` (part of `make test`) fails on any tracked file
+that does.
+
+- **A path inside the repository** is worked out at run time from the script's own location
+  (Python `os.path.dirname(os.path.abspath(__file__))`, sh `$(cd "$(dirname "$0")" && pwd)`,
+  make `$(dir $(abspath $(lastword $(MAKEFILE_LIST))))`, Tcl `[file dirname [file normalize
+  [info script]]]`, PowerShell `$PSScriptRoot`). In comments and documents it is written
+  repo-relative. A GTKWave `.gtkw` file stores its dump and save paths relative to its own folder.
+- **A path outside the repository** comes from an environment variable. When the variable is
+  not set, the script stops with a message naming it; a tool falls back to the `PATH`.
+
+| Variable | What it names | Used by |
+|---|---|---|
+| `ND_REPOS` | the folder that holds the sibling ND checkouts (`ND110Compile`, `RetroTerm`, `NDDeviceCore`, ...) | `Verilog/tests/instruction-verify/` (golden traces, microcode listings), `Verilog/sim/compare_boot.py` |
+| `ND120_ILA_CSV` | an ILA capture exported from Vivado as CSV (`iladata.csv`) | `Verilog/sim/analyze_ila.py`, `Verilog/sim/compare_boot.py` |
+| `ND120_SIM_WSLDIR` | optional: the `Verilog/sim` folder as WSL sees it; by default worked out from the script's own location | `Verilog/sim/nd120_probe.py` |
+| `ND120_OSS_CAD_SUITE`, `ND120_W64DEVKIT` | where those toolchains are installed on a Windows host (only for the Windows example in the BUS-IF gate Makefile) | `Verilog/ND-BUS-DEVICES/BUS-IF/gate/Makefile` |
+| `ND120_ORACLE_DIR` | where long trace captures are kept (they are too big to commit) | Tang capture scripts, `Verilog/sim/Makefile` |
+
 ---
 
 ## Submitting a change

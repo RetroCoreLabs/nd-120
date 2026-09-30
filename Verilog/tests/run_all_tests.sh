@@ -39,6 +39,9 @@ REGISTRY=(
   "tests :: test-microcode-sync :: TB_RESULT: PASS"
   # every relative link in tracked markdown resolves (dead-link gate)
   "tests :: test-docs-check :: TB_RESULT: PASS"
+  # no tracked file names a path that only exists on one machine (the public
+  # repo rule: inside the repo derive the path, outside it use a variable)
+  "tests :: test-no-machine-paths :: TB_RESULT: PASS"
   # --- Terminal core (board-independent console: screen + keyboard) ---------
   # 800x600@60 VGA timing: counts a whole frame and checks pixels, lines, both
   # sync widths and the polarity. A wrong polarity is a monitor saying "no
