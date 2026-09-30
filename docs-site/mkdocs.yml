@@ -15,6 +15,11 @@ site_description: >-
   The 1988 Norsk Data ND-120 CPU rebuilt in Verilog from the original design
   documents - runs SINTRAN III on FPGA boards.
 site_url: https://retrocorelabs.github.io/nd-120/
+# Keep the page addresses the Jekyll site had (Verilog/HIERARCHY.html, a
+# folder's README as its index.html), so every address already given out
+# keeps working - including the forwarding page on the old ronnya.github.io
+# site, which maps each old path onto the same path here.
+use_directory_urls: false
 repo_url: https://github.com/RetroCoreLabs/nd-120
 repo_name: RetroCoreLabs/nd-120
 edit_uri: blob/main/
