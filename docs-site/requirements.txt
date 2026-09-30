@@ -1,6 +1,6 @@
 # The docs site builder, pinned so a site build today and next month use the
 # same code. Installed by .github/workflows/jekyll-gh-pages.yml, and for a
-# local build into a venv OUTSIDE the repository (see docs-site/README.md).
+# local build into a venv OUTSIDE the repository (see CONTRIBUTING.md, "The module docs and the docs site").
 mkdocs==1.6.1
 mkdocs-material==9.7.7
 pymdown-extensions==12.1

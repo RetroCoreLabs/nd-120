@@ -3,7 +3,8 @@
 # Built by MkDocs with the Material theme from the Markdown that sits all over
 # the repository - nothing is copied into a docs/ folder. Build it with
 #     mkdocs build --strict -f docs-site/mkdocs.yml -d <a folder outside the repo>
-# (docs-site/README.md has the whole local recipe).
+# (CONTRIBUTING.md, "The module docs and the docs site", has the whole local
+# recipe).
 #
 # The left-hand page tree is NOT kept here: it is generated into nav.yml by
 # Verilog/tests/gen_site_nav.py (run by Verilog/tests/gen_module_docs.py) and

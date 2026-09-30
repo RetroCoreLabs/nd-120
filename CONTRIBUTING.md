@@ -224,6 +224,21 @@ mkdir -p ~/tools/netlistsvg && cd ~/tools/netlistsvg && npm install netlistsvg
 python3 configure.py --set ND120_NETLISTSVG=$HOME/tools/netlistsvg/node_modules/.bin/netlistsvg
 ```
 
+To redraw only a few schematics (it still elaborates the build tops first, under a minute):
+
+```bash
+python3 tests/gen_schematics.py --modules CGA_ALU_STS,TTL_74245
+```
+
+**The generator reads the files in your working tree, not the last commit.** Every module page
+carries its Verilog source and a schematic drawn from it, so an uncommitted edit in the checkout
+ends up on the published page. If you have work in progress, run the generator in a clean clone
+of the commit you want documented, commit there, and bring that commit into your checkout
+(`git fetch <clone> main` then `git merge --ff-only FETCH_HEAD`).
+
+A port's description on its page is the `//!` comment on that port's line in the Verilog. To
+change one, edit the comment in the `.v` file and regenerate; never edit a generated page.
+
 **Build the site locally** before pushing a docs change, in a Python venv outside the repository.
 `--strict` fails on any broken link, the same as the published build:
 
