@@ -62,11 +62,11 @@ flowchart TD
     P4 --> P5
     P5 -->|"RTC every ~8192 sysclk"| P5
 
-    classDef start fill:#E3F2FD,stroke:#0D47A1,color:#0D47A1;
-    classDef proc  fill:#E0F7FA,stroke:#00838F,color:#00838F;
-    classDef done  fill:#E8F5E9,stroke:#2E7D32,color:#2E7D32;
-    classDef special fill:#F3E5F5,stroke:#7B1FA2,color:#7B1FA2;
-    classDef hot   fill:#FFF3E0,stroke:#E65100,color:#E65100;
+    classDef start fill:#2196F3,stroke:#1565C0,color:#fff;
+    classDef proc  fill:#009688,stroke:#00695C,color:#fff;
+    classDef done  fill:#4CAF50,stroke:#2E7D32,color:#fff;
+    classDef special fill:#9C27B0,stroke:#7B1FA2,color:#fff;
+    classDef hot   fill:#FFA726,stroke:#F57C00,color:#000;
     class P0 start;
     class P1,P2 proc;
     class P3 hot;

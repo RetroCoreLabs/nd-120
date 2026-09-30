@@ -28,12 +28,12 @@ ND3202D                          CPU board top (CPU-BOARD-3202/circuit/ND3202D.v
 
 ```mermaid
 flowchart LR
-    CPU["CPU / bus masters<br/>(CGNT / BGNT / RGNT)"]:::blue
-    RAMC["MEM_RAMC_50<br/>PAL_44803A grants<br/>PAL_44902A RAS/CAS FSM"]:::teal
-    ADDR["MEM_ADDR_44<br/>row/col mux<br/>(HIEN_n / LOEN_n)"]:::teal
-    LBDIF["MEM_LBDIF_48<br/>MWRITE50_n, RDATA strobe"]:::teal
-    RAM["MEM_RAM_49<br/>3 banks x 18 bit<br/>6x SIP1M9"]:::green
-    DATA["MEM_DATA_46<br/>parity gen/check<br/>LBD &lt;-&gt; DD"]:::orange
+    CPU["CPU / bus masters<br/>(CGNT / BGNT / RGNT)"]
+    RAMC["MEM_RAMC_50<br/>PAL_44803A grants<br/>PAL_44902A RAS/CAS FSM"]
+    ADDR["MEM_ADDR_44<br/>row/col mux<br/>(HIEN_n / LOEN_n)"]
+    LBDIF["MEM_LBDIF_48<br/>MWRITE50_n, RDATA strobe"]
+    RAM["MEM_RAM_49<br/>3 banks x 18 bit<br/>6x SIP1M9"]
+    DATA["MEM_DATA_46<br/>parity gen/check<br/>LBD &lt;-&gt; DD"]
 
     CPU --> RAMC
     RAMC -->|"RAS, CAS"| RAM
@@ -44,10 +44,15 @@ flowchart LR
     DATA -->|"DD_17_0_IN"| RAM
     LBDIF -->|"RDATA (sample strobe)"| DATA
 
-    classDef blue fill:#E3F2FD,stroke:#0D47A1,color:#0D47A1
-    classDef teal fill:#E0F7FA,stroke:#00838F,color:#00838F
-    classDef green fill:#E8F5E9,stroke:#2E7D32,color:#2E7D32
-    classDef orange fill:#FFF3E0,stroke:#E65100,color:#E65100
+    classDef blue  fill:#2196F3,stroke:#1565C0,color:#fff
+    classDef teal  fill:#009688,stroke:#00695C,color:#fff
+    classDef green fill:#4CAF50,stroke:#2E7D32,color:#fff
+    classDef amber fill:#FFA726,stroke:#F57C00,color:#000
+
+    class CPU blue
+    class RAMC,ADDR,LBDIF teal
+    class RAM green
+    class DATA amber
 ```
 
 **Organization:** 3 banks (`BANK0/1/2`), each bank = 2 SIP1M9 chips = 18 bits
