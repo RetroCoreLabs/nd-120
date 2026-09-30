@@ -6,6 +6,10 @@
 #   make flash        program JTAG + SPI flash (persistent)
 #   make lint         synthesis with -lint only
 #   make check-config show the local settings and what is missing
+#   make fresh-build ND120_FRESH_DIR=<empty folder>
+#                     clone this commit there, configure it, run `make` (full
+#                     synthesis, no programming) in the clone - proves the build
+#                     needs nothing outside the repo
 #
 # Non-project Vivado flow (vivado_build.tcl, since 30-SEP-2026): the source
 # list (nd120_basys3_sources.txt) and the constraints (nd120_basys3.xdc +
@@ -25,6 +29,7 @@
 # WSL). Each target checks the settings it needs first and stops with a
 # message naming the missing one.
 
+ND120_FRESH_TARGET := all
 ND120_BOARD := basys3
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 

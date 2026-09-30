@@ -7,6 +7,9 @@
 #   make clean      remove Quartus temporary + output dirs
 #   make load       (not wired yet) send the core to a MiSTer over the network
 #   make check-config  show the local settings and what is missing
+#   make fresh-build ND120_FRESH_DIR=<empty folder>
+#                   clone this commit there, configure it, `make build` in the
+#                   clone - proves the build needs nothing outside the repo
 #
 # WHERE THE BUILD WRITES: $(ND120_BUILD_DIR)/mister/ and nowhere else.
 # Quartus writes db/, incremental_db/, output_files/, build_id.v and more
@@ -32,6 +35,7 @@
 
 # Local settings: local.mk at the repository root (python3 configure.py writes
 # it). `make check-config` shows every setting.
+ND120_FRESH_TARGET := build
 ND120_BOARD := mister
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 

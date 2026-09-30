@@ -19,6 +19,9 @@
 #                     every boot and cannot keep time, see docs/panel-clock-68705.md)
 #   make clean        remove build outputs
 #   make check-config show the local settings and what is missing
+#   make fresh-build ND120_FRESH_DIR=<empty folder>
+#                     clone this commit there, configure it, run `make build`
+#                     in the clone - proves the build needs nothing outside the repo
 #
 # Everything the build writes goes to $(ND120_BUILD_DIR)/nexys4ddr/ -
 # bitstream, util/timing reports, the timing-analysis/run_clk<N>/ folders,
@@ -35,6 +38,7 @@
 # From a Windows shell, run the tcl directly instead (it reads local.mk too):
 #   vivado -mode batch -source <checkout>\Verilog\fpga\nexys4ddr\build.tcl [-tclargs -noburn clk=33 -skipwcs]
 
+ND120_FRESH_TARGET := build
 ND120_BOARD := nexys4ddr
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 

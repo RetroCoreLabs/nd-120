@@ -5,6 +5,10 @@
 #   make cor BOARD=r6      # just pack an existing .bit into <build>/r6/nd120_mega65_r6.cor
 #   make rom               # just the QNICE firmware (CORE/m2m-rom/m2m-rom.rom)
 #   make toolchain         # one-off: qasm/qasm2rom + monitor.rom in the submodule, coretool (fetched)
+#   make fresh-build ND120_FRESH_DIR=<empty folder> [ND120_FRESH_ARGS="BOARD=r3"]
+#                          # clone this commit there, configure it, `make toolchain all`
+#                          # in the clone - proves the build
+#                          # needs nothing outside the repo
 #
 # Run from WSL (bash + gcc for the QNICE toolchain, python3 for coretool;
 # Vivado is reached through cmd.exe interop). There is no MEGA65 on this
@@ -25,6 +29,7 @@
 # projects were written by 2022.2 (m2m/CORE/CORE-R6.xpr) - build.tcl reads
 # the sources directly and never opens those projects.
 
+ND120_FRESH_TARGET := toolchain all
 ND120_BOARD := mega65
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 

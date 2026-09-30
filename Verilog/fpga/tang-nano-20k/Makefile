@@ -22,6 +22,10 @@
 #   make sim                         iverilog unit tbs (sdram-bridge + sdram-test)
 #   make clean                       remove the build folder
 #   make check-config                show the local settings and what is missing
+#   make fresh-build ND120_FRESH_DIR=<empty folder> [ND120_FRESH_ARGS="VARIANT=fast20"]
+#                                    clone this commit there, configure it, run
+#                                    `make gowin` in the clone - proves the build
+#                                    needs nothing outside the repo
 #
 # <build> is $(ND120_BUILD_DIR)/tang-nano-20k: EVERYTHING both flows write -
 # the copied WCS images, yosys/nextpnr logs and netlists, the tristate gate's
@@ -42,6 +46,7 @@
 # OSS flow) come from local.mk at the repository root - python3 configure.py
 # writes it. paths.mk loads it and passes it on to gowin_build.ps1 (through
 # WSLENV from WSL). `make check-config` shows every setting.
+ND120_FRESH_TARGET := gowin
 ND120_BOARD := tang-nano-20k
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 

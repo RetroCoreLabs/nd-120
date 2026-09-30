@@ -4,6 +4,9 @@
 #   make build        build only (no board needed)
 #   make clean        remove build outputs
 #   make check-config show the local settings and what is missing
+#   make fresh-build ND120_FRESH_DIR=<empty folder>
+#                     clone this commit there, configure it, run `make build`
+#                     in the clone - proves the build needs nothing outside the repo
 #
 # Everything the build writes goes to $(ND120_BUILD_DIR)/cmod-a7-35t/ -
 # bitstream, reports, routed checkpoint, the copied microcode images, and
@@ -18,6 +21,7 @@
 # From a Windows shell, run the tcl directly instead (it reads local.mk too):
 #   vivado -mode batch -source <checkout>\Verilog\fpga\cmod-a7-35t\build.tcl [-tclargs -noburn]
 
+ND120_FRESH_TARGET := build
 ND120_BOARD := cmod-a7-35t
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../paths.mk
 

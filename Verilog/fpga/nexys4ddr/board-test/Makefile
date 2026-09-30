@@ -10,6 +10,7 @@
 # at the repository root (python3 configure.py writes it); make VIVADO=...
 # overrides Vivado for one run.
 
+ND120_FRESH_TARGET := build
 ND120_BOARD := nexys4ddr/board-test
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../../../paths.mk
 

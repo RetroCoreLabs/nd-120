@@ -36,8 +36,10 @@
 #                                           (a Windows TOOL from WSL goes
 #                                           through Verilog/fpga/run_tool.ps1)
 #        ND120_BOARD_DIR                   $(ND120_BUILD_DIR)/$(ND120_BOARD)
-#   5. adds a target to the Makefile that includes it (never the default):
+#   5. adds targets to the Makefile that includes it (never the default):
 #        make check-config   configure.py --check: what is set, what is missing
+#        make fresh-build    (board Makefiles) clone the current commit into
+#                            ND120_FRESH_DIR, configure it, build it there
 
 ND120_ROOT     := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 ND120_LOCAL_MK := $(ND120_ROOT)/local.mk
@@ -146,6 +148,55 @@ _nd120_default_goal := $(.DEFAULT_GOAL)
 
 check-config:
 	@$(if $(ND120_PYTHON),,echo "nd-120: Python 3 is needed - install python3" && exit 1;) '$(ND120_PYTHON)' '$(ND120_ROOT)/configure.py' --check
+
+# ---- make fresh-build (board Makefiles) -------------------------------------------
+# Proves a board builds from nothing but the repository. It clones the
+# CURRENT COMMIT (uncommitted edits are NOT included - commit first) into the
+# empty folder ND120_FRESH_DIR, runs configure.py there non-interactively
+# with the same tool settings (Vivado, Gowin, Quartus, oss-cad-suite,
+# w64devkit, licence) but a build folder INSIDE the clone, then runs this
+# board's build target in the clone. Never runs by itself.
+#   make fresh-build ND120_FRESH_DIR=<empty folder, absolute path>
+# A board Makefile sets ND120_FRESH_TARGET (before including this file) to
+# its build-only target; ND120_FRESH_ARGS passes extra make arguments to it,
+# e.g. make fresh-build ND120_FRESH_DIR=... ND120_FRESH_ARGS="CLK=33".
+# The folder must be one the build tools can reach: on a Windows drive for
+# Vivado/Gowin started from WSL (the clone's own settings check says so).
+# configure.py in the clone runs git submodule update --init, so the
+# submodules are fetched from their remotes; ND120_FRESH_CONFIGURE_ARGS adds
+# arguments to that configure.py run (e.g. --skip-submodules for a board that
+# needs none - only the MEGA65 build uses the m2m submodule).
+ifneq ($(strip $(ND120_BOARD)),)
+ND120_FRESH_TARGET ?= all
+ND120_FRESH_REL    := $(patsubst $(ND120_ROOT)/%,%,$(CURDIR))
+ND120_FRESH_HOST    = $(call nd120_hostpath,$(ND120_FRESH_DIR))
+# The inner make is named through this variable, not as $(MAKE) in the
+# recipe: GNU make RUNS a line that names $(MAKE) even under make -n, and a
+# dry run must not start a build in a clone the dry run never made.
+_nd120_submake = $(MAKE)
+
+fresh-build:
+	@$(call nd120_require,ND120_FRESH_DIR,make fresh-build)
+	@case '$(ND120_FRESH_HOST)' in /*) ;; *) \
+	  echo "nd-120: ND120_FRESH_DIR must be an absolute path (got '$(ND120_FRESH_DIR)')."; exit 1;; esac
+	@case '$(ND120_FRESH_HOST)/' in '$(ND120_ROOT)'/*) \
+	  echo "nd-120: ND120_FRESH_DIR is inside this checkout - pick a folder outside it."; exit 1;; esac
+	@test -z "$$(ls -A '$(ND120_FRESH_HOST)' 2>/dev/null)" || { \
+	  echo "nd-120: ND120_FRESH_DIR ($(ND120_FRESH_DIR)) is not empty - fresh-build needs an empty folder."; exit 1; }
+	@test -z "$$(git -C '$(ND120_ROOT)' status --porcelain --untracked-files=no)" || \
+	  echo "nd-120: NOTE - this checkout has uncommitted changes; they are NOT in the clone."
+	sha=$$(git -C '$(ND120_ROOT)' rev-parse HEAD) && \
+	  echo "== fresh-build: cloning commit $$sha into $(ND120_FRESH_HOST)" && \
+	  git clone --quiet --no-checkout '$(ND120_ROOT)' '$(ND120_FRESH_HOST)' && \
+	  git -C '$(ND120_FRESH_HOST)' checkout --quiet --detach "$$sha"
+	cd '$(ND120_FRESH_HOST)' && env -u ND120_BUILD_DIR -u ND120_FRESH_DIR '$(ND120_PYTHON)' configure.py --non-interactive $(ND120_FRESH_CONFIGURE_ARGS) \
+	  --set 'ND120_BUILD_DIR=$(ND120_FRESH_HOST)/build' \
+	  $(foreach v,ND120_VIVADO ND120_VIVADO_LICENSE ND120_GOWIN ND120_QUARTUS ND120_OSS_CAD_SUITE ND120_W64DEVKIT,$(if $($(v)),--set '$(v)=$($(v))'))
+	env -u ND120_BUILD_DIR -u ND120_FRESH_DIR $(_nd120_submake) -C '$(ND120_FRESH_HOST)/$(ND120_FRESH_REL)' $(ND120_FRESH_TARGET) $(ND120_FRESH_ARGS)
+	@echo "== fresh-build: done - the output is in $(ND120_FRESH_HOST)/build/$(ND120_BOARD)/"
+
+.PHONY: fresh-build
+endif
 
 .PHONY: check-config
 
