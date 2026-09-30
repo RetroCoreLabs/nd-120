@@ -100,7 +100,7 @@ nd120_toolpath = $(if $(and $(ND120_WSL),$(call nd120_is_wintool,$(1))),$(call n
 # XILINXD_LICENSE_FILE when nothing else set it.
 nd120_run = $(if $(and $(ND120_WSL),$(call nd120_is_wintool,$(1))),\
 	ND120_RUN_DIR='$(call nd120_winpath,$(2))' ND120_RUN_TOOL='$(1)' powershell.exe -NoProfile -ExecutionPolicy Bypass -File '$(call nd120_winpath,$(ND120_FPGA_DIR)/run_tool.ps1)' $(3),\
-	cd '$(2)' && '$(1)' $(3))
+	mkdir -p '$(2)' && cd '$(2)' && '$(1)' $(3))
 
 # ---- the settings check ---------------------------------------------------------
 # $(call nd120_require,NAMES,what): put it as the FIRST line of a recipe. It
