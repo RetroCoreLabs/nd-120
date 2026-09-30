@@ -3,7 +3,7 @@
 
 /**************************************************************************
 ** Testbench for DECODE_DGA - the DGA TOP LEVEL (sheets 1-6).            **
-** /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/DECODE-GateArray/DGA/circuit/   **
+** Verilog/DECODE-GateArray/DGA/circuit/                                 **
 **   DECODE_DGA.v                                                        **
 **                                                                       **
 ** SCOPE - READ THIS FIRST                                               **

@@ -5,7 +5,7 @@
 **                                                                                               **
 ** WHY THIS BENCH EXISTS                                                                         **
 **   CGA_IDBCTL (page 97) ORs its six IDB sources together - see                                 **
-**   /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/DELILAH-CPU/CGA_IDBCTL/circuit/CGA_IDBCTL_SEL6.v:94.  **
+**   Verilog/DELILAH-CPU/CGA_IDBCTL/circuit/CGA_IDBCTL_SEL6.v:94.                                **
 **   If two enables could ever be asserted at the same time, two sources would be merged onto    **
 **   the IDB, and the XFIDBI (D) path - the one that closes the FIDBO -> ... -> FIDBI ring -     **
 **   would not be provably cut. Whether the enables really are mutually exclusive is decided     **

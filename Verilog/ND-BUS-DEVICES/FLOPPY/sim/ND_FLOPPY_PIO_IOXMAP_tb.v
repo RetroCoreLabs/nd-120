@@ -5,7 +5,7 @@
 ** Testbench for ND_FLOPPY_PIO - IOX REGISTER MAP, STATUS BIT POSITIONS  **
 ** COMMAND DECODE and the COMPLETION / INTERRUPT / IDENT handshake.      **
 **                                                                       **
-** DUT: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/ND-BUS-DEVICES/FLOPPY/     **
+** DUT: Verilog/ND-BUS-DEVICES/FLOPPY/                                   **
 **        circuit/ND_FLOPPY_PIO.v                                        **
 **                                                                       **
 ** WHY THIS BENCH EXISTS ALONGSIDE nd_floppy_pio_tb.v                    **

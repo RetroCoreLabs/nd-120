@@ -3,7 +3,7 @@
 
 /**************************************************************************
 ** Testbench for F924 - NEC 4-BIT D-TYPE FLIP-FLOP (DGA standard cell)   **
-** /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/DECODE-GateArray/DGA/circuit/   **
+** Verilog/DECODE-GateArray/DGA/circuit/                                 **
 **   F924.v                                                              **
 **                                                                       **
 ** WHAT IS VERIFIED                                                      **

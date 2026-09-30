@@ -11,7 +11,10 @@ Writes maccap_vectors.txt (one 171-bit binary word per line) next to the tb.
 """
 import re, sys
 
-DUMP = sys.argv[1] if len(sys.argv) > 1 else "/mnt/f/tmp/verilog/jpl_pgf.log"
+# The dump file is required: it is a capture log kept outside the repository.
+if len(sys.argv) < 2:
+    sys.exit("usage: maccap_to_vectors.py <dump-file> [out-file] [--last N]")
+DUMP = sys.argv[1]
 OUT  = sys.argv[2] if len(sys.argv) > 2 else "maccap_vectors.txt"
 LAST = None
 if "--last" in sys.argv:

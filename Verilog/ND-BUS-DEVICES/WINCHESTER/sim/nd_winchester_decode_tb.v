@@ -5,7 +5,7 @@
 ** TESTBENCH: ND_WINCHESTER - EXHAUSTIVE IOX ADDRESS DECODE, READ-MUX     **
 ** MAP, and the IDENT GRANT DAISY-CHAIN.                                  **
 **                                                                       **
-** DUT: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/ND-BUS-DEVICES/WINCHESTER/  **
+** DUT: Verilog/ND-BUS-DEVICES/WINCHESTER/                                **
 **        circuit/ND_WINCHESTER.v                                        **
 **                                                                       **
 ** WHY THIS BENCH EXISTS ALONGSIDE THE TEN OTHERS IN THIS DIRECTORY      **

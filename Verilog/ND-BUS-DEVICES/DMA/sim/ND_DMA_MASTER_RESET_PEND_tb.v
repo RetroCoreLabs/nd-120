@@ -1,7 +1,7 @@
 /**************************************************************************************************
 ** ND-100 DMA BUS MASTER - reset collision and s_pend liveness testbench                         **
 **                                                                                               **
-** DUT: /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/ND-BUS-DEVICES/DMA/circuit/ND_DMA_MASTER.v         **
+** DUT: Verilog/ND-BUS-DEVICES/DMA/circuit/ND_DMA_MASTER.v                                       **
 **                                                                                               **
 ** WHY THIS BENCH EXISTS                                                                         **
 **   Vivado reports, for the DMA subsystem:                                                      **
@@ -57,8 +57,8 @@
 **                                                                                               **
 ** No `ifdef FPGA_FF_MODE appears anywhere in ND_DMA_MASTER.v, so a single build mode covers it.  **
 **                                                                                               **
-** Compile+run:                                                                                   **
-**   cd /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/ND-BUS-DEVICES/DMA/sim && make test-dma-reset-pend  **
+** Compile+run (from the repository root):                                                        **
+**   cd Verilog/ND-BUS-DEVICES/DMA/sim && make test-dma-reset-pend                                **
 **                                                                                               **
 ** Prints "TB_RESULT: PASS" or "TB_RESULT: FAIL" as the final line.                               **
 **                                                                                               **

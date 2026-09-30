@@ -110,7 +110,7 @@ module CGA_INTR_CNTLR_VECGEN_STAT_SBIT (
   //     reaches CLOCK STARTED / DUMMY OUTPUT (the remaining IIC=11 there is
   //     the separate internal-IIC/MOR decode, not this fence)
   //   - ground-truth confirmed vs the C# DELILAH-L PIC trace
-  //     (/mnt/e/Dev/Repos/Ronny/ND110Compile/traces/PIC-TRACE-RUN-ND120.md):
+  //     ($ND_REPOS/ND110Compile/traces/PIC-TRACE-RUN-ND120.md):
   //     READ VECTOR loads vector+1 on the WINNING chip only, and the per-group
   //     DCDF (HIF/LOF) strobe qualifies the load - exactly this wiring.
   // Define ND120_INTR_STATUS_FENCE_OFF to restore the historical dead-fence

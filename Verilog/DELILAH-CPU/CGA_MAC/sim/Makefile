@@ -200,7 +200,7 @@ gtk: run
 # drives it.
 #
 # Needs maccap_vectors.txt, built from the capture dump:
-#   python3 maccap_to_vectors.py /mnt/f/tmp/verilog/jpl_pgf.log
+#   python3 maccap_to_vectors.py <capture-dump.log>
 # NOTE: each make recipe line is its own shell, so the "no vectors" guard must
 # wrap the whole thing in ONE shell - an `exit 0` on its own line would only end
 # that line and the tb would run anyway (and fail) with no capture present.

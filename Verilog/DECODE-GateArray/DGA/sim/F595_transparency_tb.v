@@ -16,8 +16,8 @@
 **   - on a transparent-latch fix it PASSES.                               **
 ** So it PINPOINTS whether the FPGA branch violates the latch semantics.   **
 **                                                                         **
-** Full path:                                                             **
-**  /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/DECODE-GateArray/DGA/sim/       **
+** Repo path:                                                             **
+**  Verilog/DECODE-GateArray/DGA/sim/                                     **
 **  F595_transparency_tb.v                                                **
 ***************************************************************************/
 `timescale 1ns / 1ps

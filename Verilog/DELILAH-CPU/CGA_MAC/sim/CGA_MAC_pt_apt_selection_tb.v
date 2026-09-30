@@ -29,7 +29,7 @@
 **   field takes NO part in address formation, and this bench asserts that: changing PIL alone     **
 **   must not change the selected table. That is faithful - the per-level PCR copies are kept by   **
 **   MICROCODE, which reloads the single latch with COMM,LDPCR on a level switch (see 00062/00065  **
-**   in /mnt/e/Dev/Ronny/nd120uc/source/nd-120-delilah.uc).                                        **
+**   in $ND_REPOS/nd120uc/source/nd-120-delilah.uc).                                               **
 **                                                                                                **
 ** Runs in both build modes (plain and -DFPGA_FF_MODE), as the CGA_MAC directory requires.         **
 **                                                                                                **

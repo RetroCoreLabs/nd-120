@@ -15,8 +15,8 @@
 ** it exercises the FIXED `else` branch. It FAILS on the old lagging-FF    **
 ** code (LUA one cycle late after a jump) and PASSES on the fix.           **
 **                                                                         **
-** Full path:                                                             **
-**   /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/CPU-BOARD-3202/circuit/sim/    **
+** Repo path:                                                             **
+**   Verilog/CPU-BOARD-3202/circuit/sim/                                  **
 **   CPU_CS_ACAL_17_tb.v                                                  **
 ** Run: iverilog -g2012 -o /tmp/acal_tb CPU_CS_ACAL_17_tb.v \             **
 **        ../CPU_CS_ACAL_17.v && vvp /tmp/acal_tb                         **
