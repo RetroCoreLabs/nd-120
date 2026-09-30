@@ -170,7 +170,7 @@ def one(path, dry):
     for m in mods:
         # path is absolute here. That is fine: module_doc.py turns it into a
         # repo-relative path before it writes the doc, so no machine path
-        # (/mnt/e/..., E:\...) ends up in a committed file.
+        # (/mnt/<drive>/..., <drive>:\...) ends up in a committed file.
         cmd = [sys.executable, MODULE_DOC, path, "-o", outdir, "--module", m]
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
         if r.returncode != 0:

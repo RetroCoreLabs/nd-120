@@ -69,7 +69,7 @@ proc H_norm {p} {
     return [file normalize $p]
 }
 
-# A Windows path as WSL sees it (F:/x -> /mnt/f/x), for a project file the
+# A Windows path as WSL sees it (<drive>:/x -> /mnt/<drive>/x), for a project file the
 # Basys3 script opens from a drive outside the repository.
 proc H_host_path {p} {
     if {[regexp {^([A-Za-z]):[/\\](.*)$} $p -> drv rest]} {

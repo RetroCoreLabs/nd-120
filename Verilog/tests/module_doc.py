@@ -395,7 +395,7 @@ def repo_relative(path):
     the git checkout, with forward slashes (Verilog/Shared/support/TTL_74245.v).
 
     RULE: a generated doc must never hold a machine path. These docs are
-    committed to a public repo, and a path like /mnt/e/... or E:\\... is only
+    committed to a public repo, and a path like /mnt/<drive>/... or <drive>:\\... is only
     right on one machine. The sweep (gen_module_docs.py) passes absolute
     paths, and until 28-SEP-2026 this script wrote them as given, so every
     doc carried the path of the machine that made it. Now the path is worked

@@ -182,7 +182,7 @@ def rel_v(path):
 
 
 def host_to_local(p):
-    """A path a build script wrote for Windows (E:/Dev/.../Verilog/X) is mapped
+    """A path a build script wrote for Windows (<drive>:/.../Verilog/X) is mapped
     onto THIS checkout by the part after /Verilog/. Other paths come back as
     they are."""
     if re.match(r"^[A-Za-z]:[/\\]", p):

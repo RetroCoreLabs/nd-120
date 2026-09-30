@@ -4,7 +4,8 @@
 #
 # Boots INSTRUCTION-B (400$ papertape), types the AREA command, records the
 # golden-format trace and compares it against the ND-110 reference:
-#   /mnt/e/Dev/Repos/Ronny/ND110Compile/traces/TRACE-INSTRUCTION-VERIFY-<AREA>.md
+#   $ND_REPOS/ND110Compile/traces/TRACE-INSTRUCTION-VERIFY-<AREA>.md
+# ND_REPOS is the folder that holds the other ND checkouts; it must be set.
 # Prints "TB_RESULT: PASS" only when the comparator reports equivalence.
 #
 # Heavy gate (~15 min sim): invoked from `make test-instr-<area>` /
@@ -15,7 +16,13 @@ set -u
 AREA="${1:?usage: run_area_test.sh <AREA>}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUNSIM="$HERE/../../runSim"
-GOLDEN="/mnt/e/Dev/Repos/Ronny/ND110Compile/traces/TRACE-INSTRUCTION-VERIFY-${AREA}.md"
+if [ -z "${ND_REPOS:-}" ]; then
+    echo "FAIL: ND_REPOS is not set - it names the folder that holds the"
+    echo "      ND110Compile checkout, where the ND-110 golden traces live."
+    echo "TB_RESULT: FAIL (ND_REPOS not set - area NOT tested)"
+    exit 1
+fi
+GOLDEN="$ND_REPOS/ND110Compile/traces/TRACE-INSTRUCTION-VERIFY-${AREA}.md"
 OUT="${TMPDIR:-/tmp}/nd120_iverify_${AREA}"
 TRACE="$OUT.md"
 LOG="$OUT.log"

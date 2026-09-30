@@ -10,10 +10,15 @@
 # empty symbol, matching the golden traces' unlabeled `0/` fetch word).
 ###############################################################################
 
+import os
 import re
 import sys
 
-DEFAULT_SRC = "/mnt/e/Dev/Repos/Ronny/ND110Compile/ND110Compile/uCode/ND-120-DELILAH-K.LISTING.TXT"
+# The listing lives in the sibling ND110Compile repository, found through the
+# ND_REPOS environment variable (the folder that holds the other ND checkouts).
+DEFAULT_SRC = (os.path.join(os.environ["ND_REPOS"], "ND110Compile", "ND110Compile",
+                            "uCode", "ND-120-DELILAH-K.LISTING.TXT")
+               if os.environ.get("ND_REPOS") else None)
 LINE_RE = re.compile(r"^(\d{4,})\s\s([0-7]{6})\s\s(.*)$")
 LABEL_RE = re.compile(r"^\s*([A-Z][A-Z0-9]*)\s*:(?!=)")
 ORIGIN_RE = re.compile(r"^\s*([0-7]+)\s*/")
@@ -21,6 +26,9 @@ ORIGIN_RE = re.compile(r"^\s*([0-7]+)\s*/")
 
 def main():
     src = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_SRC
+    if not src:
+        sys.exit("gen_nd120_syms.py: give the DELILAH listing as the first argument, "
+                 "or set ND_REPOS to the folder that holds the ND110Compile checkout")
     out = sys.argv[2] if len(sys.argv) > 2 else "nd120_symbols.tsv"
 
     words = {}  # addr(int) -> [source pieces]
