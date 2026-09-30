@@ -322,6 +322,7 @@ checkouts.
 |-------|---------------|
 | **FPGA boards** | [Verilog/fpga/README.md](Verilog/fpga/README.md) |
 | **Verilog modules** | [Verilog/MODULES.md](Verilog/MODULES.md) - one page per module: description, ports and symbol |
+| **Module hierarchy** | [Verilog/HIERARCHY.md](Verilog/HIERARCHY.md) - what sits inside what, for the simulation and every FPGA board, from a yosys elaboration |
 | **Build options** | [Verilog/docs/build-defines.md](Verilog/docs/build-defines.md) |
 | **Design notes** | [Verilog/docs/README.md](Verilog/docs/README.md) |
 | **Design documents** | [DesignDocuments/Readme.md](DesignDocuments/Readme.md) |

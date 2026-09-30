@@ -6,7 +6,10 @@
 
 Every module of the design has its own page: what it is, a table of
 its ports, and a picture of its symbol. Each page is made from the
-`//!` comments in the module's source. 393 modules in 16 areas.
+`//!` comments in the module's source. 394 modules in 16 areas.
+
+What sits inside what, for the simulation and for every FPGA board,
+is on [HIERARCHY.md](HIERARCHY.md) (made from a yosys elaboration).
 
 - [Top level (the whole machine)](#top-level-the-whole-machine) (2)
 - [DELILAH CPU gate array (CGA)](#delilah-cpu-gate-array-cga) (92)
@@ -20,7 +23,7 @@ its ports, and a picture of its symbol. Each page is made from the
 - [FPGA board: basys3](#fpga-board-basys3) (4)
 - [FPGA board: cmod-a7-35t](#fpga-board-cmod-a7-35t) (1)
 - [FPGA board: mega65](#fpga-board-mega65) (6)
-- [FPGA board: mister](#fpga-board-mister) (8)
+- [FPGA board: mister](#fpga-board-mister) (9)
 - [FPGA board: nexys4ddr](#fpga-board-nexys4ddr) (15)
 - [FPGA board: qmtech-a35t](#fpga-board-qmtech-a35t) (4)
 - [FPGA board: tang-nano-20k](#fpga-board-tang-nano-20k) (16)
@@ -439,6 +442,7 @@ its ports, and a picture of its symbol. Each page is made from the
 
 | Module | What it is | Source |
 |---|---|---|
+| [emu](fpga/mister/doc/emu.md) | - | `fpga/mister/nd120.sv` |
 | [nd120_console_mister](fpga/mister/rtl/doc/nd120_console_mister.md) | - | `fpga/mister/rtl/nd120_console_mister.v` |
 | [nd120_csa_trace](fpga/mister/rtl/doc/nd120_csa_trace.md) | nd120_csa_trace.v - print the last N microcode addresses, in order | `fpga/mister/rtl/nd120_csa_trace.v` |
 | [nd120_diag_print](fpga/mister/rtl/doc/nd120_diag_print.md) | nd120_diag_print.v - CPU state, printed onto the console | `fpga/mister/rtl/nd120_diag_print.v` |
