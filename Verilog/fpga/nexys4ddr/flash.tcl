@@ -35,11 +35,13 @@ set srcdir [file dirname [file normalize [info script]]]
 # The bitstream, probes file and captures live in the build folder,
 # $ND120_BUILD_DIR/nexys4ddr (local.mk at the repository root, written by
 # configure.py) - never in this source folder.
+# A bitstream named on the command line (a downloaded release, say) needs no
+# local settings at all; only the default needs the build folder.
 source [file join $srcdir .. paths.tcl]
-set outdir [nd120_board_dir nexys4ddr]
-set bit [file join $outdir nd120_nexys4ddr.bit]
 if {[llength $argv] > 0} {
     set bit [lindex $argv 0]
+} else {
+    set bit [file join [nd120_board_dir nexys4ddr "flash.tcl"] nd120_nexys4ddr.bit]
 }
 
 if {![file exists $bit]} {
