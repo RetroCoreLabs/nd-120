@@ -450,6 +450,11 @@ def store_form(name, value):
     if not value:
         return value
     s = SETTING.get(name)
+    if re.match(r"^[A-Za-z]:[\\/]", value):
+        # Already a Windows path: keep it exactly (wslpath -w would mangle it;
+        # measured 30-SEP-2026 - make fresh-build passed F:\...\vivado.bat on
+        # and the clone stored "FAMDDesignTools...").
+        return value
     if s and s.kind == "tool" and is_windows_tool(value):
         return windows_path(value)
     if s and s.kind == "dir" and name == "ND120_QUARTUS" and IS_WSL and value.startswith("/mnt/"):
