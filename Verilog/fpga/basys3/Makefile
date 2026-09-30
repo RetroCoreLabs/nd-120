@@ -9,8 +9,14 @@
 # Runs from WSL by delegating to the PowerShell wrappers (Vivado lives on the
 # Windows host). On Windows, call the .ps1 scripts directly:
 #   .\vivado_build.ps1 [-ReuseSynth] [-Program] ; .\flash.ps1 [-Quick]
+#
+# Local paths (Vivado project folder, vivado.bat, licence) come from
+# ../local.mk - copy ../local.mk.example. ../paths.mk loads it and passes the
+# variables on to the PowerShell wrappers (through WSLENV from WSL).
 
-PS = powershell.exe -NoProfile -ExecutionPolicy Bypass -File
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+
+PS =powershell.exe -NoProfile -ExecutionPolicy Bypass -File
 
 all:
 	$(PS) vivado_build.ps1

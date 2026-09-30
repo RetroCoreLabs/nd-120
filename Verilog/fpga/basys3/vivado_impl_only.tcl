@@ -1,7 +1,8 @@
 # Quick rebuild: implementation + bitstream + JTAG + flash (skips synthesis)
 # Usage: vivado -mode batch -source vivado_impl_only.tcl
 
-set project_dir "F:/Xilinx/ND120/ND3202D"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set project_dir $b3_project_dir
 set output_dir "${project_dir}/output"
 set top_module "ND120_TOP"
 

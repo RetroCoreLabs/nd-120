@@ -1,10 +1,11 @@
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
 open_hw_manager
 connect_hw_server -allow_non_jtag
 open_hw_target
 set hw [get_hw_devices xc7a35t_0]
 current_hw_device $hw
-set_property PROBES.FILE      {F:/Xilinx/ND120/ND3202D/output/ND120_TOP.ltx} $hw
-set_property FULL_PROBES.FILE {F:/Xilinx/ND120/ND3202D/output/ND120_TOP.ltx} $hw
+set_property PROBES.FILE      $b3_ltx $hw
+set_property FULL_PROBES.FILE $b3_ltx $hw
 refresh_hw_device $hw
 set ila [get_hw_ilas -of_objects $hw]
 set lcs [get_hw_probes -of_objects $ila s_debug_lcs_n]
@@ -16,7 +17,7 @@ puts "ARMED_LCS_RISE"
 flush stdout
 wait_on_hw_ila $ila
 upload_hw_ila_data $ila
-write_hw_ila_data -force -csv_file {E:/Dev/Repos/Ronny/nd-120/Verilog/fpga/basys3/logs/ila_lcs.csv} [current_hw_ila_data]
+write_hw_ila_data -force -csv_file [file join $b3_logdir ila_lcs.csv] [current_hw_ila_data]
 puts "LCS_CAPTURED"
 close_hw_target
 disconnect_hw_server

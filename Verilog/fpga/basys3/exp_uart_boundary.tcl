@@ -3,8 +3,9 @@
 # design close? Applies false_path from/to the UART flops and reports WNS.
 # false_path here is an UPPER BOUND on the benefit; the real design would use
 # set_multicycle_path, but this tells us if the UART is the whole story.
-set dcp "F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp"
-set logdir "E:/Dev/Repos/Ronny/nd-120/Verilog/fpga/basys3/logs"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set dcp $b3_routed_dcp
+set logdir $b3_logdir
 open_checkpoint $dcp
 create_clock -period 25.6 -name sys_clk [get_ports sysclk]
 

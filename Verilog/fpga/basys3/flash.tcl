@@ -1,7 +1,8 @@
 # Program FPGA via JTAG and/or SPI flash
 # Usage: vivado -mode batch -source flash.tcl -tclargs [jtag_only|jtag_and_flash]
 
-set output_dir "F:/Xilinx/ND120/ND3202D/output"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set output_dir $b3_output_dir
 set top_module "ND120_TOP"
 set bit_file "${output_dir}/${top_module}.bit"
 set ltx_file "${output_dir}/${top_module}.ltx"

@@ -1,7 +1,8 @@
 # Post-build classify (no resynth, ~40s): open the NEW routed checkpoint and
 # break down the remaining setup failures so we bundle the exact fixes into one
 # more build. Also lists all clocks and any clk_cpu<->sys_clk crossings.
-set dcp "F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set dcp $b3_routed_dcp
 open_checkpoint $dcp
 
 puts "\n==== clocks ===="

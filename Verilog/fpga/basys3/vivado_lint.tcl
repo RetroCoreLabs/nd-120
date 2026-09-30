@@ -2,7 +2,8 @@
 # Usage: vivado -mode batch -source vivado_lint.tcl
 # Much faster than full build -- just runs synthesis + linter
 
-set project_dir "F:/Xilinx/ND120/ND3202D"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set project_dir $b3_project_dir
 
 puts "============================================"
 puts " ND-120 Vivado Linter"

@@ -1,7 +1,8 @@
 # Find actual post-synthesis net names for debug probes
 # Usage: vivado -mode batch -source find_nets.tcl
 
-set project_dir "F:/Xilinx/ND120/ND3202D"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set project_dir $b3_project_dir
 open_project "${project_dir}/ND3202D.xpr"
 open_run synth_1
 

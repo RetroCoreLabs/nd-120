@@ -13,10 +13,11 @@
 #   .\vivado_build.ps1
 
 # Configuration
-set project_dir "F:/Xilinx/ND120/ND3202D"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set project_dir $b3_project_dir
 set top_module "ND120_TOP"
 set part "xc7a35tcpg236-1"
-set verilog_dir "E:/Dev/Repos/Ronny/nd-120/Verilog"
+set verilog_dir $b3_verilog_dir
 set output_dir "${project_dir}/output"
 
 # Create output directory

@@ -1,4 +1,5 @@
-open_checkpoint F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+open_checkpoint $b3_routed_dcp
 puts "CLKSCAN_START"
 foreach c [get_cells -hierarchical -filter {REF_NAME == BUFG}] {
     set onet [get_nets -quiet -of [get_pins -quiet -of $c -filter {DIRECTION==OUT}]]

@@ -6,8 +6,9 @@
 #   vivado -mode batch -source timing_explore.tcl
 # Outputs land in .\logs\ (readable from WSL).
 
-set dcp "F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp"
-set logdir "E:/Dev/Repos/Ronny/nd-120/Verilog/fpga/basys3/logs"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set dcp $b3_routed_dcp
+set logdir $b3_logdir
 
 if {![file exists $dcp]} {
     puts "ERROR: routed checkpoint not found: $dcp"

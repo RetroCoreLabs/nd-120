@@ -1,4 +1,5 @@
-open_checkpoint F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+open_checkpoint $b3_routed_dcp
 foreach p [get_timing_paths -max_paths 7 -nworst 1 -hold -slack_lesser_than 0] {
   set s [get_property STARTPOINT_PIN $p]
   set d [get_property ENDPOINT_PIN $p]

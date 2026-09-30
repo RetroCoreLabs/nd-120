@@ -6,10 +6,11 @@
 # whether the frequency move is the lever.
 #
 # Usage (from Verilog\fpga\basys3):
-#   & "F:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat" -mode batch -source exp_slowclk.tcl
+#   vivado -mode batch -source exp_slowclk.tcl   (or .\run_tcl.ps1 exp_slowclk.tcl)
 
-set dcp "F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp"
-set logdir "E:/Dev/Repos/Ronny/nd-120/Verilog/fpga/basys3/logs"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set dcp $b3_routed_dcp
+set logdir $b3_logdir
 open_checkpoint $dcp
 
 # Try several CPU clock periods so we can bracket where timing closes.

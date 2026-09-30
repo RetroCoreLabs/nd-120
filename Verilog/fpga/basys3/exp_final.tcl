@@ -5,7 +5,8 @@
 #      (s_osc, once/cycle) and MAC (MCLK, once/cycle) - they settle over the
 #      microcycle, not one state.
 # If WNS >= 0 here, we have the recipe: 39 MHz clock + these constraints.
-set dcp "F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set dcp $b3_routed_dcp
 open_checkpoint $dcp
 create_clock -period 25.6 -name sys_clk [get_ports sysclk]
 

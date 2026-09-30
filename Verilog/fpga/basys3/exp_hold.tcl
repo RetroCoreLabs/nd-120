@@ -1,4 +1,5 @@
-open_checkpoint F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+open_checkpoint $b3_routed_dcp
 puts "SETUP_WNS [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]"
 puts "HOLD_WHS [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -hold]]"
 set hp [get_timing_paths -max_paths 4000 -nworst 1 -hold -slack_lesser_than 0]

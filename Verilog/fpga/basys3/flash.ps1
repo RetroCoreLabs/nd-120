@@ -2,17 +2,28 @@
 # Usage: .\flash.ps1              (JTAG + SPI flash, persistent)
 #        .\flash.ps1 -Quick       (JTAG only, volatile, fast)
 
+#
+# Paths: ND120_BASYS3_PROJECT (the Vivado project folder, required) and
+# ND120_VIVADO (else vivado.bat on PATH), from Verilog/fpga/local.mk or the
+# environment - see Verilog/fpga/local.mk.example.
+
 param(
-    [string]$VivadoPath = "F:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat",
+    # Empty = take ND120_VIVADO, else vivado.bat on PATH (see Verilog/fpga/paths.ps1).
+    [string]$VivadoPath = "",
     [switch]$Quick
 )
 
-if (-not (Test-Path $VivadoPath)) {
-    Write-Error "Vivado not found at $VivadoPath"
+. (Join-Path $PSScriptRoot "..\paths.ps1")
+
+$VivadoPath = Resolve-ND120Tool -Given $VivadoPath -Var "ND120_VIVADO" -Names @("vivado.bat", "vivado")
+if (-not $VivadoPath) {
+    Write-Error "Vivado not found - set ND120_VIVADO in Verilog/fpga/local.mk or pass -VivadoPath"
     exit 1
 }
 
-$BitFile = "F:/Xilinx/ND120/ND3202D/output/ND120_TOP.bit"
+$ProjectDir = Get-ND120Required -Var "ND120_BASYS3_PROJECT" -What "the folder holding the Basys3 Vivado project ND3202D.xpr"
+if (-not $ProjectDir) { exit 1 }
+$BitFile = Join-Path $ProjectDir "output\ND120_TOP.bit"
 if (-not (Test-Path $BitFile)) {
     Write-Error "No bitstream found at $BitFile - run a build first"
     exit 1

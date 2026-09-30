@@ -1,7 +1,8 @@
 # Classify the 39 MHz failing endpoints: how many originate from the inverted-clock
 # UART (CHIP_32H/regDataOut etc.) vs elsewhere, and how many are half-cycle.
 # No resynth. ~40s.
-set dcp "F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/ND120_TOP_routed.dcp"
+source [file join [file dirname [file normalize [info script]]] paths.tcl]   ;# repo + Vivado project paths
+set dcp $b3_routed_dcp
 open_checkpoint $dcp
 create_clock -period 25.6 -name sys_clk [get_ports sysclk]
 

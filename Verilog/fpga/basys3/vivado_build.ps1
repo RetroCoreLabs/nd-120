@@ -6,7 +6,13 @@
 #   .\vivado_build.ps1 -ReuseSynth     # skip the ~1h resynth, reuse existing synth_1 checkpoint (impl only)
 #   .\vivado_build.ps1 -LintOnly       # run the linter only
 #
-# Prerequisites: Vivado installed (see -VivadoPath default below).
+# Prerequisites: Vivado installed, and Verilog/fpga/local.mk made from
+# local.mk.example. Paths come from there (or from the environment):
+#   ND120_BASYS3_PROJECT  folder holding the Vivado project ND3202D.xpr (required)
+#   ND120_VIVADO          vivado.bat; -VivadoPath overrides it, and when
+#                         neither is given vivado.bat on PATH is used
+#   ND120_VIVADO_LICENSE  licence file list; used when XILINXD_LICENSE_FILE
+#                         is not already set in this process
 #
 # Defaults changed for the clock-timing bring-up phase:
 #   * FULL SYNTHESIS is the default (pass -ReuseSynth to skip it). No more accidental stale-checkpoint runs.
@@ -15,7 +21,8 @@
 #   * All output is logged to .\logs\  (see paths printed at start/end).
 
 param(
-    [string]$VivadoPath = "F:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat",
+    # Empty = take ND120_VIVADO, else vivado.bat on PATH (see Verilog/fpga/paths.ps1).
+    [string]$VivadoPath = "",
     [switch]$LintOnly,
     # Reuse the existing synth_1 checkpoint instead of a fresh ~1h synthesis.
     [switch]$ReuseSynth,
@@ -27,11 +34,14 @@ param(
 
 $ErrorActionPreference = "Continue"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Shared path helpers: reads Verilog/fpga/local.mk into the environment.
+. (Join-Path $ScriptDir "..\paths.ps1")
+$RepoRoot  = (Resolve-Path (Join-Path $ScriptDir "..\..\..")).Path   # the checkout this script sits in
 $TclScript = Join-Path $ScriptDir "vivado_build.tcl"
 $LintScript = Join-Path $ScriptDir "vivado_lint.tcl"
 
 # ---------------------------------------------------------------------------
-# Logging: everything lands in .\logs\ (this folder is on E: = readable from WSL).
+# Logging: everything lands in .\logs\ (inside the checkout = readable from WSL).
 # ---------------------------------------------------------------------------
 $LogDir = Join-Path $ScriptDir "logs"
 if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir -Force | Out-Null }
@@ -52,29 +62,23 @@ Write-Host "   Vivado log : $VivadoLog" -ForegroundColor Cyan
 Write-Host "   PS console : $PsLog" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
-# Check Vivado exists
-if (-not (Test-Path $VivadoPath)) {
-    $alternatives = @(
-        "F:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat",
-        "C:\Xilinx\Vivado\2025.2\bin\vivado.bat",
-        "C:\Xilinx\Vivado\2024.1\bin\vivado.bat"
-    )
-    $found = $false
-    foreach ($alt in $alternatives) {
-        if (Test-Path $alt) { $VivadoPath = $alt; $found = $true; break }
-    }
-    if (-not $found) {
-        Write-Error "Vivado not found. Set -VivadoPath parameter."
-        Stop-Transcript | Out-Null
-        exit 1
-    }
+# Check Vivado exists: -VivadoPath, else ND120_VIVADO, else vivado.bat on PATH.
+$VivadoPath = Resolve-ND120Tool -Given $VivadoPath -Var "ND120_VIVADO" -Names @("vivado.bat", "vivado")
+if (-not $VivadoPath) {
+    Write-Error "Vivado not found. Set ND120_VIVADO in Verilog/fpga/local.mk, pass -VivadoPath, or put vivado.bat on PATH."
+    Stop-Transcript | Out-Null
+    exit 1
 }
 
 # Copy microcode hex files to Vivado project directory
 # (Verilog uses $readmemh with relative paths; Vivado runs from the project dir)
-$VivadoProjectDir = "F:\Xilinx\ND120\ND3202D"
+$VivadoProjectDir = Get-ND120Required -Var "ND120_BASYS3_PROJECT" -What "the folder holding the Basys3 Vivado project ND3202D.xpr"
+if (-not $VivadoProjectDir) {
+    Stop-Transcript | Out-Null
+    exit 1
+}
 $OutDir           = Join-Path $VivadoProjectDir "output"
-$MicrocodeDir     = "E:\Dev\Repos\Ronny\nd-120\Code\Microcode"
+$MicrocodeDir     = Join-Path $RepoRoot "Code\Microcode"
 $HexFiles = @("AM27256_45132L.hex", "AM27256_45133L.hex")
 
 foreach ($hex in $HexFiles) {
@@ -99,7 +103,7 @@ foreach ($hex in $HexFiles) {
 # Shared/support/IDT6168A_20.v, so the images MUST sit next to it there. (This is
 # the same mechanism by which AM27256_*.hex is found next to CPU_CS_PROM_19.v.)
 $WcsDir     = Join-Path $MicrocodeDir "wcs"
-$WcsDestDir = "E:\Dev\Repos\Ronny\nd-120\Verilog\Shared\support"   # dir of IDT6168A_20.v
+$WcsDestDir = Join-Path $RepoRoot "Verilog\Shared\support"   # dir of IDT6168A_20.v
 $WcsFiles   = Get-ChildItem -Path $WcsDir -Filter "wcs_*.hex" -ErrorAction SilentlyContinue
 if ($null -eq $WcsFiles -or $WcsFiles.Count -lt 32) {
     Write-Error "WCS preload images missing/incomplete in ${WcsDir} (found $($WcsFiles.Count), need 32). Re-run gen_wcs_image.py."
@@ -122,16 +126,20 @@ Write-Host "Copied $($WcsFiles.Count) WCS preload images -> $WcsDestDir (SKIP_WC
 #
 # Read the value from the user environment at runtime - do not hard-code a
 # licence path here, it is machine-specific. If the variable is already set in
-# this process (a normal Windows shell), leave it alone.
+# this process (a normal Windows shell), leave it alone. ND120_VIVADO_LICENSE
+# (Verilog/fpga/local.mk) is tried first, then the user, then the machine value.
 # ---------------------------------------------------------------------------
 if (-not $env:XILINXD_LICENSE_FILE) {
-    $userLic = [Environment]::GetEnvironmentVariable('XILINXD_LICENSE_FILE','User')
+    $userLic = $env:ND120_VIVADO_LICENSE
+    if (-not $userLic) {
+        $userLic = [Environment]::GetEnvironmentVariable('XILINXD_LICENSE_FILE','User')
+    }
     if (-not $userLic) {
         $userLic = [Environment]::GetEnvironmentVariable('XILINXD_LICENSE_FILE','Machine')
     }
     if ($userLic) {
         $env:XILINXD_LICENSE_FILE = $userLic
-        Write-Host "Licence: took XILINXD_LICENSE_FILE from the user/machine environment" -ForegroundColor Gray
+        Write-Host "Licence: took XILINXD_LICENSE_FILE from ND120_VIVADO_LICENSE or the user/machine environment" -ForegroundColor Gray
         Write-Host "         $userLic" -ForegroundColor Gray
     } else {
         Write-Host "Licence: XILINXD_LICENSE_FILE is not set anywhere - Vivado will pick its own." -ForegroundColor DarkYellow
@@ -177,8 +185,8 @@ if ($LintOnly) {
 }
 
 # ---------------------------------------------------------------------------
-# Pull the key reports off the F: project drive into .\logs\ so they can be
-# read from WSL (the F: drive may not be mounted there).
+# Pull the key reports out of the Vivado project folder (ND120_BASYS3_PROJECT)
+# into .\logs\ so they can be read from WSL (that drive may not be mounted there).
 # ---------------------------------------------------------------------------
 $reportsToGrab = @(
     "timing_impl.rpt",        # report_timing_summary (WNS/TNS + clock summary + critical paths)
