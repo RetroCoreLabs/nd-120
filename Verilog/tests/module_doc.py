@@ -33,6 +33,13 @@ EXAMPLE
     python3 tests/module_doc.py Shared/support/TTL_74245.v -o Shared/support/doc \\
         --note "TB_RESULT: PASS - 524292 checks, exhaustive"
 
+THE NAVIGATION BLOCK
+    A doc written by this script has NO hierarchy navigation block (where the
+    module sits, what uses it, what it contains). That block comes from
+    gen_hierarchy.py. After regenerating a doc on its own, put it back with
+    the one command for all docs (cd Verilog; python3 tests/gen_module_docs.py)
+    or just the block: python3 tests/gen_module_docs.py --hierarchy-only
+
 Last reviewed: 28-SEP-2026
 Ronny Hansen
 """
@@ -111,6 +118,43 @@ def parse_header(src):
             if tag == "author" and not author:
                 author = mm.group(1).strip()
     return title, author, desc
+
+
+def expand_port_includes(src, srcdir):
+    """Replace an `include line that sits INSIDE a module's port list with the
+    text of that file. The MiSTer core top (fpga/mister/nd120.sv, module emu)
+    takes its whole port list from the framework's sys/emu_ports.vh, so
+    without this the doc would show a module with no ports at all - or, as
+    first measured 30-SEP-2026, "no module found". Includes anywhere else are
+    left alone, so every other doc comes out exactly as before. A file that
+    cannot be found is left as it is."""
+    inc_re = re.compile(r'^[ \t]*`include\s+"([^"]+)"[^\n]*', re.M)
+
+    def repl(im):
+        p = os.path.join(srcdir, im.group(1))
+        try:
+            with open(p, encoding="utf-8", errors="replace") as fh:
+                return fh.read()
+        except OSError:
+            return im.group(0)
+    out = []
+    pos = 0
+    for m in re.finditer(r"\bmodule\s+[A-Za-z_]\w*", src):
+        # the word "module" also turns up in comments and inside a port
+        # list already passed; only a match past the last one counts
+        if m.start() < pos:
+            continue
+        end = src.find(");", m.end())
+        if end < 0:
+            continue
+        head = src[m.end():end]
+        if not inc_re.search(head):
+            continue                     # nothing to expand: leave it alone
+        out.append(src[pos:m.end()])
+        out.append(inc_re.sub(repl, head))
+        pos = end
+    out.append(src[pos:])
+    return "".join(out)
 
 
 def parse_module(src, want=None):
@@ -413,6 +457,9 @@ def write_md(name, title, author, desc, params, ports, note, src_rel,
         for direction, width, pname, comment in ports:
             wl = bus_label(width, pname) or "1"
             al = " *(active low)*" if pname.endswith(("_n", "_N")) else ""
+            # a "|" in the comment would split the table row
+            # (emu_ports.vh: "= ~(VBlank | HBlank)")
+            comment = comment.replace("|", "\\|")
             L.append(f"| {direction} | `{wl}` | `{pname}`{al} | {comment} |")
         L.append("")
     if note:
@@ -439,7 +486,9 @@ def main():
 
     src = open(args.source, encoding="utf-8", errors="replace").read()
     title, author, desc = parse_header(src)
-    name, params, ports = parse_module(src, args.module)
+    name, params, ports = parse_module(
+        expand_port_includes(src, os.path.dirname(os.path.abspath(args.source))),
+        args.module)
     if not name:
         sys.exit(f"module_doc: no module found in {args.source}")
 

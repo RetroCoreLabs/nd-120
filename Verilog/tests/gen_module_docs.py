@@ -52,13 +52,29 @@ THE INDEX
     line), so it cannot list a module that has no doc or miss one that has.
     --index-only rebuilds just the index.
 
+THE HIERARCHY
+    After the index, a whole-tree sweep runs tests/gen_hierarchy.py: yosys
+    elaborates every build top (simulation and each FPGA board) with that
+    top's own file list and defines, and from that it writes
+    Verilog/HIERARCHY.md (one tree per top) and a navigation block on every
+    module doc (where the module sits, what uses it, what it contains).
+    module_doc.py writes a doc WITHOUT that block, so this sweep is also what
+    puts the block back after a doc was regenerated on its own.
+    Needs yosys (~/oss-cad-suite) and tclsh, so run it in WSL.
+
+THE ONE COMMAND (docs, MODULES.md, HIERARCHY.md and the navigation blocks)
+    cd Verilog
+    python3 tests/gen_module_docs.py
+
 USAGE
     cd Verilog
-    python3 tests/gen_module_docs.py                 # whole tree + index
+    python3 tests/gen_module_docs.py                 # whole tree + index + hierarchy
     python3 tests/gen_module_docs.py --root DELILAH-CPU
     python3 tests/gen_module_docs.py --dry-run
     python3 tests/gen_module_docs.py --jobs 8
     python3 tests/gen_module_docs.py --index-only    # just Verilog/MODULES.md
+    python3 tests/gen_module_docs.py --hierarchy-only  # HIERARCHY.md + nav blocks
+    python3 tests/gen_module_docs.py --no-hierarchy  # skip the yosys step
 """
 
 import argparse
@@ -112,14 +128,17 @@ def find_sources(root):
                        if d not in ("sim", ".git", "doc") + SKIP_DIR_NAMES
                        and not d.startswith("obj_dir")]
         for fn in filenames:
-            if not fn.endswith(".v"):
+            # .sv too: the MiSTer core top (fpga/mister/nd120.sv, module emu)
+            # is the one SystemVerilog file of ours, and the hierarchy page
+            # starts that board's tree at it
+            if not fn.endswith((".v", ".sv")):
                 continue
             if fn.endswith("_tb.v"):
                 continue
             if fn.startswith("mig_7series_") or fn.startswith("gowin_"):
                 continue   # vendor IP that lives outside an ip/ directory
             # Quartus IP wizard output: the wizard writes a .qip next to it
-            if os.path.exists(os.path.join(dirpath, fn[:-2] + ".qip")):
+            if os.path.exists(os.path.join(dirpath, os.path.splitext(fn)[0] + ".qip")):
                 continue
             # lint-only stand-ins for vendor primitives (BUFG, MMCME2_BASE, rPLL)
             if fn.endswith("_stub.v") or fn.endswith("_stubs.v"):
@@ -316,6 +335,9 @@ def write_index():
     out.append("`//!` comments in the module's source. %d modules in %d areas."
                % (total, len(rows)))
     out.append("")
+    out.append("What sits inside what, for the simulation and for every FPGA board,")
+    out.append("is on [HIERARCHY.md](HIERARCHY.md) (made from a yosys elaboration).")
+    out.append("")
     areas = sorted(rows, key=area_sort_key)
     for key in areas:
         out.append("- [%s](#%s) (%d)" % (area_title(key), anchor(area_title(key)),
@@ -352,12 +374,19 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--index-only", action="store_true",
                     help="only rebuild Verilog/MODULES.md from the existing docs")
+    ap.add_argument("--hierarchy-only", action="store_true",
+                    help="only rebuild Verilog/HIERARCHY.md and the navigation "
+                         "blocks on the existing docs (runs yosys)")
+    ap.add_argument("--no-hierarchy", action="store_true",
+                    help="skip the yosys hierarchy step of a whole-tree sweep")
     args = ap.parse_args()
 
     if args.index_only:
         n = write_index()
         print("wrote %s: %d modules" % (os.path.relpath(INDEX_PATH, VROOT), n))
         return 0
+    if args.hierarchy_only:
+        return run_hierarchy()
 
     root = args.root if os.path.isabs(args.root) else os.path.join(VROOT, args.root)
     srcs = find_sources(root)
@@ -404,7 +433,20 @@ def main():
     if not args.dry_run and os.path.normpath(root) == os.path.normpath(VROOT):
         n = write_index()
         print("wrote %s: %d modules" % (os.path.relpath(INDEX_PATH, VROOT), n))
+        # the docs were just rewritten without their navigation blocks, so
+        # the hierarchy step is what puts them back (see THE HIERARCHY)
+        if not args.no_hierarchy:
+            if run_hierarchy() != 0:
+                return 1
     return 1 if failed else 0
+
+
+def run_hierarchy():
+    """Run tests/gen_hierarchy.py: HIERARCHY.md + the navigation blocks."""
+    sys.path.insert(0, HERE)
+    import gen_hierarchy                                   # noqa: E402
+    print("\nhierarchy: elaborating every build top with yosys")
+    return gen_hierarchy.main([])
 
 
 if __name__ == "__main__":
