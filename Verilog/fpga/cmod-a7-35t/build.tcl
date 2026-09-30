@@ -1,6 +1,6 @@
 # ND-120 on Cmod A7-35T - self-contained in-memory Vivado flow
 # (mem-test/sd-fat-test pattern: no .xpr project needed, unlike the Basys3
-# main build which drives a GUI project on F:).
+# main build which drives a GUI project outside the repo).
 #
 #   vivado -mode batch -source build.tcl                    # build + JTAG program
 #   vivado -mode batch -source build.tcl -tclargs -noburn   # build only

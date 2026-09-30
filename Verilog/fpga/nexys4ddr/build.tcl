@@ -3,7 +3,7 @@
 # Template: the Basys3 build (fpga/basys3/vivado_build.tcl) - same defines,
 # same source set, same "fail loudly on negative slack" gate. The one
 # deliberate difference: no out-of-repo .xpr GUI project (the Basys3 flow
-# drives F:/Xilinx/ND120/ND3202D). Everything here is in-memory and lives in
+# drives the project named by ND120_BASYS3_PROJECT). Everything here is in-memory and lives in
 # the repo, the way fpga/cmod-a7-35t/build.tcl already does it.
 #
 #   vivado -mode batch -source build.tcl                       # build + JTAG program

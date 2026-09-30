@@ -23,10 +23,27 @@ timing-closure problem, see [Status](#status)).
 
 ## Toolchain
 
-**Vivado, on the Windows host** (the repo is on `E:`, Vivado on `F:`). Scripts
-are run from this folder. The Vivado project itself lives **outside the repo** at
-`F:/Xilinx/ND120/ND3202D/` (`ND3202D.xpr`); the bitstream lands at
-`F:/Xilinx/ND120/ND3202D/output/ND120_TOP.bit` (+ `.ltx` for ILA probes).
+**Vivado, on the Windows host.** Scripts are run from this folder. The Vivado
+project itself lives **outside the repo**, in the folder named by
+`ND120_BASYS3_PROJECT` (it holds `ND3202D.xpr`); the bitstream lands at
+`<ND120_BASYS3_PROJECT>/output/ND120_TOP.bit` (+ `.ltx` for ILA probes).
+
+### Local paths
+
+No machine path is written in these scripts. Copy
+`Verilog/fpga/local.mk.example` to `Verilog/fpga/local.mk` (untracked) and set:
+
+| Variable | What | If unset |
+|----------|------|----------|
+| `ND120_BASYS3_PROJECT` | folder holding `ND3202D.xpr` | the scripts stop with an error |
+| `ND120_VIVADO` | `vivado.bat` | `vivado.bat` on PATH (`-VivadoPath` overrides both) |
+| `ND120_VIVADO_LICENSE` | licence file list, passed as `XILINXD_LICENSE_FILE` | the user/machine `XILINXD_LICENSE_FILE` |
+
+`make` passes them on; the `.ps1` wrappers (via `../paths.ps1`) and the Tcl
+scripts (via `paths.tcl`, which every script here sources first) also read
+`local.mk` themselves, so running a script by hand from PowerShell or the
+Vivado Tcl console needs nothing extra. A value already in the environment
+wins over `local.mk`. Logs and ILA CSVs go to `logs/` in this folder.
 
 ## Files
 
@@ -34,6 +51,7 @@ are run from this folder. The Vivado project itself lives **outside the repo** a
 |------|---------|
 | `vivado_build.tcl` | Synthesis + implementation + bitstream. Header lists flags: `full_synth` (force ~1h re-synth; default reuses the `synth_1` checkpoint), `skip_program`, `no_reset_synth`, `backup_bit`. Also sets up the ILA (probe0..26). |
 | `vivado_build.ps1` | PowerShell wrapper: copies microcode hex into the project dir, then runs `vivado_build.tcl`. Finds the tcl via its own folder. |
+| `paths.tcl` | Sourced first by every Tcl script here: derives the repo paths from its own location and reads `ND120_BASYS3_PROJECT` (see [Local paths](#local-paths)). |
 | `vivado_lint.tcl` | Lint-only run. |
 | `vivado_impl_only.tcl` | Re-run implementation on the existing synth checkpoint (skip synthesis). |
 | `flash.tcl` / `flash.ps1` | Program the FPGA. `.\flash.ps1 -Quick` = JTAG only (volatile, fast); `.\flash.ps1` = JTAG + SPI flash (persistent). Loads `ND120_TOP.ltx` so ILA probes appear in Hardware Manager. |
@@ -65,7 +83,8 @@ Probes are declared in `vivado_build.tcl` (probe0..26) via `mark_debug` on wires
 plus `connect_probe`. After capturing in Hardware Manager, export CSV:
 
 ```tcl
-write_hw_ila_data -csv_file -force C:/temp/ila_capture.csv [upload_hw_ila_data hw_ila_1]
+source paths.tcl   ;# sets b3_logdir = this folder's logs/
+write_hw_ila_data -csv_file -force [file join $b3_logdir ila_capture.csv] [upload_hw_ila_data hw_ila_1]
 ```
 
 Then compare against the Verilator golden trace - see

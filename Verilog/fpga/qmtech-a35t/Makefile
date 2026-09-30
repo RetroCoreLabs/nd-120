@@ -14,19 +14,23 @@
 # board either - see HANDOFF-qmtech-a35t-bringup.md.
 #
 # Vivado runs on the Windows host; from WSL this delegates via powershell.exe.
-# On Windows, run the tcl directly:
-#   cd E:\Dev\Repos\Ronny\nd-120\Verilog\fpga\qmtech-a35t
+# Vivado path: ND120_VIVADO from ../local.mk (copy ../local.mk.example), else
+# vivado on the Windows PATH. On Windows, run the tcl directly:
+#   cd Verilog\fpga\qmtech-a35t        (inside your checkout)
 #   vivado -mode batch -source build.tcl [-tclargs -noburn]
 
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+
+VIVADO ?= $(or $(ND120_VIVADO),vivado)
 PS   = powershell.exe -NoProfile -ExecutionPolicy Bypass -Command
 TEST = mem-test
 
 # ---- full ND-120 build -----------------------------------------------------
 all:
-	$(PS) "vivado -mode batch -source build.tcl -tclargs -noburn"
+	$(PS) "& '$(VIVADO)' -mode batch -source build.tcl -tclargs -noburn"
 
 load:
-	$(PS) "vivado -mode batch -source build.tcl"
+	$(PS) "& '$(VIVADO)' -mode batch -source build.tcl"
 
 flash:
 	@echo "flash: not implemented for qmtech-a35t yet (JTAG-volatile only;"
@@ -75,10 +79,10 @@ lint:
 
 # ---- stage tests (led-test, mem-test) --------------------------------------
 test:
-	cd $(TEST) && $(PS) "vivado -mode batch -source build.tcl -tclargs skip_program"
+	cd $(TEST) && $(PS) "& '$(VIVADO)' -mode batch -source build.tcl -tclargs skip_program"
 
 test-load:
-	cd $(TEST) && $(PS) "vivado -mode batch -source build.tcl"
+	cd $(TEST) && $(PS) "& '$(VIVADO)' -mode batch -source build.tcl"
 
 sim:
 	cd mem-test/sim && iverilog -g2012 -DNO_MMCM -o tb qmtech_mem_test_tb.v \

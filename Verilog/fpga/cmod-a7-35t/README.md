@@ -94,7 +94,8 @@ cd Verilog/fpga/cmod-a7-35t
 vivado -mode batch -source build.tcl                  # build + JTAG program
 vivado -mode batch -source build.tcl -tclargs -noburn # build only
 ```
-(or `make` / `make build` from WSL - Vivado path in the Makefile.)
+(or `make` / `make build` from WSL - Vivado path: `ND120_VIVADO` in
+`../local.mk`, copied from `../local.mk.example`; unset = `vivado` on PATH.)
 
 - **Clocking - how 27 MHz comes from the 12 MHz crystal:** the
   `TARGET_CMOD_A7` branch in

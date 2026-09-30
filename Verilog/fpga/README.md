@@ -158,6 +158,28 @@ Programming transport per board: Basys3 and Cmod A7 = onboard USB-JTAG;
 Tang Nano 20K = `openFPGALoader` from WSL (usbipd-attached) or the Gowin
 programmer GUI; QMTECH = Xilinx Platform Cable USB II on the JTAG header.
 
+### Local paths: copy local.mk.example to local.mk
+
+No build script names a folder on anybody's machine. Paths inside the repo
+are worked out from each script's own location; paths outside it are
+variables you set once in `Verilog/fpga/local.mk` (untracked - copy
+[`local.mk.example`](local.mk.example), which explains each one):
+
+| Variable | What | If unset |
+|----------|------|----------|
+| `ND120_VIVADO` | `vivado.bat` | `vivado` on the Windows PATH |
+| `ND120_VIVADO_LICENSE` | licence file list for `XILINXD_LICENSE_FILE` | the Windows user/machine value |
+| `ND120_GOWIN` | Gowin `gw_sh.exe` | `gw_sh.exe` on PATH |
+| `ND120_OSS_CAD` | Windows oss-cad-suite folder (`../ND-120-Yosys/synh.bat`) | `yosys` on PATH |
+| `ND120_BASYS3_PROJECT` | folder holding the Basys3 `ND3202D.xpr` | Basys3 scripts stop with an error |
+
+Every board Makefile includes [`paths.mk`](paths.mk), which loads `local.mk`
+and exports the values (also through `WSLENV`, so `powershell.exe` /
+`cmd.exe` started from WSL see them). The PowerShell scripts read `local.mk`
+through [`paths.ps1`](paths.ps1) and the Basys3 Tcl scripts through
+[`basys3/paths.tcl`](basys3/paths.tcl), so running a script by hand needs
+nothing more. `make VIVADO=...` still overrides the Vivado path for one run.
+
 ## Shared context (applies to all boards)
 
 - **The boot blocker is timing, not logic.** The FF-mode Verilator sim boots
