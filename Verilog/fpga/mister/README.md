@@ -61,9 +61,18 @@ installing on the host: the community image `raetro/quartus:17.0`
 ```bash
 # from Verilog/fpga/mister/, in WSL (needs the docker daemon running)
 make check     # is docker up, is the image pulled, is the project intact
-make build     # font + microcode + banner, then -> output_files/nd120.rbf
+make build     # font + microcode + banner, then -> $ND120_BUILD_DIR/mister/nd120.rbf
 make load      # scp the .rbf to the MiSTer  (MISTER=root@... to override)
 ```
+
+The build folder `ND120_BUILD_DIR` comes from `local.mk` at the repository
+root (`python3 configure.py`, see
+[CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings)).
+Quartus writes `db/`, `output_files/` and more next to the `.qpf`, so the
+build keeps a copy of this folder in `$ND120_BUILD_DIR/mister/project/` and
+runs Quartus there, with the repository's `Verilog/` tree mounted read-only
+in the container; the finished core is copied to
+`$ND120_BUILD_DIR/mister/nd120.rbf`. Nothing is written into this folder.
 
 The Quartus GUI is needed for **adding** PLL output clocks (that changes the
 port list) and for SignalTap. It is NOT needed to change a PLL *frequency* -

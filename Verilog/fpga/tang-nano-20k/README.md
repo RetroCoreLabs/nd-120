@@ -122,14 +122,23 @@ flip-flops (clock + async preset + async clear). Has **GAO** (Gowin Analyzer
 Oscilloscope), the on-chip logic analyzer = Vivado ILA equivalent. This is the
 reliable path to a real bitstream today.
 
-#### Local paths
+#### Local settings
 
-No install path is written in the scripts. Copy `Verilog/fpga/local.mk.example`
-to `Verilog/fpga/local.mk` (untracked) and set `ND120_GOWIN` to your `gw_sh.exe`;
-left unset, `gowin_build.ps1` uses `gw_sh.exe` on PATH. `make gowin` passes the
-setting on (through WSLENV from WSL), and `gowin_build.ps1` also reads
-`local.mk` itself when run by hand. The OSS flow needs no local path:
-`OSS_CAD` (default `~/oss-cad-suite`) is the only knob.
+No install path is written in the scripts. Run `python3 configure.py` at the
+repository root once: it finds `gw_sh.exe` and writes `ND120_GOWIN` and the
+build folder `ND120_BUILD_DIR` to `local.mk` (see
+[CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings)).
+`make gowin` passes the settings on (through WSLENV from WSL), and
+`gowin_build.ps1` also reads `local.mk` itself when run by hand. The OSS flow
+takes its tools from `ND120_OSS_CAD_SUITE`, else `~/oss-cad-suite`, else PATH
+(`make OSS_CAD=...` overrides for one run).
+
+**Output:** both flows write everything to `$ND120_BUILD_DIR/tang-nano-20k/`
+(the Gowin project and its `impl/` reports, the OSS netlists and logs, the
+copied WCS images) - nothing lands in this folder, and every build target,
+`make check` included, stops with a message when `ND120_BUILD_DIR` is not set.
+`make fresh-build ND120_FRESH_DIR=<empty folder>` runs `make gowin` on the
+current commit in a fresh clone.
 
 ### Option 2 - OSS flow (Linux-native, WSL)
 `yosys synth_gowin` -> `nextpnr-himbaechel --device GW2AR-LV18QN88C8/I7` ->
@@ -175,9 +184,9 @@ No variant define = `slow`.
 
 | | Gowin EDA | OSS CAD Suite |
 |---|---|---|
-| Runs on | Windows host (`gw_sh`) | WSL / Linux (`~/oss-cad-suite`, override `OSS_CAD=`) |
+| Runs on | Windows host (`gw_sh`) | WSL / Linux (`ND120_OSS_CAD_SUITE`, else `~/oss-cad-suite`; override `OSS_CAD=`) |
 | Build | `.\gowin_build.ps1 [-Variant slow\|crawl\|mid\|full\|fast20]` or `make gowin` | `make [VARIANT=slow\|crawl\|full]` (no mid/fast20) |
-| Bitstream | `build/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs` | `build/nd120_tang20k_oss-<variant>.fs` |
+| Bitstream | `<build>/nd120_tang20k_build/impl/pnr/nd120_tang20k_build.fs` | `<build>/nd120_tang20k_oss-<variant>.fs` |
 | Load / flash | `make load-gowin` / `make flash-gowin` | `make load` / `make flash` |
 | Netlist gates | EX3988 empty-WCS check in the ps1 | `make check` (IO_sdram_dq tristate + latch census; also in CI) |
 

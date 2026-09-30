@@ -104,13 +104,27 @@ nd-120/
    [MEGA65](Verilog/fpga/QUICKSTART-mega65.md) ·
    [QMTECH XC7A35T](Verilog/fpga/QUICKSTART-qmtech-a35t.md)
 
-### Run it in the simulator
+### Set up a clone (do this first)
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/RetroCoreLabs/nd-120.git
 cd nd-120
 
+# 2. Configure it: finds the tools, asks for what it cannot find (the build
+#    folder, where the other ND repositories are), fetches the submodules,
+#    makes the microcode preload images, and remembers the answers in
+#    local.mk (machine-local, never committed). From a Windows shell: py configure.py
+python3 configure.py
+python3 configure.py --check          # later: what is set, what is missing
+```
+
+Every setting, what reads it and which targets need it:
+[CONTRIBUTING.md - Local settings](CONTRIBUTING.md#local-settings).
+
+### Run it in the simulator
+
+```bash
 # Waveform simulation: compiles, runs, and opens GTKWave
 cd Verilog/sim
 make clean

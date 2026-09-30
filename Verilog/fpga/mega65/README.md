@@ -64,7 +64,7 @@ Verified 27-AUG-2026 from the mega65-core build scripts and board XDCs
 |---|---|
 | [`docs/00-plan.md`](docs/00-plan.md) | The living plan: decisions, verified framework facts, the two memory backends, build sequence B0-B5, layout |
 | `m2m/` | MiSTer2MEGA65 framework, git submodule (`git submodule update --init --recursive`) |
-| `Makefile`, `build.tcl` | `make toolchain` (once), `make all BOARD=r6` (or r3/r4/r5) -> `build/<board>/nd120_mega65_<board>.bit` + `.cor`. Working since 02-SEP-2026 on Vivado 2026.1. Vivado path: `ND120_VIVADO` in `../local.mk` (copy `../local.mk.example`), unset = `vivado` on the Windows PATH |
+| `Makefile`, `build.tcl` | `make toolchain` (once), `make all BOARD=r6` (or r3/r4/r5) -> `$ND120_BUILD_DIR/mega65/<board>/nd120_mega65_<board>.bit` + `.cor` (with every report, run folder and Vivado's own files). Working since 02-SEP-2026 on Vivado 2026.1. Settings: `ND120_VIVADO` and `ND120_BUILD_DIR` in `local.mk` at the repository root, written by `python3 configure.py` (which also checks out the `m2m` submodule) - see [CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings) |
 | `CORE/` | our side of the framework contract (the framework's `CORE/` template, copied and edited): `vhdl/main.vhd` is the thin VHDL skin over our Verilog, `vhdl/config.vhd` the OSD texts/menu, `CORE.xdc` our constraints, `m2m-rom/` the QNICE firmware build |
 | `rtl/` | the MEGA65 glue in Verilog: `m65_keys_to_ps2.v` (keyboard scan -> PS/2 events, keycap-faithful), `nd120_console_mega65.v` (the shared terminal on the framework's video/keyboard) |
 | `sim/` | their testbenches (`make test-keys`, `make test-console`, `make lint`), registered in `Verilog/tests/run_all_tests.sh` |

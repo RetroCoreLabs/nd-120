@@ -1139,7 +1139,7 @@ Defines: `FPGA_FF_MODE`, `MAIN_RAM_SDRAM`, `ND_SDRAM_PACK16`, `ND_SDRAM_DQ16`, `
 
 ## Basys3
 
-Build: `Verilog/fpga/basys3/vivado_build.tcl` with `full_synth`. Its file list is the Vivado project (.xpr) the script opens, which is kept OUTSIDE the repository, plus the files the script adds.
+Build: `Verilog/fpga/basys3/vivado_build.tcl` with `full_synth`. Its file list is `nd120_basys3_sources.txt` next to it (a non-project flow since 30-SEP-2026).
 
 Defines: `FPGA_FF_MODE`, `SKIP_WCS_LOAD`, `MAIN_RAM_BLOCKRAM`, `BOARD_CLK_FREQ=16666667`, `UART_BAUD_RATE=9600`.
 

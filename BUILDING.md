@@ -38,6 +38,11 @@ Development is done on **Linux / WSL2 with bash**. The exceptions are the
 vendor FPGA tools (Vivado, Gowin EDA), which run on a Windows host and are
 driven by the `.ps1` / `.tcl` scripts under `Verilog/fpga/<board>/`.
 
+After cloning, run `python3 configure.py` at the repository root (`py
+configure.py` from a Windows shell) once: it finds the tools, makes the
+microcode preload images and writes `local.mk`, which every build reads. See
+[CONTRIBUTING.md - Local settings](CONTRIBUTING.md#local-settings).
+
 ## Building the Project
 
 ### Quick Start
@@ -220,9 +225,16 @@ bitstreams and per-board quickstarts are on the Releases page it links to.
 
 Two notes that apply across boards:
 
+- **Every board** writes all of its output - bitstream, reports, logs,
+  Vivado's `.Xil` - to `$ND120_BUILD_DIR/<board>/`, the build folder set by
+  `configure.py`; nothing lands in the checkout. `make fresh-build
+  ND120_FRESH_DIR=<empty folder>` in a board folder clones the current commit
+  there and builds it, to prove the build needs nothing outside the
+  repository.
 - **Vivado boards** (Basys3, Cmod A7, Nexys 4 DDR, QMTECH, MEGA65) build on the
   Windows host from each folder's `.tcl` / `.ps1` script. The microcode hex
-  files must be where the build expects them or the ROM is empty.
+  files must be where the build expects them or the ROM is empty -
+  `configure.py` makes them (`Code/Microcode/gen_wcs_image.py`).
 - **Tang Nano 20K** has two flows. `make` in `Verilog/fpga/tang-nano-20k/` runs
   the open-source flow (yosys + nextpnr-himbaechel + gowin_pack), which its
   Makefile names as primary; `make gowin` / `gowin_build.ps1` runs Gowin EDA.

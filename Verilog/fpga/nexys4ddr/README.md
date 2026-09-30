@@ -65,7 +65,7 @@ memory.
 
 | File | Purpose |
 |------|---------|
-| `build.tcl` | The whole flow: in-memory project, synth, impl, timing gate, bitstream, JTAG program. No out-of-repo `.xpr` (unlike the Basys3 flow, which drives a GUI project on `F:`). |
+| `build.tcl` | The whole flow: in-memory project, synth, impl, timing gate, bitstream, JTAG program. No `.xpr` project (the Basys3 flow used one outside the repository until 30-SEP-2026; it is a non-project flow too now). Everything it writes goes to `$ND120_BUILD_DIR/nexys4ddr/`. |
 | `Makefile` | Standard board API - `make`, `make build`, `make load`, `make clean`, `CLK=<MHz>`. |
 | `nd120_nexys4ddr_top.v` | Board wrapper around `ND120_TOP` (8-digit display, active-low CPU RESET button, SD power gate). |
 | `nd120_nexys4ddr.xdc` | Active pin constraints. |
@@ -221,11 +221,19 @@ make CLK=33             # the deployed 33.333 MHz CPU clock (the default is 16.6
 make clean
 ```
 
-Vivado path and licence: `ND120_VIVADO` and `ND120_VIVADO_LICENSE` in
-`../local.mk` (copy `../local.mk.example`; see
-[Local paths](../README.md#local-paths-copy-localmkexample-to-localmk)).
-Unset, `vivado` on the Windows PATH and the Windows user licence setting are
-used. `run_board_test.sh` and `build-watch.ps1` read the same file.
+Settings: `ND120_BUILD_DIR` (where builds go), `ND120_VIVADO` and
+`ND120_VIVADO_LICENSE` in `local.mk` at the repository root, written by
+`python3 configure.py` (see
+[CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings)).
+Each target checks what it needs first and names what is missing; with
+`ND120_VIVADO_LICENSE` unset the Windows user licence setting is used.
+`run_board_test.sh` and `build-watch.ps1` read the same file.
+
+**Output:** everything goes to `$ND120_BUILD_DIR/nexys4ddr/` - the
+bitstream `nd120_nexys4ddr.bit`, `util.rpt`, `timing.rpt`, the
+`timing-analysis/run_clk<N>/` folders, board-test results and ILA captures,
+and Vivado's own log, journal and `.Xil`. `make fresh-build
+ND120_FRESH_DIR=<empty folder>` builds the current commit in a fresh clone.
 
 **Getting a built bitstream onto the board - two different things:**
 
@@ -240,7 +248,8 @@ make flash   # PERMANENT: writes the QSPI config flash (flash.tcl builds the
 ```
 
 Neither triggers a rebuild: both refuse politely if `nd120_nexys4ddr.bit` is
-missing. The board's USB must be attached to Windows, not WSL (usbipd).
+missing from the build folder (or program the file named with `-tclargs
+<file>.bit`, which needs no local settings). The board's USB must be attached to Windows, not WSL (usbipd).
 Releasing a build = `make build` (it fails loudly on negative slack, so a
 broken-timing image cannot reach this step) followed by `make flash`.
 
