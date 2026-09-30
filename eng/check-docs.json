@@ -1,0 +1,44 @@
+{
+  "_readme": [
+    "Waivers for check-docs.py, which reads this file from its own directory.",
+    "",
+    "A section that genuinely does not apply to a repository should be ABSENT, not filled",
+    "with a placeholder - that is the first rule in standards/README-TEMPLATE.md. This file",
+    "is how you tell the checker so. Every waiver needs a reason: the reason is the point of",
+    "the file, because a waiver without one is indistinguishable from giving up.",
+    "",
+    "app_folders  where to look for applications. Each immediate subdirectory holding a",
+    "             project that declares <OutputType>Exe</OutputType> or WinExe counts as one",
+    "             application, and the APPS-TABLE check wants each of them named in the",
+    "             repository README. A class library does not count. A repository with no",
+    "             executable projects yields none, so this is harmless in a C repository and",
+    "             in a library repository whose src/ holds packages rather than programs.",
+    "",
+    "waivers      a list. Each entry has:",
+    "               files   paths relative to the repository root. A bare name such as",
+    "                       \"README.md\" also matches any path ending in it, so",
+    "                       \"Desktop/README.md\" waives one application's README.",
+    "               checks  the check codes to waive for those files.",
+    "               reason  why. Required. Write it for the next person.",
+    "",
+    "Check codes: LINK ESCAPES ABSPATH MERMAID ALT-TEXT EMOJI-HEADING HAND-TOC",
+    "             NEW-HEADING H1 BADGES NAVBAR INSTALL-ORDER LICENCE-LAST ABOUT STATUS",
+    "             APPS-TABLE",
+    "",
+    "The group-2 codes - H1 BADGES NAVBAR INSTALL-ORDER LICENCE-LAST ABOUT STATUS",
+    "APPS-TABLE - are only ever applied to the repository's own README.md. A per-application",
+    "README follows the shortened spine and has no badge row or nav bar of its own.",
+    "",
+    "The waivers below are this repository's own."
+  ],
+
+  "app_folders": ["src"],
+
+  "waivers": [
+    {
+      "files": ["README.md"],
+      "checks": ["EMOJI-HEADING", "HAND-TOC", "NAVBAR"],
+      "reason": "README style chosen by the owner (pcc-nd500 layout), 29-SEP-2026"
+    }
+  ]
+}
