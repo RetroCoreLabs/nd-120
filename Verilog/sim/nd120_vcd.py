@@ -5,7 +5,8 @@ Dynamically discovers signal IDs from the VCD header.
 """
 import re
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 # Signal name substrings to search for (matched against full scoped name)
 WANT = {

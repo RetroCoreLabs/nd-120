@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Trace CSA+LC around the first RESTART after LCS_n goes HIGH."""
 import sys
-sys.path.insert(0, "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim")
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 WANT = {
     "csa": "s_debug_csa",
     "lc":  "s_lc_3_0",

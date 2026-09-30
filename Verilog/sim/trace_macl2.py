@@ -2,7 +2,8 @@
 """Trace MACL execution — count restarts, find MOPC, check RTC timing."""
 from collections import defaultdict
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 WANT = {
     "csa":    "s_debug_csa",

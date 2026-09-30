@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Find EPANS, PANCAL, and IDB signals in the FST."""
 import sys
-sys.path.insert(0, '/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim')
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fst import open_wave
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.fst"
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.fst")
 SUBS = ["epans", "EPANS", "pres", "pancal", "PANCAL", "idb_15_0_chip",
         "debug_csa", "s_f_15_0", "idb_15_0_out", "EPANSN"]
 

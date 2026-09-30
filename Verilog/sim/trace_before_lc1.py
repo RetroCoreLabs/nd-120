@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Show CSA changes in the window just before LC=1 at o000051 (tick ~738968)."""
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 id_csa = "s_"
 id_lc  = ",D"
 

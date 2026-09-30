@@ -15,7 +15,7 @@ Approach (per the vetted plan):
 """
 import sys, os, re, csv, functools
 print = functools.partial(print, flush=True)
-sys.path.insert(0, "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vcd_extract import parse_vcd_header, find_matching_signals, extract_signals, ps_to_tick
 
 FST    = sys.argv[1]

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Dump all LC load events (LDLCN went LOW) and all LC value changes with CSA context."""
 import sys
-sys.path.insert(0, '/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim')
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fst import open_wave
 from collections import defaultdict
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.fst"
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.fst")
 
 WANT = {
     "csa":   "s_debug_csa",

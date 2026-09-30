@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Trace ICONTIN/CONTINUE chain at tick 1 to find where 0 comes from."""
 import sys
-sys.path.insert(0, '/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim')
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fst import open_wave
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.fst"
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.fst")
 
 # Grab ALL signals matching icontin, continue, xcon
 SUBSTRINGS = ["icontin", "ICONTIN", "continue", "CONTINUE", "xcon", "XCON", "s_high"]

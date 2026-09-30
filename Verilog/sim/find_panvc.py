@@ -2,7 +2,8 @@
 """Find PANVC dispatch events in VCD and show LC value at each."""
 from collections import defaultdict
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 # --- header parse ---
 scope = []

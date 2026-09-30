@@ -25,7 +25,7 @@ ANTI-ASSUME DISCIPLINE:
     array is a separate memory - "landed in shadow" is inferred from the strobe).
 
 Runs the ENGINE only under WSL. Run this script itself under WSL:
-    cd /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim
+    cd Verilog/sim          # from the repository root
     python3 examples/tpe_paging_capture.py
 Outputs (in sim/):
     tpe_paging.csv      - compact PRE/POST windows around every shadow write
@@ -41,9 +41,10 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from nd120_probe import Probe   # noqa: E402
 
-SIM_DIR   = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim"
+# sim/ is this file's parent folder; runSim/ sits next to it.
+SIM_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENGINE    = os.path.join(SIM_DIR, "obj_dir_probe_floppy", "VND120_TOP")
-FLOPPY    = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/runSim/FLOPPY1.IMG"
+FLOPPY    = os.path.join(os.path.dirname(SIM_DIR), "runSim", "FLOPPY1.IMG")
 
 # Full VPI paths for the PTE write-data buses (verified to resolve).
 MMU       = "ND120_TOP.CORE.CPU_BOARD.CPU.MMU"

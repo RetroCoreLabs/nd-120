@@ -5,6 +5,7 @@ Extracts CSA values at MCLK rising edges and compares with expected sequence.
 """
 
 import csv
+import os
 import sys
 
 def parse_ila_csv(filepath):
@@ -36,7 +37,12 @@ def find_col(col_map, *patterns):
     return None, None
 
 def main():
-    filepath = sys.argv[1] if len(sys.argv) > 1 else "F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/iladata.csv"
+    # The capture is the CSV Vivado exports from the ILA (impl_1/iladata.csv in
+    # the Vivado project). Give it as the first argument, or name it with the
+    # environment variable ND120_ILA_CSV.
+    filepath = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("ND120_ILA_CSV")
+    if not filepath:
+        sys.exit("analyze_ila.py: give the ILA CSV as the first argument, or set ND120_ILA_CSV")
 
     header, rows, col_map = parse_ila_csv(filepath)
 

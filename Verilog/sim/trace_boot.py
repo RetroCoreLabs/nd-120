@@ -4,9 +4,10 @@ Show CSA + LC trace to understand boot progress.
 Finds key milestones: LCS_n going high, MACL tests, PANVC dispatch, OPCOM.
 """
 import sys
-sys.path.insert(0, "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim")
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 WANT = {
     "csa":   "s_debug_csa",

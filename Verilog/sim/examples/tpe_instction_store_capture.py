@@ -18,7 +18,7 @@ Requires the send-gap fix in nd120_probe.cpp (ND120_SEND_GAP) so `1560&` is not
 mangled - without it MOPC drops the digits and autoloads INSTRUCTION-B instead.
 
 Run under WSL:
-    cd /mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim
+    cd Verilog/sim          # from the repository root
     python3 examples/tpe_instction_store_capture.py
 Outputs (sim/): tpe_store.csv, tpe_store_events.log
 """
@@ -29,9 +29,10 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from nd120_probe import Probe   # noqa: E402
 
-SIM_DIR = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim"
+# sim/ is this file's parent folder; runSim/ sits next to it.
+SIM_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENGINE  = os.path.join(SIM_DIR, "obj_dir_probe_floppycore", "VND120_TOP")
-FLOPPY  = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/runSim/FLOPPY1.IMG"
+FLOPPY  = os.path.join(os.path.dirname(SIM_DIR), "runSim", "FLOPPY1.IMG")
 
 MMU     = "ND120_TOP.CORE.CPU_BOARD.CPU.MMU"
 WRITE   = MMU + ".s_write"                 # store-cycle write enable

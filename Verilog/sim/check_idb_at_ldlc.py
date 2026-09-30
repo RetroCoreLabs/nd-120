@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Find what drives IDB at COMM.LDLC (o000051) at tick ~738968."""
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 # Find signal IDs for signals of interest
 want_names = {

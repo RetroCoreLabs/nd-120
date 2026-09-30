@@ -3,10 +3,11 @@
 The test at o002105 checks MACL error count. Failed tests branch to o002155 (STERR).
 Show each test address, branch taken, and resulting CSA."""
 import sys
-sys.path.insert(0, '/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim')
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fst import open_wave
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.fst"
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.fst")
 
 WANT = {
     "csa":   "s_debug_csa",

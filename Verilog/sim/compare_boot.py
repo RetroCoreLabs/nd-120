@@ -10,9 +10,23 @@ import sys
 import re
 import os
 
-LISTING_PATH = "E:/Dev/Repos/Ronny/ND110Compile/ND110Compile/uCode/ND-120-DELILAH-L.LISTING.TXT"
-ILA_CSV_PATH = "F:/Xilinx/ND120/ND3202D/ND3202D.runs/impl_1/iladata.csv"
-VCD_PATH = "E:/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+_HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def _need_env(name, what):
+    """Read a location outside this repository from the environment; stop with a clear message if unset."""
+    value = os.environ.get(name)
+    if not value:
+        sys.exit("compare_boot.py: set %s to %s" % (name, what))
+    return value
+
+
+# The microcode listing lives in the sibling ND110Compile repository:
+#   $ND_REPOS/ND110Compile/ND110Compile/uCode/ND-120-DELILAH-L.LISTING.TXT
+LISTING_REL = os.path.join("ND110Compile", "ND110Compile", "uCode", "ND-120-DELILAH-L.LISTING.TXT")
+# The ILA capture is the CSV Vivado exports (impl_1/iladata.csv in the Vivado
+# project); it is named by ND120_ILA_CSV. Both are read in main().
+VCD_PATH = os.path.join(_HERE, "waveform.vcd")
 
 def load_microcode_labels(listing_path):
     """Load address->label mapping from microcode listing."""
@@ -300,6 +314,10 @@ def identify_phases(csa_sequence):
     return phases
 
 def main():
+    LISTING_PATH = os.path.join(
+        _need_env("ND_REPOS", "the folder that holds the other ND checkouts (ND110Compile)"),
+        LISTING_REL)
+    ILA_CSV_PATH = _need_env("ND120_ILA_CSV", "the ILA CSV exported from Vivado (iladata.csv)")
     labels = load_microcode_labels(LISTING_PATH)
 
     # Extract ILA data

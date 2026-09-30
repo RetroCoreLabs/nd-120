@@ -3,7 +3,8 @@
 Also trace LUA to see if it correctly points to 0."""
 from collections import defaultdict
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 WANT = {
     "csa":      "s_debug_csa",

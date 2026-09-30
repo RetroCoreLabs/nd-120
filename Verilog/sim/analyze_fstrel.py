@@ -4,7 +4,7 @@ FST timestamps are 0-based (reset when fst_on fired ~71.600M abs). The R fill ma
 FST-rel ~441455 ps. Snapshot all CGA/ALU/WRF datapath signals over a window before it,
 print each signal's value trajectory, and find where byte 0x52 ('R') becomes 0xFF."""
 import sys, re, os
-sys.path.insert(0, "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vcd_extract import parse_vcd_header, find_matching_signals, extract_signals
 
 FST = sys.argv[1] if len(sys.argv) > 1 else "lbyt_full.fst"

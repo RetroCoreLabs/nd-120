@@ -2,7 +2,8 @@
 """Find WCS/LUA/PROM signals in VCD header. Keywords searched in full signal path."""
 from collections import defaultdict
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 KEYWORDS = ["lua", "prom", "wcstb", "csbits", "wca_", "blcs",
             "debug_lcs", "ecsl", "ewca", "wcs_n", "maclk",

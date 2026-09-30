@@ -4,7 +4,8 @@ around the COMM.CONTINUE restart at tick ~738956 to understand why TVEC=0 instea
 import sys
 from collections import defaultdict
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 # Search for these substrings anywhere in the full hierarchical signal name
 WANT = {

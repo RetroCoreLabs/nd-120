@@ -186,7 +186,7 @@ probe: nd120_probe.cpp
 #   * NOT defining ND120_SD_STORAGE (SD_STORAGE=0) -> the floppy bytes come from
 #     the host file (ND120_FLOPPY_IMG), not the in-RTL SD-FAT stack.
 # Built into its OWN Mdir (obj_dir_probe_floppy) so it never clobbers `probe`.
-# Run the engine with:  ND120_FLOPPY_IMG=/mnt/e/.../runSim/FLOPPY1.IMG ./obj_dir_probe_floppy/VND120_TOP
+# Run the engine (from Verilog/sim) with:  ND120_FLOPPY_IMG=../runSim/FLOPPY1.IMG ./obj_dir_probe_floppy/VND120_TOP
 #   make probe-floppy            # FF mode default (USE_LATCHES=0), Verilog floppy on
 PROBE_FLOPPY_DEFINES = $(PROBE_DEFINES) -DND120_VERILOG_DEVICES
 # The Verilog ND bus device modules (ND_TAPE_400/ND_FLOPPY_DMA/ND_DMA_MASTER/

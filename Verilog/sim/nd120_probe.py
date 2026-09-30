@@ -63,10 +63,18 @@ class Event:
 _HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_ENGINE = os.path.join(_HERE, "obj_dir_probe", "VND120_TOP")
 
+def _to_wsl_path(p):
+    r"""A Windows path (X:\a\b) as WSL sees it (/mnt/<drive>/a/b); any other path is returned as is."""
+    if re.match(r"^[A-Za-z]:", p):
+        return "/mnt/%s%s" % (p[0].lower(), p[2:].replace("\\", "/"))
+    return p
+
+
 # The sim/ directory as seen from INSIDE WSL (so we can cd there and use relative
-# BPUN paths). Overridable via ND120_SIM_WSLDIR.
+# BPUN paths). Overridable via ND120_SIM_WSLDIR. The default is this file's own
+# folder, translated to its WSL form, so no machine path is written here.
 DEFAULT_WSLDIR = os.environ.get(
-    "ND120_SIM_WSLDIR", "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim")
+    "ND120_SIM_WSLDIR", _to_wsl_path(_HERE))
 
 
 def _line_fields(line):
@@ -121,9 +129,7 @@ class Probe:
             # Launch the ELF under WSL. cd into the sim dir so relative BPUN paths work.
             eng = self.engine
             # Translate a Windows path to a /mnt path if needed.
-            if re.match(r"^[A-Za-z]:", eng):
-                drive = eng[0].lower()
-                eng = "/mnt/%s%s" % (drive, eng[2:].replace("\\", "/"))
+            eng = _to_wsl_path(eng)
             inner = "cd %s && exec %s %s" % (self.wsldir, eng, " ".join(self.extra_args))
             return ["wsl.exe", "-e", "bash", "-lc", inner]
         return [self.engine] + self.extra_args

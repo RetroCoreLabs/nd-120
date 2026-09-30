@@ -4,9 +4,10 @@ Trace sequencer signals (CSA, SC_6_3, COND, LC, regIW/regW) around MOPC
 to diagnose why the sim hangs after the first MS20 dispatch.
 """
 import sys
-sys.path.insert(0, "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim")
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 # -----------------------------------------------------------------------
 # Extended signal discovery (search by substring in full scoped name)

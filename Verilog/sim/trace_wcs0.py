@@ -3,7 +3,8 @@
 Key question: what microcode content gets written to WCS[0]?"""
 from collections import defaultdict
 
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 
 # Signals to track — using substring match in full signal path
 WANT = {

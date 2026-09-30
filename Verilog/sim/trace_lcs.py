@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Trace LCS_n transitions to understand loading sequence."""
-VCD = "/mnt/e/Dev/Repos/Ronny/nd-120/Verilog/sim/waveform.vcd"
+import os
+VCD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waveform.vcd")
 WANT = {"lcs_n": "DEBUG_LCS_n"}
 
 scope = []
