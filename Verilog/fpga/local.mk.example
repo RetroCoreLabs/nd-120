@@ -1,0 +1,51 @@
+# ND-120 FPGA - local paths. Copy this file to Verilog/fpga/local.mk (which is
+# gitignored) and fill in the values for your machine. Nothing here is
+# committed with a real path: the checked-in scripts only name the variables.
+#
+# Who reads it:
+#   * every board Makefile, through Verilog/fpga/paths.mk, which exports the
+#     values (and lists them in WSLENV, so Windows tools started from WSL see
+#     them);
+#   * the PowerShell scripts, through Verilog/fpga/paths.ps1;
+#   * the Basys3 Tcl scripts, through Verilog/fpga/basys3/paths.tcl;
+#   * Verilog/fpga/nexys4ddr/run_board_test.sh.
+# The scripts read plain "NAME := value" lines only - no make functions or
+# $(...) in a value. A value already set in the environment wins when a
+# script is run by hand; under make, local.mk wins over the environment and
+# the make command line wins over both.
+#
+# Paths to Windows tools are Windows paths (backslashes are fine). Leave a
+# line commented out to use the fallback given for it.
+
+# Vivado launcher (vivado.bat). Unset = vivado / vivado.bat on the Windows PATH.
+# ND120_VIVADO := <Vivado install>\bin\vivado.bat
+
+# Vivado licence file list, handed to Vivado as XILINXD_LICENSE_FILE when that
+# is not already set. Several files are separated by ';'.
+# Unset = the Windows user (then machine) XILINXD_LICENSE_FILE.
+# ND120_VIVADO_LICENSE := <licence file>;<another licence file>
+
+# Gowin EDA gw_sh.exe (Tang Nano 20K backup flow, gowin_build.ps1).
+# Unset = gw_sh.exe on the Windows PATH.
+# ND120_GOWIN := <Gowin install>\IDE\bin\gw_sh.exe
+
+# Quartus bin folder. No script under Verilog/fpga reads it today (the MiSTer
+# build runs Quartus in Docker); the name is fixed here so a future script
+# uses this one.
+# ND120_QUARTUS := <Quartus install>\bin64
+
+# oss-cad-suite folder on Windows (holds environment.bat), used by
+# Verilog/ND-120-Yosys/synh.bat - which reads it from the environment only.
+# Unset = yosys on PATH. (The WSL/Linux Tang flow uses OSS_CAD instead,
+# default ~/oss-cad-suite.)
+# ND120_OSS_CAD := <oss-cad-suite folder>
+
+# Basys3 Vivado GUI project: the folder that holds ND3202D.xpr. REQUIRED for
+# every Basys3 script (build, flash, ILA, timing experiments); they stop with
+# an error when it is unset.
+# ND120_BASYS3_PROJECT := <folder holding ND3202D.xpr>
+
+# Folder holding the other ND repositories (nd120uc, ND110Compile, ...), side
+# by side. No script under Verilog/fpga reads it today; the name is fixed
+# here so any script that needs a sibling repository uses this one.
+# ND_REPOS := <folder holding the ND repositories>
