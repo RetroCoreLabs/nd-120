@@ -101,8 +101,9 @@ make -C Verilog/tests test-docs-check    # this repository's dead-link gate (run
 > correct on exactly one machine, and this repository is public. A path inside the repository goes
 > repo-relative; a sibling ND repository is written `$ND_REPOS/<repo>/...`; anything outside is
 > described. A variable such as `%USERPROFILE%` or `~` is fine - that is the portable way to name
-> a per-user location. The Vivado TCL scripts are the one known exception: they run on the
-> Windows host and name its folders.
+> a per-user location. There are no exceptions: the FPGA build scripts read tool and project
+> locations from `Verilog/fpga/local.mk` (copy `Verilog/fpga/local.mk.example`) or the
+> environment, and `make test` fails on any machine path in a tracked file.
 
 ### Paths in scripts and build files
 
