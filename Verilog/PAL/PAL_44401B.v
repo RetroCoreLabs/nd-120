@@ -23,9 +23,9 @@
 // O3-O6 output is controlled by OE_n (HIGH signal means output is three-state)
 
 module PAL_44401B(
-    input CK,
+    input CK,           //! Clock input (added for FPGA synthesis) (same net as BIF_DPATH_9.OSC)
     input sys_rst_n, //! System reset (active low, for FPGA synthesis)
-    input OE_n,
+    input OE_n,         //! Power Down 1 (from BIF_BCTL_6.PD1)
 
     input CC2_n,        // I0
     input CACT_n,       // I1

@@ -11,25 +11,25 @@
 // 44306A,21G,MMUCTL - MMU CONTROL LOGIC
 
 module PAL_44306A (
-    input CA0,
-    input WRITE,
-    input DVACC_n,
-    input RT_n,
-    input WCHIM_n,
-    input DOUBLE,
-    input EMCL_n,
-    input CC2_n,
+    input CA0,  //! Cache address (from CPU_MMU_24.CA_10_0[0])
+    input WRITE,  //! Write enable (from CPU_MMU_24.WRITE)
+    input DVACC_n,  //! DGA access qualifier, active low (see comment above) (from CPU_MMU_24.DVACC_n)
+    input RT_n,  //! Reset trap (from CPU_15.RT_n)
+    input WCHIM_n,  //! Write cache inhibit (from CPU_MMU_24.WCHIM_n)
+    input DOUBLE,  //! Extended Adressing Mode (SEXI) (from CPU_MMU_24.DOUBLE)
+    input EMCL_n,  //! Enable master clear (from CPU_MMU_24.EMCL_n)
+    input CC2_n,  //! Cycle clock 2 (from CPU_MMU_24.CC2_n)
     input WCA_n,
-    input LSHADOW,
+    input LSHADOW,  //! Load shadow signal (from CPU_MMU_24.LSHADOW)
 
     output ECD_n,
-    output LAPA_n,
-    output EIPUR_n,
-    output EIPU_n,
-    output EIPL_n,
-    output EPTI_n,
+    output LAPA_n,  //! Latch Page Address, controls latching of the page address (to CPU_MMU_24.LAPA_n)
+    output EIPUR_n,  //! Mask away the PROTECT BITS in PPN (PPN 25:19 == 000000) (to CPU_MMU_PPNX_28.EIPUR_n)
+    output EIPU_n,  //! Enable IDB upper bits (to CPU_MMU_PPNX_28.EIPU_n)
+    output EIPL_n,  //! Enable IDB lower bits (to CPU_MMU_PPNX_28.EIPL_n)
+    output EPTI_n,  //! Enable PTI(negated)        (OE_n) (to CPU_MMU_PTIDB_30.EPTI_n)
     output EPMAP_n,
-    output EPT_n
+    output EPT_n  //! Enable PT chips (Chip select for PT chips). (to CPU_MMU_PT_29.EPT_n)
 );
 
   // Creating non-negated wires for active-low inputs
