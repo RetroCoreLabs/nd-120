@@ -56,7 +56,7 @@ MISTER    ?= root@MiSTer.local
 all: build
 
 check-settings:
-	@$(call nd120_require,ND120_BUILD_DIR,make build)
+	@$(call nd120_require,ND120_BUILD_DIR,make $(or $(MAKECMDGOALS),all))
 
 # The copy of this folder that Quartus works in. Everything Quartus makes is
 # excluded, so it is kept between builds (and never copied back); the

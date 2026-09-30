@@ -97,6 +97,18 @@ $(QNICE)/assembler/qasm: $(QNICE)/assembler/qasm.c $(QNICE)/assembler/qasm2rom.c
 $(QNICE)/monitor/monitor.rom: $(QNICE)/assembler/qasm
 	cd $(QNICE)/monitor && bash ./compile_and_distribute.sh
 
+# The framework's sources come from the m2m submodule. When it is not checked
+# out, say so in plain words instead of make's "No rule to make target".
+$(QNICE)/assembler/qasm.c $(QNICE)/assembler/qasm2rom.c:
+	@echo "nd-120: the MiSTer2MEGA65 submodule (Verilog/fpga/mega65/m2m) is not checked out."
+	@echo "  Fix: from the repository root run   python3 configure.py   (it runs git submodule update --init)"
+	@exit 1
+
+# make cor packs an existing bitstream; without one, say which command makes it.
+$(OUT)/nd120_mega65_$(BOARD).bit:
+	@echo "nd-120: no bitstream at $@ - run 'make all BOARD=$(BOARD)' first."
+	@exit 1
+
 $(CORETOOL):
 	@mkdir -p tools
 	curl -sSL -o $@ $(CORETOOL_URL)
