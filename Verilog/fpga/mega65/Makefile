@@ -11,12 +11,15 @@
 # desk, so `load`/`flash` do not exist as actions: the deliverable is the
 # .cor a friend copies to an SD card and flashes from the MEGA65's own menu.
 #
-# Vivado path: $VIVADO, default is this host's 2026.1. The framework's own
+# Vivado path: $VIVADO, else ND120_VIVADO from ../local.mk (copy
+# ../local.mk.example), else vivado on the Windows PATH. The framework's own
 # projects were written by 2022.2 (m2m/CORE/CORE-R6.xpr) - build.tcl reads
 # the sources directly and never opens those projects.
 
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../paths.mk
+
 BOARD  ?= r6
-VIVADO ?= F:\\AMDDesignTools\\2026.1\\Vivado\\bin\\vivado.bat
+VIVADO ?= $(or $(ND120_VIVADO),vivado)
 QNICE   = m2m/M2M/QNICE
 
 # The .cor packer: MEGA65's `coretool` (mega65-tools, GPL-3.0 - fetched, not
