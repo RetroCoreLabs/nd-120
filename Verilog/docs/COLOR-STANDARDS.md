@@ -160,6 +160,6 @@ def ratio(a, b):
 # exactly why section 4 exists
 ```
 
-Related: `Verilog/docs/PREREQUISITES.md` (the tools), and the global Mermaid
-palette in the user's `CLAUDE.md`, which this document supersedes for generated
-images while keeping its semantic colour assignments.
+Related: `Verilog/docs/PREREQUISITES.md` (the tools), and the owner's older
+global Mermaid palette note (kept outside this repository), which this document
+supersedes for generated images while keeping its semantic colour assignments.

@@ -28,7 +28,7 @@ construction - no need to know which of the sixteen register slots the
 microcode assembler's name "R2" decodes to. The captured LBA field reports
 that slot as a by-product, which settles the question for good.
 CAREFUL - not every visit counts. The WCS loader walks PAST the STERR
-address once while loading microcode (noted in CLAUDE.md); only
+address once while loading microcode (noted in runSim/Run120.cpp); only
 execution-phase visits mean a real self-test failure. This module
 therefore reports a COUNT as well as the value, and keeps BOTH the first
 and the most recent capture, so a single spurious walk-past is visible as

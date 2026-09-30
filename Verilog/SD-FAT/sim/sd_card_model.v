@@ -75,7 +75,7 @@ module sd_card_model #(
     input  sd_clk,
     // SD bus, SPLIT _i/_o/_oe - NO TRISTATES, NO PULLUP (14-JUL-2026).
     // Rationale: `z` is iverilog-only in practice and the repo bans it inside
-    // the FPGA (see nd_storage.v header, CLAUDE.md). The testbench resolves
+    // the FPGA (see nd_storage.v header). The testbench resolves
     // each line with a MUX - host output-enable wins, then the card, then the
     // bus pullup (1) - exactly as nd_storage_vtop.v:92 already does. This is
     // what lets the SAME Verilog card model run under BOTH iverilog and
