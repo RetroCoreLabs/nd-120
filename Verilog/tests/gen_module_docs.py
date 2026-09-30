@@ -23,6 +23,22 @@ WHAT IT SKIPS, AND SAYS SO
       fpga/mega65/m2m). They are other people's repos: writing doc/ folders
       into them would leave their working trees dirty, and the code is not
       ours to document.
+    - the MiSTer FRAMEWORK in fpga/mister/sys/. It is copied as-is from
+      Template_MiSTer (GPL-2.0, see fpga/mister/README.md); every MiSTer core
+      must ship it untouched, so it is not ours to document.
+    - Quartus IP wizard output: any .v with a same-named .qip beside it
+      (fpga/mister/rtl/pll.v, rtl/pll/pll_0002.v). The wizard wrote them;
+      a regenerate would overwrite them.
+    - the Template_MiSTer demo core left in fpga/mister/rtl (mycore.v,
+      lfsr.v, cos.sv). Byte-identical to upstream (checked 30-SEP-2026),
+      and not in files.qip, so not even part of our build.
+    - build/ and lint/ folders: build output (the per-build banner ROM copy
+      in build/) and lint scratch. Git ignores them; the real source sits
+      elsewhere and gets its own doc.
+    - lint-only stand-ins for vendor primitives (*_stub.v, *_stubs.v, e.g.
+      qmtech-a35t/rtl/lint_stubs.v with BUFG and MMCME2_BASE). They are
+      hollow models that exist only so Verilator can lint; a doc under the
+      vendor's part name would describe a part that is not really there.
     - files with no module declaration
     Every skip and every failure is listed at the end. A sweep that silently
     drops files is worse than no sweep, because the count looks complete.
@@ -48,6 +64,19 @@ MODULE_DOC = os.path.join(HERE, "module_doc.py")
 
 MODULE_RE = re.compile(r"^\s*module\s+([A-Za-z_][A-Za-z0-9_$]*)", re.M)
 
+# Folders that only ever hold build output or lint scratch - see WHAT IT SKIPS.
+SKIP_DIR_NAMES = ("build", "lint")
+
+# Third-party trees, as paths relative to Verilog/. The MiSTer framework must
+# ship untouched, so it gets no doc/ folders - see WHAT IT SKIPS.
+SKIP_TREES = ("fpga/mister/sys",)
+
+# The Template_MiSTer demo core, still in the tree but not built and not ours
+# (byte-identical to upstream) - see WHAT IT SKIPS.
+SKIP_FILES = ("fpga/mister/rtl/mycore.v",
+              "fpga/mister/rtl/lfsr.v",
+              "fpga/mister/rtl/cos.sv")
+
 
 def find_sources(root):
     out = []
@@ -63,8 +92,15 @@ def find_sources(root):
             continue
         if "ip" in parts or ".Xil" in parts or "user_design" in parts:
             continue   # vendor-generated IP - see WHAT IT SKIPS above
+        # third-party trees (the MiSTer framework): drop the whole subtree
+        rel_dir = os.path.relpath(dirpath, VROOT).replace("\\", "/")
+        if any(rel_dir == t or rel_dir.startswith(t + "/") for t in SKIP_TREES):
+            dirnames[:] = []
+            continue
+        # build/ and lint/ hold build output and lint scratch, never source
         dirnames[:] = [d for d in dirnames
-                       if d not in ("sim", ".git", "doc") and not d.startswith("obj_dir")]
+                       if d not in ("sim", ".git", "doc") + SKIP_DIR_NAMES
+                       and not d.startswith("obj_dir")]
         for fn in filenames:
             if not fn.endswith(".v"):
                 continue
@@ -72,6 +108,15 @@ def find_sources(root):
                 continue
             if fn.startswith("mig_7series_") or fn.startswith("gowin_"):
                 continue   # vendor IP that lives outside an ip/ directory
+            # Quartus IP wizard output: the wizard writes a .qip next to it
+            if os.path.exists(os.path.join(dirpath, fn[:-2] + ".qip")):
+                continue
+            # lint-only stand-ins for vendor primitives (BUFG, MMCME2_BASE, rPLL)
+            if fn.endswith("_stub.v") or fn.endswith("_stubs.v"):
+                continue
+            # the unused Template_MiSTer demo core
+            if (rel_dir + "/" + fn) in SKIP_FILES:
+                continue
             out.append(os.path.join(dirpath, fn))
     return sorted(out)
 
