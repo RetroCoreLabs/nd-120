@@ -62,7 +62,16 @@ THE HIERARCHY
     puts the block back after a doc was regenerated on its own.
     Needs yosys (~/oss-cad-suite) and tclsh, so run it in WSL.
 
-THE ONE COMMAND (docs, MODULES.md, HIERARCHY.md and the navigation blocks)
+THE SCHEMATICS AND THE SITE TREE
+    After the hierarchy, tests/gen_schematics.py draws a schematic of every
+    module from the same yosys netlists (needs netlistsvg; without it the
+    step says so and the pages keep what they have), and every module page
+    carries its Verilog source in a fold-out block (module_doc.py).
+    With MODULES.md it also writes docs-site/nav.yml, the left-hand page
+    tree of the docs site (tests/gen_site_nav.py).
+
+THE ONE COMMAND (docs, MODULES.md, HIERARCHY.md, the navigation blocks,
+the schematics and the site tree)
     cd Verilog
     python3 tests/gen_module_docs.py
 
@@ -362,6 +371,14 @@ def write_index():
         out.append("")
     with open(INDEX_PATH, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(out))
+    # the docs site's left-hand page tree, from the same grouping, so the
+    # site and MODULES.md always list the same modules (tests/gen_site_nav.py)
+    sys.path.insert(0, HERE)
+    import gen_site_nav                                   # noqa: E402
+    n_nav = gen_site_nav.write_nav(rows, area_title, area_sort_key)
+    print("wrote %s: %d pages in the site tree"
+          % (os.path.relpath(gen_site_nav.NAV, os.path.dirname(VROOT)).replace(os.sep, "/"),
+             n_nav))
     return total
 
 

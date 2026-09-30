@@ -40,7 +40,13 @@ THE NAVIGATION BLOCK
     the one command for all docs (cd Verilog; python3 tests/gen_module_docs.py)
     or just the block: python3 tests/gen_module_docs.py --hierarchy-only
 
-Last reviewed: 28-SEP-2026
+THE VERILOG SOURCE AND THE SCHEMATIC
+    Every page ends with the module's Verilog in a fold-out block (the whole
+    file, or only this module's part when the file holds several) and a link
+    to the file on GitHub. The schematic block right after the symbol comes
+    from gen_schematics.py; this script keeps the one the old page had.
+
+Last reviewed: 30-SEP-2026
 Ronny Hansen
 """
 import argparse
@@ -426,7 +432,7 @@ def repo_relative(path):
 
 
 def write_md(name, title, author, desc, params, ports, note, src_rel,
-             png_rel, out_md):
+             png_rel, out_md, source_text=None):
     L = []
     L.append(f"# {name}")
     L.append("")
@@ -479,10 +485,84 @@ def write_md(name, title, author, desc, params, ports, note, src_rel,
         L.append("")
         L.append(f"`{note}`")
         L.append("")
+    if source_text is not None:
+        L.extend(source_section(name, src_rel, source_text))
+    # The schematic block (tests/gen_schematics.py) sits right after the
+    # symbol. It is kept from the old page, so regenerating a doc on a machine
+    # without netlistsvg does not throw the drawing away.
+    old_block = schematic_block_of(out_md)
+    if old_block and png_rel:
+        at = L.index(f"![{name} symbol]({png_rel})") + 2
+        L[at:at] = old_block + [""]
     os.makedirs(os.path.dirname(os.path.abspath(out_md)), exist_ok=True)
-    with open(out_md, "w", encoding="utf-8") as fh:
+    with open(out_md, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(L))
     return out_md
+
+
+SCH_BEGIN = "<!-- SCHEMATIC:BEGIN"
+SCH_END = "<!-- SCHEMATIC:END -->"
+GITHUB_BLOB = "https://github.com/RetroCoreLabs/nd-120/blob/main/"
+
+
+def schematic_block_of(md):
+    """The SCHEMATIC block of an existing page, as lines, or None."""
+    try:
+        with open(md, encoding="utf-8", errors="replace") as fh:
+            lines = fh.read().split("\n")
+    except OSError:
+        return None
+    for i, ln in enumerate(lines):
+        if ln.startswith(SCH_BEGIN):
+            for j in range(i, len(lines)):
+                if lines[j] == SCH_END:
+                    return lines[i:j + 1]
+    return None
+
+
+def module_text(src, name):
+    """The part of a file that is this module: the whole file when it holds
+    only this module, otherwise from the end of the module before it (so its
+    header comment comes along) to its own endmodule."""
+    starts = [(m.start(), m.group(1)) for m in
+              re.finditer(r"^[ \t]*module\s+([A-Za-z_]\w*)", src, re.M)]
+    if len(starts) <= 1:
+        return src
+    for i, (pos, n) in enumerate(starts):
+        if n != name:
+            continue
+        prev_end = 0
+        if i > 0:
+            pe = src.rfind("endmodule", 0, pos)
+            prev_end = src.find("\n", pe) + 1 if pe >= 0 else 0
+        e = src.find("endmodule", pos)
+        end = len(src) if e < 0 else e + len("endmodule")
+        return src[prev_end:end].strip("\n") + "\n"
+    return src
+
+
+def source_section(name, src_rel, text):
+    """A fold-out block with the Verilog. <details markdown="1"> is what the
+    docs site (MkDocs, md_in_html) needs to read Markdown inside it; GitHub
+    drops the attribute and shows the same thing."""
+    text = text.replace("\r\n", "\n").replace("\t", "    ")
+    # a fence longer than any run of backticks in the code
+    runs = [len(r) for r in re.findall(r"`+", text)]
+    fence = "`" * max(3, max(runs, default=0) + 1)
+    n = text.count("\n") + (0 if text.endswith("\n") else 1)
+    L = ["## Verilog source", ""]
+    L.append(f"[`{src_rel}`]({GITHUB_BLOB}{src_rel}) on GitHub.")
+    L.append("")
+    L.append('<details markdown="1">')
+    L.append(f"<summary>Show the Verilog of {name} ({n} lines)</summary>")
+    L.append("")
+    L.append(fence + "verilog")
+    L.extend(text.rstrip("\n").split("\n"))
+    L.append(fence)
+    L.append("")
+    L.append("</details>")
+    L.append("")
+    return L
 
 
 def main():
@@ -515,7 +595,7 @@ def main():
                              # see repo_relative() for the rule
                              args.note, repo_relative(args.source),
                              os.path.basename(png) if not args.md_only else "",
-                             md))
+                             md, module_text(src, name)))
     for f in made:
         print("module_doc:", f)
 

@@ -57,6 +57,13 @@
 # calls its environment.bat; the BUS-IF gate Windows example names it.
 # ND120_OSS_CAD_SUITE := <oss-cad-suite folder>
 
+# netlistsvg (the module schematics on the doc pages, drawn by
+# Verilog/tests/gen_schematics.py). Optional: without it the doc generator
+# says so and keeps the schematics the pages already have. Install it outside
+# the repository: npm install netlistsvg in a folder of its own; the program is
+# <that folder>/node_modules/.bin/netlistsvg.
+# ND120_NETLISTSVG := <program>
+
 # w64devkit folder (only for the BUS-IF gate Windows example).
 # ND120_W64DEVKIT := <w64devkit folder>
 

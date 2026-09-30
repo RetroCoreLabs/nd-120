@@ -258,6 +258,8 @@ class Spec:
         self.board_dir = None       # folder of the build, for vendor headers
         self.bbox_src = {}          # black-boxed module -> its real file
         self.bbox_kind = {}         # black-boxed module -> "sim" or "vendor"
+        self.rtlil = None           # yosys' elaborated netlist (gen_schematics.py
+                                    # draws the schematics from it)
 
 
 def make_vars(mdir, names):
@@ -969,7 +971,13 @@ def all_docs():
         if dirpath != VROOT and os.path.exists(os.path.join(dirpath, ".git")):
             dirnames[:] = []
             continue
-        dirnames[:] = [d for d in dirnames if d not in (".git", "obj_dir", "build")]
+        # the same skips as gen_module_docs.py: build/ and lint/ hold
+        # scratch output (an ignored lint/doc/rPLL.md with a machine path in
+        # its Source line once crashed the schematic pass), ip/ is vendor IP
+        dirnames[:] = [d for d in dirnames
+                       if d not in (".git", "obj_dir", "build", "lint", "ip", ".Xil",
+                                    "user_design")
+                       and not d.startswith("obj_dir")]
         if os.path.basename(dirpath) != "doc":
             continue
         for fn in filenames:
@@ -985,7 +993,13 @@ def all_docs():
                 continue
             name = head.split("\n", 1)[0][2:].strip()
             m = re.search(r"^Source: `Verilog/([^`]+)`", head, re.M)
-            src = m.group(1) if m else ""
+            if not m:
+                # a page that does not name a source inside Verilog/ cannot be
+                # tied to a module: say so, do not guess
+                sys.stderr.write("gen_hierarchy: %s has no 'Source: `Verilog/...`' "
+                                 "line - left out\n" % os.path.relpath(p, VROOT))
+                continue
+            src = m.group(1)
             by_key[(name, src)] = p
             by_name.setdefault(name, []).append(p)
     return by_key, by_name
@@ -1026,30 +1040,46 @@ def anchor(title):
 LEAF_NAMES_SHOWN = 12
 
 
+# Levels of the tree that start open on the page; deeper ones start closed.
+OPEN_LEVELS = 2
+
+
+def h(text):
+    """Text for HTML: the tree is written as HTML (see PageWriter)."""
+    return (text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            .replace('"', "&quot;"))
+
+
 class PageWriter:
+    """Writes each tree as nested HTML lists, with a <details>/<summary> on
+    every module that has something inside it, so the reader can fold a
+    sub-tree away. That works on github.com and on the docs site alike; a
+    Markdown list cannot fold. The top levels start open, deeper ones closed.
+    Links point at the .md pages: GitHub follows them as they are, and the
+    docs site turns them into page links (docs-site/hooks.py)."""
     def __init__(self, docs):
         self.docs = docs
         self.first = {}          # signature -> anchor id of its full drawing
         self.used = set()        # anchor ids something links back to
-        self.lines = []          # text, or ("anchor", id) placeholders
+        self.lines = []          # text, or (pad, label, itxt, aid, open) placeholders
         self.n_anchor = 0
 
     def mlink(self, tree, variant):
         base = tree.mods[variant]["base"]
         kind = tree.spec.bbox_kind.get(base)
         if kind == "vendor":
-            return "%s (vendor)" % base
+            return "%s (vendor)" % h(base)
         src = tree.src_rel(variant) or ""
         if kind == "sim":
             # sim/ folders hold test models and get no doc pages
-            return "%s (simulation model in `%s/`, read as a black box)" % (
-                base, os.path.dirname(src))
+            return "%s (simulation model in <code>%s/</code>, read as a black box)" % (
+                h(base), h(os.path.dirname(src)))
         doc = self.docs.doc_for(base, src)
         if doc:
-            return "[%s](%s)" % (base, link_from(PAGE, doc))
+            return '<a href="%s">%s</a>' % (h(link_from(PAGE, doc)), h(base))
         if is_vendor_file(src):
-            return "%s (vendor IP)" % base
-        return "**%s** (no doc page)" % base
+            return "%s (vendor IP)" % h(base)
+        return "<strong>%s</strong> (no doc page)" % h(base)
 
     @staticmethod
     def inst_text(insts):
@@ -1058,8 +1088,8 @@ class PageWriter:
         if not insts:
             return ""
         if len(insts) == 1:
-            return " `%s`" % insts[0]
-        shown = ", ".join("`%s`" % i for i in insts[:LEAF_NAMES_SHOWN])
+            return " <code>%s</code>" % h(insts[0])
+        shown = ", ".join("<code>%s</code>" % h(i) for i in insts[:LEAF_NAMES_SHOWN])
         if len(insts) > LEAF_NAMES_SHOWN:
             shown += " and %d more" % (len(insts) - LEAF_NAMES_SHOWN)
         return " x%d: %s" % (len(insts), shown)
@@ -1073,17 +1103,20 @@ class PageWriter:
         if has_kids and sig in self.first:
             aid = self.first[sig]
             self.used.add(aid)
-            self.lines.append("%s- %s%s - same as [above](#%s)" % (pad, label, itxt, aid))
+            self.lines.append('%s<li>%s%s - same as <a href="#%s">above</a></li>'
+                              % (pad, label, itxt, aid))
             return
-        if has_kids:
-            self.n_anchor += 1
-            aid = "h%d" % self.n_anchor
-            self.first[sig] = aid
-            self.lines.append((pad, label, itxt, aid))
-        else:
-            self.lines.append("%s- %s%s" % (pad, label, itxt))
+        if not has_kids:
+            self.lines.append("%s<li>%s%s</li>" % (pad, label, itxt))
             return
+        self.n_anchor += 1
+        aid = "h%d" % self.n_anchor
+        self.first[sig] = aid
+        self.lines.append((pad, label, itxt, aid, indent < OPEN_LEVELS))
+        self.lines.append("%s<ul>" % pad)
         self.children(tree, variant, indent + 1, path)
+        self.lines.append("%s</ul>" % pad)
+        self.lines.append("%s</details></li>" % pad)
 
     def children(self, tree, variant, indent, path):
         pad = "  " * indent
@@ -1108,18 +1141,17 @@ class PageWriter:
             if tree.is_mod(ctype):
                 label = self.mlink(tree, ctype)
             else:
-                label = "%s (vendor)" % base_of(ctype)
-            self.lines.append("%s- %s%s" % (pad, label, self.inst_text(insts)))
+                label = "%s (vendor)" % h(base_of(ctype))
+            self.lines.append("%s<li>%s%s</li>" % (pad, label, self.inst_text(insts)))
 
     def text(self):
         out = []
         for ln in self.lines:
             if isinstance(ln, tuple):
-                pad, label, itxt, aid = ln
-                if aid in self.used:
-                    out.append('%s- <a name="%s"></a>%s%s' % (pad, aid, label, itxt))
-                else:
-                    out.append("%s- %s%s" % (pad, label, itxt))
+                pad, label, itxt, aid, is_open = ln
+                anc = '<a name="%s"></a>' % aid if aid in self.used else ""
+                out.append("%s<li><details%s><summary>%s%s%s</summary>"
+                           % (pad, " open" if is_open else "", anc, label, itxt))
             else:
                 out.append(ln)
         return out
@@ -1142,6 +1174,8 @@ def write_page(results, yver, docs):
     out.append("")
     out.append("How to read the trees:")
     out.append("")
+    out.append("- Click a module with a triangle to fold its contents in or out. The top "
+               "two levels start open.")
     out.append("- `name` after a module is the instance name in its parent.")
     out.append("- A module that one parent uses several times goes on one line: `x16` "
                "and the instance names. What is inside it is drawn once, under that "
@@ -1197,7 +1231,11 @@ def write_page(results, yver, docs):
         # where they belong, because the "same as above" anchors can only be
         # written once every tree is drawn
         body.append(("tree", len(pw.lines)))
+        # one HTML list per top; no blank line inside it, or GitHub ends the
+        # HTML block there and prints the rest as text
+        pw.lines.append('<ul class="hier">')
         pw.node(tree, tree.top, None, 0, [])
+        pw.lines.append("</ul>")
         body.append(("end", len(pw.lines)))
         body.append("")
     tree_text = pw.text()
@@ -1424,6 +1462,7 @@ def build_all(only=None, log=print):
                     spec.incdirs.append(wd)
                 text, err = run_yosys(yosys, spec, wd)
             if text is not None:
+                spec.rtlil = text
                 mods = parse_rtlil(text, wd)
                 # a black-boxed simulation model points at its stub in the
                 # scratch folder; point it back at the real file
@@ -1449,6 +1488,8 @@ def main(argv=None):
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--only", help="comma list of top keys; prints results only, "
                     "writes nothing (a page with some tops missing would be wrong)")
+    ap.add_argument("--no-schematics", action="store_true",
+                    help="skip the schematics (tests/gen_schematics.py)")
     args = ap.parse_args(argv)
     only = set(args.only.split(",")) if args.only else None
     results, yver = build_all(only)
@@ -1459,6 +1500,12 @@ def main(argv=None):
     print("wrote %s" % rel_v(PAGE))
     n = apply_nav(results, docs)
     print("navigation block written on %d module docs" % n)
+    if not args.no_schematics:
+        # the schematic of every module, drawn from the netlists just made
+        # (tests/gen_schematics.py; skipped with a message when netlistsvg
+        # is not installed)
+        import gen_schematics                              # noqa: E402
+        gen_schematics.run(results, docs)
     return 0
 
 

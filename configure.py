@@ -16,7 +16,7 @@ What it does, in order:
      once, the old Verilog/fpga/local.mk if that still exists) - and uses them
      as the defaults;
   2. looks for the tools: vivado, gw_sh (Gowin), quartus_sh, oss-cad-suite,
-     w64devkit on PATH and in the usual install folders (from WSL it also
+     w64devkit, netlistsvg on PATH and in the usual install folders (from WSL it also
      looks on the Windows drives), plus verilator, iverilog, yosys and python3
      on PATH (those are only reported - the Makefiles take them from PATH);
   3. asks for what it could not find, and for ND120_BUILD_DIR and ND_REPOS;
@@ -126,6 +126,12 @@ SETTINGS = [
             "", "<folder>",
             "The install the shell you build from uses: a Linux one for WSL/Linux, "
             "a Windows one for synh.bat."),
+    Setting("ND120_NETLISTSVG", "the netlistsvg program", "tool", "missing",
+            "Verilog/tests/gen_schematics.py (run by gen_module_docs.py)",
+            "", "<program>",
+            "Optional: draws the module schematics on the doc pages. Install it OUTSIDE "
+            "the repository with npm (npm install netlistsvg in a folder of its own); "
+            "the program is <that folder>/node_modules/.bin/netlistsvg."),
     Setting("ND120_W64DEVKIT", "the w64devkit folder", "dir", "never",
             "the BUS-IF gate Windows example (Verilog/ND-BUS-DEVICES/BUS-IF/gate/Makefile)",
             "", "<folder>"),
@@ -421,6 +427,25 @@ def detect_w64devkit():
     return None, None
 
 
+def detect_netlistsvg():
+    """netlistsvg on PATH, else an npm install in the home folder (a folder
+    of its own under ~/tools, or ~ itself). Only the shell that runs the doc
+    generator (WSL/Linux) is searched - it runs netlistsvg directly."""
+    on_path = shutil.which("netlistsvg")
+    if on_path:
+        return on_path, "on PATH"
+    if IS_WINDOWS:
+        return None, None
+    cands = _globs([_home()], ["tools/netlistsvg/node_modules/.bin/netlistsvg",
+                               "tools/*/node_modules/.bin/netlistsvg",
+                               "node_modules/.bin/netlistsvg",
+                               ".npm-global/bin/netlistsvg"])
+    cands = [c for c in cands if os.path.isfile(c)]
+    if cands:
+        return sorted(cands)[0], "in an npm install folder"
+    return None, None
+
+
 def detect_nd_repos():
     """The folder above this checkout, if it holds another ND repository."""
     parent = os.path.dirname(ROOT)
@@ -437,6 +462,7 @@ DETECT = {
     "ND120_OSS_CAD_SUITE": detect_oss_cad_suite,
     "ND120_W64DEVKIT": detect_w64devkit,
     "ND_REPOS": detect_nd_repos,
+    "ND120_NETLISTSVG": detect_netlistsvg,
 }
 
 # Tools the Makefiles take from PATH - reported, never stored.
