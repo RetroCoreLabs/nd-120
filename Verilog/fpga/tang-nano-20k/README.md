@@ -193,10 +193,10 @@ the oss-cad-suite CI downloads): yosys maps it to 22254-22626 LUT4 against
 20736 on the chip (107-109%), so nextpnr cannot place it - older suites sit in
 the placer until they are stopped (CI run 33664876050: 2 h), newer ones stop
 at once with `no BELs remaining`. No timeout fixes that. Gowin EDA fits the
-same design (it maps it differently), so bitstreams come from Gowin. The CI
-job `tang-oss` stays red until the OSS flow fits; synthesis-setting work that
-brings it to 19790 LUT4 but still does not place is recorded in
-`Verilog/TODO.md` (tang-oss item).
+same design (it maps it differently), so bitstreams come from Gowin.
+Synthesis-setting work that brings it to 19790 LUT4 but still does not place
+is recorded in `Verilog/TODO.md` (the OSS-fit item). No bitstream is built in
+CI.
 
 ## Full ND-120 build
 
@@ -218,15 +218,12 @@ read), main memory is the **8 MB embedded SDRAM** through
 the variant (below; `slow` = 6.75 MHz is the default). The Verilator sim build is
 unaffected by the Tang defines.
 
-**Which toolchain builds it (checked 28-SEP-2026):** the Makefile calls the OSS
-flow (yosys/nextpnr) its primary and its default target builds the full CPU
-file list. The full CPU was built with it locally on 12-JUL-2026 (all three
-variants; `Verilog/TODO.md` Tang section, Fmax in [Two build flows](#two-build-flows)),
-but the CI `tang-oss` job has never finished (every run so far stopped at
-about 2 hours) and no OSS build since is recorded.
-Release bitstreams are Gowin EDA builds by design (see the header of
-`.github/workflows/verilog-ci.yml`). The Fmax and
-violation figures in this README are Gowin EDA timing reports.
+**Which toolchain builds it:** Gowin EDA. The OSS flow (yosys/nextpnr) built
+the full CPU locally on 12-JUL-2026 (all three variants; Fmax in
+[Two build flows](#two-build-flows)) but no longer fits it (see there).
+Release bitstreams are Gowin EDA builds, made locally and checked on the
+board. The Fmax and violation figures in this README are Gowin EDA timing
+reports.
 
 ## Clock variants and measured boot timings (24-AUG-2026)
 

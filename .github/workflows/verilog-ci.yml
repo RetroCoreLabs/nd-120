@@ -8,12 +8,9 @@
 #                 including the tb-catalog and audit meta-gates.
 #   netlist-gates same triggers: the Tang yosys gates (make check) -
 #                 tristate contract on IO_sdram_dq + inferred-latch census.
-#   tang-oss     same triggers: full OSS
-#                 bitstream build (yosys -> nextpnr-himbaechel ->
-#                 gowin_pack) as a workflow ARTIFACT. Deliberately NOT
-#                 attached to the release: release bitstreams are the
-#                 silicon-verified vendor-flow builds, and an OSS-flow .fs
-#                 is a different artifact that has not earned that label.
+#
+# No bitstreams are built here. Release bitstreams are built locally with
+# the vendor tools (Gowin EDA, Vivado, Quartus) and checked on the boards.
 #
 # The WCS preload hexes (Verilog needs 33 wcs_*.hex) are gitignored;
 # Code/Microcode/gen_wcs_image.py regenerates them from the tracked PROM
@@ -59,37 +56,3 @@ jobs:
         run: cd Code/Microcode && python3 gen_wcs_image.py
       - name: Tang netlist gates (tristate + latch census)
         run: make -C Verilog/fpga/tang-nano-20k check
-
-  tang-oss:
-    # Full OSS bitstream on release tags and on demand - the oss-cad-suite
-    # download is ~1.5 GB, too heavy for every push.
-    # KNOWN RED - NOT A TIME PROBLEM (measured 28-SEP-2026): the OSS flow
-    # does not fit the full CPU on the GW2AR-18. yosys maps it to
-    # 22254-22626 LUT4 cells against 20736 LUT4 sites (107-109%), so no
-    # legal placement exists. The 02-SEP run was cancelled at 2 h inside
-    # "Running main analytical placer" (legaliser allows ~195M attempts
-    # per cell, one thread) and local runs do the same. A longer timeout
-    # cannot help; the fix is a smaller netlist from the OSS synthesis,
-    # not more minutes. The earlier "2-core runner" note was wrong: this
-    # repository is public, and public repos get 4 vCPU / 16 GB.
-    if: startsWith(github.ref, 'refs/tags/bitstreams-') || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    timeout-minutes: 300
-    steps:
-      - uses: actions/checkout@v7
-      - name: Install oss-cad-suite
-        run: |
-          URL=$(curl -s https://api.github.com/repos/YosysHQ/oss-cad-suite-build/releases/latest \
-            | grep browser_download_url | grep linux-x64 | cut -d'"' -f4 | head -1)
-          curl -L "$URL" -o oss-cad-suite.tgz
-          tar -xzf oss-cad-suite.tgz
-          echo "$PWD/oss-cad-suite/bin" >> "$GITHUB_PATH"
-      - name: Regenerate WCS preload images
-        run: cd Code/Microcode && python3 gen_wcs_image.py
-      - name: Build Tang OSS bitstream (slow variant)
-        run: make -C Verilog/fpga/tang-nano-20k VARIANT=slow
-      - name: Upload bitstream artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: nd120_tang20k_oss-slow
-          path: Verilog/fpga/tang-nano-20k/build/*.fs

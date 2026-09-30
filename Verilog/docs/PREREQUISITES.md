@@ -222,9 +222,8 @@ ls "$(wslpath "$GOWIN_BIN")" && echo "gw_sh present"
 oss-cad-suite (yosys + nextpnr-himbaechel + gowin_pack), from WSL, with
 `make` in `Verilog/fpga/tang-nano-20k/`. It covers the `slow`, `crawl` and
 `full` variants only; the deployed `fast20` variant needs Gowin EDA. The
-full-CPU OSS place-and-route is slow: the CI job `tang-oss` in
-`.github/workflows/verilog-ci.yml` runs it only on release tags, with a
-300-minute limit, after two runs were killed at 120 minutes. Install
+full CPU no longer fits with this flow (107-109% LUT4, measured
+28-SEP-2026), so bitstreams come from Gowin EDA. Install
 instructions (one prebuilt tarball, no sudo) are in
 `Verilog/fpga/tang-nano-20k/README.md`, section "Toolchain". That flow needs
 the oss-cad-suite yosys (0.4x+), not the distro 0.9 of §2.3.
@@ -559,5 +558,5 @@ python3 -c "import importlib.metadata as m; \
 - `Verilog/fpga/README.md` — the FPGA target directory and the shared board build API
 - `Verilog/fpga/<board>/README.md` — per-board build, pins and status
 - `Verilog/readme.md` — Verilog implementation status
-- `CLAUDE.md` (repo root) — project conventions
+- `DEVELOPMENT.md` (repo root) — architecture, coding rules and conventions
 - `Verilog/docs/build-defines.md` — the compile-time defines

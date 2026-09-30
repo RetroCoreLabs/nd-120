@@ -88,8 +88,6 @@ an image still comes up in OPCOM - the quickstart shows that as the
 ## Open questions (parked)
 
 - Basys3/Cmod A7 artifacts (OPCOM-only demos).
-- CI-built releases: Vivado cannot run in CI (size/licence). The Tang OSS
-  flow has a CI job (`tang-oss` in `.github/workflows/verilog-ci.yml`, on
-  `bitstreams-*` tags) and no run has finished yet: the three runs on record
-(28-AUG twice, 02-SEP) all stopped at about 2 hours, although the job's limit
-was raised to 300 min in `06edd3d`.
+- CI-built releases: not done, by decision. Release bitstreams are built
+  locally with the vendor tools and checked on the boards; GitHub Actions
+  only runs the tests (the Tang OSS bitstream job was removed 30-SEP-2026).
