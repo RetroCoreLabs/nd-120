@@ -869,6 +869,7 @@ module ND120_TOP
       .INCLUDE_WD    (CORE_INCLUDE_WD)
   ) CORE (
       .CACHE_SW(1'b1),   // console SW1: cache on, as it always was in sim
+      .BAUD_9600(1'b0),  // no baud switch in sim: console at the build default speed
       // (a) clock / reset. clk1 is the CPU+bus+device domain in BOTH
       // branches: sim assigns clk1 = sysclk, FPGA assigns clk1 = clk_cpu.
       .clk_cpu(clk1),
