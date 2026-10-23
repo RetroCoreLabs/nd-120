@@ -192,6 +192,16 @@ disc card. Measured with the 15 MHz card as default, `BIGDISK0-L2-100.IMG`:
 - nd100x on the same image prints `DIRECTORY ENTERED BY ANOTHER SYSTEM` instead with
   CPU number 102 or 120 (nothing with 100). That message and error 97 are different
   entries in the same error table.
+- Other controllers cleared too: every mass-storage address except the SMD at 1540 (ST-506
+  500-577, second SMD 1550-1557, floppy 1560-1577, SCSI 144300-144777) gets only a device
+  clear (000020) and one status read, in Verilator and in nd100x alike; nothing but the
+  SMD is ever activated. The ordered list of unanswered IOX is identical in both machines
+  (16584 events), and an unanswered IOX raises the IOX error in both (SINTRAN's
+  `FINDFLOPPY` and the start-up disc table `MDISCS` in `PH-P2-OPPSTART.NPL` decide which
+  controllers exist from that flag). Value 141 octal (97) is also the SCSI driver's generic
+  "transfer error" code (`IP-P2-SCSI-DISK.NPL`), so 97 is the common code, not a hint that
+  SCSI is involved. Not identified: IOX 100114, written 62 times in Verilator and never
+  seen in nd100x (probably a CPU-internal register).
 - The two machines send identical disc requests for the first 249 GOs. Then SINTRAN
   chooses a different next request (Verilator seeks block 002002/000046, nd100x
   000020/000000), and its buffer addresses already differ (06 102000 against 06 106000).
