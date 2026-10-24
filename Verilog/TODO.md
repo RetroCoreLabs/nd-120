@@ -202,6 +202,9 @@ disc card. Measured with the 15 MHz card as default, `BIGDISK0-L2-100.IMG`:
   "transfer error" code (`IP-P2-SCSI-DISK.NPL`), so 97 is the common code, not a hint that
   SCSI is involved. Not identified: IOX 100114, written 62 times in Verilator and never
   seen in nd100x (probably a CPU-internal register).
+- The harness' DEBUG.BPUN pre-deposit into RAM (`runSim/Run120.cpp`, on by default for a
+  C-tape build) is not the cause either: a boot with `ND120_PRELOAD_BPUN=` (empty, RAM
+  starts empty as in nd100x) prints the same `TRANSFER ERROR` and the same banner.
 - The two machines send identical disc requests for the first 249 GOs. Then SINTRAN
   chooses a different next request (Verilator seeks block 002002/000046, nd100x
   000020/000000), and its buffer addresses already differ (06 102000 against 06 106000).
