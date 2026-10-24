@@ -184,13 +184,20 @@ compare (control word 014005) after its first read, and the old stub finished it
 reading memory or stepping the counters, so the driver saw a failed compare, retried it
 8 times and stored error 97. M3 now reads one memory word per word and sets status b10 on a
 mismatch (unit test `test-smd`); the Verilator boot prints `DIRECTORY ENTERED BY ANOTHER
-SYSTEM`, as nd100x does. Still open: the C twin `nd_smd.c` has the same M3 stub.
+SYSTEM`, as nd100x does. The C twin `nd_smd.c` (NDDeviceCore) now models M2 and M3 too, with the
+same fixes as `ND_SMD.v` (commit d30dc5c in that repository).
+
+**Open: the C twin picks its disk geometry from the image size, and the SINTRAN image does not
+fit the 75 MB entry.** `nd_smd.c` takes the smallest table entry whose capacity holds the image.
+The 75 MB entry (5 heads, 18 sectors, 823 cylinders) holds 75,847,680 bytes; the BIGDISK0 image
+is 78,643,200 bytes, so the twin picks the 150 MB entry (10 heads) and would compute other LBAs
+than `ND_SMD.v` (5 heads) for the same C/H/S. Not run on a board; found by the arithmetic.
 
 **Open: SMD points where `ND_SMD.v` still differs from nd100x (`device_smd.c`), found by
-reading both; not settled by the SMD manual (ND-11.020.01).** Fixed from the manual: the head
-and cylinder range check, seek-complete raised only by a seek (not by a transfer or a device
-clear), status b12 abnormal completion, and the address and word counters kept current when a
-transfer fails part way. Left as they are, because nothing we hold decides them:
+reading both; not settled by the SMD manual (ND-11.020.01).** Fixed from the manual (RTL and C twin): the
+head and cylinder range check, seek-complete raised only by a seek (not by a transfer or a
+device clear), status b12 abnormal completion, and the address and word counters kept current
+when a transfer fails part way. Left as they are, because nothing we hold decides them:
 - Status b5 (illegal load) stays set until a device clear; nd100x clears it at each GO (its
   comment cites DISC-TEMA, whose message text is not in our manuals).
 - Status b14 (on cylinder) is forced to 1 by every control word (`ND_SMD.v`, the "selecting a
