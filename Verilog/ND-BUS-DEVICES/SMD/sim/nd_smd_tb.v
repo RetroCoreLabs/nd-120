@@ -24,7 +24,8 @@
 **                                                                       **
 ** Covered: reset status, '1540&' boot byte-server, M0 read (1500 words, **
 ** crosses the 1K chunk), 24-bit register readback, M1 write (800 words), **
-** M2 read parity (words counted, no memory cycle, media fault ends it,   **
+** M3 compare (one memory read per word, b10 on mismatch), M2 read       **
+** parity (words counted, no memory cycle, media fault ends it,          **
 ** M4 seek (on-cyl + seek-complete + 15 MHz id), interrupt + IDENT 017,   **
 ** address mismatch, error interrupt, ECC pattern register, real 75 MB    **
 ** image windows, and a DMA bus fault -> disk-not-ready + recovery.       **
@@ -580,6 +581,54 @@ module nd_smd_tb;
     for (i = 0; i < 1600; i = i + 1)
       if (memory[16'hA000 + i] !== 16'hBEEF)
         check(1'b0, "M2 after fault wrote to memory");
+
+    // 3d: M3 COMPARE TRANSFER, 1500 words (crosses the 1K chunk) from cyl 1,
+    //     head 0, sector 2 against core 0xA000. ND-11.020.01 "M3: Compare
+    //     transfer": the disk data and the memory data are compared bit by
+    //     bit, "a mismatch causes compare error to be set" (status b10). One
+    //     memory READ per word, nothing written to memory, the address and
+    //     word counters step as in M0/M2. SINTRAN's driver sends an M3 after
+    //     its first read and treats a command that does not step the counters
+    //     as a failed compare (the start-up TRANSFER ERROR).
+    // device clear first: the media-fault test above leaves b4/b10 set
+    iox_write(16'o001545, 16'h0010);
+    dpos = ((1 * 5 + 0) * 18 + 2) * 512 - window_base;   // image index of that block
+    for (i = 0; i < 1500; i = i + 1) memory[16'hA000 + i] = image[dpos + i];
+    load_core(24'h00A000);
+    load_block(16'd2, 16'd1);
+    load_wcnt(24'd1500);
+    nzcount = dma_reqs;
+    iox_write(16'o001545, 16'h1804);   // GO: ACTIVE (b2), op M3 (b11-12)
+    wait_ready();
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h0004) === 0, "M3 still active after ready");
+    check((rdata & 16'h0400) === 0, "M3 compare error on equal data");
+    check((rdata & 16'h0010) === 0, "M3 flagged an error on equal data");
+    check(dma_reqs === nzcount + 1500, "M3 memory cycles != one per word");
+    for (i = 0; i < 1500; i = i + 1)
+      if (memory[16'hA000 + i] !== image[dpos + i])
+        check(1'b0, "M3 wrote to ND memory");
+    iox_read(16'o001540, rdata);       // core address LO
+    check(rdata === (16'hA000 + 16'd1500), "M3 core address != start+words");
+    iox_read(16'o001540, rdata);       // bits 16-23
+    iox_read(16'o001544, rdata);       // status read: flip-flop back to "first"
+    iox_write(16'o001545, 16'h8000);   // CWR=1
+    iox_read(16'o001540, rdata);
+    check(rdata === 16'd0, "M3 word counter not 0 at the end");
+    iox_read(16'o001540, rdata);
+    iox_write(16'o001545, 16'h0000);   // CWR back to 0
+    iox_read(16'o001544, rdata);
+    // one wrong bit in the second chunk -> compare error, command still ends
+    memory[16'hA000 + 1200] = image[dpos + 1200] ^ 16'h0100;
+    load_core(24'h00A000);
+    load_block(16'd2, 16'd1);
+    load_wcnt(24'd1500);
+    iox_write(16'o001545, 16'h1804);
+    wait_ready();
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h0400) !== 0, "M3 mismatch: compare error b10 not set");
+    check((rdata & 16'h0010) !== 0, "M3 mismatch: error OR b4 not set");
+    check((rdata & 16'h0004) === 0, "M3 mismatch: still active");
 
     // 4: M4 seek -> on-cylinder (status b14), per-unit seek-complete
     //    (seek condition b0) and the 15 MHz card id (seek condition b12)

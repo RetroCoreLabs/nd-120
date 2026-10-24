@@ -176,50 +176,15 @@ correct. Off our plate:
 Captured ground truth for the oracle side lives in
 `ND-BUS-DEVICES/SMD/sim/traces/`.
 
-**Open: "TRANSFER ERROR" line during the `21540&` SMD boot (Verilator).** SINTRAN boots
-to RUNNING from the SMD, but prints `TRANSFER ERROR` once during start-up (SINTRAN file
-system error 97, a message in the error table paged in from the disc). It is not the
-disc card. Measured with the 15 MHz card as default, `BIGDISK0-L2-100.IMG`:
-
-- Cleared: every SMD status and seek-condition value before the print is clean (040010 /
-  040005), no illegal load anywhere; the C disc backend (`process_verilog_smd()` in
-  `simDevices/NDBus.cpp`) moves every word correctly (384 reads, 51 writes, checksums
-  equal, no shifted word); only unit 0 is ever asked for; the CPU number (100 or 120)
-  does not change it in Verilator; floppy status bit 14 (1 in nd100x, 0 in
-  `ND_FLOPPY_DMA.v` at the time) does not change it; the Verilog M2, a stub at the time,
-  was not the cause, because SINTRAN never reads the memory address or word count back
-  after an M2.
-- nd100x on the same image prints `DIRECTORY ENTERED BY ANOTHER SYSTEM` instead with
-  CPU number 102 or 120 (nothing with 100). That message and error 97 are different
-  entries in the same error table.
-- Other controllers cleared too: every mass-storage address except the SMD at 1540 (ST-506
-  500-577, second SMD 1550-1557, floppy 1560-1577, SCSI 144300-144777) gets only a device
-  clear (000020) and one status read, in Verilator and in nd100x alike; nothing but the
-  SMD is ever activated. The ordered list of unanswered IOX is identical in both machines
-  (16584 events), and an unanswered IOX raises the IOX error in both (SINTRAN's
-  `FINDFLOPPY` and the start-up disc table `MDISCS` in `PH-P2-OPPSTART.NPL` decide which
-  controllers exist from that flag). Value 141 octal (97) is also the SCSI driver's generic
-  "transfer error" code (`IP-P2-SCSI-DISK.NPL`), so 97 is the common code, not a hint that
-  SCSI is involved. Not identified: IOX 100114, written 62 times in Verilator and never
-  seen in nd100x (probably a CPU-internal register).
-- The harness' DEBUG.BPUN pre-deposit into RAM (`runSim/Run120.cpp`, on by default for a
-  C-tape build) is not the cause either: a boot with `ND120_PRELOAD_BPUN=` (empty, RAM
-  starts empty as in nd100x) prints the same `TRANSFER ERROR` and the same banner.
-- The two machines send identical disc requests for the first 249 GOs. Then SINTRAN
-  chooses a different next request (Verilator seeks block 002002/000046, nd100x
-  000020/000000), and its buffer addresses already differ (06 102000 against 06 106000).
-  So error 97 is decided inside SINTRAN's own state, not by anything the card returns.
-- Both machines rewrite block 000414/000057 (LBA 4260) with the error recorded:
-  Verilator stores 000141 (97) at words 104 and 631, nd100x stores 003203.
-- Not tried: record the last instructions before the first 97 appears and read that
-  code against the SINTRAN symbols (`BDISK`, the SMD driver routine, has no NPL source).
-- Found on the way and fixed, not the cause: the Verilog and C M2 now read the blocks,
-  count the words down and step the address, without a memory cycle (ND-11.020.01 "M2:
-  Read parity transfer"); the floppy hardware status word now returns bit 14 (streamer
-  interface) as 1, as ND-11.021 sec 3.7 lists it.
-- Still not modelled in the SMD: M3 compare, M5 write format and M8 run ECC complete
-  without doing the operation (`ND_SMD.v` default branch, `nd_smd.c` default case); M2
-  does not check the CRC check words, only a media fault ends it in error.
+**Open: SMD M5 write format and M8 run ECC are not modelled; M2 does not check CRC.**
+`ND_SMD.v` (default branch) and `nd_smd.c` (default case) complete M5 and M8 without
+doing the operation, and M2 only ends in error on a media fault, not on a bad check word.
+The `21540&` start-up "TRANSFER ERROR" line is gone in `ND_SMD.v`: SINTRAN sends an M3
+compare (control word 014005) after its first read, and the old stub finished it without
+reading memory or stepping the counters, so the driver saw a failed compare, retried it
+8 times and stored error 97. M3 now reads one memory word per word and sets status b10 on a
+mismatch (unit test `test-smd`); the Verilator boot prints `DIRECTORY ENTERED BY ANOTHER
+SYSTEM`, as nd100x does. Still open: the C twin `nd_smd.c` has the same M3 stub.
 
 **Open: SMD units 1-3 are NOT supported.** Only unit 0 has a disc image
 (`ND120_SMD_IMG`). SINTRAN could ask for another unit, and none is served yet:

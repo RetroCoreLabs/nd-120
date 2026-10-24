@@ -397,6 +397,7 @@ module ND_SMD #(
   localparam E_DISK_WR = 3'd4;  // backend: buffer -> image chunk
   localparam E_DELAY   = 3'd5;  // completion delay -> ReadEnd
   localparam E_PARITY  = 3'd6;  // M2: the chunk's words pass, NO memory cycle
+  localparam E_COMPARE = 3'd7;  // M3: memory word read and compared with the disk word
 
   reg [2:0]  s_eng;
   reg [10:0] s_chunk_q;
@@ -555,7 +556,7 @@ module ND_SMD #(
   wire        s_buf_we    = dbuf_we | s_memrd_commit;
   wire [ 9:0] s_buf_waddr = dbuf_we ? dbuf_addr : s_sec_idx[9:0];
   wire [15:0] s_buf_wdata = dbuf_we ? dbuf_wdata : dma_rdata;
-  wire [ 9:0] s_buf_raddr = (s_eng == E_MEM_WR)  ? s_sec_idx[9:0] :
+  wire [ 9:0] s_buf_raddr = (s_eng == E_MEM_WR || s_eng == E_COMPARE) ? s_sec_idx[9:0] :
                             (s_eng == E_DISK_WR) ? dbuf_addr      :
                                                    s_bootptr[9:0];
   reg  [15:0] s_buf_dout;
@@ -905,6 +906,27 @@ module ND_SMD #(
                         s_eng       <= E_DELAY;
                       end
                     end
+                    4'd3: begin  // M3 compare transfer
+                      // ND-11.020.01 "M3: Compare transfer": "the controller
+                      // compares the data read from the disk and the data from
+                      // the computer memory bit by bit. A mismatch causes
+                      // compare error to be set." Same disk read and chunking
+                      // as M0; E_COMPARE then makes one memory READ per word
+                      // (the counters step as a pair, as in M0/M2) and checks
+                      // it against the disk word. Nothing is written to memory.
+                      if (w_words != 24'd0) begin
+                        disk_start <= 1'b1;
+                        disk_req   <= 1'b1;
+                        disk_wr    <= 1'b0;
+                        s_chunk_q  <= (w_words > {13'd0, BUF_WORDS}) ?
+                                      BUF_WORDS : w_words[10:0];
+                        s_sec_idx  <= 11'd0;
+                        s_eng      <= E_DISK_RD;
+                      end else begin
+                        s_delay_cnt <= DELAY_TICKS;
+                        s_eng       <= E_DELAY;
+                      end
+                    end
                     4'd4: begin  // M4 initiate seek
                       // NO completion delay. ND-11.020.01 "M4: Initiate seek":
                       // "As soon as this function is accepted by the disk, the
@@ -944,7 +966,7 @@ module ND_SMD #(
                       s_delay_cnt <= DELAY_TICKS;
                       s_eng       <= E_DELAY;
                     end
-                    default: begin  // M3/M5/M8 stub completion - NOT modelled
+                    default: begin  // M5/M8 stub completion - NOT modelled
                       s_delay_cnt <= DELAY_TICKS;
                       s_eng       <= E_DELAY;
                     end
@@ -1027,7 +1049,8 @@ module ND_SMD #(
               s_eng         <= E_IDLE;
             end else begin
               s_sec_idx <= 11'd0;
-              s_eng     <= (s_op == 4'd2) ? E_PARITY : E_MEM_WR;
+              s_eng     <= (s_op == 4'd2) ? E_PARITY :
+                           (s_op == 4'd3) ? E_COMPARE : E_MEM_WR;
             end
           end
         end
@@ -1052,6 +1075,41 @@ module ND_SMD #(
             end
           end else begin
             s_sec_idx <= s_sec_idx + 11'd1;
+          end
+        end
+
+        // M3: for each word of the chunk read one word from ND memory and
+        // compare it with the disk word s_buf_dout (the read port follows
+        // s_sec_idx in this state). A mismatch sets status b10, the compare
+        // error; the command still runs to the word count and ends normally.
+        // Chunk bookkeeping is E_MEM_WR's.
+        E_COMPARE: begin
+          if (!s_dma_wait && !dma_busy && s_buf_valid) begin
+            dma_issue(1'b0, s_mem_addr, 16'd0);
+          end else if (s_dma_wait && dma_ack) begin
+            s_dma_wait <= 1'b0;
+            if (dma_err) begin
+              s_dma_ch_err <= 1'b1;
+              err_active;
+            end else begin
+              if (dma_rdata != s_buf_dout) s_comparer_err <= 1'b1;
+              s_mem_addr   <= s_mem_addr   + 24'd1;
+              s_words_left <= s_words_left - 24'd1;
+              if (s_sec_idx + 11'd1 >= s_chunk_q || s_words_left == 24'd1) begin
+                if (s_words_left == 24'd1) begin
+                  s_delay_cnt <= DELAY_TICKS;
+                  s_eng       <= E_DELAY;
+                end else begin
+                  s_chunk_q <= ((s_words_left - 24'd1) > {13'd0, BUF_WORDS}) ?
+                               BUF_WORDS : (s_words_left[10:0] - 11'd1);
+                  disk_req  <= 1'b1;
+                  disk_wr   <= 1'b0;
+                  s_eng     <= E_DISK_RD;
+                end
+              end else begin
+                s_sec_idx <= s_sec_idx + 11'd1;
+              end
+            end
           end
         end
 
