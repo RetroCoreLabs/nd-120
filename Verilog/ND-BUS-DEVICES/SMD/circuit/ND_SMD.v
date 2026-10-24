@@ -55,7 +55,9 @@
 **   b0 int-enabled     b1 error-int-enabled   b2 active                 **
 **   b3 ready-for-xfer  b4 inclusive-OR error  b5 illegal load           **
 **   b6 timeout         b7 hardware error 2    b8 address mismatch        **
-**   b10 comparer error b13 disk unit NOT ready (FORCED 1 when no unit    **
+**   b10 comparer error b12 abnormal completion (any error end, cleared   **
+**   at the next GO; sec 3.7.2)                                           **
+**   b13 disk unit NOT ready (FORCED 1 when no unit                       **
 **   selected)          b14 on cylinder        b15 register multiplex.    **
 **   Inclusive-OR (b4) = OR(illegal, timeout, hwErr2, addrMismatch,       **
 **   comparerErr, seekErr) - the UNION taken by the C port so neither     **
@@ -226,6 +228,14 @@ module ND_SMD #(
   // diagnostic which side failed. NOT part of the inclusive-OR (b4): the
   // oracle's hardwareError does not include bit 11.
   reg        s_dma_ch_err;    // status b11
+  // status b12 = ABNORMAL COMPLETION. ND-11.020.01 sec 3.7.2 lists the five
+  // conditions that set it: loss of ready (SB13), address mismatch (SB8),
+  // fault line / ECC parity / missing clocks (SB7), illegal load while the
+  // controller is busy (SB5), and timeout (SB6). It was hard-wired to 0 here.
+  // Set where those conditions are raised, cleared at the next GO and by a
+  // device clear. NOT part of the inclusive-OR (b4): it is the consequence of
+  // the other error bits, not a cause.
+  reg        s_abnormal;      // status b12
   reg        s_seek_err;      // seek-condition b11
 
   // ---- flip-flops (15 MHz card only, HAS_WC_FLIPFLOP = 1) ----
@@ -294,7 +304,7 @@ module ND_SMD #(
       { s_cwr,            // b15 register multiplex
         s_oncyl_bit,      // b14 on cylinder
         s_notready_bit,   // b13 disk unit not ready
-        1'b0,             // b12
+        s_abnormal,       // b12 abnormal completion
         s_dma_ch_err,     // b11 DMA channel error (bus/memory fault)
         s_comparer_err,   // b10 comparer error
         1'b0,             // b9
@@ -532,6 +542,15 @@ module ND_SMD #(
     begin
       s_rft    <= 1'b0;
       s_active <= 1'b0;
+      s_abnormal <= 1'b1;
+      // The address counter and the word counter step with every word moved
+      // (one Am2942 chain), so a driver that reads them after a failed
+      // transfer sees how far it got. They used to keep the values loaded
+      // before the GO, which are only replaced at normal completion.
+      s_core_addr    <= s_mem_addr[15:0];
+      s_core_addr_hi <= s_mem_addr[23:16];
+      s_word_cnt     <= s_words_left[15:0];
+      s_word_cnt_hi  <= s_words_left[23:16];
       clr_ff;
       s_on_cyl[s_unit]    <= 1'b0;
       s_not_ready[s_unit] <= 1'b1;
@@ -598,6 +617,7 @@ module ND_SMD #(
       s_addr_mismatch<= 1'b0;
       s_comparer_err <= 1'b0;
       s_dma_ch_err   <= 1'b0;
+      s_abnormal     <= 1'b0;
       s_seek_err     <= 1'b0;
       s_ma_wc_ff     <= 1'b0;
       s_wc_eccw_ff   <= 1'b0;
@@ -680,6 +700,7 @@ module ND_SMD #(
               // register during an active parity check and then expects to read
               // status with b5 AND b2 both set.
               s_illegal <= 1'b1;
+              s_abnormal <= 1'b1;
             end else if (!HAS_WC_FLIPFLOP) begin
               // ECC / BIG-DISC: no flip-flop - one write loads the full 16 bits.
               // Bits 16-17 are NOT loaded here; they come from control-word
@@ -739,6 +760,7 @@ module ND_SMD #(
               // Illegal load while active - b5 only, operation continues.
               // See the +1 case above.
               s_illegal <= 1'b1;
+              s_abnormal <= 1'b1;
             end else if (s_cwr) begin
               s_blkaddr2 <= iox_wdata;       // cylinder
             end else begin
@@ -759,6 +781,7 @@ module ND_SMD #(
           // active controller could never be recovered.
           3'd5: if (s_active && !iox_wdata[4]) begin
             s_illegal <= 1'b1;
+            s_abnormal <= 1'b1;
           end else begin
             s_boot_mode <= 1'b0;
             s_int_en    <= iox_wdata[0];
@@ -784,7 +807,9 @@ module ND_SMD #(
               // ---- Device clear ----
               s_active <= 1'b0;
               if (~iox_wdata[9]) s_not_ready[iox_wdata[9:7]] <= 1'b0;
-              s_seek_complete[iox_wdata[9:7]] <= 1'b1;
+              // A device clear does NOT raise seek-complete: ND-11.020.01
+              // (seek condition, bits 0-3) says that bit is "only set if an
+              // initiate seek command for that unit has first been issued".
               s_core_addr    <= 16'd0;
               s_core_addr_hi <= 8'd0;
               s_blkaddr1     <= 16'd0;
@@ -799,6 +824,7 @@ module ND_SMD #(
               s_addr_mismatch<= 1'b0;
               s_comparer_err <= 1'b0;
               s_dma_ch_err   <= 1'b0;
+              s_abnormal     <= 1'b0;
               s_seek_err     <= 1'b0;
               s_eng          <= E_IDLE;
               s_dma_wait     <= 1'b0;
@@ -806,9 +832,11 @@ module ND_SMD #(
               s_irq          <= iox_wdata[0] && iox_wdata[3];
             end else if (iox_wdata[2]) begin
               // ---- GO ----
+              s_abnormal <= 1'b0;   // b12 reports on THIS operation
               if (iox_wdata[9]) begin
                 // no unit selected -> DRIVE_NOT_SELECTED
                 s_hw_err2 <= 1'b1;
+                s_abnormal <= 1'b1;
                 s_rft     <= 1'b0;
                 s_active  <= 1'b0;
                 clr_ff;
@@ -833,12 +861,19 @@ module ND_SMD #(
                 s_words_left <= w_words;
                 s_op         <= iox_wdata[14:11];
 
+                // Each part of the C/H/S address is range-checked on its own.
+                // The head used to be compared with GEO_MAX_CYL (a transcription
+                // slip), so heads 5..822 passed and aliased onto other tracks,
+                // and cylinder GEO_MAX_CYL itself passed because the LBA test
+                // is "greater than".
                 if (!iox_wdata[3] &&
                     ((w_lba > w_max_lba) ||
-                     (w_sector >= GEO_SPT[7:0]) ||
-                     ({8'd0, w_head} >= GEO_MAX_CYL))) begin
+                     (w_cyl >= GEO_MAX_CYL) ||
+                     ({8'd0, w_head} >= GEO_HEADS) ||
+                     ({8'd0, w_sector} >= GEO_SPT))) begin
                   // ---- address mismatch ----
                   s_addr_mismatch <= 1'b1;
+                  s_abnormal      <= 1'b1;
                   s_rft    <= 1'b0;
                   s_active <= 1'b0;
                   clr_ff;
@@ -991,6 +1026,7 @@ module ND_SMD #(
             // The load is ignored; the running operation is NOT disturbed.
             if (s_active) begin
               s_illegal <= 1'b1;
+              s_abnormal <= 1'b1;
             end else begin
               s_boot_mode <= 1'b0;
               if (s_cwr) begin
@@ -1205,7 +1241,13 @@ module ND_SMD #(
             s_core_addr_hi <= s_mem_addr[23:16];
             s_word_cnt     <= 16'd0;
             s_word_cnt_hi  <= 8'd0;
-            s_seek_complete<= (8'd1 << s_unit);
+            // Only a SEEK raises the unit's seek-complete bit (M4, M6, M7).
+            // A transfer (M0-M3) gave it too, and the assignment cleared the
+            // other units' bits; the manual says the condition "will last
+            // until a transfer command is given", i.e. a transfer ends it.
+            // The GO already cleared this unit's bit for the command.
+            if (s_op == 4'd4 || s_op == 4'd6 || s_op == 4'd7)
+              s_seek_complete <= s_seek_complete | (8'd1 << s_unit);
             s_eng          <= E_IDLE;
             s_irq          <= s_int_en;   // ReadEnd: interrupt iff int-enabled
           end

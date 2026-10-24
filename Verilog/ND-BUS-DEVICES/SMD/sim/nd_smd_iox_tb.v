@@ -256,18 +256,19 @@ module nd_smd_iox_tb;
     check(int_pending === 4'b0000, "IDENT must clear enable and drop the int line");
 
     // =================================================================
-    // 7. Device clear (+5 b4): RFT low, registers zeroed, seek-complete
-    //    set for the selected unit, errors cleared.
+    // 7. Device clear (+5 b4): RFT low, registers zeroed, errors cleared.
+    //    A clear raises NO seek-complete: ND-11.020.01 (seek condition) says
+    //    that bit is only set once an initiate seek has been issued.
     //      status: b14 oncyl=1 (clear does not touch on-cyl), b3 rft=0,
     //      everything else 0 -> 0x4000.
-    //      seek cond: seek-complete[0]=1, b12=1 -> 0x1001.
+    //      seek cond: seek-complete=0, b12=1 -> 0x1000.
     //      core address reads back 0 (LO then HI).
     // =================================================================
     ctrl_word(1'b0, 1'b0, 1'b0, 1'b1, 3'd0); // device clear, unit0, CWR=0
     iox_read(BASE + 16'd4, r);
     check(r === 16'h4000, "device clear status must be 0x4000 (rft=0, errors clear)");
     iox_read(BASE + 16'd2, r);
-    check(r === 16'h1001, "device clear seek cond must be 0x1001 (seek-complete[0], b12)");
+    check(r === 16'h1000, "device clear seek cond must be 0x1000 (b12 only: a clear raises no seek-complete)");
     iox_read(BASE + 16'd0, r);
     iox_read(BASE + 16'd0, r2);
     check(r  === 16'h0000, "device clear core addr LO must be 0");
@@ -397,6 +398,39 @@ module nd_smd_iox_tb;
     iox_read(BASE + 16'd0, r2);
     check(r  === 16'o000011, "13: +1 clear +1: MA bits 0-15 must be 000011");
     check(r2 === 16'o000011, "13: device clear must reset: second +1 loads MA bits 16-23 = 011");
+
+    // =================================================================
+    // 14. C/H/S range check with the default 75 MB geometry (5 heads, 18
+    //     sectors per track, 823 cylinders), each part on its own. Cylinder
+    //     823 used to pass (the LBA test is "greater than") and heads 5.. were
+    //     compared with the cylinder limit. A mismatch ends the command at
+    //     once: b8 address mismatch, b12 abnormal completion (ND-11.020.01
+    //     sec 3.7.2), b4 error OR, not active. A device clear drops them.
+    // =================================================================
+    ctrl_word(1'b0, 1'b0, 1'b0, 1'b1, 3'd0);      // device clear
+    ctrl_word(1'b0, 1'b0, 1'b0, 1'b0, 3'd0);      // unit 0, CWR=0
+    iox_write(BASE + 16'd3, 16'h0000);            // block address I: head 0, sector 0
+    ctrl_word(1'b1, 1'b0, 1'b0, 1'b0, 3'd0);      // CWR=1
+    iox_write(BASE + 16'd3, 16'd823);             // block address II: cylinder 823
+    ctrl_word(1'b0, 1'b0, 1'b0, 1'b0, 3'd0);      // CWR=0
+    iox_write(BASE + 16'd5, 16'h0004);            // GO, M0
+    iox_read(BASE + 16'd4, r);
+    check(r[8]  === 1'b1, "14: cylinder 823 must set address mismatch b8");
+    check(r[12] === 1'b1, "14: address mismatch must set abnormal completion b12");
+    check(r[4]  === 1'b1, "14: address mismatch must set the error OR b4");
+    check(r[2]  === 1'b0, "14: address mismatch must not leave the controller active");
+    ctrl_word(1'b0, 1'b0, 1'b0, 1'b1, 3'd0);      // device clear
+    iox_read(BASE + 16'd4, r);
+    check(r[8] === 1'b0 && r[12] === 1'b0 && r[4] === 1'b0, "14: device clear must drop b8, b12, b4");
+    ctrl_word(1'b0, 1'b0, 1'b0, 1'b0, 3'd0);
+    iox_write(BASE + 16'd3, 16'h0500);            // head 5 of 0-4, sector 0
+    ctrl_word(1'b1, 1'b0, 1'b0, 1'b0, 3'd0);
+    iox_write(BASE + 16'd3, 16'd0);               // cylinder 0
+    ctrl_word(1'b0, 1'b0, 1'b0, 1'b0, 3'd0);
+    iox_write(BASE + 16'd5, 16'h0004);
+    iox_read(BASE + 16'd4, r);
+    check(r[8] === 1'b1, "14: head 5 must set address mismatch b8");
+    ctrl_word(1'b0, 1'b0, 1'b0, 1'b1, 3'd0);      // device clear
 
     // ---- verdict ----
     if (errors == 0) $display("TB_RESULT: PASS");

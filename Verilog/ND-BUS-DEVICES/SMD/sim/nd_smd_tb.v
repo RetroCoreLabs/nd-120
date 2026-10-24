@@ -214,6 +214,10 @@ module nd_smd_tb;
 
   // When set, every disk request fails (media fault) instead of moving data.
   reg inject_fault = 1'b0;
+  // Fail the Nth disk request counted from now (0 = off): a fault in the
+  // middle of a multi-chunk transfer, after the first chunk already moved.
+  integer req_seq      = 0;
+  integer fault_at_seq = 0;
 
   task load_window(input integer word_base);
     integer fd, n;
@@ -245,7 +249,8 @@ module nd_smd_tb;
                   + (disk_blkaddr1 & 8'hFF)) * 512 - window_base;
     end
     if (disk_req) begin
-      if (inject_fault) begin
+      req_seq = req_seq + 1;
+      if (inject_fault || (fault_at_seq != 0 && req_seq == fault_at_seq)) begin
         @(posedge sysclk);
         disk_err_in <= 1'b1;
         disk_done   <= 1'b1;
@@ -630,6 +635,36 @@ module nd_smd_tb;
     check((rdata & 16'h0010) !== 0, "M3 mismatch: error OR b4 not set");
     check((rdata & 16'h0004) === 0, "M3 mismatch: still active");
 
+    // 3f: a media fault in the SECOND chunk of an M0. The first 1024 words
+    //     already reached memory, and the address and word counters are one
+    //     chain that steps with every word moved, so a driver reading them
+    //     after the failed command sees how far it got: address = start +
+    //     1024, word counter = 1500 - 1024 = 476. They used to keep the values
+    //     loaded before the GO. The error also sets abnormal completion (b12,
+    //     ND-11.020.01 sec 3.7.2) and not-ready (b13).
+    iox_write(16'o001545, 16'h0010);   // device clear
+    load_core(24'h00A000);
+    load_block(16'd2, 16'd1);
+    load_wcnt(24'd1500);
+    fault_at_seq = req_seq + 2;
+    iox_write(16'o001545, 16'h0004);   // GO: M0
+    wait_idle();
+    fault_at_seq = 0;
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h2000) !== 0, "chunk-2 fault: not-ready b13 not set");
+    check((rdata & 16'h1000) !== 0, "chunk-2 fault: abnormal completion b12 not set");
+    iox_read(16'o001540, rdata);       // core address LO
+    check(rdata === (16'hA000 + 16'd1024), "chunk-2 fault: core address != start+1024");
+    iox_read(16'o001544, rdata);       // status read: flip-flop back to "first"
+    iox_write(16'o001545, 16'h8000);   // CWR=1
+    iox_read(16'o001540, rdata);
+    check(rdata === 16'd476, "chunk-2 fault: word counter != 476");
+    iox_write(16'o001545, 16'h0000);   // CWR back to 0
+    iox_read(16'o001544, rdata);
+    iox_write(16'o001545, 16'h0010);   // device clear: b12 and the rest drop
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h1000) === 0, "device clear left abnormal completion b12 set");
+
     // 4: M4 seek -> on-cylinder (status b14), per-unit seek-complete
     //    (seek condition b0) and the 15 MHz card id (seek condition b12)
     load_block(16'd0, 16'd2);
@@ -647,6 +682,60 @@ module nd_smd_tb;
     iox_read(16'o001542, rdata);       // seek condition (CWR=0)
     check((rdata & 16'h0001) !== 0, "unit-0 seek-complete (seek cond b0) missing");
     check((rdata & 16'h1000) !== 0, "SMD-15MHz id (seek cond b12) not set");
+
+    // 4b: only a SEEK raises seek-complete. ND-11.020.01 (seek condition,
+    //     bits 0-3): "only set if an initiate seek command for that unit has
+    //     first been issued ... The condition will last until a transfer
+    //     command is given." So an M0 ends it, and a device clear does not
+    //     raise it. (M4 above left unit 0's bit set.)
+    load_core(24'h006000);
+    load_block(16'd0, 16'd0);
+    load_wcnt(24'd16);
+    iox_write(16'o001545, 16'h0004);   // GO: M0
+    wait_ready();
+    iox_read(16'o001542, rdata);       // seek condition (CWR=0)
+    check((rdata & 16'h00FF) === 16'h0000, "seek-complete still set after a transfer");
+    check((rdata & 16'h1000) !== 0, "SMD-15MHz id lost");
+    iox_write(16'o001545, 16'h0010);   // device clear
+    iox_read(16'o001542, rdata);
+    check((rdata & 16'h00FF) === 16'h0000, "device clear raised seek-complete");
+    load_block(16'd0, 16'd2);
+    iox_write(16'o001545, 16'h2004);   // GO: M4
+    wait_ready();
+    iox_read(16'o001542, rdata);
+    check((rdata & 16'h0001) !== 0, "M4 did not raise seek-complete");
+
+    // 4c: C/H/S range check, every part on its own (75 MB geometry: 5 heads,
+    //     18 sectors, 823 cylinders). Head 5 used to pass (the head was
+    //     compared with the cylinder limit) and aliased onto the next
+    //     cylinder's track; cylinder 823 passed because the LBA test is
+    //     "greater than". Mismatch = b8, abnormal completion b12, b4.
+    iox_write(16'o001545, 16'h0010);   // device clear
+    load_core(24'h006000);
+    load_wcnt(24'd16);
+    load_block(16'h0500, 16'd0);       // head 5, sector 0, cylinder 0
+    iox_write(16'o001545, 16'h0004);
+    wait_idle();
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h0100) !== 0, "head 5: address mismatch b8 not set");
+    check((rdata & 16'h1000) !== 0, "head 5: abnormal completion b12 not set");
+    // (cylinder 823 is checked in nd_smd_iox_tb.v: this tb instances the DUT
+    //  with a huge GEO_MAX_CYL for its linear block map)
+    iox_write(16'o001545, 16'h0010);
+    load_block(16'h0012, 16'd0);       // sector 18 of a 18-sector track
+    iox_write(16'o001545, 16'h0004);
+    wait_idle();
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h0100) !== 0, "sector 18: address mismatch b8 not set");
+    // the last legal address passes and leaves b8 and b12 clear
+    iox_write(16'o001545, 16'h0010);
+    load_wcnt(24'd0);
+    load_block(16'h0411, 16'd822);     // head 4, sector 17, cylinder 822
+    iox_write(16'o001545, 16'h0004);
+    wait_ready();
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h0100) === 0, "last legal C/H/S flagged address mismatch");
+    check((rdata & 16'h1000) === 0, "last legal C/H/S set abnormal completion");
 
     // 5: interrupt + IDENT: M0 read with interrupt enabled
     check(bint11_n === 1'b1, "BINT11 asserted before enable");

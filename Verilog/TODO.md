@@ -186,6 +186,21 @@ reading memory or stepping the counters, so the driver saw a failed compare, ret
 mismatch (unit test `test-smd`); the Verilator boot prints `DIRECTORY ENTERED BY ANOTHER
 SYSTEM`, as nd100x does. Still open: the C twin `nd_smd.c` has the same M3 stub.
 
+**Open: SMD points where `ND_SMD.v` still differs from nd100x (`device_smd.c`), found by
+reading both; not settled by the SMD manual (ND-11.020.01).** Fixed from the manual: the head
+and cylinder range check, seek-complete raised only by a seek (not by a transfer or a device
+clear), status b12 abnormal completion, and the address and word counters kept current when a
+transfer fails part way. Left as they are, because nothing we hold decides them:
+- Status b5 (illegal load) stays set until a device clear; nd100x clears it at each GO (its
+  comment cites DISC-TEMA, whose message text is not in our manuals).
+- Status b14 (on cylinder) is forced to 1 by every control word (`ND_SMD.v`, the "selecting a
+  unit puts it on-cylinder" line); nd100x removed that. The manual says on-cylinder drops on
+  an initiate seek and returns on arrival; the instant M4 never shows the drop.
+- M6 with no earlier seek completes at once (nd100x times out, b6); M5 does not check its
+  word count (nd100x raises a timeout unless it is a whole number of tracks); a register load
+  while the unit is off cylinder is not an illegal load; write protect and "unit not
+  attached" (units 1-3) are not seen by the RTL.
+
 **Open: SMD units 1-3 are NOT supported.** Only unit 0 has a disc image
 (`ND120_SMD_IMG`). SINTRAN could ask for another unit, and none is served yet:
 
