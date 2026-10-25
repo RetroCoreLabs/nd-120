@@ -15,6 +15,7 @@
 set part xc7a35tcpg236-1
 set srcdir [file dirname [file normalize [info script]]]
 set vroot  [file normalize [file join $srcdir .. ..]]   ;# Verilog/
+
 # Everything this build writes - copied microcode, reports, routed checkpoint,
 # bitstream, and Vivado's .Xil - goes to $ND120_BUILD_DIR/cmod-a7-35t (local.mk
 # at the repository root, written by configure.py). Never into this folder.
@@ -40,6 +41,32 @@ set outdir [nd120_board_dir cmod-a7-35t "Cmod A7 build.tcl"]
 # either. This build was the only one left still carrying the runtime PROM
 # load. -promload keeps the old behaviour for anyone who wants to measure it.
 set skip_wcs [expr {[lsearch $argv "-promload"] < 0}]
+
+# -slowclk: build at 13.5 MHz instead of 27 MHz. The README and the failure
+# message below have documented this fallback since 04-SEP-2026 but the script
+# had no way to do it - the two defines were hard-coded, so anyone following
+# the advice had to hand-edit. Both must move together or every UART and RTC
+# count is wrong.
+#
+# It also exists as an EXPERIMENT knob. Vivado picks its loop-breaking cuts
+# during synthesis, where the target clock is already known, so the clock can
+# steer where the CGA IDB ring gets snipped - and that choice decides how many
+# times a reported path winds around the ring (5 laps on this board at 27 MHz,
+# 1 lap on the QMTECH at 20 MHz, same RTL). Building at 13.5 MHz and counting
+# the laps in the worst path separates "the clock target steers the cut" from
+# "the memory backend does". See docs/HANDOFF-cga-idb-ring-cut.md.
+set slow_clk [expr {[lsearch $argv "-slowclk"] >= 0}]
+if {$slow_clk} {
+    set clk_hz   13500000
+    set clk_name "13.5 MHz"
+    set extra_defs [list -verilog_define ND120_CMOD_MMCM_DIV=56.0]
+    puts "CLOCK: 13.5 MHz (-slowclk, ND120_CMOD_MMCM_DIV=56.0)"
+} else {
+    set clk_hz   27000000
+    set clk_name "27 MHz"
+    set extra_defs [list]
+    puts "CLOCK: 27 MHz (default)"
+}
 if {$skip_wcs} {
     # $readmemh("wcs_*.hex") resolves against Vivado's working directory in
     # this in-memory flow, so the images are copied into the build folder
@@ -122,9 +149,10 @@ synth_design -top nd120_cmod_top -part $part \
     -verilog_define TARGET_CMOD_A7 \
     -verilog_define FPGA_FF_MODE \
     -verilog_define MAIN_RAM_BLOCKRAM \
-    -verilog_define BOARD_CLK_FREQ=27000000 \
+    -verilog_define BOARD_CLK_FREQ=$clk_hz \
     -verilog_define UART_BAUD_RATE=115200 \
-    {*}[expr {$skip_wcs ? [list -verilog_define SKIP_WCS_LOAD] : [list]}]
+    {*}[expr {$skip_wcs ? [list -verilog_define SKIP_WCS_LOAD] : [list]}] \
+    {*}$extra_defs
 opt_design
 place_design
 route_design
@@ -145,7 +173,7 @@ write_checkpoint -force [file join $outdir nd120_cmod_routed.dcp]
 set wns [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]
 puts "WNS: $wns ns"
 if {$wns < 0} {
-    puts "ERROR: timing NOT met at 27 MHz (WNS $wns ns)."
+    puts "ERROR: timing NOT met at $clk_name (WNS $wns ns)."
     puts "Fallback: -verilog_define ND120_CMOD_MMCM_DIV=56.0 (13.5 MHz)"
     puts "and BOARD_CLK_FREQ=13500000. See README.md."
     exit 1
