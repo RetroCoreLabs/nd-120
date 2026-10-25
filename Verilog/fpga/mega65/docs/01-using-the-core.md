@@ -78,7 +78,7 @@ the line numbers are the `C_MENU_*` constants in `mega65.vhd`.
 | 14 | `Winch. 0:` *file* | Winchester unit 0 - the SINTRAN boot disc, `20500&` | |
 | 15 | `Winch. 1:` *file* | Winchester unit 1 | |
 | 16 | `Tape:` *file* | the paper-tape reader (ND_TAPE_400); the file is read from byte 0 | |
-| 18 | `HDMI: ` *mode* | submenu: `720p 50 Hz 16:9`, `720p 60 Hz 16:9`, `576p 50 Hz 4:3`, `576p 50 Hz 5:4`, `640x480 60 Hz`, `720x480 59.94 Hz`, `800x600 60 Hz` - the HDMI output mode; the console's native 800x600@60 is scaled to it by the framework. VGA always shows the native mode | 720p 60 Hz |
+| 18 | `HDMI: ` *mode* | submenu: `720p 50 Hz 16:9`, `720p 60 Hz 16:9`, `576p 50 Hz 4:3`, `576p 50 Hz 5:4`, `640x480 60 Hz`, `720x480 59.94 Hz`, `800x600 60 Hz` - the HDMI output mode; the console's native 640x480@60 is scaled to it by the framework (in `640x480 60 Hz` the scaler passes it through 1:1). VGA always shows the native mode | 720p 60 Hz |
 | 31 | `HDMI: CRT emulation` | the framework's scanline/polyphase filter on HDMI | off |
 | 32 | `HDMI: Zoom-in` | the framework's crop/zoom on HDMI | off |
 | 34 | `Close Menu` | | |

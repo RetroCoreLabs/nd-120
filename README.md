@@ -37,7 +37,7 @@ you can log in and run programs.**
 - ✅ **Tang Nano 20K** - boots SINTRAN, 20.25 MHz, timing-clean - [quickstart](Verilog/fpga/QUICKSTART-tang-nano-20k.md)
 - ✅ **Nexys 4 DDR** - boots SINTRAN, 33.333 MHz with the cache on - [quickstart](Verilog/fpga/QUICKSTART-nexys4ddr.md)
 - ✅ **MiSTer / DE10-Nano** - boots SINTRAN, 20 MHz - [quickstart](Verilog/fpga/QUICKSTART-mister.md)
-- 🚧 **MEGA65** - builds for both board revisions, timing-clean, not yet run on a real MEGA65 - [quickstart](Verilog/fpga/QUICKSTART-mega65.md)
+- 🚧 **MEGA65** - builds for both board revisions, timing-clean; R6 boots to OPCOM on a tester's machine, R3 not yet run - [quickstart](Verilog/fpga/QUICKSTART-mega65.md)
 
 ---
 
@@ -175,7 +175,7 @@ status and priority order.
 | **Tang Nano 20K** | ✅ Boots SINTRAN III - primary target | 20.25 MHz (`fast20`), timing-clean | 4 MB SDRAM | Serial, 115200 | SD card | OSS CAD Suite + Gowin EDA | [README](Verilog/fpga/tang-nano-20k/README.md) · [quickstart](Verilog/fpga/QUICKSTART-tang-nano-20k.md) |
 | **Nexys 4 DDR** | ✅ Boots SINTRAN III | 33.333 MHz, cache on (7.52 MIPS) | DDR2 behind a BRAM cache | TDV2200 on VGA + USB keyboard, and serial | microSD - boots with no PC | Vivado | [README](Verilog/fpga/nexys4ddr/README.md) · [quickstart](Verilog/fpga/QUICKSTART-nexys4ddr.md) · [timing](Verilog/fpga/nexys4ddr/timing.md) |
 | **MiSTer (DE10-Nano)** | ✅ Boots SINTRAN III | 20 MHz | 4 MB SDRAM module | TDV2200 on the MiSTer screen and keyboard | Picked in the OSD | Quartus | [README](Verilog/fpga/mister/README.md) · [quickstart](Verilog/fpga/QUICKSTART-mister.md) |
-| **MEGA65** | 🚧 Built and timing-clean, not yet run on a MEGA65 | 13.33 MHz (R3) / 20 MHz (R4-R6) | 4 MB in HyperRAM (R3) / SDRAM (R4-R6) | TDV2200 on the MEGA65 keyboard and screen | SD card | Vivado | [README](Verilog/fpga/mega65/README.md) · [quickstart](Verilog/fpga/QUICKSTART-mega65.md) |
+| **MEGA65** | 🚧 R6 boots to OPCOM on a tester's machine (SINTRAN not yet tried there); R3 built, not yet run | 13.33 MHz (R3) / 20 MHz (R4-R6) | 4 MB in HyperRAM (R3) / SDRAM (R4-R6) | TDV2200 on the MEGA65 keyboard and screen | SD card | Vivado | [README](Verilog/fpga/mega65/README.md) · [quickstart](Verilog/fpga/QUICKSTART-mega65.md) |
 | **QMTECH XC7A35T** | 🚧 Built, timing met, not yet run | 20 MHz | 4 MB SDRAM | Serial | SD card (Pmod) | Vivado | [README](Verilog/fpga/qmtech-a35t/README.md) · [quickstart](Verilog/fpga/QUICKSTART-qmtech-a35t.md) |
 | **Basys3** | ⚠️ Reaches OPCOM only - too little memory for the OS | - | 24K words BRAM | Serial | - | Vivado | [README](Verilog/fpga/basys3/README.md) |
 | **Cmod A7-35T** | ⚠️ Misses timing, no bitstream - SRAM bridge planned | - | BRAM | - | - | Vivado | [README](Verilog/fpga/cmod-a7-35t/README.md) |
