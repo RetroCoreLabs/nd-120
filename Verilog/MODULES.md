@@ -4,7 +4,7 @@
 
 Every module of the design has its own page: what it is, a table of
 its ports, and a picture of its symbol. Each page is made from the
-`//!` comments in the module's source. 394 modules in 16 areas.
+`//!` comments in the module's source. 393 modules in 16 areas.
 
 What sits inside what, for the simulation and for every FPGA board,
 is on [HIERARCHY.md](HIERARCHY.md) (made from a yosys elaboration).
@@ -12,7 +12,7 @@ is on [HIERARCHY.md](HIERARCHY.md) (made from a yosys elaboration).
 - [Top level (the whole machine)](#top-level-the-whole-machine) (2)
 - [DELILAH CPU gate array (CGA)](#delilah-cpu-gate-array-cga) (92)
 - [Decoder gate array (DGA)](#decoder-gate-array-dga) (11)
-- [CPU board 3202D](#cpu-board-3202d) (52)
+- [CPU board 3202D](#cpu-board-3202d) (51)
 - [PAL chips](#pal-chips) (32)
 - [Shared chips and support logic](#shared-chips-and-support-logic) (99)
 - [ND-bus devices (floppy, Winchester, tape)](#nd-bus-devices-floppy-winchester-tape) (7)
@@ -165,7 +165,6 @@ is on [HIERARCHY.md](HIERARCHY.md) (made from a yosys elaboration).
 | [CPU_CS_ACAL_17](CPU-BOARD-3202/circuit/doc/CPU_CS_ACAL_17.md) | MICRO ADDR CALC UNIT | `CPU-BOARD-3202/circuit/CPU_CS_ACAL_17.v` |
 | [CPU_CS_CTL_18](CPU-BOARD-3202/circuit/doc/CPU_CS_CTL_18.md) | CS CONTROL | `CPU-BOARD-3202/circuit/CPU_CS_CTL_18.v` |
 | [CPU_CS_PROM_19](CPU-BOARD-3202/circuit/doc/CPU_CS_PROM_19.md) | PROMS | `CPU-BOARD-3202/circuit/CPU_CS_PROM_19.v` |
-| [CPU_CS_PROM_19_ORG](CPU-BOARD-3202/circuit/doc/CPU_CS_PROM_19_ORG.md) | Logisim-evolution goes FPGA automatic generated Verilog code | `CPU-BOARD-3202/circuit/CPU_CS_PROM_19_ORG.v` |
 | [CPU_CS_TCV_20](CPU-BOARD-3202/circuit/doc/CPU_CS_TCV_20.md) | CS TRANSCEIVERS | `CPU-BOARD-3202/circuit/CPU_CS_TCV_20.v` |
 | [CPU_CS_WCS_21_22](CPU-BOARD-3202/circuit/doc/CPU_CS_WCS_21_22.md) | Writable Control Store | `CPU-BOARD-3202/circuit/CPU_CS_WCS_21_22.v` |
 | [CPU_MMU_24](CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md) | MMU TOP LEVEL | `CPU-BOARD-3202/circuit/CPU_MMU_24.v` |

@@ -29,7 +29,7 @@ check themselves are registered in `Verilog/tests/run_all_tests.sh`.
 | CPU/CS            | CONTROL STORE         | 16    | CPU  | [CPU_CS_16.v](circuit/CPU_CS_16.v) | [Test](circuit/CPU_CS_16/readme.md) |
 | CPU/CS/ACAL       | MICRO ADDR CALC       | 17    | CPU  | [CPU_CS_ACAL_17.v](circuit/CPU_CS_ACAL_17.v) | [Test](circuit/CPU_CS_ACAL_17/readme.md) |
 | CPU/CS/CTL        | CS CONTROL            | 18    | CPU  | [CPU_CS_CTL_18.v](circuit/CPU_CS_CTL_18.v) | [Test](circuit/CPU_CS_CTL_18/readme.md) |
-| CPU/CS/PROM       | CS PROMS              | 19    | CPU  | [CPU_CS_PROM_19.v](circuit/CPU_CS_PROM_19.v) | [Test](circuit/CPU_CS_PROM_19/readme.md). `CPU_CS_PROM_19_ORG.v` is the original Logisim-generated version. |
+| CPU/CS/PROM       | CS PROMS              | 19    | CPU  | [CPU_CS_PROM_19.v](circuit/CPU_CS_PROM_19.v) | [Test](circuit/CPU_CS_PROM_19/readme.md). |
 | CPU/CS/TCV        | CS TRANSCIEVERS       | 20    | CPU  | [CPU_CS_TCV_20.v](circuit/CPU_CS_TCV_20.v) | [Test](circuit/CPU_CS_TCV_20/readme.md) |
 | CPU/CS/WCS        | WRITABLE CTRL STORE   | 21-22 | CPU  | [CPU_CS_WCS_21_22.v](circuit/CPU_CS_WCS_21_22.v) | [Test](circuit/CPU_CS_WCS_21_22/readme.md) |
 | CPU/LAPA          | LA TO PPN BUFF        | 23    | CPU  | none | One line of code in `CPU_15.v` |

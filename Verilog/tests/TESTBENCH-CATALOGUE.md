@@ -14,7 +14,7 @@ One row per RTL module in the three main areas. Coverage is measured, not assume
 
 ## CPU board 3202D
 
-52 modules - **36 DIRECT** (36 linked into `make test`), 11 indirect, **5 with no testbench**.
+51 modules - **36 DIRECT** (36 linked into `make test`), 11 indirect, **4 with no testbench**.
 
 | Module | Coverage | Testbench | in `make test` |
 |---|---|---|---|
@@ -33,7 +33,6 @@ One row per RTL module in the three main areas. Coverage is measured, not assume
 | `CPU-BOARD-3202/circuit/CPU_CS_ACAL_17.v` | **DIRECT** | `CPU_CS_ACAL_17_tb.v` | yes |
 | `CPU-BOARD-3202/circuit/CPU_CS_CTL_18.v` | **DIRECT** | `CPU_CS_CTL_18_tb.v` | yes |
 | `CPU-BOARD-3202/circuit/CPU_CS_PROM_19.v` | **DIRECT** | `CPU_CS_PROM_19_tb.v` | yes |
-| `CPU-BOARD-3202/circuit/CPU_CS_PROM_19_ORG.v` | **NONE** | - | - |
 | `CPU-BOARD-3202/circuit/CPU_CS_TCV_20.v` | **DIRECT** | `CPU_CS_TCV_20_tb.v` | yes |
 | `CPU-BOARD-3202/circuit/CPU_CS_WCS_21_22.v` | COMPILED | compiled by a registered target | yes |
 | `CPU-BOARD-3202/circuit/CPU_MMU_24.v` | COMPILED | compiled by a registered target | yes |
@@ -96,7 +95,7 @@ One row per RTL module in the three main areas. Coverage is measured, not assume
 | Module | Coverage | Testbench | in `make test` |
 |---|---|---|---|
 | `DELILAH-CPU/CGA/circuit/BusDriver16.v` | **DIRECT** | `BusDriver16_tb.v` | yes |
-| `DELILAH-CPU/CGA/circuit/CGA.v` | INDIRECT | named in `CPU_CS_RWCS_CYCLE_tb.v` (+96) | - |
+| `DELILAH-CPU/CGA/circuit/CGA.v` | INDIRECT | named in `CPU_CS_RWCS_CYCLE_tb.v` (+95) | - |
 | `DELILAH-CPU/CGA/circuit/ND120_PF_CAPTURE.v` | **DIRECT** | `ND120_PF_CAPTURE_tb.v` | yes |
 | `DELILAH-CPU/CGA_ALU/circuit/CGA_ALU.v` | **DIRECT** | `CGA_ALU_tb.v` | yes |
 | `DELILAH-CPU/CGA_ALU/circuit/CGA_ALU_ARG.v` | **DIRECT** | `CGA_ALU_ARG_tb.v` | yes |
@@ -201,7 +200,6 @@ Note on the `assign` column: the Logisim-generated style wires nets together wit
 | Module | `always` | `assign` | submodules | kind |
 |---|---|---|---|---|
 | `CPU-BOARD-3202/circuit/IO_37.v` | 2 | 83 | 4 | **HIGH** |
-| `CPU-BOARD-3202/circuit/CPU_CS_PROM_19_ORG.v` | 2 | 5 | 0 | **HIGH** |
 | `CPU-BOARD-3202/circuit/CPU_PROC_32.v` | 1 | 79 | 4 | **HIGH** |
 | `CPU-BOARD-3202/circuit/BIF_BCTL_6.v` | 1 | 62 | 5 | **HIGH** |
 | `CPU-BOARD-3202/circuit/BIF_5.v` | 0 | 71 | 2 | MED |
@@ -216,7 +214,7 @@ Modules marked **NONE** have no testbench at all. This is a backlog, not a failu
 
 | Area | Modules | DIRECT | linked | INDIRECT | NONE |
 |---|---|---|---|---|---|
-| CPU board 3202D | 52 | 36 | 36 | 11 | 5 |
+| CPU board 3202D | 51 | 36 | 36 | 11 | 4 |
 | Decoder gate array (DGA) | 11 | 8 | 7 | 3 | 0 |
 | DELILAH CPU gate array (CGA) | 92 | 88 | 88 | 4 | 0 |
 
