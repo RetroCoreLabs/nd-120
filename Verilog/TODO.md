@@ -166,26 +166,23 @@ were never kept, so the "6 of 42" count cannot be checked. Settling it: keep the
 run captured at 8N1 (pyserial) and one at 7E1 with `ParityReplace=63`, from the same board
 output, then count the bytes whose bit 7 differs from the even parity of their low 7 bits.
 
-## Terminal: does PED query the terminal?
+## Terminal: PED on the Nexys (captured, analysed)
 
-`terminal_ctrl.v` answers no reports (DA `ESC[c`, CPR `ESC[6n`, DSR) - it has no
-path back to the host. If PED sends one and waits, it would look like "PED does not
-respond to keys". Not measured. Experiment: log the bytes PED sends at start-up
-(TeraTerm log on the board's console) and look for `ESC [ c` or `ESC [ 6 n`.
-Background: `docs/worklog-2026-08-31-vt100-terminal-uart-overrun.md`.
-Static check of PED and the VT100 (type 6) terminal table on the SINTRAN
-image found no query string (no `ESC[c`, `ESC Z`, `ESC[6n`, `ESC[5n`); the
-type-6 init string is `ESC <`, `ESC[?3l`, `ESC =`, `ESC(B`, `ESC)0`. PED's
-machine code was not decoded, so a reply read is not ruled out. Other leads:
-PED function commands on non-NOTIS terminals start with FUNC (Ctrl-underscore,
-octal 37), which the board keyboard must send; and VTM decodes keys only for
-the terminal type it was told, so the line must be set to type 6. A wire
-capture at PED start-up settles it.
-PED could not be run on the Nexys booted from the SMD system (`21540&`, SINTRAN L):
-PED stops at once with `UE-ERRORS-ENG-A:ERR missing`, and `LIST-FILES` on the board
-shows that file is not on that disc (only `UE-ERMSG-*-*:ERR`; it has `PED-ENG-J:PROG`,
-no `BPUN`). The Winchester image has the file. To capture PED's start-up bytes: boot the
-Winchester system (`20500&`), log in, start PED, log COM11 (9600 7E1) as hex.
+Captured on the Nexys (Winchester system, COM11 9600 7E1): PED sends NO terminal query. It asks
+the USER `What is your terminal type?` (menu; 6 = DEC VT100 80 columns) and sends nothing until
+answered. After `6` it sends: init `ESC <  ESC[?3l  ESC =  ESC(B  ESC)0`, cursor moves with
+3-digit zero-padded parameters (`ESC[001;001H`), `ESC[2J`, `ESC[2K`, a status line, a ruler row,
+`ESC[2;7m` (SGR 2 = dim, then 7 = reverse) for the bottom bar, `ESC[4m` underline, and the
+DEC line-drawing set through SO/SI (`0E q 0F`, `0E n 0F`). It answers keys on the wire (`X`
+redraws a region table, CR redraws the screen). So "PED does not respond to keypresses" is NOT
+a PED query problem and not a serial fault.
+Read from `Terminals/rtl/terminal_ctrl.v`: every sequence above is in its handled set (cursor
+move, ED, EL, SGR 0/1/4/5/7, SO/SI, `ESC )0`); SGR 2 is swallowed on purpose. `ESC <` and
+`ESC =` were not checked. Not yet done: send the captured bytes into the terminal core in
+simulation and compare the screen, and check what the board keyboard sends for PED's keys (PED
+on non-NOTIS terminals takes FUNC = Ctrl-underscore, octal 37, as a prefix).
+The PED run needs the Winchester system (`20500&`): the SMD system's disc has no
+`UE-ERRORS-ENG-A:ERR`, so PED stops at once there.
 
 ## Owned elsewhere (from the 02-AUG-2026 plan)
 
@@ -218,6 +215,16 @@ same fixes as `ND_SMD.v` (commit d30dc5c in that repository).
 fit the 75 MB entry.** `nd_smd.c` takes the smallest table entry whose capacity holds the image.
 The 75 MB entry (5 heads, 18 sectors, 823 cylinders) holds 75,847,680 bytes; the BIGDISK0 image
 is 78,643,200 bytes, so the twin picks the 150 MB entry (10 heads) and would compute other LBAs
+Checked against the manual and nd100x: `ND_SMD.v` (5 heads) is right and `nd_smd.c` is wrong for
+this image. The SINTRAN System Supervisor manual lists 36,945 pages for a 75 MB drive (5 surfaces,
+823 tracks, 18 sectors, 1024 bytes), and `ndtool -i` on the image reports 36,945 pages available;
+the SMD controller manual (ND-11.020.01) gives 5 surfaces for 38/75 MB and 10 for 150 MB. nd100x
+(`smd_disk_type_for_size`) picks the largest layout that fits INSIDE the file (the 75 MB one); the
+twin picks the smallest layout that holds the file, so any image padded past a drive's exact size
+gets the next bigger drive. Still open: the label does not rule out a 150 MB disc cut into two 75 MB
+directories (36,945 pages is also that size), and the drive type SINTRAN records for the image was
+not traced. Fix belongs in NDDeviceCore `smd_select_geometry` (exact match first, then largest
+fit); not done.
 than `ND_SMD.v` (5 heads) for the same C/H/S. Not run on a board; found by the arithmetic.
 
 **Open: SMD points where `ND_SMD.v` and `nd_smd.c` still differ from nd100x (`device_smd.c`),
