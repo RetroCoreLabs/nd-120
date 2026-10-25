@@ -46,7 +46,9 @@ constant QNICE_FIRMWARE           : string  := QNICE_FIRMWARE_M2M;
 -- then add all the clocks speeds here by adding more constants.
 ----------------------------------------------------------------------------------------------------------
 
--- The console's pixel clock, 800x600@60 at one pixel per clock (clk.vhd)
+-- The core's main clock (clk.vhd main_clk): the SDRAM bridge and the
+-- framework's keyboard scan. The whole console runs on a separate 25.197 MHz
+-- output of the same MMCM (video_clk_o) - clk.vhd says why.
 constant CORE_CLK_SPEED       : natural := 40_000_000;
 
 -- System clock speed (crystal that is driving the FPGA) and QNICE clock speed
@@ -62,9 +64,12 @@ constant QNICE_CLK_SPEED      : natural := 50_000_000;   -- a change here has de
 --    VGA_*   size of the core's target output post scandoubler
 --    If in doubt, use twice the values found in this link:
 --    https://mister-devel.github.io/MkDocs_MiSTer/advanced/nativeres/#arcade-core-default-native-resolutions
--- The terminal core's native 800x600 (Verilog/Terminals/rtl/terminal_top.v)
-constant VGA_DX               : natural := 800;
-constant VGA_DY               : natural := 600;
+-- The MEGA65 runs the shared terminal core (Verilog/Terminals/rtl/
+-- terminal_top.v) at 640x480: 80x24 text + the 5-row operator panel fill it
+-- exactly (rtl/nd120_console_mega65.v). The framework's OSM is then 40x30
+-- characters of the 16x16 font - config.vhd's texts are wrapped to 38.
+constant VGA_DX               : natural := 640;
+constant VGA_DY               : natural := 480;
 
 --    FONT_*  size of one OSM character
 constant FONT_FILE            : string  := "../font/Anikki-16x16-m2m.rom";

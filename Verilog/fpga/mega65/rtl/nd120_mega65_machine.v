@@ -11,7 +11,10 @@
 //! MiSTer2MEGA65 framework's contract, which CORE/vhdl/main.vhd hands in:
 //!
 //!   keyboard   the framework's 1 kHz key scan -> nd120_console_mega65
-//!   video      RGB + syncs + blanks at 40 MHz, one pixel per clock
+//!   video      RGB + syncs + blanks at 25.197 MHz, one pixel per clock,
+//!              640x480@60 (why not 800x600 at 40 MHz: CORE/vhdl/clk.vhd -
+//!              the framework's HDMI rescaler cannot store a 40 Mpx/s
+//!              picture in the HyperRAM fast enough)
 //!   storage    vdrives (MiSTer sd_* protocol, BYTE-wide buffer, QNICE
 //!              clock) -> nd_storage_vdrives -> the same three
 //!              controller-facing adapters the MiSTer and Nexys use
@@ -30,8 +33,12 @@
 //! "same PLL, edge-aligned" rule holds):
 //!   clk_cpu      20 MHz   the CPU board (13.333 MHz on R3, see build.tcl;
 //!                         BOARD_CLK_FREQ must say the same)
-//!   clk_2x       40 MHz   SDRAM bridge clock AND the console's pixel clock
+//!   clk_2x       40 MHz   SDRAM bridge clock; the framework's keyboard scan
+//!                         arrives in this domain
 //!   clk_2x_sdram 40 MHz   180 degrees, the SDRAM chip's clock pin
+//!   clk_pix  25.197 MHz   the WHOLE console: terminal, keyboard decoder,
+//!                         UART bridge (fractional output of the same MMCM,
+//!                         so NOT edge-related to the others)
 //!   clk_qnice    50 MHz   the framework's QNICE clock: vdrives' sd_* side
 //!   hr_clk      100 MHz   the framework's HyperRAM clock: the Avalon side
 //!
@@ -49,16 +56,18 @@ module nd120_mega65_machine #(
     input wire clk_cpu,        //! 20 MHz
     input wire clk_2x,         //! 40 MHz, same MMCM, edge-aligned
     input wire clk_2x_sdram,   //! 40 MHz, 180 degrees (SDRAM builds)
+    input wire clk_pix,        //! 25.197 MHz, the console's clock (pixel, keyboard decoder, UART bridge)
     input wire rst_n,          //! async, active low, released in the clk_2x domain
+    input wire rst_pix_n,      //! async, active low: framework reset + pix MMCM lock; release synchronised here
     input wire cache_on,       //! CACHE_SW: 1 = the CPU's own cache enabled
 
-    // ---- keyboard scan (clk_2x domain) ----
+    // ---- keyboard scan (clk_2x domain; sampled on clk_pix after 32 stable clocks) ----
     input wire [6:0] key_num,
     input wire       key_pressed_n,
     input wire [1:0] text_colour,
     input wire       panel_enable,
 
-    // ---- video (clk_2x domain) ----
+    // ---- video (clk_pix domain) ----
     output wire [7:0] video_r,
     output wire [7:0] video_g,
     output wire [7:0] video_b,
@@ -163,12 +172,28 @@ module nd120_mega65_machine #(
   wire [15:0] s_panel_mips;
   wire        s_lamp_hdd_rd, s_lamp_hdd_wr, s_lamp_flp_rd, s_lamp_flp_wr;
 
+  // The pixel domain's reset: asserted asynchronously with the framework's
+  // reset or the MMCM losing lock, released on clk_pix - the same shape as
+  // cpu_rst_sync above, so the terminal's renderer never sees a release edge
+  // that violates its recovery time.
+  reg [1:0] pix_rst_sync = 2'b00;
+  always @(posedge clk_pix or negedge rst_pix_n) begin
+    if (!rst_pix_n) pix_rst_sync <= 2'b00;
+    else            pix_rst_sync <= {pix_rst_sync[0], 1'b1};
+  end
+  wire s_pix_rst_n = pix_rst_sync[1];
+
+  // The whole console runs on the pixel clock (why: nd120_console_mega65.v).
+  // key_num/key_pressed_n arrive from the framework's 40 MHz scan and are
+  // sampled inside after 32 stable clocks; everything else that enters the
+  // console is quasi-static (OSD bits), already synchronised (the panel's
+  // machine signals, in terminal_top) or a serial line (the UART bridge).
   nd120_console_mega65 #(
       .FONT_FILE ("embedded"),
       .LOCAL_ECHO(LOCAL_ECHO)
   ) CONSOLE (
-      .clk  (clk_2x),
-      .rst_n(rst_n),
+      .clk  (clk_pix),
+      .rst_n(s_pix_rst_n),
 
       .key_num      (key_num),
       .key_pressed_n(key_pressed_n),
@@ -217,15 +242,16 @@ module nd120_mega65_machine #(
   // 7 DATA BITS + PARITY on receive - SINTRAN's boot text carries software
   // parity in bit 7, and an 8N1 receiver hands the terminal bytes >= 0x7F
   // that it drops, losing every other character of those lines. 8N1 on
-  // transmit. 115200 fixed. Both on the 40 MHz console clock.
+  // transmit. 115200 fixed. Both on the console clock, 25.197 MHz: the
+  // divisor rounds to 219, i.e. 115 055 baud, -0.13%.
   console_uart_rx #(
-      .CLK_HZ   (40_000_000),
+      .CLK_HZ   (25_197_000),
       .BAUD     (115_200),
       .DATA_BITS(7),
       .PARITY   (1'b1)
   ) CONSOLE_UART_RX (
-      .clk        (clk_2x),
-      .rst_n      (rst_n),
+      .clk        (clk_pix),
+      .rst_n      (s_pix_rst_n),
       .divisor_ovr(16'd0),
       .rxd        (s_cpu_txd),
       .byte_valid (s_cpu_byte_valid),
@@ -233,14 +259,14 @@ module nd120_mega65_machine #(
   );
 
   console_uart_tx #(
-      .CLK_HZ    (40_000_000),
+      .CLK_HZ    (25_197_000),
       .BAUD      (115_200),
       .DATA_BITS (8),
       .PARITY    (1'b0),
       .PARITY_ODD(1'b0)
   ) CONSOLE_UART_TX (
-      .clk        (clk_2x),
-      .rst_n      (rst_n),
+      .clk        (clk_pix),
+      .rst_n      (s_pix_rst_n),
       .divisor_ovr(16'd0),
       .byte_valid (s_kbd_valid),
       .byte_data  (s_kbd_data),

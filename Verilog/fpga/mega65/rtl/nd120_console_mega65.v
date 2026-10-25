@@ -21,10 +21,35 @@
 //! THE VIDEO END. The framework wants a pixel clock, a pixel enable, RGB
 //! 8:8:8, syncs and SEPARATE hblank/vblank in the video clock domain, and
 //! scales whatever it is given for HDMI while passing it straight out on
-//! VGA. We hand it the terminal's own 800x600@60 at one pixel per clock
-//! (40.000 MHz, ce = 1), the same mode the Nexys and MiSTer builds use - one
-//! tested configuration rather than one per board. hblank/vblank come from
-//! the terminal core (ports added 02-SEP-2026 for this board).
+//! VGA. We hand it the terminal core at 640x480@60, one pixel per clock
+//! (25.197 MHz, ce = 1). The WHOLE console - terminal, keyboard decoder,
+//! UART bridge - runs on that one clock, exactly as on the other boards:
+//! the terminal core carries its cursor/scroll state from its byte side to
+//! its pixel side without a synchroniser, which is right only while the two
+//! are one clock. The framework's key scan arrives from its 40 MHz domain;
+//! m65_keys_to_ps2 samples a key only after 32 stable clocks, so that
+//! crossing needs nothing else. hblank/vblank come from the terminal core.
+//!
+//! WHY 640x480 AND NOT THE 800x600 THE NEXYS AND MiSTer USE. The MEGA65 is
+//! the one board whose HDMI goes through a frame-buffer rescaler in a slow
+//! external memory: the framework's ascal stores every input pixel in the
+//! 8-bit 100 MHz HyperRAM (~75 clocks per 128-byte burst) and reads it back
+//! for the HDMI mode from the same chip. The rescaler's input buffer is two
+//! 128-byte halves with no back-pressure, so a half must be drained within
+//! ~151 clocks or the input overwrites it and that chunk is lost. 800x600 at
+//! 40 Mpx/s x 24 bpp filled a half every 107 clocks: chunks were lost
+//! whenever the output side was reading, which in 720p is nearly always -
+//! the torn, colour-rotated picture the R6 tester filmed. 640x480 at
+//! 25.2 Mpx/s with the rescaler storing 16 bpp (CORE/vhdl/framework-
+//! overrides/digital_pipeline.vhd) fills a half every 254 clocks and loads
+//! the chip ~45% in 720p60. Numbers and the comparison with the other M2M
+//! cores: CORE/vhdl/clk.vhd and docs/00-plan.md.
+//!
+//! The 80x24 text (640x384) plus one blank row and the 5-row operator panel
+//! (80 lines) is 480 lines exactly, so the grid starts on line 0 (ORIGIN_Y
+//! 0 below); terminal_top's own centring would push the panel off the
+//! bottom. Nothing in the shared terminal core changes - these are its
+//! parameters.
 //!
 //! B1 (02-SEP-2026) has no ND-120 in it. `cpu_*` is wired but nothing
 //! drives it: the banner prints, then the keyboard echoes locally. That
@@ -49,8 +74,8 @@ module nd120_console_mega65 #(
     //! both shows every character twice.
     parameter LOCAL_ECHO = 1
 ) (
-    input wire clk,    //! pixel clock, 40.000 MHz for 800x600@60
-    input wire rst_n,  //! async reset, active low, in the pixel domain
+    input wire clk,    //! the console clock = the pixel clock, 25.197 MHz for 640x480@60 (clk.vhd)
+    input wire rst_n,  //! async reset, active low, release synchronised to clk
 
     //! The framework's keyboard scan (main_kb_key_num_i / _pressed_n_i)
     input wire [6:0] key_num,
@@ -194,7 +219,24 @@ module nd120_console_mega65 #(
   wire [2:0] s_colour;
 
   terminal_top #(
-      .FONT_FILE(FONT_FILE)
+      .FONT_FILE    (FONT_FILE),
+      //! 640x480@60: 800 x 525 total, VESA 25.175 MHz (ours 25.197). The
+      //! syncs stay POSITIVE (vga_timing's default): the framework's
+      //! rescaler and video mixer want them so (m2m/doc/temp/
+      //! VS-HS-Polarity.md); the HDMI mode's own polarity is made by the
+      //! framework on the way out.
+      .H_VISIBLE    (640),
+      .H_FRONT_PORCH(16),
+      .H_SYNC       (96),
+      .H_BACK_PORCH (48),
+      .V_VISIBLE    (480),
+      .V_FRONT_PORCH(10),
+      .V_SYNC       (2),
+      .V_BACK_PORCH (33),
+      //! 24 rows x 16 = 384 text lines, one blank row, then the 5-row panel
+      //! (term_panel's origin is ORIGIN_Y + ROWS*CELL_H + CELL_H = 400) = 480.
+      .ORIGIN_X     (0),
+      .ORIGIN_Y     (0)
   ) TERMINAL (
       .byte_clk  (clk),
       .byte_rst_n(rst_n),

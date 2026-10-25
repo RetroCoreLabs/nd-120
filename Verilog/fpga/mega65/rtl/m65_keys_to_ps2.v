@@ -75,10 +75,15 @@
 `default_nettype none
 
 module m65_keys_to_ps2 (
-    input wire clk,                  //! pixel clock, 40.000 MHz for 800x600@60 (from nd120_console_mega65.clk)
+    input wire clk,                  //! the console clock, 25.197 MHz (from nd120_console_mega65.clk)
     input wire rst_n,  //! async reset, active low
 
-    //! The framework's scan, in this clock domain.
+    //! The framework's scan. It is produced in the framework's 40 MHz main
+    //! clock domain and sampled here on the console clock: a key is only
+    //! looked at once `key_num` has held still for 32 clocks (below), so a
+    //! value caught mid-change simply restarts the wait. Each key is
+    //! presented for ~350 clocks here (555 at 40 MHz), so the wait never
+    //! misses a key.
     input wire [6:0] key_num,        //! 0..79
     input wire       key_pressed_n,  //! 0 = key `key_num` is down (debounced)
 

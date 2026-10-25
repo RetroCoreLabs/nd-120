@@ -2,6 +2,10 @@
 #
 #   make test-keys     MEGA65 keyboard scan -> PS/2 events, through the shared TDV decoder
 #   make test-console  the console glue: keyboard path, banner, echo, video shape
+#   make vtest         the WHOLE machine (R6 configuration, 16-bit SDRAM model) booted
+#                      in Verilator --timing; RETURN typed through the framework's
+#                      key scan must be answered by MOPC with a new '#' - the full
+#                      keyboard path to the CPU and back (~3 min; lint_machine.sh)
 #   make lint          Verilator lint over the MEGA65 glue + the terminal core
 #   make clean
 #
@@ -32,7 +36,7 @@ TERM_SRC = $(TERM)/terminal_top.v $(TERM)/terminal_ctrl.v $(TERM)/terminal_ctrl_
            $(TERM)/term_banner.v $(TERM)/term_banner_rom.v \
            $(TERM)/term_console_feed.v $(TERM)/term_panel.v $(TERM)/term_panel_rom.v $(TERM)/rate_meter.v $(TERM)/ratio_meter.v
 
-.PHONY: all test-keys test-console test-storage-vdrives test-storage-devices test-avalon-port lint clean
+.PHONY: all test-keys test-console test-storage-vdrives test-storage-devices test-avalon-port vtest lint clean
 
 all: test-keys test-console test-storage-vdrives test-storage-devices test-avalon-port
 	@echo "MEGA65 core: all testbenches passed"
@@ -94,6 +98,9 @@ VVFLAGS = --lint-only -Wall \
   -Wno-BLKSEQ -Wno-DECLFILENAME -Wno-EOFNEWLINE -Wno-LATCH -Wno-PINCONNECTEMPTY \
   -Wno-PINMISSING -Wno-SYNCASYNCNET -Wno-TIMESCALEMOD -Wno-UNDRIVEN \
   -Wno-UNOPTFLAT -Wno-UNUSED -Wno-WIDTH
+
+vtest:
+	bash lint_machine.sh sdram vtest
 
 lint:
 	$(VERILATOR) $(VVFLAGS) --top-module nd120_console_mega65 \

@@ -10,13 +10,22 @@
 ## Important: Using them in subsequent statements, e.g. clock dividers requires that they
 ## have been named/defined here before
 ## otherwise Vivado does not find the pins)
-create_generated_clock -name main_clk      [get_pins CORE/clk_gen/i_clk_main/CLKOUT0]
-# ND-120 (02-SEP-2026): the machine's other two clocks from the same MMCM
-# (CORE/vhdl/clk.vhd): the CPU at 20 MHz and the SDRAM chip clock at 40 MHz,
-# 180 degrees. build.tcl bounds the crossings from cpu_clk to the framework's
-# qnice_clk and hr_clk after synthesis (set_max_delay -datapath_only).
+# ND-120: the machine's four clocks from one MMCM (CORE/vhdl/clk.vhd): the
+# console's clock (25.197 MHz: pixels, keyboard decoder, UART bridge) on the
+# fractional CLKOUT0, the CPU at 20 MHz, the SDRAM chip clock at 40 MHz 180
+# degrees, and main_clk (40 MHz: the SDRAM bridge, the framework's keyboard
+# scan). main_clk, cpu_clk and sdram_clk are integer divisions of one VCO
+# and stay timed as related (the bridge depends on it). pix_clk is
+# fractional and relates to none of them; what crosses into it is the
+# framework's key scan (m65_keys_to_ps2 samples it after 32 stable clocks),
+# the panel's machine signals from cpu_clk (two-flop chains in terminal_top)
+# and quasi-static OSD bits, and build.tcl bounds those crossings after
+# synthesis with set_max_delay -datapath_only, as it does cpu_clk to the
+# framework's qnice_clk and hr_clk.
+create_generated_clock -name pix_clk       [get_pins CORE/clk_gen/i_clk_main/CLKOUT0]
 create_generated_clock -name cpu_clk       [get_pins CORE/clk_gen/i_clk_main/CLKOUT1]
 create_generated_clock -name sdram_clk     [get_pins CORE/clk_gen/i_clk_main/CLKOUT2]
+create_generated_clock -name main_clk      [get_pins CORE/clk_gen/i_clk_main/CLKOUT3]
 
 
 ## ---------------------------------------------------------------------------

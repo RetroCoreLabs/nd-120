@@ -35,7 +35,7 @@ entity main is
       G_VDNUM                 : natural                     -- amount of virtual drives
    );
    port (
-      clk_main_i              : in  std_logic;              -- 40 MHz: console pixel clock, SDRAM bridge clock
+      clk_main_i              : in  std_logic;              -- 40 MHz: SDRAM bridge clock; the framework's keyboard scan arrives on it
       reset_soft_i            : in  std_logic;
       reset_hard_i            : in  std_logic;
       pause_i                 : in  std_logic;
@@ -47,6 +47,8 @@ entity main is
       -- ND-120: the machine's other clocks, from the same MMCM (clk.vhd)
       clk_cpu_i               : in  std_logic;              -- 20 MHz
       clk_sdram_i             : in  std_logic;              -- 40 MHz, 180 degrees
+      clk_pix_i               : in  std_logic;              -- 25.197 MHz: the console's clock, pixels + keyboard decoder + UART bridge (= the framework's video_clk)
+      rst_pix_i               : in  std_logic;              -- active high, synchronous to clk_pix_i (MMCM lock)
 
       -- ND-120: settings from the OSD
       text_colour_i           : in  std_logic_vector(1 downto 0);   -- 0 green 1 amber 2 white 3 cyan
@@ -154,7 +156,9 @@ architecture synthesis of main is
          clk_cpu          : in  std_logic;
          clk_2x           : in  std_logic;
          clk_2x_sdram     : in  std_logic;
+         clk_pix          : in  std_logic;
          rst_n            : in  std_logic;
+         rst_pix_n        : in  std_logic;
          cache_on         : in  std_logic;
          key_num          : in  std_logic_vector(6 downto 0);
          key_pressed_n    : in  std_logic;
@@ -211,6 +215,7 @@ architecture synthesis of main is
    end component;
 
    signal rst_n        : std_logic;
+   signal rst_pix_n    : std_logic;
    signal rst_qnice_n  : std_logic;
    signal key_num_slv  : std_logic_vector(6 downto 0);
 
@@ -225,8 +230,11 @@ architecture synthesis of main is
 begin
 
    -- The whole machine runs on the framework's reset (either button press),
-   -- asynchronous and active low into the Verilog side.
+   -- asynchronous and active low into the Verilog side. The pixel domain
+   -- takes the same buttons plus its own clock's lock; the Verilog side
+   -- synchronises the release onto clk_pix.
    rst_n       <= not (reset_soft_i or reset_hard_i);
+   rst_pix_n   <= not (reset_soft_i or reset_hard_i or rst_pix_i);
    rst_qnice_n <= not rst_qnice_i;
    key_num_slv <= std_logic_vector(to_unsigned(kb_key_num_i, 7));
 
@@ -250,7 +258,9 @@ begin
          clk_cpu          => clk_cpu_i,
          clk_2x           => clk_main_i,
          clk_2x_sdram     => clk_sdram_i,
+         clk_pix          => clk_pix_i,
          rst_n            => rst_n,
+         rst_pix_n        => rst_pix_n,
          cache_on         => cache_on_i,
          key_num          => key_num_slv,
          key_pressed_n    => kb_key_pressed_n_i,
@@ -305,7 +315,8 @@ begin
          disc_activity    => disc_activity_o
       );
 
-   -- One pixel per clock: the console's 40 MHz IS the pixel clock.
+   -- One pixel per clock: the console's 25.197 MHz pix_clk IS the pixel clock,
+   -- and mega65.vhd hands that clock to the framework as video_clk_o.
    video_ce_o     <= '1';
    video_ce_ovl_o <= '1';
 

@@ -9,6 +9,9 @@
 #                      - runSim FF-mode console against the golden log
 #                      - fpga/tang-nano-20k vtest (full Tang boot + deposit
 #                        + verified readback, ~100 s)
+#                      - fpga/mega65 vtest (full R6 machine boot on a 16-bit
+#                        SDRAM model, RETURN through the framework's key scan
+#                        answered by MOPC, ~3 min)
 #
 #   make test-tape   heavy system gate for the Verilog tape-400 device
 #                    (ND-BUS-DEVICES): boots INSTRUCTION-B twice via
@@ -105,6 +108,8 @@ test-full: test
 	  cmp /tmp/nd120_console_check.log golden/console_ff_golden.log
 	@echo "==== system gate: Tang vtest (boot + deposit + readback) ===="
 	$(MAKE) -C fpga/tang-nano-20k/sim vtest
+	@echo "==== system gate: MEGA65 vtest (boot + keyboard path to MOPC) ===="
+	$(MAKE) -C fpga/mega65/sim vtest
 	$(MAKE) test-floppy-stdin
 	$(MAKE) test-smd-boot
 	$(MAKE) test-democore

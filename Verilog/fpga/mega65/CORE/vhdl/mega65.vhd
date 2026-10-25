@@ -245,10 +245,12 @@ architecture synthesis of MEGA65_Core is
 -- Clocks and active high reset signals for each clock domain
 ---------------------------------------------------------------------------------------------
 
-signal main_clk               : std_logic;               -- Core main clock: 40 MHz, console + SDRAM bridge
+signal main_clk               : std_logic;               -- Core main clock: 40 MHz, SDRAM bridge + the framework's keyboard scan
 signal main_rst               : std_logic;
 signal cpu_clk                : std_logic;               -- 20 MHz, the ND-120 CPU
 signal sdram_clk              : std_logic;               -- 40 MHz at 180 degrees, the SDRAM chip
+signal pix_clk                : std_logic;               -- 25.197 MHz, the console's pixel clock (the framework's video_clk)
+signal pix_rst                : std_logic;
 
 ---------------------------------------------------------------------------------------------
 -- main_clk (MiSTer core's clock)
@@ -352,9 +354,13 @@ begin
    main_joy_2_fire_n_o  <= '1';
 
 
-   -- MMCME2_ADV clock generators:
-   --   ND-120 console pixel clock: 40.000 MHz (clk.vhd)
-   -- The CPU clock per revision (docs/00-plan.md, 02-SEP-2026): 20 MHz on
+   -- MMCME2_ADV clock generators (clk.vhd, one MMCM):
+   --   main_clk 40 MHz (SDRAM bridge, the framework's keyboard scan),
+   --   pix_clk 25.197 MHz (the whole console: 640x480@60 pixels, keyboard
+   --   decoder, UART bridge - why it is not the 40 MHz main clock is
+   --   explained at the top of clk.vhd: the framework's HDMI rescaler cannot
+   --   store a 40 Mpx/s picture in the HyperRAM fast enough).
+   -- The CPU clock per revision (docs/00-plan.md): 20 MHz on
    -- R4/R5/R6; 13.333 MHz on R3, where the HyperRAM configuration's netlist
    -- times the CGA's IDB ring through a longer loop-break (57 ns) - a path
    -- that cannot happen but that the tool cannot prove, so the period is
@@ -365,16 +371,20 @@ begin
       )
       port map (
          sys_clk_i         => clk_i,           -- expects 100 MHz
-         main_clk_o        => main_clk,        -- 40 MHz: console pixel clock, SDRAM bridge
+         main_clk_o        => main_clk,        -- 40 MHz: SDRAM bridge, the framework's keyboard scan
          main_rst_o        => main_rst,        -- CORE's reset, synchronized
          cpu_clk_o         => cpu_clk,         -- 20 MHz: the ND-120
-         sdram_clk_o       => sdram_clk        -- 40 MHz at 180 degrees
+         sdram_clk_o       => sdram_clk,       -- 40 MHz at 180 degrees
+         pix_clk_o         => pix_clk,         -- 25.197 MHz: the console's pixel clock
+         pix_rst_o         => pix_rst          -- its reset, synchronized
       ); -- clk_gen
 
    main_clk_o  <= main_clk;
    main_rst_o  <= main_rst;
-   video_clk_o <= main_clk;
-   video_rst_o <= main_rst;
+   -- The video clock domain the framework consumes IS the pixel clock, as in
+   -- the Apple II core (video_clk /= main_clk is a supported shape).
+   video_clk_o <= pix_clk;
+   video_rst_o <= pix_rst;
 
    ---------------------------------------------------------------------------------------------
    -- main_clk (MiSTer core's clock)
@@ -413,12 +423,14 @@ begin
 
          clk_cpu_i            => cpu_clk,
          clk_sdram_i          => sdram_clk,
+         clk_pix_i            => pix_clk,
+         rst_pix_i            => pix_rst,
 
          text_colour_i        => main_text_colour,
          panel_enable_i       => main_osm_control_i(C_MENU_PANEL),
          cache_on_i           => main_osm_control_i(C_MENU_CACHE),
 
-         -- Video output: 800x600 @ 60 Hz, one pixel per main_clk (40 MHz)
+         -- Video output: 640x480 @ 60 Hz, one pixel per pix_clk (25.197 MHz)
          video_ce_o           => video_ce_o,
          video_ce_ovl_o       => video_ce_ovl_o,
          video_red_o          => video_red_o,

@@ -48,11 +48,51 @@ The whole machine, two revisions, one `build.tcl`:
 | Main memory R4-R6 | `MEM_RAM_49_SDRAM` + `sdram18` (ND_SDRAM_PACK16 + DQ16, refresh 7 us), pins through `CORE/vhdl/framework-overrides/top_mega65-r{4,5,6}.vhd` | proven on the DE10-Nano's 16-bit module; the R6 chip is the same shape (32M x 16, A[12:0], BA[1:0]) |
 | Main memory R3 | `MEM_RAM_49_DDR2` (Nexys cache + MEM_HOLD) over `rtl/nd_avalon_port.v` on the framework's `hr_core_*` port, window at word 0x200000 | seam proven on the Nexys DDR2; the port passes `sim/nd_avalon_port_tb.v` (burst and single-beat, random wait/latency, 300 random ops); the HyperRAM controller is the framework's, proven in every M2M core |
 | Storage | `rtl/nd_storage_vdrives.v` (the MiSTer `nd_storage_hps.v` on vdrives' byte-wide bus) + `rtl/nd_storage_mega65_devices.v` (fd0 fd1 wd0 wd1 tape) | `sim/nd_storage_vdrives_tb.v` (8 checks) and `sim/nd_storage_mega65_devices_tb.v` (floppy R/W both drives, Winchester R/W both units, tape stream/rewind/EOF) against `sim/vdrives_model.v`; the vdrives side is the framework's, proven in the C64 core |
-| Console | `Verilog/Terminals/` on the framework's video, `rtl/m65_keys_to_ps2.v` + the shared TDV decoder, 7E1 UART bridge at 115200 | `sim/m65_keys_to_ps2_tb.v` (60 keycap checks), `sim/nd120_console_mega65_tb.v`; the console-only bitstreams (B1) closed timing on both revisions |
+| Console | `Verilog/Terminals/` on the framework's video, `rtl/m65_keys_to_ps2.v` + the shared TDV decoder, 7E1 UART bridge at 115200 | `sim/m65_keys_to_ps2_tb.v` (60 keycap checks), `sim/nd120_console_mega65_tb.v`; **`make vtest` (`sim/nd120_mega65_machine_tb.v`): the whole R6 machine booted in Verilator on a 16-bit SDRAM model, RETURN typed through the framework's key scan answered by MOPC with a new `#`, twice** - the full keyboard path scan -> decoder -> UART -> SC2661 -> MOPC, after the first tester reported the console keyboard dead; the console-only bitstreams (B1) closed timing on both revisions |
 | Machine top | `rtl/nd120_mega65_machine.v` (Verilog) under `CORE/vhdl/main.vhd` + `mega65.vhd` (VHDL skin, vdrives x5, HyperRAM port, SDRAM pins, OSD: text colour, panel, cache, HDMI mode) | Verilator lint clean in both memory configurations (`sim/lint_machine.sh sdram|hyperram`); Vivado elaborates and synthesises the whole thing |
-| Clocks | `CORE/vhdl/clk.vhd`: one MMCM -> 40 MHz (console pixel + SDRAM bridge), CPU 20 MHz on R4-R6 / **13.333 MHz on R3** (the R3 netlist times the CGA IDB ring through a longer loop-break, 57 ns; the period is made to fit it rather than untiming the internal data bus), 40 MHz @180 SDRAM chip; `CORE.xdc` names them; `build.tcl` bounds cpu_clk<->qnice_clk and cpu_clk<->hr_clk with `set_max_delay -datapath_only` | the bridge's "same PLL" rule holds by construction |
+| Clocks | `CORE/vhdl/clk.vhd`: one MMCM -> 40 MHz main (SDRAM bridge, the framework's keyboard scan), **25.197 MHz console clock** on the fractional CLKOUT0 (the whole console: 640x480@60 pixels, keyboard decoder, UART bridge; see the budget below), CPU 20 MHz on R4-R6 / **13.333 MHz on R3** (the R3 netlist times the CGA IDB ring through a longer loop-break, 57 ns; the period is made to fit it rather than untiming the internal data bus), 40 MHz @180 SDRAM chip; `CORE.xdc` names them; `build.tcl` bounds cpu_clk<->qnice_clk, cpu_clk<->hr_clk and the crossings into pix_clk with `set_max_delay -datapath_only` | the bridge's "same PLL" rule holds by construction |
 | Packaging | `make all BOARD=r6` / `r3` -> `build/<board>/nd120_mega65_<board>.cor` via `coretool` (model byte, CRC, FPGA-part check); `.cor` version = the banner stamp | `--verify` on both |
 | Boot verdict without a monitor | case power LED: amber = self-test running / halted, green = MACL2 reached (self-test passed) | wired from the CPU board's own green lamp |
+
+### Video data rate and the HyperRAM budget
+
+The first R6 tester's picture tore in every HDMI mode above 480p (diagonal
+streaks, colour noise, the panel drawn twice) and showed red flecks in
+720x480; the welcome screen and the framework menu were clean. The cause is
+the data rate of our picture into the framework's HDMI path, not sync:
+
+- The framework's `ascal` rescaler stores every input pixel in the board's
+  HyperRAM and reads it back for the HDMI mode. That is ONE 8-bit chip at
+  100 MHz; a 128-byte burst costs ~75 clocks (`hyperram_ctrl.vhd`: command,
+  latency 4, data, recovery), so the chip moves ~170 MB/s for writes and
+  reads together.
+- The rescaler's input buffer is 2 x 128 bytes with no back-pressure
+  (`ascal.vhd` `i_dpram`, write queue depth 1 + 1). Writes have priority but
+  must wait for a read already in flight, so a half must be drained within
+  2 + 75 + 74 = **151 clocks** of filling, or the input overwrites it and that
+  chunk is lost. At 24 bpp a 128-byte chunk is 42 2/3 pixels, so a lost chunk
+  also rotates R/G/B for the rest of the line - the colour noise.
+- 800x600 at 40 Mpx/s x 24 bpp filled a half every **107 clocks**: lost
+  chunks whenever the output side was reading, which in 720p is nearly
+  always. The other M2M cores feed the rescaler 7.9 Mpx/s (C64) and
+  14.3 Mpx/s (Apple II); we fed it 2.8x anything it had been used with.
+
+| console into the rescaler | half-buffer fill | margin vs 151 | chip load, 720p60 |
+|---|---|---|---|
+| 800x600 @ 40 MHz, 24 bpp (first release) | 107 clocks | **-44** | 105 % |
+| 800x600 @ 40 MHz, 16 bpp | 160 | +9 (+2 after the 5-clock toggle delay) | 72 % |
+| 640x480 @ 25.2 MHz, 24 bpp | 169 | +18 | 67 % |
+| **640x480 @ 25.2 MHz, 16 bpp (now)** | 254 | **+103** | 45 % |
+
+Load = (write bursts + read bursts per second) x 75 clocks / 100 MHz; reads
+are one input line per input line per frame (nearest-neighbour, `o_readlev`).
+In 480p/576p the rescaler downscales first and the first release ran at
+~75 %, which is why those modes were nearly clean. Where it is implemented:
+the pixel clock in `CORE/vhdl/clk.vhd`, the 640x480 parameters in
+`rtl/nd120_console_mega65.v`, the 16 bpp format in
+`CORE/vhdl/framework-overrides/digital_pipeline.vhd` (the framework hard-wires
+24 bpp), `VGA_DX/DY` in `globals.vhd`, the OSM texts re-wrapped to 38
+columns in `config.vhd`.
 
 **First full R6 build (02-SEP 15:32):** synthesis and implementation went
 through; WNS -0.174 ns on 17 endpoints that were ONE bug (vdrives' mount

@@ -381,6 +381,28 @@ foreach {src dst lim} [list \
     $_chr  $_ccpu $_cpu_ns] {
     set_max_delay -datapath_only -from $src -to $dst $lim
 }
+# The console's pixel clock (CORE.xdc pix_clk, 25.197 MHz) is the MMCM's
+# fractional output: Vivado would otherwise time its crossings against the
+# tightest alignment of 31.75 and 20 (or 40/60) VCO cycles, a few hundred ps.
+# What crosses it: the framework's key scan from main_clk (m65_keys_to_ps2
+# samples a key only after 32 stable clocks), the panel's raw machine signals
+# from cpu_clk (two-flop chains in terminal_top), and the quasi-static OSD
+# bits. The whole console itself - terminal, keyboard decoder, UART bridge -
+# is inside pix_clk. Same shape as above: one destination period each.
+set _cpix  [get_clocks -quiet pix_clk]
+set _cmain [get_clocks -quiet main_clk]
+if {[llength $_cpix] == 0 || [llength $_cmain] == 0} {
+    puts "ERROR: expected clocks not found (pix_clk/main_clk). Present: [get_clocks]"
+    exit 1
+}
+set _pix_ns [expr {1.0e9 / 25197000.0}]
+foreach {src dst lim} [list \
+    $_cmain $_cpix  $_pix_ns \
+    $_cpix  $_cmain 25.000 \
+    $_ccpu  $_cpix  $_pix_ns \
+    $_cpix  $_ccpu  $_cpu_ns] {
+    set_max_delay -datapath_only -from $src -to $dst $lim
+}
 # The OSD cache switch: a quasi-static bit from the framework's main_clk
 # synchroniser into the machine's own 2-FF synchroniser on cpu_clk
 # (nd120_mega65_machine.v s_cache_sync). Not a data path.

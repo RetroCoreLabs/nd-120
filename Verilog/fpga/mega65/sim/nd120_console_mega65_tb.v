@@ -38,7 +38,7 @@ module nd120_console_mega65_tb;
 
   reg clk = 1'b0;
   reg rst_n = 1'b0;
-  always #12.5 clk = ~clk;   // 40 MHz
+  always #19.84 clk = ~clk;   // 25.197 MHz: the console clock = the pixel clock (clk.vhd CLKOUT0)
 
   reg [6:0]  key_num = 7'd0;
   reg        key_pressed_n = 1'b1;
@@ -353,7 +353,8 @@ module nd120_console_mega65_tb;
     expect_exit("Alt+X");
 
     //------------------------------------------------------------------
-    // 8. Video shape over more than one full frame (1056 x 628 clocks).
+    // 8. Video shape over more than one full frame (800 x 525 pixel clocks:
+    //    640x480@60 on this board, see nd120_console_mega65.v).
     //------------------------------------------------------------------
     // Zero the counters on a NEGEDGE: the sampling block above increments
     // them with non-blocking assignments on the posedge, and a blocking
@@ -362,7 +363,7 @@ module nd120_console_mega65_tb;
     // de_count came out as the whole run's total, 526548).
     @(negedge clk);
     v_samples = 0; v_de_shape_errs = 0; v_rgb_errs = 0; v_de_count = 0; v_green_count = 0;
-    repeat (1056 * 628 + 2000) @(posedge clk);
+    repeat (800 * 525 + 2000) @(posedge clk);
     if (v_de_shape_errs != 0) begin
       $display("FAIL: de != !(hblank|vblank) on %0d of %0d clocks", v_de_shape_errs, v_samples);
       errors = errors + 1;
@@ -375,12 +376,13 @@ module nd120_console_mega65_tb;
     end else begin
       $display("-- RGB black outside de");
     end
-    // 800x600 visible of 1056x628 total: de should be high ~72% of the time
-    if (v_de_count < 470000 || v_de_count > 490000) begin
-      $display("FAIL: de high on %0d clocks per frame-ish, expected ~480000 (800x600)", v_de_count);
+    // 640x480 visible of 800x525 total: de should be high ~73% of the time.
+    // 307200 per frame, plus the 2000-clock tail's share of the next one.
+    if (v_de_count < 300000 || v_de_count > 316000) begin
+      $display("FAIL: de high on %0d clocks per frame-ish, expected ~307200 (640x480)", v_de_count);
       errors = errors + 1;
     end else begin
-      $display("-- de covers %0d clocks, consistent with 800x600", v_de_count);
+      $display("-- de covers %0d clocks, consistent with 640x480", v_de_count);
     end
     if (v_green_count == 0) begin
       $display("FAIL: no green text pixels at all - palette or ink path dead");

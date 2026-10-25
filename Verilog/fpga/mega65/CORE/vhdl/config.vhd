@@ -76,27 +76,33 @@ type WHS_RECORD_ARRAY_TYPE is array (0 to WHS_RECORDS - 1) of WHS_RECORD_TYPE;
 
 constant SCR_WELCOME : string :=
 
+   -- The console is 640x480 (globals.vhd VGA_DX/DY), so the OSM is 40
+   -- characters wide and, inside the full-screen frame, 38 usable. Every
+   -- line below is <= 38 characters; the help pages count their leading
+   -- space.
    "ND-120 for MEGA65\n" &
-   "Norsk Data ND-120 (1988) minicomputer in FPGA\n\n" &
+   "Norsk Data ND-120 (1988) minicomputer\n" &
+   "in FPGA\n\n" &
 
    -- We are not insisting. But it would be nice if you gave us credit for MiSTer2MEGA65 by leaving these lines in
-   "Powered by MiSTer2MEGA65 Version [WIP],\n" &
+   "Powered by MiSTer2MEGA65 V2.0.1,\n" &
    "done by sy2002 and MJoergen in 2022\n\n" &
 
-   "A full ND-120 CPU board with 4 MB of memory,\n" &
-   "a Tandberg TDV2200 terminal on this screen\n" &
-   "and keyboard, and two floppy drives, two\n" &
-   "Winchester discs and a paper tape reader\n" &
-   "served from image files on the SD card.\n" &
+   "A full ND-120 CPU board with 4 MB of\n" &
+   "memory, a Tandberg TDV2200 terminal on\n" &
+   "this screen and keyboard, two floppy\n" &
+   "drives, two Winchester discs and a\n" &
+   "paper tape reader, served from image\n" &
+   "files on the SD card.\n" &
    "\n" &
    "Getting started:\n" &
-   " 1. Put your disc images in /nd120 on the\n" &
-   "    SD card. HELP opens the menu; under\n" &
-   "    Drives, mount them.\n" &
-   " 2. Press RETURN: the microprogram answers\n" &
-   "    with the OPCOM prompt.\n" &
-   " 3. Type 20500& to boot SINTRAN III from\n" &
-   "    Winchester 0.\n" &
+   " 1. Put your disc images in /nd120 on\n" &
+   "    the SD card. HELP opens the menu;\n" &
+   "    under Drives, mount them.\n" &
+   " 2. Press RETURN: the microprogram\n" &
+   "    answers with the OPCOM prompt.\n" &
+   " 3. Type 20500& to boot SINTRAN III\n" &
+   "    from Winchester 0.\n" &
    "\n" &
    "    Press Space to continue.\n";
 
@@ -104,48 +110,51 @@ constant HELP_1 : string :=
 
    "\n ND-120 for MEGA65\n\n" &
 
-   " Port done in 2026 (github: nd-120 repo)\n" &
+   " Port done in 2026 (github: nd-120)\n" &
    " Powered by MiSTer2MEGA65\n" &
    "\n" &
-   " The machine: ND-120 CPU (the 1988 Norsk\n" &
-   " Data DELILAH gate arrays), 4 MB memory,\n" &
-   " MMU with cache, panel clock, and the ND-100\n" &
-   " bus controllers for floppy, Winchester and\n" &
-   " paper tape.\n" &
+   " The machine: ND-120 CPU (the 1988\n" &
+   " Norsk Data DELILAH gate arrays), 4 MB\n" &
+   " memory, MMU with cache, panel clock,\n" &
+   " and the ND-100 bus controllers for\n" &
+   " floppy, Winchester and paper tape.\n" &
    "\n" &
-   " The console is a Tandberg TDV2200 terminal,\n" &
-   " 80x25 at 800x600 60 Hz: VGA shows it as is,\n" &
-   " HDMI is scaled by the framework (mode in\n" &
-   " this menu). The bottom of the screen is the\n" &
-   " operator panel: program level, lamps, MIPS.\n" &
+   " The console is a Tandberg TDV2200\n" &
+   " terminal, 80x24 at 640x480 60 Hz: VGA\n" &
+   " shows it as is, HDMI is scaled by the\n" &
+   " framework (mode in this menu). The\n" &
+   " bottom of the screen is the operator\n" &
+   " panel: program level, lamps, MIPS.\n" &
    "\n" &
 
-   " Cursor right to learn more.       (1 of 3)\n" &
+   " Cursor right to learn more. (1 of 3)\n" &
    " Press Space to close the help screen.";
 
 constant HELP_2 : string :=
 
    "\n Booting and discs\n\n" &
 
-   " Images go in /nd120 on the SD card and are\n" &
-   " mounted from the Drives section. Slots:\n" &
-   "   Floppy 0/1, Winchester 0/1, Tape.\n" &
+   " Images go in /nd120 on the SD card\n" &
+   " and are mounted from the Drives\n" &
+   " section. Slots: Floppy 0/1,\n" &
+   " Winchester 0/1, Tape.\n" &
    "\n" &
-   " At the OPCOM prompt (RETURN if you do not\n" &
-   " see it):\n" &
-   "   20500&   boot SINTRAN III from Winch. 0\n" &
-   "   1560&    boot from floppy 0\n" &
+   " At the OPCOM prompt (RETURN if you\n" &
+   " do not see it):\n" &
+   "   20500&  boot SINTRAN III, Winch. 0\n" &
+   "   1560&   boot from floppy 0\n" &
    "\n" &
-   " The case power LED is the CPU verdict:\n" &
-   "   amber = master clear / self-test running\n" &
-   "   green = self-test passed, OPCOM alive\n" &
+   " The case power LED is the verdict:\n" &
+   "   amber = self-test running\n" &
+   "   green = self-test passed, OPCOM up\n" &
    "\n" &
-   " Keys type what the keycaps say; INST/DEL is\n" &
-   " Backspace, CLR/HOME is Home, F1-F8 and the\n" &
-   " cursor keys send the TDV2200 codes.\n" &
+   " Keys type what the keycaps say;\n" &
+   " INST/DEL is Backspace, CLR/HOME is\n" &
+   " Home, F1-F8 and the cursor keys send\n" &
+   " the TDV2200 codes.\n" &
    "\n" &
 
-   " Crsr left: Prev  Crsr right: Next (2 of 3)\n" &
+   " Crsr left/right: Prev/Next (2 of 3)\n" &
    " Press Space to close the help screen.";
 
 constant HELP_3 : string :=
@@ -153,22 +162,25 @@ constant HELP_3 : string :=
    "\n If something is wrong\n\n" &
 
    " Black screen but this menu works: the\n" &
-   " framework is fine, the terminal is not.\n" &
+   " framework is fine, the terminal is\n" &
+   " not.\n" &
    "\n" &
-   " Banner but no OPCOM prompt after RETURN:\n" &
-   " the CPU did not pass its self-test (power\n" &
-   " LED amber). Say which memory your board\n" &
-   " has (R3: HyperRAM, R4-R6: SDRAM).\n" &
+   " Banner but no OPCOM prompt after\n" &
+   " RETURN: the CPU did not pass its\n" &
+   " self-test (power LED amber). Say\n" &
+   " which memory your board has (R3:\n" &
+   " HyperRAM, R4-R6: SDRAM).\n" &
    "\n" &
-   " OPCOM but 20500& prints nothing: no image\n" &
-   " mounted on Winchester 0, or the image is\n" &
-   " not a bootable SINTRAN disc.\n" &
+   " OPCOM but 20500& prints nothing: no\n" &
+   " image mounted on Winchester 0, or the\n" &
+   " image is not a bootable SINTRAN disc.\n" &
    "\n" &
-   " Please report the banner line (git hash,\n" &
-   " date, board revision) with a photo.\n" &
+   " Please report the banner line (git\n" &
+   " hash, date, board revision) with a\n" &
+   " photo.\n" &
    "\n" &
 
-   " Cursor left to go back.           (3 of 3)\n" &
+   " Cursor left to go back.     (3 of 3)\n" &
    " Press Space to close the help screen.";
 
 -- Concatenate all your Welcome and Help screens into one large string, so that during synthesis one large string ROM can be build.

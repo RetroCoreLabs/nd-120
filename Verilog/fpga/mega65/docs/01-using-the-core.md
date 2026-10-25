@@ -48,7 +48,7 @@ the flash menu shows - so the flashed build is identifiable there too.
 1. The framework's welcome page (our text: what the core is, how to boot).
    **Space** closes it. It shows again after every reset
    (`WELCOME_AT_RESET` in `config.vhd`).
-2. The terminal: green 80x25 text, the banner (`ND-120 ...`, git hash +
+2. The terminal: green 80x24 text at 640x480, the banner (`ND-120 ...`, git hash +
    build date, `MEGA65 R3 - 13.33 MHz - HyperRAM 4 MB - cache on` or the
    R6 line), the operator panel below the text.
 3. The case **power LED** is the CPU's self-test verdict: blue while the
