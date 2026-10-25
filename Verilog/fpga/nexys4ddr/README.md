@@ -345,6 +345,39 @@ is clean**. `build.tcl` reads WNS after routing and refuses to write a
 bitstream when it is negative, so a missed target fails the build instead of
 producing a board that boots erratically.
 
+## Booting from the disc images
+
+Both disc controllers are built in: the Winchester (ST506 card, IOX 500) and
+the SMD (IOX 1540). Each is served from a file in the root of the microSD
+card.
+
+| Command at the `#` prompt | What it loads | Card file |
+|---------------------------|---------------|-----------|
+| `20500&` | SINTRAN III from the Winchester (mass load) | `WD0.IMG` (`WD1.IMG` for unit 1) |
+| `21540&` | SINTRAN III from the SMD (mass load) | `SMD0.IMG` |
+| `1560&` | floppy, byte-stream load (TPE Monitor) | `FLOPPY1.IMG` |
+| `400$` | papertape | `BOOT.TAP` |
+
+The leading `2` in `20500&` and `21540&` is bit 13 of the address word: it
+selects MASS storage load. `1540&` (no leading 2) is the byte-stream load, which
+does not boot SINTRAN. `201540&` is not a valid form.
+
+Measured on the board with the build in `build.tcl` (33 MHz, cache on): both
+`20500&` and `21540&` reach `SINTRAN III RUNNING` and the watchdog line. The two
+images are different systems (the banner names them), so the controllers are
+separate disks, not two views of one.
+
+Commands go in UPPERCASE with about 0.3 s between characters, or the console
+drops characters.
+
+Console speed is set by slide switch SW7: on = 9600, off = 115200 (both 7 data
+bits, even parity). On the board used for these measurements the
+console answered at 9600.
+
+A line `DIRECTORY ENTERED BY ANOTHER SYSTEM` at boot means the image was left
+entered by an emulator that was stopped without releasing it. It is a warning;
+the boot continues. `ndtool --release <image>` (norskdata-ndfs) clears it.
+
 ## Board I/O map
 
 **The complete indicator reference is [`DEBUG-PANEL.md`](DEBUG-PANEL.md)** -
