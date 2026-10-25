@@ -650,6 +650,22 @@ Makefile never does (about 600 more slots if it did). Where the extra cost
 sat, OSS vs Gowin: the SD stack `u_engine` (+1606 LUT+ALU), the CPU gate
 array (+1343), the floppy (+481).
 
+### SMD and Winchester together on the Tang: does not fit (measured)
+
+The guard in `ND120_TANG20K_TOP.v` stops TANG_SMD and TANG_WD together for want of
+a BSRAM block. Tested by removing the guard and building the fast20 variant:
+
+| Build | Logic | BSRAM | Place and route |
+|-------|-------|-------|-----------------|
+| SMD + Winchester + tape reader | 97% | 46 of 46 | failed, 553 unrouted nets |
+| SMD + Winchester, tape reader removed | 97% | 45 of 46 | failed, 269 unrouted nets |
+| SMD + tape reader (no Winchester) | 89% | 45 of 46 | routed; `21540&` boots SINTRAN in 26 s |
+| Winchester + tape reader (the default) | 87% | 45 of 46 | routed; `20500&` boots SINTRAN |
+
+Removing the tape reader frees one BSRAM block, but logic stays at 97% and the
+router still leaves nets open. Whether freeing more logic would close it is
+not measured. The Nexys has room for both and boots both.
+
 ### Get a timing-clean Tang build above 20.25 MHz
 
 `fast20` (20.25 MHz) is the fastest timing-clean build (TNS 0, Fmax
