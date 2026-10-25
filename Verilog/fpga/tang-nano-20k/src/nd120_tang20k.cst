@@ -4,16 +4,22 @@
 // NOTE: ../ND120_TOP.cst is a STALE Tang Nano 9K pinout - do not use it.
 // NOTE (Gowin EDA): the O_sdram_*/IO_sdram_* ports are auto-connected to the
 // on-package SDRAM and must NOT be constrained here. The OSS flow (the
-// PRIMARY flow since 12-JUL-2026, see docs/tang20k-build-flows.md) appends
+// second flow, see ../README.md "Two build flows") appends
 // ../sdram-test/src/sdram_pins_oss.cst automatically (Makefile build/oss.cst).
 
+// IO_TYPE=LVCMOS33 on sys_clk/s1/s2 is REQUIRED from Gowin V1.9.12.03 on.
+// V1.9.10.02 silently gave an unconstrained input LVCMOS18 and accepted it
+// in a 3.3 V bank (see the good build's pin report: sys_clk LVCMOS18,
+// BankVccio 3.3). V1.9.12.03 rejects that as ERROR CT1136 "Bank 7/3
+// vccio(3.3) is locked ... conflicting BANK_VCCIO ... LVCMOS18". Banks 3
+// and 7 are 3.3 V on the Tang Nano 20K, so 3.3 V is the true value.
 IO_LOC "sys_clk" 4;
-IO_PORT "sys_clk" PULL_MODE=UP;
+IO_PORT "sys_clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
 
 IO_LOC "s1" 88;
-IO_PORT "s1" PULL_MODE=NONE;
+IO_PORT "s1" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
 IO_LOC "s2" 87;
-IO_PORT "s2" PULL_MODE=NONE;
+IO_PORT "s2" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
 
 // BL616 USB serial (one COM port on the host, 9600 8N1 for OPCOM)
 IO_LOC "uart_txp" 69;
