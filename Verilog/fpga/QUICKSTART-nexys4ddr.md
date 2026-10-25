@@ -93,8 +93,23 @@ To go back to a plain board, restore the demo or move JP1 back to JTAG.
 
 ### 2. Disc image and boot
 
-1. Copy a Winchester disc image onto the FAT32 microSD (root directory)
-   and insert it. The image is **not** part of the release - it contains
+1. Copy the disc images onto the FAT32 microSD (root directory) and insert
+   it. The file names are fixed; the core opens exactly these:
+
+   | File on the card | What it is | Boot command |
+   |---|---|---|
+   | `WD0.IMG` | Winchester disc 0, the SINTRAN III system disc | `20500&` |
+   | `WD1.IMG` | Winchester disc 1 (optional) | |
+   | `SMD0.IMG` | SMD disc 0, a SINTRAN III system disc (optional) | `21540&` |
+   | `FLOPPY1.IMG` | floppy drive 0 (optional) | `1560&` |
+   | `FLOPPY2.IMG` | floppy drive 1 (optional) | |
+   | `BOOT.TAP` | paper tape (optional) | `400$` |
+
+   Both disc controllers are in the Nexys build. `20500&` and `21540&` are
+   MASS loads and boot SINTRAN III; `1540&` (no leading 2) is only the
+   byte-stream load.
+
+   The images are **not** part of the release - they contain
    SINTRAN III, which is not this project's to distribute. The ND software
    preservation community keeps images; `ndtool` builds and inspects them.
 2. Open the terminal (settings above). You are at the machine's OPCOM
@@ -117,7 +132,8 @@ To go back to a plain board, restore the demo or move JP1 back to JTAG.
 1. Format the microSD FAT32. Copy **both** files to the root directory:
    - **exactly ONE `.bit`** file (the config controller picks the `.bit`
      it finds - two on one card is asking for the wrong one)
-   - the Winchester disc image
+   - the Winchester disc image, named `WD0.IMG` (the other image names are
+     in the table under Path 1, step 2)
 2. Set **two** jumpers (both verified on hardware):
    - **JP1** ("MODE", the header up by the DONE LED): move the blue
      jumper cap to the **far-right position, covering pins 3 and 4** -

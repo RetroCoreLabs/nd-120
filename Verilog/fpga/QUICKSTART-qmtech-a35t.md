@@ -205,6 +205,9 @@ plain 8.3 names (the build strips long-filename support to save space):
 | `WD0.IMG` | Winchester disc 0 - this is the one SINTRAN boots from |
 | `FLOPPY1.IMG` | floppy, optional |
 
+These three names are exact: the core opens only these. There is no SMD disc
+(`SMD0.IMG`, `1540&`) in the QMTech build.
+
 The disc images are **not** part of the release: they contain SINTRAN III,
 which is not this project's to distribute. The ND software preservation
 community keeps images, and `ndtool` builds and inspects them.

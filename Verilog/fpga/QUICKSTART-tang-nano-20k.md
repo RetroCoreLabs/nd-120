@@ -51,10 +51,26 @@ WSL note: the board must be attached to WSL first
 
 ## 3. Disc image
 
-Copy a Winchester disc image onto the FAT32 microSD (root directory) and
-insert it. The image is **not** part of the release - it contains
-SINTRAN III, which is not this project's to distribute. The ND software
-preservation community keeps images; `ndtool` builds and inspects them.
+Copy the disc images onto the FAT32 microSD, in the **root directory**, and
+insert it. Here the file names are fixed: the core opens exactly these
+names, 8.3 style (long file names are switched off in this build).
+
+| File on the card | What it is | Boot command |
+|---|---|---|
+| `WD0.IMG` | Winchester disc 0, the SINTRAN III system disc | `20500&` |
+| `FLOPPY1.IMG` | floppy drive 0 (optional) | `1560&` |
+| `BOOT.TAP` | paper tape (optional) | `400$` |
+
+SMD disc: `SMD0.IMG`, booted with `21540&`. It is **not** in the standard
+bitstream. The SMD controller and the Winchester cannot both fit in this
+FPGA (one block of RAM is missing), so an SMD bitstream is a separate build
+with `TANG_SMD` defined and `TANG_WD` removed in `src/tang20k_defines.v`.
+In that build there is no `WD0.IMG` and no `20500&`, and `SMD0.IMG` can be
+at most 2,818,048 bytes.
+
+The images are **not** part of the release - they contain SINTRAN III,
+which is not this project's to distribute. The ND software preservation
+community keeps images; `ndtool` builds and inspects them.
 
 ## 4. Console and boot
 
