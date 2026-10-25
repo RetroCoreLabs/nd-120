@@ -552,7 +552,6 @@ module ND_SMD #(
       s_word_cnt     <= s_words_left[15:0];
       s_word_cnt_hi  <= s_words_left[23:16];
       clr_ff;
-      s_on_cyl[s_unit]    <= 1'b0;
       s_not_ready[s_unit] <= 1'b1;
       s_eng      <= E_IDLE;
       s_dma_wait <= 1'b0;
@@ -601,7 +600,7 @@ module ND_SMD #(
       s_ecc_count    <= 16'd0;
       s_sel_unit     <= 3'd0;
       s_disk_selected<= 1'b0;
-      s_on_cyl       <= 8'd0;
+      s_on_cyl       <= 8'hFF;   // powered-up drives sit on cylinder
       s_not_ready    <= 8'd0;
       s_seek_complete<= 8'd0;
       s_cwr          <= 1'b0;
@@ -800,8 +799,13 @@ module ND_SMD #(
             s_rft       <= 1'b1;               // oracle: ready = true (top)
             if (!iox_wdata[0]) s_irq <= 1'b0;  // int-enable clear drops line
 
-            // selecting a unit puts it on-cylinder
-            if (~iox_wdata[9]) s_on_cyl[iox_wdata[9:7]] <= 1'b1;
+            // No forcing of s_on_cyl here: on-cylinder is drive state. A powered-up
+            // drive sits on cylinder, and only a
+            // seek (M6, M7) puts it back; forcing it on at every control word made
+            // status b14 permanently 1. Source: nd100x (device_smd.c), whose DISC-TEMA
+            // fixes removed the same forcing; NOT from ND-11.020.01, which only says
+            // on-cylinder drops on an initiate seek and returns on arrival (this model
+            // positions the heads instantly, so M4 shows no drop).
 
             if (iox_wdata[4]) begin
               // ---- Device clear ----
@@ -833,6 +837,10 @@ module ND_SMD #(
             end else if (iox_wdata[2]) begin
               // ---- GO ----
               s_abnormal <= 1'b0;   // b12 reports on THIS operation
+              // Illegal load (b5) is per operation too: a stray illegal load must not
+              // keep b4 set for every later command. Source: nd100x (device_smd.c,
+              // ExecuteGO), which cites DISC-TEMA; NOT from ND-11.020.01.
+              s_illegal  <= 1'b0;
               if (iox_wdata[9]) begin
                 // no unit selected -> DRIVE_NOT_SELECTED
                 s_hw_err2 <= 1'b1;
@@ -877,7 +885,6 @@ module ND_SMD #(
                   s_rft    <= 1'b0;
                   s_active <= 1'b0;
                   clr_ff;
-                  s_on_cyl[iox_wdata[9:7]]    <= 1'b0;
                   s_not_ready[iox_wdata[9:7]] <= 1'b1;
                   s_eng      <= E_IDLE;
                   s_dma_wait <= 1'b0;

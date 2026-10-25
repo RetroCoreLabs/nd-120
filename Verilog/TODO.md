@@ -193,16 +193,15 @@ The 75 MB entry (5 heads, 18 sectors, 823 cylinders) holds 75,847,680 bytes; the
 is 78,643,200 bytes, so the twin picks the 150 MB entry (10 heads) and would compute other LBAs
 than `ND_SMD.v` (5 heads) for the same C/H/S. Not run on a board; found by the arithmetic.
 
-**Open: SMD points where `ND_SMD.v` still differs from nd100x (`device_smd.c`), found by
-reading both; not settled by the SMD manual (ND-11.020.01).** Fixed from the manual (RTL and C twin): the
-head and cylinder range check, seek-complete raised only by a seek (not by a transfer or a
-device clear), status b12 abnormal completion, and the address and word counters kept current
-when a transfer fails part way. Left as they are, because nothing we hold decides them:
-- Status b5 (illegal load) stays set until a device clear; nd100x clears it at each GO (its
-  comment cites DISC-TEMA, whose message text is not in our manuals).
-- Status b14 (on cylinder) is forced to 1 by every control word (`ND_SMD.v`, the "selecting a
-  unit puts it on-cylinder" line); nd100x removed that. The manual says on-cylinder drops on
-  an initiate seek and returns on arrival; the instant M4 never shows the drop.
+**Open: SMD points where `ND_SMD.v` and `nd_smd.c` still differ from nd100x (`device_smd.c`),
+found by reading both.** Fixed from the manual (ND-11.020.01), RTL and C twin: the head and
+cylinder range check, seek-complete raised only by a seek (not by a transfer or a device
+clear), status b12 abnormal completion, and the address and word counters kept current when a
+transfer fails part way. Done on nd100x's evidence ONLY (its comments cite DISC-TEMA, whose
+message text is not in our manuals; the SMD manual does not state either): status b5 (illegal
+load) is cleared at each GO, and status b14 (on cylinder) is no longer forced to 1 by every
+control word (powered-up drives start on cylinder, errors leave it alone, M6/M7 set it). If a
+real DISC-TEMA run on the SMD disagrees, these two are the ones to revisit. Still different:
 - M6 with no earlier seek completes at once (nd100x times out, b6); M5 does not check its
   word count (nd100x raises a timeout unless it is a whole number of tracks); a register load
   while the unit is off cylinder is not an illegal load; write protect and "unit not

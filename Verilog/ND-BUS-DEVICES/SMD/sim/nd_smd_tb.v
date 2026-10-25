@@ -737,6 +737,29 @@ module nd_smd_tb;
     check((rdata & 16'h0100) === 0, "last legal C/H/S flagged address mismatch");
     check((rdata & 16'h1000) === 0, "last legal C/H/S set abnormal completion");
 
+    // 4d: illegal load (b5) is per operation. A register load while the
+    //     controller is active sets b5 (and b4); the next GO starts clean.
+    //     Source: nd100x (ExecuteGO clears it, citing DISC-TEMA); the SMD
+    //     manual only says what sets b5. A device clear is NOT used here.
+    load_core(24'h00A000);
+    load_block(16'd2, 16'd1);
+    load_wcnt(24'd1500);
+    iox_write(16'o001545, 16'h0004);   // GO: M0, 1500 words (busy for a while)
+    iox_write(16'o001543, 16'h0002);   // block address I while active: illegal
+    wait_ready();
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h0020) !== 0, "illegal load while active: b5 not set");
+    check((rdata & 16'h0010) !== 0, "illegal load while active: b4 not set");
+    load_core(24'h006000);
+    load_block(16'd0, 16'd0);
+    load_wcnt(24'd16);
+    iox_write(16'o001545, 16'h0004);   // next GO
+    wait_ready();
+    iox_read(16'o001544, rdata);
+    check((rdata & 16'h0020) === 0, "illegal load (b5) still set after the next GO");
+    check((rdata & 16'h0010) === 0, "error OR (b4) still set after the next GO");
+    check((rdata & 16'h4000) !== 0, "on-cylinder b14 lost");
+
     // 5: interrupt + IDENT: M0 read with interrupt enabled
     check(bint11_n === 1'b1, "BINT11 asserted before enable");
     load_core(24'h006000);

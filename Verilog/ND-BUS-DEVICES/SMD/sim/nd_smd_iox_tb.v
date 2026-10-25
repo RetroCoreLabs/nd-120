@@ -418,6 +418,9 @@ module nd_smd_iox_tb;
     check(r[8]  === 1'b1, "14: cylinder 823 must set address mismatch b8");
     check(r[12] === 1'b1, "14: address mismatch must set abnormal completion b12");
     check(r[4]  === 1'b1, "14: address mismatch must set the error OR b4");
+    // On-cylinder is drive state: an address error does not move the heads, and
+    // no control word forces it (nd100x; not stated in ND-11.020.01).
+    check(r[14] === 1'b1, "14: address mismatch must leave on-cylinder b14 alone");
     check(r[2]  === 1'b0, "14: address mismatch must not leave the controller active");
     ctrl_word(1'b0, 1'b0, 1'b0, 1'b1, 3'd0);      // device clear
     iox_read(BASE + 16'd4, r);
