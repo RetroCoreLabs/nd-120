@@ -676,7 +676,7 @@ def microcode_state():
 def submodule_state():
     """[(path, state)] from `git submodule status`; state 'ok', 'missing' or '?'."""
     try:
-        r = subprocess.run(["git", "submodule", "status"], cwd=ROOT, stdout=subprocess.PIPE,
+        r = subprocess.run(["git", "submodule", "status", "--recursive"], cwd=ROOT, stdout=subprocess.PIPE,
                            stderr=subprocess.DEVNULL, universal_newlines=True)
     except OSError:
         return []
@@ -699,7 +699,9 @@ def setup(values, skip_submodules):
         print("  submodules: git not found - skipped")
         ok = False
     else:
-        ok &= run_step("submodules", ["git", "submodule", "update", "--init"], ROOT)
+        # --recursive: the MiSTer2MEGA65 framework carries a nested submodule
+        # (QNICE); without it a fresh clone cannot build the MEGA65 firmware.
+        ok &= run_step("submodules", ["git", "submodule", "update", "--init", "--recursive"], ROOT)
     uc = os.path.join(ROOT, "Code", "Microcode")
     py = sys.executable or "python3"
     ok &= run_step("microcode for the boards (Code/Microcode/wcs)",
