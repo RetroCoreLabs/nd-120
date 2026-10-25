@@ -166,7 +166,7 @@ were never kept, so the "6 of 42" count cannot be checked. Settling it: keep the
 run captured at 8N1 (pyserial) and one at 7E1 with `ParityReplace=63`, from the same board
 output, then count the bytes whose bit 7 differs from the even parity of their low 7 bits.
 
-## Terminal: PED on the Nexys (captured, analysed)
+## Terminal: PED on the Nexys (captured, analysed; no host-to-terminal query seen)
 
 Captured on the Nexys (Winchester system, COM11 9600 7E1): PED sends NO terminal query. It asks
 the USER `What is your terminal type?` (menu; 6 = DEC VT100 80 columns) and sends nothing until
