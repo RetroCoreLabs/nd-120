@@ -140,7 +140,9 @@ if [ -d framework-overrides ]; then
         [ -f "$ov" ] || continue
         name=$(basename "$ov")
         base=../../m2m/M2M/rom/$name
-        want=$(grep "^$name " framework-overrides/overrides.sha256 | awk '{print $2}')
+        # tr: a checkout with CRLF line endings leaves a carriage return on
+        # the field, and the compare below would fail on equal hashes
+        want=$(grep "^$name " framework-overrides/overrides.sha256 | awk '{print $2}' | tr -d '\r')
         have=$(sha256sum "$base" | awk '{print $1}')
         if [ -z "$want" ]; then
             echo "ERROR: framework-overrides/$name has no line in framework-overrides/overrides.sha256"
