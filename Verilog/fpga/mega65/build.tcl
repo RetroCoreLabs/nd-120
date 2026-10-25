@@ -425,7 +425,21 @@ route_design
 # fixed. A hold violation on a DRP write would corrupt the framework's
 # dynamic HDMI clock reprogramming, so it is not something to wave through.
 # -hold_fix inserts data-path delay against the sign-off numbers.
-phys_opt_design -hold_fix
+#
+# Run it until sign-off hold is met, at most four passes. One pass is not a
+# complete repair: it stops at its own "hold_fix net fail limit is 5" and
+# leaves whatever is behind that - measured on the 640x480/16 bpp build,
+# where one pass went to +0.002 on 04-Sep but left ONE reset_manager counter
+# path 27 ps short (WHS -0.027) on this placement. Raising the clk hold
+# uncertainty instead (0.150) made it far worse (-1.738 before the fixer,
+# -0.136 on 39 paths after), so the padding stays at its measured 0.100
+# (CORE.xdc) and the fixer gets the passes it needs. Each pass is printed.
+for {set _pass 1} {$_pass <= 4} {incr _pass} {
+    phys_opt_design -hold_fix
+    set _whs [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -hold]]
+    puts "hold fix pass $_pass: WHS $_whs ns"
+    if {$_whs >= 0} { break }
+}
 
 report_utilization    -file [file join $outdir util.rpt]
 report_timing_summary -file [file join $outdir timing.rpt]

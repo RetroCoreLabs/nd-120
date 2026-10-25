@@ -69,4 +69,14 @@ set_false_path -hold -from [get_pins -hierarchical -filter {NAME =~ *i_video_out
 ## hold to ITS estimate, so a sign-off miss of tens of ps survives every
 ## hold-fix pass. 100 ps of hold uncertainty on clk makes the router aim past
 ## the gap; setup analysis is untouched (-hold only).
+## 0.100 is measured to be the right amount, and MORE is worse: the
+## 640x480/16 bpp build left ONE path 27 ps short at sign-off (the
+## framework's reset debouncer count_reg[6] -> count_reg[20], 0.706 ns of
+## data against 0.528 ns of clock skew; the router's own view was +0.050).
+## Raising this to 0.150 pushed sign-off to WHS -1.738 / THS -62.861 before
+## the hold fixer, which then stopped at its 5-net fail limit at -0.136 on
+## 39 paths - every one a reset_manager counter or the video_out_clock DRP.
+## The repair for the last picoseconds is to let the hold fixer run to
+## completion (build.tcl iterates phys_opt_design -hold_fix), not to ask the
+## router to pad every clk path.
 set_clock_uncertainty -hold 0.100 [get_clocks clk]
