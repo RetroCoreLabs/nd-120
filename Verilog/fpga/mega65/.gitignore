@@ -17,6 +17,9 @@ CORE/m2m-rom/globals.asm
 CORE/m2m-rom/shell_fhandles.asm
 CORE/m2m-rom/shell_fh_ptrs.asm
 CORE/m2m-rom/__temp__.asm
+# the copy of the framework's M2M/rom/ that make_rom.sh assembles from,
+# with CORE/m2m-rom/framework-overrides/ on top
+CORE/m2m-rom/.rom-shadow/
 # Fetched build tools (make toolchain) - third-party, not vendored
 tools/
 sim/*.vvp

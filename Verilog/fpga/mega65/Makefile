@@ -81,10 +81,16 @@ $(OUT)/nd120_mega65_$(BOARD).cor: $(OUT)/nd120_mega65_$(BOARD).bit $(CORETOOL)
 
 # The M2M "Shell" firmware for the QNICE soft CPU, baked into the bitstream
 # (CORE/vhdl/globals.vhd: QNICE_FIRMWARE_M2M). Regenerated whenever the
-# assembly source or the vdrive/ROM counts in globals.vhd change.
+# assembly source, the vdrive/ROM counts in globals.vhd, the framework's own
+# rom/ sources, the firmware overrides (CORE/m2m-rom/framework-overrides/,
+# see make_rom.sh) or make_rom.sh itself change.
 rom: CORE/m2m-rom/m2m-rom.rom
 
-CORE/m2m-rom/m2m-rom.rom: CORE/m2m-rom/m2m-rom.asm CORE/vhdl/globals.vhd $(QNICE)/assembler/qasm
+ROM_DEPS = CORE/m2m-rom/m2m-rom.asm CORE/m2m-rom/make_rom.sh CORE/vhdl/globals.vhd \
+           $(wildcard CORE/m2m-rom/framework-overrides/*) $(wildcard m2m/M2M/rom/*.asm) \
+           $(QNICE)/assembler/qasm
+
+CORE/m2m-rom/m2m-rom.rom: $(ROM_DEPS)
 	cd CORE/m2m-rom && bash ./make_rom.sh
 
 # One-off host tools. The framework's make-toolchain.sh also builds a C

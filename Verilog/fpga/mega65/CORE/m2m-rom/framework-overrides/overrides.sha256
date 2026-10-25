@@ -1,0 +1,5 @@
+# SHA-256 of the framework file each override here was made from
+# (m2m/M2M/rom/<name>, at the submodule commit the repository points to).
+# make_rom.sh checks these before assembling; a mismatch stops the build.
+# Line format: <name> <sha256> (lowercase hex).
+options.asm 6b10de8c400872569b880f13a513ea15c75e84c4dbc8c3e1d14791a98162ae29

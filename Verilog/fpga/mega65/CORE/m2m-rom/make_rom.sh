@@ -103,19 +103,64 @@ print_file_handles "HNDL_RM_FILES" "HANDLE_RM_FILE" $crtrom_man_max
 #   m2m-rom.rom: Vivado ROM compatible 16-bit binary
 ##############################################################################
 
-# ND-120 port (02-SEP-2026): the framework calls ../../M2M/QNICE/assembler/asm
-# here. That wrapper runs the C preprocessor with no include path, and the
-# framework's own M2M/rom/shell.asm does
+# ND-120 port: the framework calls ../../M2M/QNICE/assembler/asm here. That
+# wrapper runs the C preprocessor with no include path, and the framework's
+# own M2M/rom/shell.asm does
 #     #include "../../CORE/m2m-rom/shell_fh_ptrs.asm"
 # which cpp resolves relative to the INCLUDING file, i.e. to
 # m2m/CORE/m2m-rom/ inside the submodule - not to this folder. The submodule's
 # CORE/ has no generated files, so cpp falls through to its -I list; giving it
-# ../../m2m/M2M makes "<that>/../../CORE/m2m-rom/..." land HERE. The steps
-# below are the wrapper's own, with that one -I added.
+# ../../m2m/M2M makes "<that>/../../CORE/m2m-rom/..." land HERE.
+#
+# FRAMEWORK OVERRIDES FOR THE FIRMWARE. framework-overrides/ here holds
+# fixed copies of framework M2M/rom/ files, the way CORE/vhdl/
+# framework-overrides/ does for the VHDL (build.tcl). cpp looks for a quoted
+# include next to the including file first, so a -I alone cannot replace
+# "options.asm" as seen from shell.asm. Instead the Shell is assembled from a
+# COPY: .rom-shadow/m2m/M2M/rom/ gets the framework's rom/*.asm, the
+# overrides on top, and a copy of m2m-rom.asm at the same depth
+# (.rom-shadow/CORE/m2m-rom/) so its "../../m2m/M2M/rom/..." includes land in
+# the shadow. Everything the shadow does not hold (rom/monitor/, the QNICE
+# libraries, video_filters/, and this folder's generated files) is missing
+# there and cpp falls through to the two -I paths, which resolve those
+# relative includes against the real submodule and this folder.
+#
+# Each override names the submodule file it was made from and that file's
+# SHA-256 (the lines after "# base:" in overrides.sha256). If the submodule's
+# file changes (a submodule bump), the build stops here: the override must be
+# re-made from the new file, not silently kept.
 QASM=../../m2m/M2M/QNICE/assembler/qasm
 QASM2ROM=../../m2m/M2M/QNICE/assembler/qasm2rom
+SHADOW=.rom-shadow
+rm -rf "$SHADOW"
+mkdir -p "$SHADOW/m2m/M2M/rom" "$SHADOW/CORE/m2m-rom"
+cp ../../m2m/M2M/rom/*.asm "$SHADOW/m2m/M2M/rom/"
+if [ -d framework-overrides ]; then
+    for ov in framework-overrides/*.asm; do
+        [ -f "$ov" ] || continue
+        name=$(basename "$ov")
+        base=../../m2m/M2M/rom/$name
+        want=$(grep "^$name " framework-overrides/overrides.sha256 | awk '{print $2}')
+        have=$(sha256sum "$base" | awk '{print $1}')
+        if [ -z "$want" ]; then
+            echo "ERROR: framework-overrides/$name has no line in framework-overrides/overrides.sha256"
+            exit 1
+        fi
+        if [ "$want" != "$have" ]; then
+            echo "ERROR: the framework's M2M/rom/$name changed since framework-overrides/$name was made from it."
+            echo "       base recorded: $want"
+            echo "       base now:      $have"
+            echo "       Re-make the override from the new file (keep only the change its header describes),"
+            echo "       then update overrides.sha256."
+            exit 1
+        fi
+        echo "OVERRIDE: M2M/rom/$name <- CORE/m2m-rom/framework-overrides/$name"
+        cp "$ov" "$SHADOW/m2m/M2M/rom/$name"
+    done
+fi
+cp m2m-rom.asm "$SHADOW/CORE/m2m-rom/m2m-rom.asm"
 rm -f m2m-rom.out m2m-rom.rom
-${COMPILER:-cc} -xc -E -I ../../m2m/M2M m2m-rom.asm | sed '/^#.*/d' > __temp__.asm
+${COMPILER:-cc} -xc -E -I ../../m2m/M2M -I ../../m2m/M2M/rom "$SHADOW/CORE/m2m-rom/m2m-rom.asm" | sed '/^#.*/d' > __temp__.asm
 $QASM __temp__.asm m2m-rom.out || { echo "qasm failed"; rm -f __temp__.asm; exit 1; }
 rm -f __temp__.asm
 $QASM2ROM m2m-rom.out m2m-rom.rom
