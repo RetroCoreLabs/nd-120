@@ -183,6 +183,17 @@ simulation and compare the screen, and check what the board keyboard sends for P
 on non-NOTIS terminals takes FUNC = Ctrl-underscore, octal 37, as a prefix).
 The PED run needs the Winchester system (`20500&`): the SMD system's disc has no
 `UE-ERRORS-ENG-A:ERR`, so PED stops at once there.
+Same capture with terminal type 93 (TDV 2200/9S ND-NOTIS; set with `SET-TERMINAL-TYPE`, terminal
+number 1, type 93; PED asks for the type only while none is set, then remembers it). Start-up:
+`ESC Q`, `ESC[30;7;80l`, `ESC[62;62h`, four DCS strings `ESC P L10 ESC \`, `L20`, `L30`, `L40`,
+then the same cursor/erase/status-line drawing as type 6 but for 25 rows (bar at row 025, "Line:
+1-21"), with no charset init. Against `terminal_ctrl.v` (24 rows, read not simulated): `ESC Q` and
+the ND modes are swallowed (fine); `ESC P` is swallowed but its text `L10`..`L40` is PRINTED (no
+DCS string state; the `ESC[2J` right after hides it); row 025 clamps to 24 and is then erased by
+the `ESC[024;001H ESC[2K` that follows, so the bottom bar would not show. A real VT100 clears the
+screen and homes the cursor on `ESC[?3l` (DECCOLM) - claim from a web paste, not yet checked against
+the VT100 manual; `terminal_ctrl.v` swallows `?3`. PED sends it at every start-up, so the clear
+would be invisible here anyway.
 
 ## Owned elsewhere (from the 02-AUG-2026 plan)
 
