@@ -12,7 +12,7 @@
 # Both flows compile the SAME ordered file list (nd120_tang20k.gprj) with the
 # SAME defines file first (src/tang20k_defines.v) - one source of truth.
 #
-#   make [VARIANT=slow|crawl|full]   OSS bitstream -> <build>/nd120_tang20k_oss-<variant>.fs
+#   make [VARIANT=slow|crawl|mid|fast20|full]   OSS bitstream -> <build>/nd120_tang20k_oss-<variant>.fs
 #   make check [VARIANT=...]         netlist gates: IO_sdram_dq tristate + latch census
 #   make load / flash [VARIANT=...]  program the OSS bitstream (SRAM / config flash)
 #
@@ -38,6 +38,8 @@
 # VARIANT selects the clocking (default slow, same as always):
 #   slow  = CPU 6.75 MHz / SDRAM 13.5 MHz  (TANG_SLOW_BRINGUP)
 #   crawl = CPU 3.375 MHz / SDRAM 6.75 MHz (TANG_CRAWL_BRINGUP, mechanism probe)
+#   mid   = CPU 13.5 MHz                   (TANG_VARIANT_MID, timing-clean)
+#   fast20 = CPU 20.25 MHz, 115200 console (TANG_VARIANT_FAST20, timing-clean; the released one)
 #   full  = CPU 27 MHz / SDRAM 54 MHz      (target speed; needs timing closure)
 # Selection is via TANG_VARIANT_* pre-defines consumed by src/tang20k_defines.v
 # - no file editing, both toolchains use the same mechanism.
@@ -79,8 +81,12 @@ else ifeq ($(VARIANT),crawl)
   VDEFS = -DTANG_VARIANT_CRAWL
 else ifeq ($(VARIANT),full)
   VDEFS = -DTANG_VARIANT_FULL
+else ifeq ($(VARIANT),mid)
+  VDEFS = -DTANG_VARIANT_MID
+else ifeq ($(VARIANT),fast20)
+  VDEFS = -DTANG_VARIANT_FAST20
 else
-  $(error VARIANT must be slow, crawl or full)
+  $(error VARIANT must be slow, crawl, mid, fast20 or full)
 endif
 
 # CACHE: 0 (default) = CPU cache compiled out (src/tang20k_defines.v defines
