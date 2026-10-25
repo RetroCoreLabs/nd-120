@@ -405,6 +405,11 @@ module nd120_qmtech_top (
   ) CORE (
       .clk_cpu  (clk_cpu),
       .sys_rst_n(sys_rst_n),
+      // Runtime console line speed. There is no baud switch on this board, so
+      // the console is fixed at the build default (115200) - same as the Tang,
+      // the MEGA65 and the MiSTer. Only the Nexys wires this to a slide switch.
+      // Leaving it unconnected would hand SC2661_UART an undriven select.
+      .BAUD_9600(1'b0),
       // The CPU's own cache. Left ON: this part has the block RAM for it,
       // unlike the Tang where it does not fit.
       .CACHE_SW (1'b1),

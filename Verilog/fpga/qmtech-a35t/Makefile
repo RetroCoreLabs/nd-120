@@ -13,9 +13,15 @@
 #                          clone this commit there, configure it, run `make` in
 #                          the clone - proves the build needs nothing outside the repo
 #
-# The full build (build.tcl in this directory) was written 04-SEP-2026 and has
-# NEVER BEEN RUN. The two stage tests predate it and have never run on the
-# board either - see HANDOFF-qmtech-a35t-bringup.md.
+# The full build (build.tcl in this directory) HAS BEEN RUN: 04-SEP-2026 21:02
+# produced nd120_qmtech.bit (2192219 bytes), and timing.rpt from that run says
+# "All user specified timing constraints are met" at 20 MHz. That bitstream is
+# published as nd120_qmtech_a35t_20MHz_115200.bit on the bitstreams-2026-09
+# release.
+#
+# NOTHING ON THIS BOARD HAS EVER RUN ON REAL HARDWARE - not the full build, not
+# the two stage tests. A clean build is not a working board. See
+# README.md and docs/board-notes.md.
 #
 # Vivado runs on the Windows host; from WSL this delegates via powershell.exe.
 # Everything the builds write goes to $(ND120_BUILD_DIR)/qmtech-a35t/ (the stage
