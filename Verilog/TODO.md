@@ -160,6 +160,12 @@ The panel clock is emulated by `CPU-BOARD-3202/circuit/PANCAL_68705_CLOCK.v`
 of an output character is unknown. Experiment: capture the raw bytes of the same command at
 8N1 and list which have bit 8 set; then compare with the 7E1 `?` positions.
 
+Read from the RTL (not simulated): the SC2661 transmit side sends exactly 10 bits per byte and
+adds nothing, so the 6 extra bytes are a Windows-side effect. The byte lists of the original run
+were never kept, so the "6 of 42" count cannot be checked. Settling it: keep the raw hex of one
+run captured at 8N1 (pyserial) and one at 7E1 with `ParityReplace=63`, from the same board
+output, then count the bytes whose bit 7 differs from the even parity of their low 7 bits.
+
 ## Terminal: does PED query the terminal?
 
 `terminal_ctrl.v` answers no reports (DA `ESC[c`, CPR `ESC[6n`, DSR) - it has no
@@ -167,6 +173,14 @@ path back to the host. If PED sends one and waits, it would look like "PED does 
 respond to keys". Not measured. Experiment: log the bytes PED sends at start-up
 (TeraTerm log on the board's console) and look for `ESC [ c` or `ESC [ 6 n`.
 Background: `docs/worklog-2026-08-31-vt100-terminal-uart-overrun.md`.
+Static check of PED and the VT100 (type 6) terminal table on the SINTRAN
+image found no query string (no `ESC[c`, `ESC Z`, `ESC[6n`, `ESC[5n`); the
+type-6 init string is `ESC <`, `ESC[?3l`, `ESC =`, `ESC(B`, `ESC)0`. PED's
+machine code was not decoded, so a reply read is not ruled out. Other leads:
+PED function commands on non-NOTIS terminals start with FUNC (Ctrl-underscore,
+octal 37), which the board keyboard must send; and VTM decodes keys only for
+the terminal type it was told, so the line must be set to type 6. A wire
+capture at PED start-up settles it.
 
 ## Owned elsewhere (from the 02-AUG-2026 plan)
 

@@ -246,6 +246,11 @@ Measured on real hardware, same wire, same command:
 | .NET, `ParityReplace=0` | 7E1 | 42 | 0 |
 | pyserial / .NET | 8N1 | 42 | 0 |
 
-Which characters fail, and why .NET delivered 48 bytes instead of 42, is not explained (open
-item in `Verilog/TODO.md`). The rule does not depend on it: connect at 8N1.
+The 6 extra bytes are not on the wire: pyserial at 7E1 and .NET with `ParityReplace=0` both got
+42. The count fits one inserted `?` per parity error with the bad byte still delivered, but
+that was read from the numbers, not shown. SINTRAN puts software parity in bit 7 of its boot
+text, so that text passes a 7E1 check; only bytes with bit 7 = 0 and an odd number of ones in
+the low 7 bits fail, which is why the failures sit on echoes and prompts. Whether exactly 6 of
+the 42 bytes fail was never checked: the byte lists were not kept (open item in
+`Verilog/TODO.md`). The rule does not depend on it: connect at 8N1.
 
