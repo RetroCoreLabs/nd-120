@@ -116,6 +116,12 @@ Read from `M2M/rom/options.asm` (not yet seen running on a MEGA65):
   `build/delivery/`); copy it to `/nd120/` on the card. Without it,
   settings reset to the defaults at every power-on. Regenerate it whenever
   `OPTM_SIZE` changes (`m2m/M2M/tools/make_config.sh <file> 35`).
+  With this file present, the framework's V2.0.1 firmware froze on closing
+  the menu in any core with two or more drives (upstream issue #58), which
+  left the keyboard and the HELP key dead - the first tester's report. The
+  core carries the upstream fix in `CORE/m2m-rom/framework-overrides/`
+  (see `00-plan.md`); if a build ever shows that symptom again, check that
+  `make rom` printed the `OVERRIDE:` line.
 - **Mounts do NOT persist.** The firmware writes a 0 for every
   `OPTM_G_MOUNT_DRV` line when it saves (`_ROSMS_4A`, "exclude
   OPTM_G_MOUNT_DRV items"), so after a power cycle the drives are empty and

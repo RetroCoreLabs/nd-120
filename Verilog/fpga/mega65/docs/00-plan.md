@@ -126,12 +126,48 @@ the deployed Nexys build.
 5. `coretool` (mega65-tools, fetched by `make toolchain`, pinned) packs the
    `.cor`; the QNICE submodule's `bit2core` cannot (no model byte).
 6. Host prerequisites in WSL: gcc for `qasm`/`qasm2rom`/`monitor.rom`
-   (`make toolchain`), `make rom` for the M2M firmware with one `-I` patch
-   in `CORE/m2m-rom/make_rom.sh`; both submodules need LF line endings
-   (`core.autocrlf false` set locally in each).
+   (`make toolchain`), `make rom` for the M2M firmware; both submodules need
+   LF line endings (`core.autocrlf false` set locally in each).
+   `CORE/m2m-rom/make_rom.sh` assembles the Shell from a COPY of the
+   framework's `M2M/rom/` with `CORE/m2m-rom/framework-overrides/` laid on
+   top - the firmware counterpart of `CORE/vhdl/framework-overrides/`. cpp
+   resolves a quoted `#include` next to the including file first, so a `-I`
+   path alone cannot replace a file `shell.asm` includes; hence the copy.
+   `overrides.sha256` names the submodule file each override was made from
+   and the build stops when that file changes (a submodule bump), so an
+   override is re-made, never silently kept.
 7. VHDL file paths in `globals.vhd` resolve relative to the reading VHDL
    file; our `CORE/` is one level above the submodule, so the firmware
    path gained one `../`.
+
+## Found by the first tester: keyboard and Help key dead
+
+The report was "the keyboard does not work at all, the Help key neither",
+with the CPU at the OPCOM `#` prompt. The whole keyboard path of OUR code
+(framework scan -> `m65_keys_to_ps2` -> `ps2_decoder_tdv` -> UART -> CPU)
+answers a RETURN in the full-machine Verilator bench (`make vtest`), so the
+fault was looked for in what runs beside it: the framework's QNICE Shell.
+
+The cause is a V2.0.1 firmware bug, upstream issue sy2002/MiSTer2MEGA65#58:
+`ROSM_SAVE` (`M2M/rom/options.asm`) walks the virtual drives before saving
+the menu settings and keeps the drive number in R8, the register
+`VD_DRV_READ` returns its result in. With clean write caches R8 alternates
+0,1,0,1 for ever. The loop is left by accident with one drive; we have five
+(`C_VDNUM`), and the code only runs with a settings file on the card - we
+ship `/nd120/nd120cfg`. So QNICE froze the moment the tester closed the
+Help menu (the HDMI-mode photo proves the menu was used). The keyboard is
+disconnected from the core while the menu is open (`KEYBOARD_AT_OSD` false,
+`gencfg.asm RP_OPTM_START`) and reconnected only AFTER `ROSM_SAVE`
+(`HELP_MENU`), so the freeze left the core without a keyboard and the Help
+key dead - both symptoms, one fault. The shipped ROM's listing has the loop
+at 0x2BE5-0x2BF0, where the upstream reporter found QNICE stuck.
+
+Upstream fixed it on `develop` (commit `bcb34f4`, planned for V2.1.0); that
+fix is `CORE/m2m-rom/framework-overrides/options.asm` here (toolchain fact 6
+above). Related upstream reports worth knowing when a tester says "no
+keyboard, no menu": #82 (a short reset while QNICE waits on a HyperRAM read
+hangs QNICE; watchdog in `qnice2hyperram` on `develop`, R3 only for us) and
+#59 (QNICE stuck in `HANDLE_DRV_RD` with disc images in HyperRAM; open).
 
 ## Open questions only the board can answer
 
@@ -152,7 +188,7 @@ the deployed Nexys build.
 | Path | What |
 |---|---|
 | `m2m/` | git submodule -> sy2002/MiSTer2MEGA65 @ `423ba6e`; its own `M2M/QNICE` submodule inside |
-| `CORE/` | our side of M2M's `CORE/` contract (the framework's template, edited): `vhdl/mega65.vhd` (wrapper), `vhdl/main.vhd` (VHDL skin over the Verilog machine), `vhdl/clk.vhd`, `vhdl/config.vhd` (OSD texts + menu), `vhdl/globals.vhd` (5 vdrives), `vhdl/framework-overrides/top_mega65-r*.vhd` (SDRAM pins into the core), `CORE.xdc`, `m2m-rom/` (firmware build). Capital CORE because the framework's `#include "../../CORE/..."` depends on it |
+| `CORE/` | our side of M2M's `CORE/` contract (the framework's template, edited): `vhdl/mega65.vhd` (wrapper), `vhdl/main.vhd` (VHDL skin over the Verilog machine), `vhdl/clk.vhd`, `vhdl/config.vhd` (OSD texts + menu), `vhdl/globals.vhd` (5 vdrives), `vhdl/framework-overrides/top_mega65-r*.vhd` (SDRAM pins into the core), `CORE.xdc`, `m2m-rom/` (firmware build; `m2m-rom/framework-overrides/` = fixed copies of framework `M2M/rom/` files). Capital CORE because the framework's `#include "../../CORE/..."` depends on it |
 | `rtl/` | the Verilog: `nd120_mega65_machine.v`, `nd120_console_mega65.v`, `m65_keys_to_ps2.v`, `nd_storage_mega65_devices.v`, `nd_storage_vdrives.v`, `nd_avalon_port.v` |
 | `sim/` | one bench per file + `vdrives_model.v`, `lint_machine.sh`; `make all` runs them; registered in `Verilog/tests/run_all_tests.sh` |
 | `build.tcl`, `Makefile` | `make toolchain` once, `make all BOARD=r3|r4|r5|r6` -> `.bit` + `.cor` under `build/<board>/` |
