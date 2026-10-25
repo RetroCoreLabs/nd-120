@@ -21,6 +21,7 @@ The results that mark eras, pulled out of the full table below:
 | **September 2026** | **Board-independent TDV2200 terminal core**: real box-drawing font (set 2, from RetroCore) embedded in `font_rom.v`, PS/2 keyboard - the console is the machine's own screen and keyboard, on the Nexys, MiSTer and MEGA65 |
 | **September 2026** | **SINTRAN III boots on the MiSTer (DE10-Nano)** - third board on real silicon, TDV2200 console, self-test green |
 | **September 2026** | **MEGA65 cores built for both revisions** (R3 HyperRAM 13.33 MHz, R4/R5/R6 SDRAM 20 MHz), timing-clean, not yet run on a MEGA65; Release 2 (`bitstreams-2026-09`) ships the MEGA65 and MiSTer binaries |
+| **October 2026** | **ND-120 runs on a real MEGA65 (R6)** - the CPU boots to OPCOM on the first hardware test. The test's two faults fixed: torn HDMI picture (console data rate above the HyperRAM rescaler budget - now 640x480, 16 bpp) and dead keyboard + HELP key (the framework's V2.0.1 Shell freezing on menu close, upstream issue #58, fixed by a firmware override) |
 
 ## Full history
 
@@ -102,6 +103,7 @@ Compressed history of the work progress on the ND-120 recreation:
 | September 2026 | FPGA | Board-independent TDV2200 terminal core: 800x600 screen, PS/2 keyboard, console UART (7E1/8N1), the real TDV2200 box-drawing font (set 2, dumped from RetroCore) embedded in `font_rom.v` so every board carries the glyphs; wired on the Nexys with the physical keyboard (incl. the Left-arrow bridge fix). The terminal core reads the console as 7 data bits + parity (not checked) + 1 stop bit, the same 10-bit frame the SC2661 sends as 8N1; the earlier 7E2 in the docs was wrong |
 | September 2026 | SILICON | SINTRAN III boots on the MiSTer (DE10-Nano): the whole machine, 4 MB in the DE10-Nano SDRAM module, TDV2200 console on its own screen and keyboard, storage from the OSD; boot, CPU self-test (green G lamp), font and keyboard all confirmed |
 | September 2026 | FPGA | MEGA65 cores built for both revisions on the MiSTer2MEGA65 framework (R3 HyperRAM 13.33 MHz / R4-R6 SDRAM 20 MHz), timing-clean, not yet run on hardware. Release 2 (`bitstreams-2026-09`) published with the MEGA65 and MiSTer binaries and per-board quickstarts |
+| October 2026 | SILICON | First MEGA65 hardware test (R6, by a remote tester): the CPU boots to the OPCOM `#` prompt. Two faults, both root-caused from the framework's source and fixed: the HDMI picture tore in the high-resolution modes because the 800x600 console filled the rescaler's HyperRAM input buffer faster than the 8-bit HyperRAM could drain it (console now 640x480 on its own 25.197 MHz clock, rescaler at 16 bpp, budget table in the plan); the keyboard and HELP key died after the first menu visit because the framework's V2.0.1 Shell loops for ever in `ROSM_SAVE` with two or more virtual drives and a settings file (upstream MiSTer2MEGA65 issue #58) - the upstream fix is carried as a firmware override, assembled over a copy of the framework's `rom/`. Full-machine Verilator bench of the keyboard path added (`make vtest`) |
 
 ## Retired documents
 

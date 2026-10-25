@@ -1,15 +1,22 @@
 # ND-120 on the MEGA65
 
-**Status: BOTH CORES BUILT AND TIMING-CLEAN, 02-SEP-2026 - not yet run on a
-real MEGA65.** ND-120 CPU board with 4 MB main memory, TDV2200 terminal on
-the MEGA65's own keyboard and screen, floppy 0/1, Winchester 0/1 and paper
-tape on the framework's virtual drives. One `.cor` per board revision -
-`nd120_mega65_rev3_13MHz_115200.cor` (R3/R3A) and `nd120_mega65_r6_20MHz_115200.cor` (R4/R5/R6) - both
-timing-clean including hold, shipped in Release 2 (`bitstreams-2026-09`).
-Every piece has run on the DE10-Nano (MiSTer) or the Nexys 4 DDR, or passes
-its bench here; this exact combination has not met a MEGA65 yet - the
-release is how it gets its first hardware test. The living plan, with a
-"Next" line at the top, is [`docs/00-plan.md`](docs/00-plan.md).
+**Status: R6 RAN ON A REAL MEGA65 - the CPU booted to the OPCOM `#` prompt
+on the first hardware test; the two faults that test found are fixed and a
+second build is with the tester.** ND-120 CPU board with 4 MB main memory,
+TDV2200 terminal on the MEGA65's own keyboard and screen, floppy 0/1,
+Winchester 0/1 and paper tape on the framework's virtual drives. One `.cor`
+per board revision - R3/R3A and R4/R5/R6 - both timing-clean including hold;
+Release 2 (`bitstreams-2026-09`) shipped the first pair.
+
+The first test (Release 2 core, R6) found: (1) the HDMI picture tore in the
+high-resolution modes - the 800x600 console arrived faster than the board's
+HyperRAM could store it for the rescaler; now 640x480 and 16 bpp, budget in
+the plan; (2) keyboard and HELP key dead - the framework's V2.0.1 Shell
+froze on closing the Help menu (upstream MiSTer2MEGA65 issue #58, every
+core with two or more drives and a settings file), fixed by a firmware
+override in `CORE/m2m-rom/framework-overrides/`. Both in
+[`docs/00-plan.md`](docs/00-plan.md), the living plan with a "Next" line at
+the top. R3 has not been on hardware yet.
 
 **Two memories, picked by the board revision at build** (Ronny, 02-SEP-2026):
 
@@ -65,7 +72,7 @@ Verified 27-AUG-2026 from the mega65-core build scripts and board XDCs
 | [`docs/00-plan.md`](docs/00-plan.md) | The living plan: decisions, verified framework facts, the two memory backends, build sequence B0-B5, layout |
 | `m2m/` | MiSTer2MEGA65 framework, git submodule (`git submodule update --init --recursive`) |
 | `Makefile`, `build.tcl` | `make toolchain` (once), `make all BOARD=r6` (or r3/r4/r5) -> `$ND120_BUILD_DIR/mega65/<board>/nd120_mega65_<board>.bit` + `.cor` (with every report, run folder and Vivado's own files). Working since 02-SEP-2026 on Vivado 2026.1. Settings: `ND120_VIVADO` and `ND120_BUILD_DIR` in `local.mk` at the repository root, written by `python3 configure.py` (which also checks out the `m2m` submodule) - see [CONTRIBUTING.md - Local settings](../../../CONTRIBUTING.md#local-settings) |
-| `CORE/` | our side of the framework contract (the framework's `CORE/` template, copied and edited): `vhdl/main.vhd` is the thin VHDL skin over our Verilog, `vhdl/config.vhd` the OSD texts/menu, `CORE.xdc` our constraints, `m2m-rom/` the QNICE firmware build |
+| `CORE/` | our side of the framework contract (the framework's `CORE/` template, copied and edited): `vhdl/main.vhd` is the thin VHDL skin over our Verilog, `vhdl/config.vhd` the OSD texts/menu, `CORE.xdc` our constraints, `m2m-rom/` the QNICE firmware build; `vhdl/framework-overrides/` and `m2m-rom/framework-overrides/` hold our fixed copies of framework files (VHDL and firmware), substituted at build time - see the plan's toolchain facts |
 | `rtl/` | the MEGA65 glue in Verilog: `m65_keys_to_ps2.v` (keyboard scan -> PS/2 events, keycap-faithful), `nd120_console_mega65.v` (the shared terminal on the framework's video/keyboard) |
 | `sim/` | their testbenches (`make test-keys`, `make test-console`, `make lint`), registered in `Verilog/tests/run_all_tests.sh` |
 | [`docs/01-using-the-core.md`](docs/01-using-the-core.md) | using the core: flashing, the SD card layout, every menu line (drives, colour, panel, cache, HDMI), what persists (`nd120cfg`) and what does not (mounts), booting, keys, differences from the MiSTer core |
