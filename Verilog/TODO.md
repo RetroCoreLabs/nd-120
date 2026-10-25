@@ -181,6 +181,11 @@ PED function commands on non-NOTIS terminals start with FUNC (Ctrl-underscore,
 octal 37), which the board keyboard must send; and VTM decodes keys only for
 the terminal type it was told, so the line must be set to type 6. A wire
 capture at PED start-up settles it.
+PED could not be run on the Nexys booted from the SMD system (`21540&`, SINTRAN L):
+PED stops at once with `UE-ERRORS-ENG-A:ERR missing`, and `LIST-FILES` on the board
+shows that file is not on that disc (only `UE-ERMSG-*-*:ERR`; it has `PED-ENG-J:PROG`,
+no `BPUN`). The Winchester image has the file. To capture PED's start-up bytes: boot the
+Winchester system (`20500&`), log in, start PED, log COM11 (9600 7E1) as hex.
 
 ## Owned elsewhere (from the 02-AUG-2026 plan)
 
