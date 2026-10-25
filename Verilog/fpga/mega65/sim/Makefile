@@ -100,6 +100,7 @@ VVFLAGS = --lint-only -Wall \
   -Wno-UNOPTFLAT -Wno-UNUSED -Wno-WIDTH
 
 vtest:
+	@echo "vtest: nd120_mega65_machine_tb (Verilator --timing, built and run by lint_machine.sh)"
 	bash lint_machine.sh sdram vtest
 
 lint:

@@ -223,21 +223,16 @@ mismatch (unit test `test-smd`); the Verilator boot prints `DIRECTORY ENTERED BY
 SYSTEM`, as nd100x does. The C twin `nd_smd.c` (NDDeviceCore) now models M2 and M3 too, with the
 same fixes as `ND_SMD.v` (commit d30dc5c in that repository).
 
-**Open: the C twin picks its disk geometry from the image size, and the SINTRAN image does not
-fit the 75 MB entry.** `nd_smd.c` takes the smallest table entry whose capacity holds the image.
-The 75 MB entry (5 heads, 18 sectors, 823 cylinders) holds 75,847,680 bytes; the BIGDISK0 image
-is 78,643,200 bytes, so the twin picks the 150 MB entry (10 heads) and would compute other LBAs
-Checked against the manual and nd100x: `ND_SMD.v` (5 heads) is right and `nd_smd.c` is wrong for
-this image. The SINTRAN System Supervisor manual lists 36,945 pages for a 75 MB drive (5 surfaces,
-823 tracks, 18 sectors, 1024 bytes), and `ndtool -i` on the image reports 36,945 pages available;
-the SMD controller manual (ND-11.020.01) gives 5 surfaces for 38/75 MB and 10 for 150 MB. nd100x
-(`smd_disk_type_for_size`) picks the largest layout that fits INSIDE the file (the 75 MB one); the
-twin picks the smallest layout that holds the file, so any image padded past a drive's exact size
-gets the next bigger drive. Still open: the label does not rule out a 150 MB disc cut into two 75 MB
-directories (36,945 pages is also that size), and the drive type SINTRAN records for the image was
-not traced. Fix belongs in NDDeviceCore `smd_select_geometry` (exact match first, then largest
-fit); not done.
-than `ND_SMD.v` (5 heads) for the same C/H/S. Not run on a board; found by the arithmetic.
+**Fixed: the C twin picked the wrong geometry for the SINTRAN image.** `nd_smd.c` took the
+smallest table entry that holds the image, so the 78,643,200-byte SINTRAN image (more than the
+75 MB drive's 75,847,680 bytes) got the 150 MB entry (10 heads) and other LBAs than `ND_SMD.v`
+(5 heads). The SINTRAN System Supervisor manual lists 36,945 pages for a 75 MB drive (5 surfaces,
+823 tracks, 18 sectors, 1024 bytes) and `ndtool -i` on the image reports 36,945 pages available;
+the SMD controller manual (ND-11.020.01) gives 5 surfaces for 38/75 MB and 10 for 150 MB. The twin
+now takes the largest entry that fits inside the image (what nd100x does), with a test for padded,
+exact and undersized sizes (NDDeviceCore `dd41941`). Still open: the label does not rule out a
+150 MB disc cut into two 75 MB directories (36,945 pages is also that size), and the drive type
+SINTRAN records for the image was not traced.
 
 **Open: SMD points where `ND_SMD.v` and `nd_smd.c` still differ from nd100x (`device_smd.c`),
 found by reading both.** Fixed from the manual (ND-11.020.01), RTL and C twin: the head and
