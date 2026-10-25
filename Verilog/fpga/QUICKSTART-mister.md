@@ -64,6 +64,24 @@ Not in the release (instructions only). The machine needs a Winchester image
 preservation community for images, and at `ndtool` for building/inspecting
 them. A core with no image still reaches OPCOM (step 2).
 
+The OSD has five mount slots. The file browser only shows files with the
+extension of the slot, so a disc image must end in `.IMG`:
+
+| OSD slot | File extension | Typical file name |
+|---|---|---|
+| Floppy drive 0 | `.IMG` | `FLOPPY1.IMG` |
+| Floppy drive 1 | `.IMG` | `FLOPPY2.IMG` |
+| Winchester unit 0 | `.IMG` | `WD0.IMG` (the SINTRAN system disc) |
+| Winchester unit 1 | `.IMG` | `WD1.IMG` |
+| Paper tape | `.BPU` or `.TAP` | `BOOT.TAP` |
+
+The slot, not the file name, decides which drive an image becomes. The
+names are the ones used on the other boards. This core has no SMD disc
+(`SMD0.IMG`, `1540&`).
+
+Do not name a file `boot0.vhd` to `boot3.vhd` or `ND120.VHD` in the core's
+folder: the MiSTer system mounts those on its own at start-up.
+
 ## Troubleshooting
 
 | Symptom | Fix |
