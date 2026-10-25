@@ -1147,7 +1147,7 @@ module CGA (
   //
   // It exists to settle ONE question with no inference: is the page fault that
   // halts SINTRAN real? See
-  //   Verilog/fpga/tang-nano-20k/PLAN-pagefault-root-cause.md
+  //   Verilog/fpga/tang-nano-20k/PLAN-pagefault-root-cause.md (retired, git 043c460)
   //
   // HAS_PTRAM_STROBES = 0: the page-table RAM chip-select and output-enable are
   // NOT routed into the CGA. The two bits are therefore MEANINGLESS and the
@@ -1185,7 +1185,7 @@ module CGA (
       // 2^31 is ~318 s after arming, comfortably past the halt.
       .CENSUS_LOG2(31),
       .MATCH_ANY(0),
-      // RETARGETED 23-AUG-2026, the zero-read question (PLAN-pf-campaign-23aug):
+      // RETARGETED 23-AUG-2026, the zero-read question (PLAN-pf-campaign-23aug, git 043c460):
       // freeze on the first committed NO-PERMIT access to the page the CPU
       // fetches as zeros. VA 064540 faults in the oracle as software PT=4
       // VPN=26, software PNUMB = 0o432; raw = software XOR 0o1400 = 0o1032

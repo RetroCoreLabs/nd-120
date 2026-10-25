@@ -377,18 +377,11 @@ if {$skip_wcs} { lappend defines SKIP_WCS_LOAD }
 # compiles the cache RAMs out entirely (ND120_NO_CACHE) if the space is needed;
 # "cache" is still accepted and means the default.
 #
-# HISTORY, kept because the measurements in it are still true:
-# MEASURED 28-AUG-2026, so the reason has changed - see docs/CACHE-STATUS.md.
-# It BUILDS and BOOTS: WNS +0.166 ns, SINTRAN comes up, TPE reports
-# "Cache: Yes / NO ERRORS DETECTED". The old worry that CHIP_21F falling back
-# to LUTRAM would not fit or close is dead; it costs ~0.1 ns of margin.
-#
-# It is off because it is now KNOWN BROKEN rather than merely unvalidated. The
-# machine's own diagnostic (CACHE-120-A00 under TPE) fails: the used-bit memory
-# never sets, so nothing is written to the cache and nothing is read from it.
-# HIT requires the used bit, so the hit rate is a true 0%. A cache that silently
-# never hits is worse than no cache. Turn this default around when CUP is fixed
-# and CACHE-120-A00 passes.
+# HISTORY: the cache builds and fits (28-AUG-2026: WNS +0.166 ns, ~0.1 ns
+# less margin than without it). It failed the machine's own diagnostic until
+# four transcription fixes (PAL 44511A CWR latch + pin 19, Am9150 used-bit
+# write, DGA EPANS leak); all 8 CACHE-1X0-A00 tests pass on this board since
+# 31-AUG-2026. Root causes: Verilog/docs/CACHE-STATUS.md (HISTORY.md 31-AUG).
 if {[lsearch $argv "nocache"] >= 0} { lappend defines ND120_NO_CACHE }
 # -tclargs ila: keep the CGA_MAC address-chain nets and cpu_txd through
 # synthesis (mark_debug attributes in CGA_MAC.v / the top, guarded by this
@@ -499,10 +492,28 @@ puts "Bounded clk_cpu_pre / clk_stor_pre / clk_pll_i crossings with datapath-onl
 # path timed in the cache + panel-clock build (-50.7 ns). The text below is
 # kept as the record of what the tool used to do.
 #
-# Last verified 24-AUG-2026 (this block used to claim "12 loops remain" -
-# that was pre-ring-cut and STALE; commit b3ee391 cut the FIDBO ring):
-# the current builds report ZERO LUTLP-1 errors and Vivado auto-inserts
-# exactly TWO loop-breaking false paths (Synth 8-326):
+# CORRECTED 07-SEP-2026. This block claimed "ZERO LUTLP-1 errors and exactly
+# TWO auto-inserted false paths". That is FALSE and no artifact in this tree
+# has ever supported it. Counted over all 45 drc.rpt files under
+# timing-analysis/ (grep -c "LUTLP-1#"):
+#
+#     5 loops  in 15 builds
+#     6 loops  in 16 builds
+#    16 loops  in 14 builds
+#     0 loops  in  0 builds     <-- never, not once
+#
+# So the ring is present in every Nexys netlist ever built here, exactly as it
+# is on the Tang, MEGA65, QMTECH and Cmod. What makes this board fast is the
+# explicit ordered false path below, NOT an absence of loops.
+#
+# The wider lesson, and it cost a day on 07-SEP-2026: loop counts are netlist
+# properties that move build to build (2, 3, 4, 5, 6, 12, 16, 19, 23, 32 have
+# all been recorded from the same source). NEVER use a loop count as evidence
+# that anything was fixed, and never quote one from prose - read it off a
+# drc.rpt. See docs/HANDOFF-cga-idb-ring-cut.md section 3a.
+#
+# The text below is kept as the record of what the tool used to be described
+# as doing; the two named nodes are illustrative, not a current measurement:
 #   set_false_path -through .../CGA/DELILAH/ALU/ALU_OUTMUX/D_15_0[8]... 
 #   set_false_path -through ALU_i_426/O
 # Paths THROUGH those two nodes are untimed - the WNS gate below does not
