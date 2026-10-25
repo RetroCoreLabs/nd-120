@@ -15,8 +15,8 @@
 //! keyboard at the same moment the PC sends one, which is a person's problem,
 //! not a design flaw.
 //!
-//! Framing must match console_uart_rx and the machine - see the long note in
-//! that file about the SC2661 being software programmable.
+//! Framing must match console_uart_rx and the machine - see the note in that
+//! file: the SC2661 model is a fixed 8-bit frame with no hardware parity.
 //!
 //! Written 27-AUG-2026.
 //============================================================================

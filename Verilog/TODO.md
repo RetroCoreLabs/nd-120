@@ -160,6 +160,14 @@ The panel clock is emulated by `CPU-BOARD-3202/circuit/PANCAL_68705_CLOCK.v`
 of an output character is unknown. Experiment: capture the raw bytes of the same command at
 8N1 and list which have bit 8 set; then compare with the 7E1 `?` positions.
 
+## Terminal: does PED query the terminal?
+
+`terminal_ctrl.v` answers no reports (DA `ESC[c`, CPR `ESC[6n`, DSR) - it has no
+path back to the host. If PED sends one and waits, it would look like "PED does not
+respond to keys". Not measured. Experiment: log the bytes PED sends at start-up
+(TeraTerm log on the board's console) and look for `ESC [ c` or `ESC [ 6 n`.
+Background: `docs/worklog-2026-08-31-vt100-terminal-uart-overrun.md`.
+
 ## Owned elsewhere (from the 02-AUG-2026 plan)
 
 **SMD disc controller (1540).** A separate session has taken over the SMD work
