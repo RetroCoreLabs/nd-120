@@ -179,6 +179,12 @@ ORPHAN_BASELINE = {
     "fpga/tang-nano-20k/sim/nd120_tang20k_tb.v":
         "whole-board Tang top-level simulation, not a unit test. Covered in "
         "practice by the `make test-full` Tang vtest boot+deposit gate.",
+
+    "fpga/mega65/sim/nd120_mega65_machine_tb.v":
+        "whole-machine MEGA65 (R6 configuration) boot + keyboard-path test in "
+        "Verilator --timing, about 3 minutes. Run by the `make test-full` "
+        "MEGA65 vtest gate (fpga/mega65/sim `make vtest`), not by the fast "
+        "per-testbench sweep behind `make test`.",
 }
 
 # Directories that are not CPU/board RTL and are not expected to carry a
