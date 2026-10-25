@@ -395,6 +395,38 @@ unprotected: correct parity in, no checking.
 
 ---
 
+## Winchester fidelity - differences found and NOT fixed
+
+Found by reading `ND_WINCHESTER.v` against the nd100x oracle and manual
+ND-11.015.01. Seven RTL defects were fixed (range check on the GO head, interrupt
+only when not active, test mode still checks bounds, unit and head latched at GO,
+device clear mid-transfer, zero-step seek delay, read/write/compare during a
+return to zero sets b5); `nd_winchester_fix_tb.v` covers them. These are left
+open. The manual is the authority; where only the oracle says something, that is
+marked.
+
+- [ ] A GO while the card is active but not in a return to zero restarts the
+  engine. The manual is silent on this case.
+- [ ] M2 and M5 are stubs in the RTL. The oracle's M5 writes memory as if it were
+  M1, which is wrong against the manual (sec 3.4.6).
+- [ ] The oracle's partial-sector DMA overruns its buffer (oracle bug, not ours).
+- [ ] The oracle's master clear does not return the arm to cylinder 0. The manual
+  (3.4.8) and the RTL do.
+- [ ] A stale DMA acknowledge after a device clear may be possible. Not verified.
+- [ ] Status b14 is forced to 1 at GO and errors clear it. Neither has a source.
+- [ ] Write protect and card error map to b9 in the RTL and b7 in the oracle.
+- [ ] Cylinder 1024 is accepted by both.
+- [ ] After an error the RTL zeroes the word count; the oracle writes back the
+  residual.
+- [ ] Neither side models the arm-position check (b8), bad-track b15, the M7
+  seek-error bit, M2 CRC, or the read/write-gate bit.
+- [ ] No Winchester model exists in NDDeviceCore, so there is no C twin to
+  compare against.
+- Proof so far: 14 Winchester testbenches pass, the new 23-check testbench fails
+  16 checks on the old RTL, and SINTRAN boots from the Winchester image on the
+  Tang Nano 20K with no transfer error. The Verilator probe-wd boot runs at about
+  2 million ticks per minute and was not finished.
+
 ## Storage and devices - open items
 
 - [ ] nd_storage clean-up: remove the dead M_LOAD path and s_slot_bytes from

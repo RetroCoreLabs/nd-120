@@ -468,6 +468,27 @@ run-floppy:
 	$(MAKE) compile VERILOG_TAPE=1 SD_STORAGE=0
 	ND120_PRELOAD_BPUN=$(FS_BPUN) ND120_FLOPPY_IMG=$(FLOPPY_IMG) ./obj_dir/VND120_TOP
 
+# Interactive Winchester session: the Verilog device stack PLUS the Winchester
+# card at IOX 500, with the keyboard as the console. At the OPCOM prompt type
+# 20500& to boot SINTRAN from the disc image.
+#   make run-wd WD_IMG=/path/to/WD0.IMG
+# WD_IMG has no default (like ND120_WD_IMG: without an image every operation
+# reports an error, like a drive with no pack), so the target stops without it.
+# The card is not in BUSDEV_COMPONENTS for every build because IOX 500 is the
+# CDC cartridge disc's block - it only appears when asked for.
+# ND120_DEV_DELAY_TICKS=216000: the 8 ms drive latency in cycles at the Tang's
+# 27 MHz; the sim would otherwise assume 100 MHz and hand the CPU's status-wait
+# loops 3.7x more iterations (see ND-BUS-DEVICES/WINCHESTER/sim/wd_disctema.py).
+WD_IMG ?=
+WD_BUSDEV = $(BUSDEV_COMPONENTS) -I../ND-BUS-DEVICES/WINCHESTER/circuit
+run-wd: card
+	@if [ -z "$(WD_IMG)" ] || [ ! -f "$(WD_IMG)" ]; then \
+	  echo "run-wd: WD_IMG=<Winchester disc image> is required (not found: '$(WD_IMG)')" >&2; \
+	  exit 1; \
+	fi
+	$(MAKE) compile BUSDEV_COMPONENTS="$(WD_BUSDEV)" EXTRA_VDEFINES="$(EXTRA_VDEFINES) -DND120_INCLUDE_WD -DND120_DEV_DELAY_TICKS=216000"
+	ND120_WD_IMG=$(WD_IMG) ./obj_dir/VND120_TOP
+
 # ---- NDDeviceCore C-core interactive runs (the portable RP2350 device cores) --
 # These build the PORTABLE C device cores (VERILOG_TAPE=0, DEVICECORE=1) and boot
 # a real image THROUGH them, so you exercise the SAME .c code the Pico runs. No

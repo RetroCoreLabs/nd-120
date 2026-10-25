@@ -252,9 +252,14 @@ module ND_WINCHESTER #(
 
   reg        s_irq;           // latched level-11 interrupt line
 
-  assign disk_blkaddr1 = {4'd0, s_head, 3'd0, w_sector};
+  // Head and unit are latched at activation (s_go_head / s_unit), NOT read from
+  // the live control registers: a later control word (DISC-TEMA writes +5 = 0
+  // while the card is active) must not move a running transfer to another
+  // head or drive between its chunks. The oracle cannot show the difference
+  // because its GO finishes inside the write.
+  assign disk_blkaddr1 = {4'd0, s_go_head, 3'd0, w_sector};
   assign disk_blkaddr2 = {5'd0, w_cyl};
-  assign disk_unit     = {2'd0, s_sel_unit};
+  assign disk_unit     = {2'd0, s_unit};
 
   // ---- internal buffer ----
   // Async-read arrays do NOT map to Gowin BSRAM, so this is a simple dual-port
@@ -452,8 +457,19 @@ module ND_WINCHESTER #(
   localparam E_DISK_WR = 3'd4;  // backend: buffer -> image chunk
   localparam E_DELAY   = 3'd5;  // completion delay -> FinishOperation
   localparam E_MEM_CMP = 3'd6;  // DMA: ND memory vs buffer (M3 compare)
+  // A disk operation was activated while a backend done was still owed (a device
+  // clear cut the previous operation short): hold the start (s_wait_op) until
+  // the backend is quiet, so that stale done cannot be taken for the answer to
+  // this operation's first request. The oracle cannot show this: its GO
+  // finishes inside the write.
+  localparam E_WAIT_DISK = 3'd7;
 
   reg [2:0]  s_eng;
+  reg        s_disk_out;      // a backend request was sent and its done has not come yet
+  wire       w_disk_out = s_disk_out | disk_req;
+  reg [2:0]  s_wait_op;       // the opcode held in E_WAIT_DISK
+  reg [3:0]  s_go_head;       // head latched at activation (b8-5 of the GO word)
+  reg        s_rtz_busy;      // the running operation is an M7 return to zero
   reg        s_is_cmp;       // this operation is M3, not M0
   reg [10:0] s_chunk_q;
   reg [10:0] s_sec_idx;
@@ -477,9 +493,19 @@ module ND_WINCHESTER #(
   endfunction
 
   // GO-time address decode (registers are stable outside a control write).
-  wire [31:0] w_lba     = chs2lba({5'd0, w_cyl}, {12'd0, s_head}, {11'd0, w_sector});
+  // The range check of a GO runs on the head OF THAT GO WORD (iox_wdata[8:5]),
+  // not on s_head, which only takes the new value at this same clock edge.
+  // A device clear in the same word zeroes the block address, word count and
+  // memory address, so the GO sees cylinder 0 / sector 0 / zero words / address
+  // 0 (the oracle clears first, then runs the GO).
+  wire        w_go_clr  = iox_wdata[4];
+  wire [3:0]  w_go_head = iox_wdata[8:5];
+  wire [10:0] w_go_cyl  = w_go_clr ? 11'd0 : w_cyl;
+  wire [4:0]  w_go_sec  = w_go_clr ? 5'd0  : w_sector;
+  wire [31:0] w_lba     = chs2lba({5'd0, w_go_cyl}, {12'd0, w_go_head}, {11'd0, w_go_sec});
   wire [31:0] w_max_lba = chs2lba(GEO_MAX_CYL, GEO_HEADS, GEO_SPT);
   wire [23:0] w_words   = {8'd0, s_word_cnt};
+  wire [23:0] w_go_words = w_go_clr ? 24'd0 : w_words;
 
   task dma_issue(input wr, input [23:0] a, input [15:0] d);
     begin
@@ -600,6 +626,30 @@ module ND_WINCHESTER #(
     end
   endtask
 
+  // Begin the data phase of M0 / M1 / M3 for `words` words (chunk setup, then
+  // the first backend request for a read or compare, or the first DMA read for
+  // a write). Called at activation, or from E_WAIT_DISK once the backend is quiet.
+  task start_xfer;
+    input [2:0]  op;
+    input [23:0] words;
+    begin
+      s_chunk_q <= (words > {13'd0, BUF_WORDS}) ? BUF_WORDS : words[10:0];
+      s_sec_idx <= 11'd0;
+      // M3 takes the READ path off the disc - it has to, it is reading the
+      // sector - and then compares in E_MEM_CMP instead of storing in E_MEM_WR.
+      s_is_cmp <= (op == OP_COMPARE);
+      if (op == OP_READ || op == OP_COMPARE) begin
+        disk_start <= 1'b1;
+        disk_req   <= 1'b1;
+        disk_wr    <= 1'b0;
+        s_eng      <= E_DISK_RD;
+      end else begin
+        disk_start <= 1'b1;
+        s_eng      <= E_MEM_RD;
+      end
+    end
+  endtask
+
   // ---- buffer RAM ports (BSRAM-mappable: sync write + sync read) ----------
   wire        s_memrd_commit = (s_eng == E_MEM_RD) && s_dma_wait &&
                                dma_ack && !dma_err;
@@ -664,6 +714,10 @@ module ND_WINCHESTER #(
       s_dma_addr_r   <= 24'd0;
       s_words_left   <= 24'd0;
       s_unit         <= 1'b0;
+      s_disk_out     <= 1'b0;
+      s_wait_op      <= 3'd0;
+      s_go_head      <= 4'd0;
+      s_rtz_busy     <= 1'b0;
       dma_req        <= 1'b0;
       dma_wr         <= 1'b0;
       dma_addr       <= 24'd0;
@@ -676,6 +730,11 @@ module ND_WINCHESTER #(
       disk_start <= 1'b0;
       disk_req   <= 1'b0;
       trace_done <= 1'b0;
+
+      // Is a backend request still owed its done? (A request is outstanding from
+      // the cycle disk_req goes out until disk_done comes back.)
+      if (disk_done && !disk_req) s_disk_out <= 1'b0;
+      else if (disk_req)          s_disk_out <= 1'b1;
 
       // ---- read-strobe side effects (END of access: see the note above) ----
       if (s_rd_end) begin
@@ -753,12 +812,22 @@ module ND_WINCHESTER #(
             // activate M6 anyway ("no activation should be made" is guidance
             // to the programmer); both C models make the same choice, and the
             // cross-check trace keeps all three from drifting apart.
-            if (iox_wdata[2] && iox_wdata[13:11] != OP_LOAD_CTRL) begin
+            // A read, write or compare while a return to zero is running is a
+            // return-to-zero violation (status b5, sec 3.5): it is refused, the
+            // return to zero carries on, and b5 stays until the next activation
+            // or device clear. (A device clear in the same word cancels the run.)
+            if (iox_wdata[2] && !iox_wdata[4] && s_active && s_rtz_busy &&
+                (iox_wdata[13:11] == OP_READ || iox_wdata[13:11] == OP_WRITE ||
+                 iox_wdata[13:11] == OP_COMPARE)) begin
+              s_rtz_viol <= 1'b1;
+            end else if (iox_wdata[2] && iox_wdata[13:11] != OP_LOAD_CTRL) begin
               // Activation is flip-flop reset condition #4 (sec 3.2).
               clr_ff;
               s_active <= 1'b1;
               s_rft    <= 1'b0;
               s_unit   <= iox_wdata[9];
+              s_go_head  <= w_go_head;
+              s_rtz_busy <= (iox_wdata[13:11] == OP_RTZ);
               s_on_cyl[iox_wdata[9]] <= 1'b1;
 
               s_rtz_viol      <= 1'b0;
@@ -773,8 +842,8 @@ module ND_WINCHESTER #(
               // b3, so the line drops with it and returns at completion.
               s_irq <= 1'b0;
 
-              s_dma_addr_r <= {s_mem_addr_hi, s_mem_addr_lo};
-              s_words_left <= w_words;
+              s_dma_addr_r <= w_go_clr ? 24'd0 : {s_mem_addr_hi, s_mem_addr_lo};
+              s_words_left <= w_go_words;
 
               case (iox_wdata[13:11])
                 OP_SEEK: begin
@@ -794,10 +863,11 @@ module ND_WINCHESTER #(
                           s_cyl_pos[iox_wdata[9]]) ?
                         GEO_MAX_CYL : (s_cyl_pos[iox_wdata[9]] + s_word_cnt);
                   end
-                  // A zero-step seek moves nothing: the drive only re-checks
-                  // its position and completes. See the OP_RTZ note - the
-                  // completion delay is only earned by ARM MOTION.
-                  s_delay_cnt <= (s_word_cnt == 16'd0) ? 32'd8 : DELAY_TICKS;
+                  // A zero-step seek takes the same delay as any other: the
+                  // oracle gives every seek one delay, and the OP_RTZ note below
+                  // proves from a silicon trace that a short "nothing to do"
+                  // shortcut is visible to a guest polling the status.
+                  s_delay_cnt <= DELAY_TICKS;
                   s_eng       <= E_DELAY;
                 end
 
@@ -831,11 +901,15 @@ module ND_WINCHESTER #(
                 end
 
                 OP_READ, OP_WRITE, OP_COMPARE: begin
-                  // Test mode bypasses the bounds check (sec 3.4).
-                  if (!iox_wdata[3] &&
-                      ((w_lba > w_max_lba) ||
-                       ({11'd0, s_head}  >= GEO_HEADS) ||
-                       ({11'd0, w_sector} >= GEO_SPT))) begin
+                  // Test mode (control b3) does NOT skip this check. An earlier
+                  // version bypassed it and cited sec 3.4, but 3.4 only gives the
+                  // test-mode control word (100254: read, head 5, bad-track) and
+                  // says nothing about skipping a check; the oracle runs the
+                  // check in test mode too. The head tested is the one in THIS
+                  // control word (see w_go_head).
+                  if ((w_lba > w_max_lba) ||
+                      ({11'd0, w_go_head} >= GEO_HEADS) ||
+                      ({11'd0, w_go_sec}  >= GEO_SPT)) begin
                     s_addr_mismatch <= 1'b1;
                     s_active <= 1'b0;
                     s_rft    <= 1'b1;
@@ -860,23 +934,14 @@ module ND_WINCHESTER #(
                     s_word_cnt <= 16'd0;
                     if (iox_wdata[1]) s_irq <= 1'b1;
                     else              s_irq <= iox_wdata[0];
-                  end else if (w_words != 24'd0) begin
-                    s_chunk_q <= (w_words > {13'd0, BUF_WORDS}) ?
-                                 BUF_WORDS : w_words[10:0];
-                    s_sec_idx <= 11'd0;
-                    // M3 takes the READ path off the disc - it has to, it is
-                    // reading the sector - and then compares in E_MEM_CMP
-                    // instead of storing in E_MEM_WR.
-                    s_is_cmp <= (iox_wdata[13:11] == OP_COMPARE);
-                    if (iox_wdata[13:11] == OP_READ ||
-                        iox_wdata[13:11] == OP_COMPARE) begin
-                      disk_start <= 1'b1;
-                      disk_req   <= 1'b1;
-                      disk_wr    <= 1'b0;
-                      s_eng      <= E_DISK_RD;
+                  end else if (w_go_words != 24'd0) begin
+                    if (w_disk_out) begin
+                      // The backend still owes a done from a cut-short
+                      // operation: wait for it (E_WAIT_DISK).
+                      s_wait_op <= iox_wdata[13:11];
+                      s_eng     <= E_WAIT_DISK;
                     end else begin
-                      disk_start <= 1'b1;
-                      s_eng      <= E_MEM_RD;
+                      start_xfer(iox_wdata[13:11], w_go_words);
                     end
                   end else begin
                     // A zero-length transfer still completes.
@@ -931,8 +996,15 @@ module ND_WINCHESTER #(
               // next +4 read returned 060014 - b2 AND b3 both set. The oracle
               // never emits that word; its whole status set for this run is
               // 020010 / 020011 / 060011 / 060010 / 060005.
-              if (!s_active) s_rft <= 1'b1;
-              s_irq <= iox_wdata[0];
+              //
+              // The interrupt line follows the same rule (sec 4.1: line = b3 AND
+              // b0): while active b3 is 0, so the line is left alone (it is
+              // already low) and rises at completion. The oracle raises it here
+              // unconditionally, which is safe only because it is never active.
+              if (!s_active) begin
+                s_rft <= 1'b1;
+                s_irq <= iox_wdata[0];
+              end
             end else begin
               // Device clear AND the interrupt enable in one word: the clear
               // ran above; still evaluate sec 4.1 with ready now true.
@@ -955,6 +1027,10 @@ module ND_WINCHESTER #(
       // ---- transfer engine ----
       case (s_eng)
         E_IDLE: ;
+
+        E_WAIT_DISK: begin
+          if (!w_disk_out) start_xfer(s_wait_op, s_words_left);
+        end
 
         E_DISK_RD: begin
           if (disk_done) begin

@@ -436,15 +436,17 @@ module nd_winchester_iox_tb;
     check(d[SB_ACTIVE]   === 1'b0, "address mismatch terminates the operation");
     check(d[SB_FINISHED] === 1'b1, "a failed operation has still FINISHED");
 
-    // Test mode bypasses the bounds check (sec 3.4).
+    // Test mode does NOT bypass the bounds check. The RTL used to skip it and
+    // cited sec 3.4, which only gives the test-mode control word and says
+    // nothing about skipping a check; the oracle checks in test mode too.
     master_clear;
     iox_write(BASE + R_LOAD_BLOCK, 16'd20);
     iox_write(BASE + R_LOAD_WC, 16'd0);          // zero-length: no backend
     iox_write(BASE + R_CONTROL, CW_ACTIVE | CW_TEST);
     repeat (LONG_DELAY + 100) @(posedge sysclk);
     iox_read(BASE + R_STATUS, d);
-    check(d[SB_ADDRMISM] === 1'b0,
-          "test mode bypasses the address bounds check");
+    check(d[SB_ADDRMISM] === 1'b1,
+          "test mode still checks the address bounds");
 
     if (errors == 0)
       $display("=== %0d checks passed ===\nTB_RESULT: PASS", checks);

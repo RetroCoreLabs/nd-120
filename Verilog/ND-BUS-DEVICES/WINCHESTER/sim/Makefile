@@ -296,3 +296,20 @@ test-wd-ticks: nd_winchester_ticks_tb.vvp ../../../SD-FAT/sim/nds_storage.img
 	$(VVP) nd_winchester_ticks_tb.vvp | tee wd_ticks_out.log
 	@grep -q "TB_RESULT: PASS" wd_ticks_out.log
 .PHONY: test-wd-boothang test-wd-ticks
+
+# test-wd-fix: seven behaviours found by reading the RTL against the nd100x
+#   oracle and ND-11.015.01 - range check on the head of the GO word, no
+#   interrupt while active, test mode still range-checks, unit/head latched
+#   at activation, device clear with an owed backend done, a zero-step seek's
+#   delay, and the return-to-zero violation bit (b5). Each case fails on the
+#   RTL as it was before the fixes.
+FIX_SRCS = ../circuit/ND_WINCHESTER.v \
+           nd_winchester_fix_tb.v
+
+nd_winchester_fix_tb.vvp: $(FIX_SRCS)
+	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(FIX_SRCS)
+
+test-wd-fix: nd_winchester_fix_tb.vvp
+	$(VVP) nd_winchester_fix_tb.vvp | tee wd_fix_out.log
+	@grep -q "TB_RESULT: PASS" wd_fix_out.log
+.PHONY: test-wd-fix
