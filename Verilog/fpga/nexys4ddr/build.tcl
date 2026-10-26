@@ -331,6 +331,17 @@ if {![file exists $migxci]} {
 }
 read_ip $migxci
 
+# The synthesized core (ddr.dcp) is gitignored, so a fresh clone has the .xci
+# but not the checkpoint, and synth_design stops with "DCP does not exist".
+# Synthesize the IP here when the checkpoint is missing; an existing one is
+# reused, so a normal rebuild pays nothing.
+set migdcp [file rootname $migxci].dcp
+if {![file exists $migdcp]} {
+    puts "MIG core: $migdcp missing - generating and synthesizing the IP (minutes, once)"
+    generate_target all [get_ips ddr]
+    synth_ip [get_ips ddr]
+}
+
 read_xdc [file join $srcdir nd120_nexys4ddr.xdc]
 read_xdc [file join $srcdir nd120_timing.xdc]
 if {$vga_console} {
