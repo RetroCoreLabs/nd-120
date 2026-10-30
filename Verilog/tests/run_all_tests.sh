@@ -731,6 +731,7 @@ REGISTRY=(
   "ND-BUS-DEVICES/SMD/sim    :: test-smd-p2     :: TB_RESULT: PASS"
   "ND-BUS-DEVICES/SMD/sim    :: test-smd-ecc    :: TB_RESULT: PASS"
   "ND-BUS-DEVICES/SMD/sim    :: test-smd-err    :: TB_RESULT: PASS"
+  "ND-BUS-DEVICES/SMD/sim    :: test-smd-timing :: TB_RESULT: PASS"
   "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-iox :: TB_RESULT: PASS"
   "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-fix :: TB_RESULT: PASS"
   "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-adapter :: TB_RESULT: PASS"

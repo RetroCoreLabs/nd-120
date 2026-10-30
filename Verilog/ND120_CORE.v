@@ -800,6 +800,17 @@ module ND120_CORE #(
           .IDENT_CODE (16'o000017),
           .INT_LEVEL  (4'd11),
           .DELAY_TICKS(SMD_DELAY_TICKS),
+          // Drive timing: fast (a flat DELAY_TICKS) unless the build defines
+          // ND120_SMD_REAL_TIMING, then nd100x's SMD seek curve (CDC 976x:
+          // 6 / 30 / 55 ms) and 3600 rpm rotation, counted in this board's
+          // own clock. CLK_HZ also sets the 500 ms Seek Complete Search
+          // timeout in both modes.
+          .CLK_HZ     (DEV_CLK_HZ),
+`ifdef ND120_SMD_REAL_TIMING
+          .FAST       (1'b0),
+`else
+          .FAST       (1'b1),
+`endif
           // Controller-type strap: default the 15 MHz card. Override the
           // top-level SMD_HAS_FLIPFLOP to 0 (or build with -DND120_SMD_ECC_CARD)
           // for the ECC single-write card.

@@ -15,8 +15,11 @@
 **  - New status layout: b4 inclusive-OR, b5 illegal load, b8 address     **
 **    mismatch, b13 disk-unit-not-ready, b14 on-cylinder.               **
 **  - Seek condition: b0-7 per-unit seek-complete, b12 = 1 (15 MHz id).  **
-**  - On an ERROR the oracle leaves ready-for-transfer LOW and marks the  **
-**    unit not-ready; error interrupts fire from HandleError. Tests use   **
+**  - Aligned with nd100x (device_smd.c): an error end raises ready-for-  **
+**    transfer (b3) like any end, the interrupt follows control bit 0    **
+**    only (BUGS.md S6), an address mismatch does not make the unit not  **
+**    ready, an M3 mismatch ends the compare at that word (S7), and a    **
+**    failed memory write in M0 is not reported (S8). Tests use          **
 **    wait_idle (poll not-active) on the error paths.                    **
 **  - The DUT is instanced with a large GEO_MAX_CYL so the tb's linear    **
 **    block map is never rejected by the CHS bound; address-mismatch is   **
@@ -28,7 +31,8 @@
 ** parity (words counted, no memory cycle, media fault ends it,          **
 ** M4 seek (on-cyl + seek-complete + 15 MHz id), interrupt + IDENT 017,   **
 ** address mismatch, error interrupt, ECC pattern register, real 75 MB    **
-** image windows, and a DMA bus fault -> disk-not-ready + recovery.       **
+** image windows, and a DMA bus fault on an M0 (the words are lost, the   **
+** transfer ends normally).                                              **
 **                                                                       **
 ** Verdict line: TB_RESULT: PASS / TB_RESULT: FAIL                       **
 **                                                                       **
@@ -623,17 +627,32 @@ module nd_smd_tb;
     iox_read(16'o001540, rdata);
     iox_write(16'o001545, 16'h0000);   // CWR back to 0
     iox_read(16'o001544, rdata);
-    // one wrong bit in the second chunk -> compare error, command still ends
+    // one wrong bit in the second chunk -> compare error b10. nd100x ends the
+    // compare AT that word with abnormal completion b12 and leaves the
+    // counters on it (execute_go, BUGS.md S7): address = start + 1200, word
+    // counter = 1500 - 1200 = 300.
     memory[16'hA000 + 1200] = image[dpos + 1200] ^ 16'h0100;
     load_core(24'h00A000);
     load_block(16'd2, 16'd1);
     load_wcnt(24'd1500);
+    nzcount = dma_reqs;
     iox_write(16'o001545, 16'h1804);
     wait_ready();
     iox_read(16'o001544, rdata);
     check((rdata & 16'h0400) !== 0, "M3 mismatch: compare error b10 not set");
     check((rdata & 16'h0010) !== 0, "M3 mismatch: error OR b4 not set");
+    check((rdata & 16'h1000) !== 0, "M3 mismatch: abnormal completion b12 not set");
     check((rdata & 16'h0004) === 0, "M3 mismatch: still active");
+    check(dma_reqs === nzcount + 1201, "M3 mismatch: compare did not stop at the differing word");
+    iox_read(16'o001540, rdata);       // core address LO
+    check(rdata === (16'hA000 + 16'd1200), "M3 mismatch: core address not on the differing word");
+    iox_read(16'o001544, rdata);       // status read: flip-flop back to "first"
+    iox_write(16'o001545, 16'h8000);   // CWR=1
+    iox_read(16'o001540, rdata);
+    check(rdata === 16'd300, "M3 mismatch: word counter != 300");
+    iox_write(16'o001545, 16'h0000);   // CWR back to 0
+    iox_read(16'o001544, rdata);
+    memory[16'hA000 + 1200] = image[dpos + 1200];
 
     // 3f: a media fault in the SECOND chunk of an M0. The first 1024 words
     //     already reached memory, and the address and word counters are one
@@ -774,8 +793,10 @@ module nd_smd_tb;
     check(bint11_n === 1'b1, "BINT11_n not released after IDENT");
 
     // 6: ADDRESS MISMATCH: a sector field >= sectors/track (18) is out of
-    //    range -> status b8, inclusive-OR b4, disk-not-ready b13; NO transfer,
-    //    ready stays low.
+    //    range -> status b8, inclusive-OR b4, abnormal completion b12 and the
+    //    seek error (seek condition b11); NO transfer. The unit does NOT go
+    //    not ready (nd100x execute_go sets only b8, b12 and the seek error),
+    //    and the operation ends with b3 set like any other.
     for (i = 0; i < 8; i = i + 1) memory[16'h6800 + i] = 16'hBEEF;
     load_core(24'h006800);
     load_block(16'd20, 16'd0);         // sector 20 >= 18 -> out of range
@@ -785,20 +806,33 @@ module nd_smd_tb;
     iox_read(16'o001544, rdata);
     check((rdata & 16'h0100) !== 0, "address mismatch (status b8) not set");
     check((rdata & 16'h0010) !== 0, "inclusive-OR (status b4) not set on mismatch");
-    check((rdata & 16'h2000) !== 0, "disk-not-ready (status b13) not set on mismatch");
+    check((rdata & 16'h2000) === 0, "disk-not-ready (status b13) set on mismatch");
+    check((rdata & 16'h1000) !== 0, "abnormal completion (status b12) not set on mismatch");
+    check((rdata & 16'h0008) !== 0, "ready-for-transfer (status b3) not set on mismatch");
     check(memory[16'h6800] === 16'hBEEF, "mismatch still moved data");
+    iox_read(16'o001542, rdata);       // seek condition (CWR=0)
+    check((rdata & 16'h0800) !== 0, "seek error (seek cond b11) not set on mismatch");
 
-    // 7: ERROR INTERRUPT: with ONLY the error interrupt enabled (b1, not b0),
-    //    a fault must still raise BINT11 (oracle HandleError).
+    // 7: ERROR INTERRUPT. nd100x raises the line at the end of an operation,
+    //    error ends included, iff control bit 0 (int-enable) is set; bit 1,
+    //    error-int enable, is read back in b1 but raises nothing (BUGS.md S6;
+    //    the manual's Fig. 14 has it raise the line on an error).
     iox_write(16'o001545, 16'h0010);   // device clear -> clean state
     load_block(16'd20, 16'd0);         // out-of-range again
     load_wcnt(24'd8);
     iox_write(16'o001545, 16'h0006);   // GO M0, error-int enable (b1), no b0
     wait_idle();
-    check(bint11_n === 1'b0, "error interrupt (BINT11) not raised on fault");
+    repeat (20) @(negedge sysclk);
+    check(bint11_n === 1'b1, "error end with only b1 raised BINT11 (nd100x: bit 0 only)");
+    iox_write(16'o001545, 16'h0010);   // device clear
+    load_block(16'd20, 16'd0);
+    load_wcnt(24'd8);
+    iox_write(16'o001545, 16'h0005);   // GO M0, int enable (b0)
+    wait_idle();
+    check(bint11_n === 1'b0, "error end with b0 did not raise BINT11");
     ident(16'o000011, ihit, icode);
-    check(ihit === 1'b1, "IDENT PL11 no hit on error interrupt");
-    check(bint11_n === 1'b1, "BINT11 not released after IDENT (error int)");
+    check(ihit === 1'b1, "IDENT PL11 no hit on error-end interrupt");
+    check(bint11_n === 1'b1, "BINT11 not released after IDENT (error end)");
 
     // 8: 24-bit core-address readback via the mar flip-flop (LO then HI)
     iox_write(16'o001545, 16'h0010);   // device clear (clears flip-flops)
@@ -919,18 +953,27 @@ module nd_smd_tb;
       check(nzcount > 0, "SMD far window compared only zeros (vacuous)");
     end
 
-    // 11: DMA BUS FAULT -> disk-unit-not-ready (b13) via HandleError (oracle:
-    //     a DMA/bus fault marks the unit not ready). Ready stays low on the
-    //     fault, so poll for not-active, then a fresh command recovers.
+    // 11: DMA BUS FAULT on an M0. nd100x does not check its memory writes
+    //     (BUGS.md S8): the words are lost, the counters step on, the
+    //     transfer ends normally and no status bit reports it - not b11, not
+    //     b12, not b13. Then a fresh command transfers normally.
     window_base = 0;                   // synthetic map again for this phase
     mem_stall = 1'b1;
+    for (i = 0; i < 16; i = i + 1) memory[16'h6000 + i] = 16'hBEEF;
     load_core(24'h006000);
     load_block(16'd0, 16'd0);
     load_wcnt(24'd16);
     iox_write(16'o001545, 16'h0004);   // GO M0 -> DMA into the stalled memory
     wait_idle();
     iox_read(16'o001544, rdata);
-    check((rdata & 16'h2000) !== 0, "DMA fault: disk-not-ready (b13) not set");
+    check((rdata & 16'h2000) === 0, "DMA fault: disk-not-ready (b13) set");
+    check((rdata & 16'h0800) === 0, "DMA fault: b11 set (nd100x never sets it)");
+    check((rdata & 16'h1000) === 0, "DMA fault: abnormal completion b12 set");
+    check((rdata & 16'h0008) !== 0, "DMA fault: the transfer did not end normally");
+    check(memory[16'h6000] === 16'hBEEF, "DMA fault: a word reached the stalled memory");
+    iox_read(16'o001540, rdata);       // core address LO
+    check(rdata === 16'h6010, "DMA fault: the counters did not step over the lost words");
+    iox_read(16'o001544, rdata);
     mem_stall = 1'b0;
     // recovery: a fresh command clears not-ready and transfers normally
     load_core(24'h006800);

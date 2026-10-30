@@ -43,15 +43,24 @@ ECC_SRCS = ../circuit/ND_SMD.v \
 # test-smd-err: the ILLEGAL / ERROR paths - what the controller does when the
 #   guest misbehaves. Every other bench drives only legal sequences, so the
 #   missing illegal-load checks on +7 and +5 (and +5 blocking device clear
-#   while active) sat undetected with all gates green. Issues a real GO (M4
-#   seek, no disk backend) with a long DELAY_TICKS to hold the controller
-#   active while the illegal writes are made.
+#   while active) sat undetected with all gates green. Issues a real GO (M6
+#   seek complete search with no seek given, no disk backend) that stays
+#   active until its timeout, with a small CLK_HZ so that is short, while the
+#   illegal writes are made. Also the off-cylinder illegal load after an M4,
+#   the drive's arrival, and the M6 timeout.
 ERR_SRCS = ../circuit/ND_SMD.v \
            nd_smd_err_tb.v
 
+# test-smd-timing: the real drive timing (FAST = 0) against nd100x's own
+#   formulas - the drives' seeks (M4, M7), transfers with and without a
+#   seek, Write Format, a test-mode transfer, and the Seek Complete Search
+#   (M6) with and without a seek given.
+TIMING_SRCS = ../circuit/ND_SMD.v \
+              nd_smd_timing_tb.v
+
 all: test
 
-test: test-smd test-smd-iox test-smd-p2 test-smd-ecc test-smd-err
+test: test-smd test-smd-iox test-smd-p2 test-smd-ecc test-smd-err test-smd-timing
 
 nd_smd_tb.vvp: $(SRCS)
 	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(SRCS)
@@ -88,7 +97,14 @@ test-smd-err: nd_smd_err_tb.vvp
 	$(VVP) nd_smd_err_tb.vvp | tee smd_err_out.log
 	@grep -q "TB_RESULT: PASS" smd_err_out.log
 
+nd_smd_timing_tb.vvp: $(TIMING_SRCS)
+	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(TIMING_SRCS)
+
+test-smd-timing: nd_smd_timing_tb.vvp
+	$(VVP) nd_smd_timing_tb.vvp | tee smd_timing_out.log
+	@grep -q "TB_RESULT: PASS" smd_timing_out.log
+
 clean:
 	rm -f *.vvp *.log *.vcd
 
-.PHONY: all test test-smd test-smd-iox test-smd-p2 test-smd-ecc test-smd-err clean
+.PHONY: all test test-smd test-smd-iox test-smd-p2 test-smd-ecc test-smd-err test-smd-timing clean

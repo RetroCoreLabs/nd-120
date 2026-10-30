@@ -9,7 +9,7 @@
 **   - +7 (Load Word Counter) had no illegal-load check at all            **
 **   - +5 (Load Control Word) dropped the write silently instead of       **
 **     raising b5, and blocked DEVICE CLEAR while the controller was      **
-**     active - the one escape a wedged controller has                    **
+**     active - the one escape a stuck controller has                     **
 ** This bench closes that blind spot.                                     **
 **                                                                       **
 ** Rules under test (ND-11.020.01 sec 2.5 / sec 2.6, ND-11.013.01A):     **
@@ -24,13 +24,20 @@
 **   must ALWAYS reach the controller, including while it is active -     **
 **   it clears b2 and the error bits.                                     **
 **                                                                       **
-** Method: the DUT is instantiated with a long DELAY_TICKS so that an M7  **
-** Return-to-Zero GO holds the controller active for a wide window with   **
-** no disk backend involved (M7 goes straight to E_DELAY). Register writes**
-** are then issued inside that window. NOT M4: an initiate seek ends as   **
-** soon as the drive accepts it (ND-11.020.01 "M4: Initiate seek"), while **
-** a return to zero ends only when track 0 is reached (Normal End of      **
-** Operation, case 4).                                                    **
+** Method: a Seek Complete Search (M6) with no seek given holds the       **
+** controller active until its 500 ms timeout, with no disk backend       **
+** involved (nd100x: the search has nothing to find). The DUT is given a  **
+** small CLK_HZ so that 500 ms is a short window of sysclks. Register     **
+** writes are issued inside that window. NOT M4 or M7: both end the       **
+** controller's operation at once (nd100x finish_operation) and leave the **
+** drive moving, which is the off-cylinder case of section 8.             **
+**                                                                       **
+** Off cylinder (nd100x load_is_illegal, the DISC-TEMA manual's b5 "load  **
+** while the unit is NOT ON CYLINDER"): after an M4 the unit's heads move **
+** for DELAY_TICKS; a load of +1, +3 or +7 in that time is an illegal     **
+** load although the controller is not active, while the control word    **
+** stays loadable. When the heads arrive the unit is on cylinder and its  **
+** seek-complete bit is set.                                              **
 **                                                                       **
 ** Verdict line: TB_RESULT: PASS / TB_RESULT: FAIL                       **
 **                                                                       **
@@ -43,9 +50,12 @@ module nd_smd_err_tb;
 
   localparam [15:0] BASE = 16'o001540;
 
-  // Long enough that a GO stays active across many IOX cycles, short enough
-  // that the bench finishes quickly. E_DELAY counts down one per sysclk.
+  // The drive's seek time (FAST = 1: every drive movement takes DELAY_TICKS).
   localparam [31:0] LONG_DELAY = 32'd2000;
+  // sysclk frequency given to the DUT: the M6 timeout is CLK_HZ / 2 = 2000
+  // sysclks, long enough that a GO stays active across many IOX cycles,
+  // short enough that the bench finishes quickly.
+  localparam integer TB_CLK_HZ = 4000;
 
   // status bit positions (see the s_status assembly in ND_SMD.v)
   localparam SB_CWR      = 15;
@@ -78,7 +88,7 @@ module nd_smd_err_tb;
   wire [10:0] disk_wordcount;
   wire [15:0] dbuf_rdata;
 
-  ND_SMD #(.HAS_WC_FLIPFLOP(1), .DELAY_TICKS(LONG_DELAY)) dut (
+  ND_SMD #(.HAS_WC_FLIPFLOP(1), .DELAY_TICKS(LONG_DELAY), .CLK_HZ(TB_CLK_HZ)) dut (
       .sysclk        (sysclk),
       .sys_rst_n     (sys_rst_n),
       .iox_addr      (iox_addr),
@@ -159,15 +169,15 @@ module nd_smd_err_tb;
     end
   endtask
 
-  // GO with op M7 (return to zero) on unit 0: no disk backend needed, the
-  // engine parks in E_DELAY for LONG_DELAY sysclks with b2 held high - the
-  // heads travelling to track 0. (M4 would complete at once.)
+  // GO with op M6 (seek complete search) on unit 0 and no seek given: no
+  // disk backend needed, the engine waits in E_SEARCH for the timeout with
+  // b2 held high. (M4 and M7 would complete at once.)
   task go_seek;
     reg [15:0] cw;
     begin
       cw        = 16'd0;
       cw[2]     = 1'b1;      // activate
-      cw[14:11] = 4'd7;      // M7 return to zero
+      cw[14:11] = 4'd6;      // M6 seek complete search
       iox_write(BASE + 16'd5, cw);
     end
   endtask
@@ -248,7 +258,7 @@ module nd_smd_err_tb;
     // =================================================================
     // 5. DEVICE CLEAR WHILE ACTIVE must get through. This is the escape
     //    hatch: if +5 were rejected wholesale while active (as it was),
-    //    a wedged controller could never be recovered by software.
+    //    a stuck controller could never be recovered by software.
     // =================================================================
     device_clear;
     iox_read(BASE + 16'd4, st);
@@ -287,6 +297,87 @@ module nd_smd_err_tb;
       check(!st[SB_ACTIVE],   "not-specified unit : b2 must NOT stay set");
       check(st[SB_NOTREADY],  "not-specified unit : b13 must be set");
     end
+
+    // =================================================================
+    // 8. OFF CYLINDER. An Initiate Seek (M4) ends the controller's
+    //    operation at once; the unit's heads then move for DELAY_TICKS.
+    //    A data-register load in that time is an illegal load with b2 at 0
+    //    (nd100x load_is_illegal); the control word stays loadable. The
+    //    heads' arrival sets on-cylinder and the unit's seek-complete bit.
+    // =================================================================
+    begin : off_cylinder
+      reg [15:0] sc;
+      device_clear;
+      iox_write(BASE + 16'd5, 16'h8000);   // CWR = 1, unit 0, no GO
+      iox_write(BASE + 16'd3, 16'd100);    // block address II = cylinder 100
+      iox_write(BASE + 16'd5, 16'h2004);   // GO, M4, unit 0, CWR = 0
+      iox_read(BASE + 16'd4, st);
+      check(!st[SB_ACTIVE],  "M4 : the controller's operation ends at once (b2 = 0)");
+      check(st[SB_RFT],      "M4 : b3 (finished) is set at once");
+      check(!st[SB_ONCYL],   "M4 : the unit drops on-cylinder (b14 = 0)");
+      iox_read(BASE + 16'd2, sc);
+      check(!sc[0],          "M4 : no seek-complete bit before the heads arrive");
+
+      iox_write(BASE + 16'd3, 16'o000400); // block address I while off cylinder
+      iox_read(BASE + 16'd4, st);
+      check(st[SB_ILLEGAL],  "off cylinder : +3 load is an illegal load (b5)");
+      check(st[12],          "off cylinder : the illegal load sets b12");
+      check(!st[SB_ACTIVE],  "off cylinder : b2 stays 0");
+
+      iox_write(BASE + 16'd5, 16'h0001);   // control word, int-enable, no GO
+      iox_read(BASE + 16'd4, st);
+      check(st[0],           "off cylinder : the control word is still loaded (b0 = 1)");
+
+      repeat (LONG_DELAY + 20) @(negedge sysclk);
+      iox_read(BASE + 16'd4, st);
+      check(st[SB_ONCYL],    "M4 : on cylinder again when the heads arrive");
+      iox_read(BASE + 16'd2, sc);
+      check(sc[0],           "M4 : seek-complete bit 0 set when the heads arrive");
+      check(!sc[11],         "M4 : no seek error");
+
+      // M6 now finds the seek it was given: it ends at once, without the
+      // timeout, and the GO clears the old b5 / b12.
+      iox_write(BASE + 16'd5, 16'h3004);   // GO, M6, unit 0
+      repeat (4) @(negedge sysclk);
+      iox_read(BASE + 16'd4, st);
+      check(!st[SB_ACTIVE],  "M6 after M4 : ends when it sees the seek-complete bit");
+      check(!st[6],          "M6 after M4 : no timeout (b6)");
+      check(!st[12],         "M6 after M4 : no abnormal completion (b12)");
+      check(!st[SB_ILLEGAL], "M6 after M4 : the GO cleared b5");
+      iox_write(BASE + 16'd3, 16'o000400); // legal now
+      iox_read(BASE + 16'd4, st);
+      check(!st[SB_ILLEGAL], "on cylinder : +3 load is legal again");
+
+      // Return To Zero on unit 1: on-cylinder drops, comes back, and NO
+      // seek-complete bit (nd100x smd_rtz_end).
+      iox_write(BASE + 16'd5, 16'h3884);   // GO, M7, unit 1  (7<<11 | 1<<7 | 4)
+      iox_read(BASE + 16'd4, st);
+      check(!st[SB_ACTIVE],  "M7 : the controller's operation ends at once");
+      check(!st[SB_ONCYL],   "M7 : the unit drops on-cylinder");
+      repeat (LONG_DELAY + 20) @(negedge sysclk);
+      iox_read(BASE + 16'd4, st);
+      check(st[SB_ONCYL],    "M7 : on cylinder again at cylinder 0");
+      iox_read(BASE + 16'd2, sc);
+      check(!sc[1],          "M7 : no seek-complete bit for unit 1");
+    end
+
+    // =================================================================
+    // 9. M6 with no seek given: active for the whole 500 ms window, then
+    //    the timeout, b6 with b12 (nd100x smd_timeout_end).
+    // =================================================================
+    device_clear;                        // forgets the seeks given
+    select_unit(3'd0);
+    go_seek;
+    repeat (TB_CLK_HZ / 2 - 50) @(negedge sysclk);
+    iox_read(BASE + 16'd4, st);
+    check(st[SB_ACTIVE],   "M6 timeout : still active just before 500 ms");
+    repeat (100) @(negedge sysclk);
+    iox_read(BASE + 16'd4, st);
+    check(!st[SB_ACTIVE],  "M6 timeout : not active after 500 ms");
+    check(st[SB_RFT],      "M6 timeout : b3 set");
+    check(st[6],           "M6 timeout : b6 (timeout) set");
+    check(st[12],          "M6 timeout : b12 (abnormal completion) set");
+    check(st[SB_INCLOR],   "M6 timeout : b4 follows b6");
 
     if (errors == 0)
       $display("TB_RESULT: PASS");
