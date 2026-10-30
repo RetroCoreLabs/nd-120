@@ -296,6 +296,19 @@ module nd_winchester_timing_tb;
     end
     expect_rot("address mismatch at sector 7", 8);
 
+    // An address outside the drive (cylinder 1500 of 1024): nd100x ends it
+    // through wd_end_later - the flat floor - and leaves the block address
+    // where it was (device_winchester.c, the geometry bound check).
+    iox_write(BASE + R_LOAD_BLOCK, (16'd1500 << 5) | 16'd2);
+    iox_write(BASE + R_LOAD_WC, 16'd512);
+    run_op(OP_READ);
+    expect_time("address outside the drive", T_MIN);
+    if (dut.s_blkaddr != ((16'd1500 << 5) | 16'd2)) begin
+      $display("FAIL: an out-of-range mismatch moved the block address to %o", dut.s_blkaddr);
+      errors = errors + 1;
+    end else
+      $display("[ ok ] out-of-range mismatch left the block address alone");
+
     // Seeks along the curve.
     seek(0,    1, 0,    "seek of 0 cylinders");
     seek(1,    1, 1,    "seek of 1 cylinder");          // arm 1

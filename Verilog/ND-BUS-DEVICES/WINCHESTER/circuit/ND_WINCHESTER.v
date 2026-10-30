@@ -1170,11 +1170,14 @@ module ND_WINCHESTER #(
                   // cleared there, and the memory address stays as loaded, since
                   // s_dma_addr_r starts at it and nothing moves it.
                   if (w_out_of_range) begin
-                    // Nothing found, but the sector it failed on counts: + 1.
+                    // As nd100x: an address outside the drive (cylinder, head
+                    // or sector past its geometry) is a mismatch that ends
+                    // through wd_end_later - the flat delay, here T_MIN - and
+                    // leaves the block address where it was. Only the
+                    // run-off case below moves it on.
                     s_addr_mismatch <= 1'b1;
-                    s_blk_adv   <= 8'd1;
-                    // The card looks for the sector as it comes round.
-                    drive_time(xfer_ticks(w_go_sec, 8'd1));
+                    s_blk_adv   <= 8'd0;
+                    drive_time(T_MIN);
                     s_delay_cnt <= END_DELAY;
                     s_eng       <= E_DELAY;
                   end else if (w_runs_off) begin
