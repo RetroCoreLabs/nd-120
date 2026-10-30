@@ -253,7 +253,7 @@ RTC fires → trap `o016` (octal) → `PANVC[5]` → microcode CONT with `COMM,C
 
 After the WCS loads and the CPU starts at `o02001`, it runs the built-in self-test sequence:
 
-### Phase 1: MACL (Microcode All Loaded)
+### Phase 1: MACL (Master Clear)
 
 The microcode writes to `COMM,SIOC` with value `30120` (octal):
 
@@ -261,9 +261,14 @@ The microcode writes to `COMM,SIOC` with value `30120` (octal):
 COMM,SIOC ← 30120
 ```
 
-This write sets:
-- Bit 5 (red LED) = 1 → Master Clear / MACL in progress indicator
+030120 has bit 5 = 0 and bit 4 = 1. That means:
+- Bit 5 = 0 → EMCL_n low → MCL = NOT(EMCL_n AND CLEAR_n) is active: the bus master clear
+  (MCL~ on C-plug B20) resets the I/O cards (`ND120_CORE.v`, BMCL block), and the red LED
+  is lit (the LEDs are active low, `IO_REG_41.v`)
+- Bit 4 = 1 → green LED off
 - Other control bits for the I/O controller
+
+The operator command MACL at the microprogram console runs this same routine again.
 
 Simultaneously, the `AB,MACL` microcode scratch location is set non-zero at vector 0 and cleared at `STOP2` when it is safe to leave that phase.
 
@@ -288,9 +293,9 @@ If all self-tests pass, the microcode writes:
 COMM,SIOC ← 30140
 ```
 
-This sets:
-- Bit 4 (green LED) = 1 → Initialization complete
-- Bit 5 (red LED) = 1 → Master Clear remains set
+030140 has bit 5 = 1 and bit 4 = 0. That means:
+- Bit 5 = 1 → EMCL_n high → master clear released, the I/O cards leave reset, red LED off
+- Bit 4 = 0 → green LED lit → initialization complete
 
 Then `AB,STATUS` is written with the current SIOC value (30140), recording the post-MACL2 I/O controller state.
 
@@ -329,21 +334,24 @@ Three ND-120-specific scratchpad locations are used during boot. **Note**: `AB,N
 
 ## 10. SIOC LED Signals
 
-The `COMM,SIOC` register controls I/O controller state and maps to physical LEDs on the operator panel:
+The `COMM,SIOC` register controls I/O controller state and drives the two CPU-board LEDs.
+Both LEDs are ACTIVE LOW: a bit at 0 lights its LED (measured on the MiSTer port, see the
+comment at `IOLED` in `CPU-BOARD-3202/circuit/IO_REG_41.v`).
 
-| Bit | Value (octal) | Color | Meaning |
-|-----|--------------|-------|---------|
-| 4   | 000020       | Green | Initialization complete (set at MACL2) |
-| 5   | 000040       | Red   | Master Clear / MACL in progress |
+| Bit | Value (octal) | Signal | LED | At 0 |
+|-----|--------------|--------|-----|------|
+| 4   | 000020       | green LED, active low | Green | Initialization complete (MACL2 clears it) |
+| 5   | 000040       | EMCL_n | Red | Master clear active: MCL drives the bus MCL~, the I/O cards are reset (MACL clears it) |
 
 ### Write sequence
 
-| Phase | SIOC value | Green (bit 4) | Red (bit 5) |
-|-------|-----------|--------------|------------|
-| MACL  | 30120     | 0            | 1          |
-| MACL2 | 30140     | 1            | 1          |
+| Phase | SIOC value | Bit 4 | Bit 5 | Green | Red | Bus master clear |
+|-------|-----------|-------|-------|-------|-----|------------------|
+| MACL  | 30120     | 1     | 0     | off   | on  | active |
+| MACL2 | 30140     | 0     | 1     | on    | off | released |
 
-Both LEDs lit after MACL2 = normal post-boot state. Only red during MACL = self-test running.
+Green on and red off after MACL2 is the normal post-boot state. Red on during MACL means
+the master clear and the self-test are running.
 
 ---
 
@@ -441,8 +449,8 @@ cd Verilog/runSim && make compile && make run
 | Signal | Description |
 |--------|-------------|
 | `COMM,SIOC` | I/O controller register, written by microcode |
-| Bit 4 (green) | Initialization complete — set at MACL2 |
-| Bit 5 (red) | Master Clear / MACL in progress — set at MACL |
+| Bit 4 (green, active low) | Initialization complete — cleared to 0 at MACL2 |
+| Bit 5 (EMCL_n, red, active low) | Master clear active, bus cards in reset — cleared to 0 at MACL, set at MACL2 |
 
 ---
 

@@ -222,6 +222,16 @@ static void buildRegistry()
                               "IO.REG_MODULE.s_ioc_3" };
     g_registry["SIOC_n"]  = { 1,  RD(ND120_TOP__DOT__CORE__DOT__CPU_BOARD__DOT__IO__DOT__REG_MODULE__DOT__SIOC_n),
                               "IO.REG_MODULE.SIOC_n" };
+    // ---- master clear: IOC bit 5 (EMCL_n), the CPU's MCL output, and the
+    // bus master clear the I/O cards are reset by (ND120_CORE s_card_rst_n).
+    // Read as model members: VPI did not resolve these, and its reads of
+    // signals inside the device generate blocks did not follow the RTL.
+    g_registry["EMCL_n"]   = { 1, RD(ND120_TOP__DOT__CORE__DOT__CPU_BOARD__DOT__IO__DOT__REG_MODULE__DOT__s_emcl_n),
+                               "IO.REG_MODULE.s_emcl_n" };
+    // CORE.MCL is the bus MCL~ (ND3202D.v: MCL = ~s_mcl), so 0 = master clear active.
+    g_registry["MCL_n"]    = { 1, RD(ND120_TOP__DOT__CORE__DOT__MCL), "CORE.MCL (bus MCL~)" };
+    g_registry["CARD_RST_N"] = { 1, RD(ND120_TOP__DOT__CORE__DOT__s_card_rst_n),
+                                 "CORE.s_card_rst_n" };
     g_registry["RTC"]     = { 1,  RD(ND120_TOP__DOT__CORE__DOT__CPU_BOARD__DOT__IO__DOT__DCD__DOT__DGA__DOT__POW__DOT__s_rtc),
                               "IO.DCD.DGA.POW.s_rtc" };
     g_registry["RTC_CNT"] = { 32, RD(ND120_TOP__DOT__CORE__DOT__CPU_BOARD__DOT__IO__DOT__DCD__DOT__DGA__DOT__POW__DOT__s_rtc_cnt),

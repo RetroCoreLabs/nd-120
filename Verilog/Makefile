@@ -12,6 +12,8 @@
 #                      - fpga/mega65 vtest (full R6 machine boot on a 16-bit
 #                        SDRAM model, RETURN through the framework's key scan
 #                        answered by MOPC, ~3 min)
+#                      - sim test-bmcl (bus master clear reaches the I/O
+#                        cards at power-up and on the operator MACL command)
 #
 #   make test-tape   heavy system gate for the Verilog tape-400 device
 #                    (ND-BUS-DEVICES): boots INSTRUCTION-B twice via
@@ -113,6 +115,8 @@ test-full: test
 	$(MAKE) test-floppy-stdin
 	$(MAKE) test-smd-boot
 	$(MAKE) test-democore
+	@echo "==== system gate: BMCL reaches the I/O cards (power-up and MACL) ===="
+	$(MAKE) -C sim test-bmcl
 	$(MAKE) test-instr-argument
 	@echo ""
 	@echo "===================================================================="

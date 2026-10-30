@@ -112,7 +112,7 @@ all: test
 test: test-wd-iox test-wd-adapter test-wd-oracle test-wd-bus test-wd-storage \
       test-wd-wcsweep test-wd-dmapath \
       test-wd-storage-uncached test-wd-storage-sdram test-wd-rtz test-wd-decode \
-      test-wd-compare
+      test-wd-compare test-wd-timing
 
 nd_winchester_storage_tb.vvp: $(STOR_SRCS)
 	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(STOR_SRCS)
@@ -195,6 +195,21 @@ test-wd-rtz: nd_winchester_rtz_tb.vvp
 	@grep -q "TB_RESULT: PASS" wd_rtz_out.log
 
 .PHONY: test-wd-rtz
+
+# test-wd-timing: real drive timing (FAST = 0). Seeks along the Micropolis
+#   curve and transfers that end as their last sector passes the head, checked
+#   against nd100x's own formulas (wd_seek_ticks, wd_transfer_ticks).
+TIM_SRCS = ../circuit/ND_WINCHESTER.v \
+           nd_winchester_timing_tb.v
+
+nd_winchester_timing_tb.vvp: $(TIM_SRCS)
+	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(TIM_SRCS)
+
+test-wd-timing: nd_winchester_timing_tb.vvp
+	$(VVP) nd_winchester_timing_tb.vvp | tee wd_timing_out.log
+	@grep -q "TB_RESULT: PASS" wd_timing_out.log
+
+.PHONY: test-wd-timing
 
 nd_winchester_compare_tb.vvp: $(CMP_SRCS)
 	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(CMP_SRCS)

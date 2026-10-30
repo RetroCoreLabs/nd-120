@@ -761,6 +761,9 @@ REGISTRY=(
   "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-compare :: TB_RESULT: PASS"
   "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-boothang :: TB_RESULT: PASS"
   "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-ticks :: TB_RESULT: PASS"
+  # Real drive timing (FAST = 0): Micropolis seek curve and rotation, checked
+  # against nd100x's formulas.
+  "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-timing :: TB_RESULT: PASS"
 )
 # NOT in the registry (run manually, documented reasons):
 #   DECODE-GateArray/DGA/sim test-f595-transparency - FAILS BY DESIGN on the
@@ -772,6 +775,9 @@ REGISTRY=(
 #     race-documentation tbs with EXPECTED FAIL lines; not strict pass/fail.
 #   Verilog/sim make compare, runSim golden, fpga vtest - heavy system gates,
 #     run via `make test-full`.
+#   Verilog/sim test-bmcl - bus master clear reaches the I/O cards at
+#     power-up and on MACL. Needs the whole-machine probe-wd engine build
+#     (several minutes), so it runs in `make test-full`, not here.
 #   Verilog make test-democore - the NDDeviceCore RTL EQUIVALENCE GATE
 #     (portable C99 nd_lineprinter driven by the real ND-120 CPU + bus RTL,
 #     verdict line "[democore] RESULT: PASS"). Deliberately NOT in this

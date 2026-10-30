@@ -108,6 +108,14 @@ module ND_WINCHESTER #(
     // own clock frequency. The module default stays small so the unit
     // testbenches run fast. Same rule as ND_SMD.v's DELAY_TICKS.
     parameter [31:0] DELAY_TICKS = 32'd10,
+    // Drive timing. FAST = 1 (the default): every operation ends DELAY_TICKS
+    // after its data has moved, as before. FAST = 0: the operation takes as
+    // long as the drive does - the arm's seek and the disc's rotation, in
+    // sysclk cycles worked out from CLK_HZ (see "DRIVE TIMING" below). CLK_HZ
+    // is the frequency of sysclk; the board wrapper passes its own, like
+    // DELAY_TICKS.
+    parameter integer CLK_HZ     = 100_000_000,
+    parameter [0:0]  FAST        = 1'b1,
     // Geometry for the address-mismatch bound. Default = the Micropolis 1325
     // (the DISC-74-1): 8 heads, 9 sectors/track, 1024 cylinders, 1024-byte
     // sectors. That is the drive SINTRAN boots from, and the default both C
@@ -206,6 +214,92 @@ module ND_WINCHESTER #(
   localparam [2:0] OP_WR_FORMAT  = 3'd5;  // M5
   localparam [2:0] OP_LOAD_CTRL  = 3'd6;  // M6 - 3038 only, NOT activated
   localparam [2:0] OP_RTZ        = 3'd7;  // M7
+
+  /*---------------------------------------------
+  *  DRIVE TIMING (used when FAST = 0)
+  *--------------------------------------------*/
+  // The same model as nd100x device_winchester.c "DRIVE TIMING", in sysclk
+  // cycles instead of instruction ticks. The figures are the Micropolis 1320
+  // series' (the 1325 is the DISC-74MB): track-to-track seek 6 ms, average
+  // seek 28 ms "including settling time", maximum seek 62 ms, 3600 rpm.
+  //
+  // NOT in the data sheet, and so an assumption (nd100x BUGS.md W9): the shape
+  // of the seek curve between those three points. Two straight lines through
+  // (1 cylinder, 6 ms), (one third of the stroke, 28 ms) and (full stroke,
+  // 62 ms), as nd100x draws it.
+  //
+  // One revolution is CLK_HZ / 60 cycles (3600 rpm = 60 turns a second),
+  // rounded down to a whole number of sector times so every sector starts on
+  // a whole cycle. nd100x rounds the revolution to 16.7 ms instead.
+  //
+  // Every operation lasts at least T_MIN, 20 us: the same floor as nd100x's
+  // IODELAY_HDD (10 instruction ticks, 19 us), so no operation ends before a
+  // guest can read the status after activating it.
+  // All of them are 32-bit unsigned, like the counters they load.
+  localparam [31:0] CLK32       = CLK_HZ;
+  localparam [31:0] SPT32       = {16'd0, GEO_SPT};
+  localparam [31:0] T_MS        = CLK32 / 32'd1000;
+  localparam [31:0] T_SEEK_ONE  = 32'd6  * T_MS;
+  localparam [31:0] T_SEEK_AVG  = 32'd28 * T_MS;
+  localparam [31:0] T_SEEK_FULL = 32'd62 * T_MS;
+  localparam [31:0] T_SECTOR    = (CLK32 / 32'd60) / SPT32;
+  localparam [31:0] T_REV       = T_SECTOR * SPT32;
+  localparam [31:0] T_MIN       = (CLK32 / 32'd50_000) != 32'd0 ? (CLK32 / 32'd50_000) : 32'd1;
+  // The seek curve. CYL_FULL is the full stroke in cylinders, CYL_THIRD the
+  // knee. Each cylinder the arm crosses after the first costs S1_Q (or S2_Q
+  // past the knee) cycles plus a carry from a running remainder, so a seek of
+  // d cylinders totals exactly nd100x's wd_seek_ticks: 6 ms + (d-1) * (28-6)
+  // ms / (third-1) up to the knee, 28 ms + (d-third) * (62-28) ms /
+  // (full-third) past it, each rounded down once.
+  localparam [31:0] CYL_FULL    = {16'd0, GEO_MAX_CYL} - 32'd1;
+  localparam [31:0] CYL_THIRD   = CYL_FULL / 32'd3;
+  // A drive too small for a curve (nd100x: full < 3 or third < 2) takes the
+  // track-to-track time for every seek.
+  localparam        SEEK_FLAT   = (CYL_FULL < 32'd3) || (CYL_THIRD < 32'd2);
+  localparam [31:0] S1_B        = SEEK_FLAT ? 32'd1 : (CYL_THIRD - 32'd1);
+  localparam [31:0] S1_Q        = (T_SEEK_AVG - T_SEEK_ONE) / S1_B;
+  localparam [31:0] S1_R        = (T_SEEK_AVG - T_SEEK_ONE) % S1_B;
+  localparam [31:0] S2_B        = SEEK_FLAT ? 32'd1 : (CYL_FULL - CYL_THIRD);
+  localparam [31:0] S2_Q        = (T_SEEK_FULL - T_SEEK_AVG) / S2_B;
+  localparam [31:0] S2_R        = (T_SEEK_FULL - T_SEEK_AVG) % S2_B;
+
+  // What a completion waits for after the data has moved: the flat delay
+  // when FAST, otherwise nothing more than the drive time left (s_drv_left).
+  localparam [31:0] END_DELAY    = FAST ? DELAY_TICKS : 32'd0;
+
+  // The disc turns all the time: r_rot is where it is, 0 .. T_REV-1, and
+  // sector s starts under the head when r_rot = s * T_SECTOR. One phase for
+  // both units, as in nd100x (two real spindles are not locked together; an
+  // assumption that only shifts each wait). It starts at 0 on the card reset,
+  // which a real spindle does not do; only the phase is affected.
+  reg [31:0] r_rot;
+  always @(posedge sysclk or negedge sys_rst_n) begin
+    if (!sys_rst_n)                    r_rot <= 32'd0;
+    else if (r_rot >= T_REV - 1)       r_rot <= 32'd0;
+    else                               r_rot <= r_rot + 32'd1;
+  end
+
+  // Cycles from now until `sec` is under the head, then `n` sector times:
+  // nd100x wd_transfer_ticks, floored at T_MIN. Three small functions, so
+  // none needs a temporary.
+  function [31:0] sec_start(input [4:0] sec);   // where sector `sec` begins
+    sec_start = ({27'd0, sec} % SPT32) * T_SECTOR;
+  endfunction
+  function [31:0] rot_wait(input [31:0] start); // until the disc is at `start`
+    rot_wait = (start >= r_rot) ? (start - r_rot) : (start + T_REV - r_rot);
+  endfunction
+  function [31:0] at_least_min(input [31:0] t);
+    at_least_min = (t < T_MIN) ? T_MIN : t;
+  endfunction
+  function [31:0] xfer_ticks(input [4:0] sec, input [7:0] n);
+    xfer_ticks = at_least_min(rot_wait(sec_start(sec)) + {24'd0, n} * T_SECTOR);
+  endfunction
+
+  reg [31:0] s_drv_left;   // drive time still to run for this operation
+  reg [15:0] s_seek_k;     // next cylinder of the seek to charge (2 ..)
+  reg [15:0] s_seek_d;     // the seek's distance in cylinders
+  reg [31:0] s_seek_acc;   // the running remainder of the curve
+  wire       w_drv_busy = (s_drv_left != 32'd0) || (s_seek_k <= s_seek_d);
 
   // ---- controller registers ----
   reg [15:0] s_mem_addr_lo;   // memory address bits 0-15
@@ -498,6 +592,18 @@ module ND_WINCHESTER #(
   wire        w_go_unit = iox_wdata[9];
   wire [10:0] w_go_cyl  = w_cyl;
   wire [4:0]  w_go_sec  = w_sector;
+
+  // Where an M4 in this control word leaves the arm, and how far it moves.
+  // Step count in the word-count register, direction in b14 (0 = towards
+  // cylinder 0), clamped at both stops; see OP_SEEK below.
+  wire [15:0] w_seek_old = s_cyl_pos[iox_wdata[9]];
+  wire [16:0] w_seek_up  = {1'b0, w_seek_old} + {1'b0, s_word_cnt};
+  wire [15:0] w_seek_new = !iox_wdata[14] ?
+                           ((w_seek_old > s_word_cnt) ? (w_seek_old - s_word_cnt) : 16'd0) :
+                           ((w_seek_up > {1'b0, GEO_MAX_CYL - 16'd1}) ?
+                            (GEO_MAX_CYL - 16'd1) : w_seek_up[15:0]);
+  wire [15:0] w_seek_dist = (w_seek_new > w_seek_old) ? (w_seek_new - w_seek_old) :
+                                                         (w_seek_old - w_seek_new);
   wire [23:0] w_words   = {8'd0, s_word_cnt};
   wire [23:0] w_go_words = w_go_clr ? 24'd0 : w_words;
 
@@ -597,6 +703,7 @@ module ND_WINCHESTER #(
       // a transfer does not move; it was already on its cylinder.
       s_on_cyl[s_unit] <= 1'b1;
       s_eng      <= E_IDLE;
+      drive_time(32'd0);   // the operation is over, so is its drive time
       s_dma_wait <= 1'b0;
       if (s_errint_en) s_irq <= 1'b1;
       else             s_irq <= s_int_en;   // sec 4.1: ready && enabled
@@ -676,6 +783,40 @@ module ND_WINCHESTER #(
         // b9 CRC error (sec 3.5) - CARDIO, FATCHAIN, WRPROT, WRALIGN
         default:           s_crc_err       <= 1'b1;
       endcase
+    end
+  endtask
+
+  // Load the drive time of an operation that is not a seek (FAST = 0 only;
+  // when FAST the timer stays 0 and completion is END_DELAY after the data).
+  task drive_time;
+    input [31:0] ticks;
+    begin
+      s_drv_left <= FAST ? 32'd0 : ticks;
+      s_seek_d   <= 16'd0;
+      s_seek_k   <= 16'd1;
+    end
+  endtask
+
+  // Start the arm on a seek of `cyls` cylinders (M4, M7). The first cylinder
+  // costs the track-to-track time at once; the rest are charged one per cycle
+  // by seek_charge above. A zero-cylinder seek still takes T_MIN, and when
+  // FAST it takes DELAY_TICKS like every other operation (s_delay_cnt).
+  task start_seek;
+    input [15:0] cyls;
+    begin
+      s_seek_acc <= 32'd0;
+      s_seek_k   <= 16'd2;
+      if (FAST) begin
+        s_drv_left <= 32'd0;
+        s_seek_d   <= 16'd0;
+      end else if (cyls == 16'd0) begin
+        s_drv_left <= T_MIN;
+        s_seek_d   <= 16'd0;
+      end else begin
+        s_drv_left <= T_SEEK_ONE;
+        s_seek_d   <= SEEK_FLAT ? 16'd1 :
+                      (({16'd0, cyls} > CYL_FULL) ? CYL_FULL[15:0] : cyls);
+      end
     end
   endtask
 
@@ -772,6 +913,10 @@ module ND_WINCHESTER #(
       s_chunk_q      <= 11'd0;
       s_sec_idx      <= 11'd0;
       s_delay_cnt    <= 32'd0;
+      s_drv_left     <= 32'd0;
+      s_seek_k       <= 16'd1;
+      s_seek_d       <= 16'd0;
+      s_seek_acc     <= 32'd0;
       s_dma_wait     <= 1'b0;
       s_dma_addr_r   <= 24'd0;
       s_words_left   <= 24'd0;
@@ -797,6 +942,29 @@ module ND_WINCHESTER #(
       // the cycle disk_req goes out until disk_done comes back.)
       if (disk_done && !disk_req) s_disk_out <= 1'b0;
       else if (disk_req)          s_disk_out <= 1'b1;
+
+      // The drive's own time runs down one cycle at a time (FAST = 0 only;
+      // when FAST it is never loaded and stays 0). While a seek is being
+      // charged, one more cylinder's worth is added each cycle - the arm's
+      // travel along the curve - so the total from the GO is the curve's.
+      // A GO later in this block loads new values over these.
+      if (s_seek_k <= s_seek_d) begin : seek_charge
+        reg        seg1;
+        reg [31:0] acc_n, b, add;
+        seg1  = ({16'd0, s_seek_k} <= CYL_THIRD);
+        b     = seg1 ? S1_B : S2_B;
+        acc_n = s_seek_acc + (seg1 ? S1_R : S2_R);
+        add   = seg1 ? S1_Q : S2_Q;
+        if (acc_n >= b) begin
+          acc_n = acc_n - b;
+          add   = add + 32'd1;
+        end
+        s_seek_acc <= acc_n;
+        s_seek_k   <= s_seek_k + 16'd1;
+        s_drv_left <= s_drv_left + add - ((s_drv_left != 32'd0) ? 32'd1 : 32'd0);
+      end else if (s_drv_left != 32'd0) begin
+        s_drv_left <= s_drv_left - 32'd1;
+      end
 
       // ---- read-strobe side effects (END of access: see the note above) ----
       if (s_rd_end) begin
@@ -866,6 +1034,7 @@ module ND_WINCHESTER #(
               s_dma_ch_err   <= 1'b0;
               clr_ff;
               s_eng          <= E_IDLE;
+              drive_time(32'd0);   // an aborted operation leaves no drive time behind
               s_dma_wait     <= 1'b0;
               s_irq          <= 1'b0;
             end
@@ -928,17 +1097,10 @@ module ND_WINCHESTER #(
                   // used to be allowed to stop ON GEO_MAX_CYL, a cylinder the
                   // drive does not have). What a real drive does when stepped
                   // past either end is not in the manual (nd100x BUGS.md W5).
-                  if (!iox_wdata[14]) begin
-                    s_cyl_pos[iox_wdata[9]] <=
-                        (s_cyl_pos[iox_wdata[9]] > s_word_cnt) ?
-                        (s_cyl_pos[iox_wdata[9]] - s_word_cnt) : 16'd0;
-                  end else begin
-                    s_cyl_pos[iox_wdata[9]] <=
-                        ((s_cyl_pos[iox_wdata[9]] + s_word_cnt) > (GEO_MAX_CYL - 16'd1) ||
-                         (s_cyl_pos[iox_wdata[9]] + s_word_cnt) <
-                          s_cyl_pos[iox_wdata[9]]) ?
-                        (GEO_MAX_CYL - 16'd1) : (s_cyl_pos[iox_wdata[9]] + s_word_cnt);
-                  end
+                  s_cyl_pos[iox_wdata[9]] <= w_seek_new;
+                  // The arm takes the curve's time for the cylinders it
+                  // really moves (nd100x: wd_seek_ticks of the distance moved).
+                  start_seek(w_seek_dist);
                   // Status bit 14 "On cylinder" reads 0 while the heads travel
                   // (sec 3.4.5 "completed when the heads are settled over the
                   // correct tracks"); the completion in E_DELAY puts it back.
@@ -947,7 +1109,7 @@ module ND_WINCHESTER #(
                   // oracle gives every seek one delay, and the OP_RTZ note below
                   // proves from a silicon trace that a short "nothing to do"
                   // shortcut is visible to a guest polling the status.
-                  s_delay_cnt <= DELAY_TICKS;
+                  s_delay_cnt <= END_DELAY;
                   s_eng       <= E_DELAY;
                 end
 
@@ -979,7 +1141,10 @@ module ND_WINCHESTER #(
                   // Not on cylinder while the arm travels home (sec 3.4.8: the
                   // disc seeks to cylinder 0); the completion puts it back.
                   s_on_cyl[iox_wdata[9]] <= 1'b0;
-                  s_delay_cnt <= DELAY_TICKS;
+                  // The way home is a seek from where the arm is (nd100x:
+                  // wd_seek_ticks of the current cylinder).
+                  start_seek(w_seek_old);
+                  s_delay_cnt <= END_DELAY;
                   s_eng       <= E_DELAY;
                 end
 
@@ -1008,7 +1173,9 @@ module ND_WINCHESTER #(
                     // Nothing found, but the sector it failed on counts: + 1.
                     s_addr_mismatch <= 1'b1;
                     s_blk_adv   <= 8'd1;
-                    s_delay_cnt <= DELAY_TICKS;
+                    // The card looks for the sector as it comes round.
+                    drive_time(xfer_ticks(w_go_sec, 8'd1));
+                    s_delay_cnt <= END_DELAY;
                     s_eng       <= E_DELAY;
                   end else if (w_runs_off) begin
                     // The arm is on another cylinder, or the transfer runs off
@@ -1016,11 +1183,17 @@ module ND_WINCHESTER #(
                     // was not.
                     s_addr_mismatch <= 1'b1;
                     s_blk_adv   <= w_found[7:0] + 8'd1;
-                    s_delay_cnt <= DELAY_TICKS;
+                    // The sectors found pass the head, then the one that is not.
+                    drive_time(xfer_ticks(w_go_sec, w_found[7:0] + 8'd1));
+                    s_delay_cnt <= END_DELAY;
                     s_eng       <= E_DELAY;
                   end else if (w_go_words != 24'd0) begin
                     s_blk_adv <= w_go_count;
                     s_is_par  <= (iox_wdata[13:11] == OP_READ_PAR);
+                    // The wait for the first sector, then one sector time
+                    // each. The data moves meanwhile; E_DELAY ends the
+                    // operation when both are done.
+                    drive_time(xfer_ticks(w_go_sec, w_go_count));
                     if (w_disk_out) begin
                       // The backend still owes a done from a cut-short
                       // operation: wait for it (E_WAIT_DISK).
@@ -1030,8 +1203,10 @@ module ND_WINCHESTER #(
                       start_xfer(iox_wdata[13:11], w_go_words);
                     end
                   end else begin
-                    // A zero-length transfer still completes.
-                    s_delay_cnt <= DELAY_TICKS;
+                    // A zero-length transfer still completes (nd100x: the
+                    // flat IODELAY_HDD, here T_MIN).
+                    drive_time(T_MIN);
+                    s_delay_cnt <= END_DELAY;
                     s_eng       <= E_DELAY;
                   end
                 end
@@ -1059,7 +1234,13 @@ module ND_WINCHESTER #(
                   // SINTRAN reads block 0 twice and compares it. nd100x moves
                   // on; the Tang re-issued block 0 eleven times and gave up
                   // with SINTRAN's own 'TRANSFER ERROR' message.
-                  s_delay_cnt <= DELAY_TICKS;
+                  //
+                  // The time is the drive's even while the address fields are
+                  // a stub: a format writes the whole track from sector 0
+                  // round (nd100x). Any other code here gets T_MIN.
+                  drive_time((iox_wdata[13:11] == OP_WR_FORMAT) ?
+                             xfer_ticks(5'd0, GEO_SPT[7:0]) : T_MIN);
+                  s_delay_cnt <= END_DELAY;
                   s_eng       <= E_DELAY;
                 end
               endcase
@@ -1139,7 +1320,7 @@ module ND_WINCHESTER #(
               s_dma_addr_r <= s_dma_addr_r + {13'd0, s_chunk_q};
               s_words_left <= s_words_left - {13'd0, s_chunk_q};
               if (s_words_left <= {13'd0, s_chunk_q}) begin
-                s_delay_cnt <= DELAY_TICKS;
+                s_delay_cnt <= END_DELAY;
                 s_eng       <= E_DELAY;
               end else begin
                 s_chunk_q <= ((s_words_left - {13'd0, s_chunk_q}) > {13'd0, BUF_WORDS}) ?
@@ -1169,7 +1350,7 @@ module ND_WINCHESTER #(
               s_words_left <= s_words_left - 24'd1;
               if (s_sec_idx + 11'd1 >= s_chunk_q || s_words_left == 24'd1) begin
                 if (s_words_left == 24'd1) begin
-                  s_delay_cnt <= DELAY_TICKS;
+                  s_delay_cnt <= END_DELAY;
                   s_eng       <= E_DELAY;
                 end else begin
                   s_chunk_q <= ((s_words_left - 24'd1) > {13'd0, BUF_WORDS}) ?
@@ -1217,7 +1398,7 @@ module ND_WINCHESTER #(
               s_words_left <= s_words_left - 24'd1;
               if (s_sec_idx + 11'd1 >= s_chunk_q || s_words_left == 24'd1) begin
                 if (s_words_left == 24'd1) begin
-                  s_delay_cnt <= DELAY_TICKS;
+                  s_delay_cnt <= END_DELAY;
                   s_eng       <= E_DELAY;
                 end else begin
                   s_chunk_q <= ((s_words_left - 24'd1) > {13'd0, BUF_WORDS}) ?
@@ -1268,7 +1449,7 @@ module ND_WINCHESTER #(
               set_backend_fault(disk_err_code);
               err_active;
             end else if (s_words_left == 24'd0) begin
-              s_delay_cnt <= DELAY_TICKS;
+              s_delay_cnt <= END_DELAY;
               s_eng       <= E_DELAY;
             end else begin
               s_chunk_q <= (s_words_left > {13'd0, BUF_WORDS}) ?
@@ -1280,10 +1461,12 @@ module ND_WINCHESTER #(
         end
 
         // Completion delay, then FinishOperation.
+        // Ends when the flat delay (FAST) and the drive time (FAST = 0) are
+        // both over; in each mode the other one is 0.
         E_DELAY: begin
           if (s_delay_cnt != 32'd0) begin
             s_delay_cnt <= s_delay_cnt - 32'd1;
-          end else begin
+          end else if (!w_drv_busy) begin
             s_active <= 1'b0;
             s_rft    <= 1'b1;
             trace_done <= 1'b1;

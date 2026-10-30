@@ -238,6 +238,15 @@ probe-wd: nd120_probe.cpp
 	cd obj_dir_probe_wd && make -f VND120_TOP.mk VND120_TOP
 	@echo "=== probe-wd engine built: obj_dir_probe_wd/VND120_TOP (set ND120_WD_IMG) ==="
 
+# BMCL gate: the bus master clear (CPU MCL, ND120_CORE s_card_rst_n) reaches the
+# I/O cards at power-up and when the operator types MACL. Whole machine, so it
+# needs the probe-wd engine (FF mode) and runs from Verilog/Makefile test-full.
+.PHONY: test-bmcl
+test-bmcl:
+	$(MAKE) probe-wd USE_LATCHES=0
+	python3 test_bmcl.py | tee /tmp/nd120_bmcl.log
+	grep -q "TB_RESULT: PASS" /tmp/nd120_bmcl.log
+
 # --- PROBE variant: WINCHESTER SERVED THROUGH THE REAL SD-FAT STACK ----------
 # ADDITIVE target, own Mdir - never clobbers probe / probe-floppy / probe-wd.
 #

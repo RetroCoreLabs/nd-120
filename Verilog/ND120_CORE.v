@@ -554,6 +554,38 @@ module ND120_CORE #(
   wire        s_dma_bdap_n, s_fdmam_bdap_n, s_smdm_bdap_n, s_wdm_bdap_n;
 
   /*---------------------------------------------
+  *  BMCL - bus master clear to the I/O cards
+  *--------------------------------------------*/
+  // On the ND-100 bus, BMCL is "logic initialization at power up and Master
+  // Clear button" (docs/nd100-bus-dma.md, signal table, F.2): every card is
+  // reset by it. The CPU drives it as MCL (C-plug B20), MCL = NOT(EMCL_n AND
+  // CLEAR_n) in DECODE_DGA_POW / IO_DCD_38: active during the board reset, and
+  // while the micro code holds EMCL_n low. EMCL_n is bit 5 of the IOC register
+  // (IO_REG_41, chip 28A). The DELILAH-L master clear routine MACL (CS 002001,
+  // reached at power-up and by the operator command MACL) writes SIOC = 030120,
+  // bit 5 = 0, so MCL is active; MACL2 (CS 002160) writes 030140, bit 5 = 1,
+  // and releases it. The red CPU-board LED shows the same bit.
+  //
+  // Before this, the cards saw only the board reset, so an operator master
+  // clear never reached them: a Winchester arm left on another cylinder by
+  // SINTRAN stayed there, and the next mass storage load could not find block 0
+  // (ND-11.015.01 sec 3.4.8: "Return to zero by pushing the master clear
+  // button"). The release is taken through two sysclk stages so the cards'
+  // asynchronous resets end on a clock edge; the board reset still clears them
+  // at once.
+  //
+  // Polarity: the port MCL is the bus signal MCL~ (C-plug B20 "after
+  // negation"), active LOW. CPU-BOARD-3202/circuit/ND3202D.v drives it as
+  // MCL = ~s_mcl, where s_mcl is the active-high MCL from IO_DCD_38. So MCL = 0
+  // means master clear is active, and MCL itself is the cards' reset_n.
+  reg [1:0] r_bmcl_sync;
+  always @(posedge s_dev_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) r_bmcl_sync <= 2'b00;
+    else            r_bmcl_sync <= {r_bmcl_sync[0], MCL};
+  end
+  wire s_card_rst_n = r_bmcl_sync[1];
+
+  /*---------------------------------------------
   *  ND-BUS slave shell (present with any device)
   *--------------------------------------------*/
   generate
@@ -616,7 +648,7 @@ module ND120_CORE #(
           .INT_LEVEL (4'd12)
       ) TAPE_400 (
           .sysclk(s_dev_clk),
-          .sys_rst_n(sys_rst_n),
+          .sys_rst_n(s_card_rst_n),  // BMCL, see above
           .iox_addr(s_dev_iox_addr),
           .iox_wr(s_dev_iox_wr),
           .iox_wdata(s_dev_iox_wdata),
@@ -666,7 +698,7 @@ module ND120_CORE #(
           .INT_LEVEL (4'd11)
       ) FLOPPY_1560 (
           .sysclk(s_dev_clk),
-          .sys_rst_n(sys_rst_n),
+          .sys_rst_n(s_card_rst_n),  // BMCL, see above
           .iox_addr(s_dev_iox_addr),
           .iox_wr(s_dev_iox_wr),
           .iox_wdata(s_dev_iox_wdata),
@@ -708,7 +740,7 @@ module ND120_CORE #(
           .TIMEOUT_TICKS(16'd8192)
       ) FLOPPY_DMA_MASTER (
           .sysclk(s_dev_clk),
-          .sys_rst_n(sys_rst_n),
+          .sys_rst_n(s_card_rst_n),  // BMCL, see above
           .dma_req(s_fdma_req),
           .dma_wr(s_fdma_wr),
           .dma_addr(s_fdma_addr),
@@ -774,7 +806,7 @@ module ND120_CORE #(
           .HAS_WC_FLIPFLOP(SMD_HAS_FLIPFLOP)
       ) SMD_1540 (
           .sysclk(s_dev_clk),
-          .sys_rst_n(sys_rst_n),
+          .sys_rst_n(s_card_rst_n),  // BMCL, see above
           .iox_addr(s_dev_iox_addr),
           .iox_wr(s_dev_iox_wr),
           .iox_wdata(s_dev_iox_wdata),
@@ -816,7 +848,7 @@ module ND120_CORE #(
           .TIMEOUT_TICKS(16'd8192)
       ) SMD_DMA_MASTER (
           .sysclk(s_dev_clk),
-          .sys_rst_n(sys_rst_n),
+          .sys_rst_n(s_card_rst_n),  // BMCL, see above
           .dma_req(s_smd_req),
           .dma_wr(s_smd_wr),
           .dma_addr(s_smd_addr),
@@ -883,6 +915,15 @@ module ND120_CORE #(
           .IDENT_CODE (16'o000001),
           .INT_LEVEL  (4'd11),
           .DELAY_TICKS(SMD_DELAY_TICKS),
+          // Drive timing: fast (a flat DELAY_TICKS) unless the build defines
+          // ND120_WD_REAL_TIMING, then the Micropolis seek curve and 3600 rpm
+          // rotation, counted in this board's own clock.
+          .CLK_HZ     (DEV_CLK_HZ),
+`ifdef ND120_WD_REAL_TIMING
+          .FAST       (1'b0),
+`else
+          .FAST       (1'b1),
+`endif
           // Micropolis 1325 (the DISC-74-1) - the drive SINTRAN boots from,
           // and the default in both C models. MUST match the GEO_* the
           // storage adapter in front of the backend is given.
@@ -891,7 +932,7 @@ module ND120_CORE #(
           .GEO_MAX_CYL(16'd1024)
       ) WD_500 (
           .sysclk(s_dev_clk),
-          .sys_rst_n(sys_rst_n),
+          .sys_rst_n(s_card_rst_n),  // BMCL, see above
           .iox_addr(s_dev_iox_addr),
           .iox_wr(s_dev_iox_wr),
           .iox_wdata(s_dev_iox_wdata),
@@ -946,7 +987,7 @@ module ND120_CORE #(
           .TIMEOUT_TICKS(16'd8192)
       ) WD_DMA_MASTER (
           .sysclk(s_dev_clk),
-          .sys_rst_n(sys_rst_n),
+          .sys_rst_n(s_card_rst_n),  // BMCL, see above
           .dma_req(s_wd_req),
           .dma_wr(s_wd_wr),
           .dma_addr(s_wd_addr),
