@@ -58,9 +58,16 @@ ERR_SRCS = ../circuit/ND_SMD.v \
 TIMING_SRCS = ../circuit/ND_SMD.v \
               nd_smd_timing_tb.v
 
+# test-smd-ops: the operations the other benches do not reach, against
+#   nd100x - ECC control in one write, test-mode M0 / M3, Write Format (M5)
+#   field reads and its timeout and mismatch ends, M1 with a failed memory
+#   read, M8, M9, codes 10-15, and a GO on a not-specified unit.
+OPS_SRCS = ../circuit/ND_SMD.v \
+           nd_smd_ops_tb.v
+
 all: test
 
-test: test-smd test-smd-iox test-smd-p2 test-smd-ecc test-smd-err test-smd-timing
+test: test-smd test-smd-iox test-smd-p2 test-smd-ecc test-smd-err test-smd-timing test-smd-ops
 
 nd_smd_tb.vvp: $(SRCS)
 	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(SRCS)
@@ -104,7 +111,14 @@ test-smd-timing: nd_smd_timing_tb.vvp
 	$(VVP) nd_smd_timing_tb.vvp | tee smd_timing_out.log
 	@grep -q "TB_RESULT: PASS" smd_timing_out.log
 
+nd_smd_ops_tb.vvp: $(OPS_SRCS)
+	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(OPS_SRCS)
+
+test-smd-ops: nd_smd_ops_tb.vvp
+	$(VVP) nd_smd_ops_tb.vvp | tee smd_ops_out.log
+	@grep -q "TB_RESULT: PASS" smd_ops_out.log
+
 clean:
 	rm -f *.vvp *.log *.vcd
 
-.PHONY: all test test-smd test-smd-iox test-smd-p2 test-smd-ecc test-smd-err test-smd-timing clean
+.PHONY: all test test-smd test-smd-iox test-smd-p2 test-smd-ecc test-smd-err test-smd-timing test-smd-ops clean
