@@ -766,6 +766,9 @@ REGISTRY=(
   # Real drive timing (FAST = 0): Micropolis seek curve and rotation, checked
   # against nd100x's formulas.
   "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-timing :: TB_RESULT: PASS"
+  # Write Format (M5) reads its address fields from memory and moves the
+  # memory address and word count on by them, as nd100x does.
+  "ND-BUS-DEVICES/WINCHESTER/sim :: test-wd-format :: TB_RESULT: PASS"
 )
 # NOT in the registry (run manually, documented reasons):
 #   DECODE-GateArray/DGA/sim test-f595-transparency - FAILS BY DESIGN on the

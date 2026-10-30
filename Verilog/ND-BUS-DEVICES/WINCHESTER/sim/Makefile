@@ -112,7 +112,7 @@ all: test
 test: test-wd-iox test-wd-adapter test-wd-oracle test-wd-bus test-wd-storage \
       test-wd-wcsweep test-wd-dmapath \
       test-wd-storage-uncached test-wd-storage-sdram test-wd-rtz test-wd-decode \
-      test-wd-compare test-wd-timing
+      test-wd-compare test-wd-timing test-wd-format
 
 nd_winchester_storage_tb.vvp: $(STOR_SRCS)
 	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(STOR_SRCS)
@@ -219,6 +219,23 @@ test-wd-compare: nd_winchester_compare_tb.vvp
 	@grep -q "TB_RESULT: PASS" wd_compare_out.log
 
 .PHONY: test-wd-compare
+
+# test-wd-format: Write Format (M5) data side, against nd100x
+#   WD_OP_WRITE_FORMAT - the address fields DMA-read two words per sector
+#   (at most one track), the memory address and word count moved on by them,
+#   the out-of-drive address mismatch that ends later, and a failed field
+#   read. The fields are not kept (nd100x BUGS.md W2; Verilog/TODO.md).
+FMT_SRCS = ../circuit/ND_WINCHESTER.v \
+           nd_winchester_format_tb.v
+
+nd_winchester_format_tb.vvp: $(FMT_SRCS)
+	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(FMT_SRCS)
+
+test-wd-format: nd_winchester_format_tb.vvp
+	$(VVP) nd_winchester_format_tb.vvp | tee wd_format_out.log
+	@grep -q "TB_RESULT: PASS" wd_format_out.log
+
+.PHONY: test-wd-format
 
 nd_winchester_bus_tb.vvp: $(BUS_SRCS)
 	$(IVERILOG) -g2005 $(ND_INC) -o $@ $(BUS_SRCS)

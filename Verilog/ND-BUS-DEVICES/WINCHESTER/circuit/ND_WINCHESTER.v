@@ -544,21 +544,29 @@ module ND_WINCHESTER #(
   end
 
   // ---- transfer engine ----
-  localparam E_IDLE    = 3'd0;
-  localparam E_DISK_RD = 3'd1;  // backend: image chunk -> buffer
-  localparam E_MEM_WR  = 3'd2;  // DMA: buffer -> ND memory
-  localparam E_MEM_RD  = 3'd3;  // DMA: ND memory -> buffer
-  localparam E_DISK_WR = 3'd4;  // backend: buffer -> image chunk
-  localparam E_DELAY   = 3'd5;  // completion delay -> FinishOperation
-  localparam E_MEM_CMP = 3'd6;  // DMA: ND memory vs buffer (M3 compare)
+  // Four bits: the eight three-bit codes were all in use when M5 got a state
+  // of its own (E_FMT_RD).
+  localparam [3:0] E_IDLE    = 4'd0;
+  localparam [3:0] E_DISK_RD = 4'd1;  // backend: image chunk -> buffer
+  localparam [3:0] E_MEM_WR  = 4'd2;  // DMA: buffer -> ND memory
+  localparam [3:0] E_MEM_RD  = 4'd3;  // DMA: ND memory -> buffer
+  localparam [3:0] E_DISK_WR = 4'd4;  // backend: buffer -> image chunk
+  localparam [3:0] E_DELAY   = 4'd5;  // completion delay -> FinishOperation
+  localparam [3:0] E_MEM_CMP = 4'd6;  // DMA: ND memory vs buffer (M3 compare)
   // A disk operation was activated while a backend done was still owed (a device
   // clear cut the previous operation short): hold the start (s_wait_op) until
   // the backend is quiet, so that stale done cannot be taken for the answer to
   // this operation's first request. The oracle cannot show this: its GO
   // finishes inside the write.
-  localparam E_WAIT_DISK = 3'd7;
+  localparam [3:0] E_WAIT_DISK = 4'd7;
+  localparam [3:0] E_FMT_RD  = 4'd8;  // M5: DMA-read the address fields from memory
 
-  reg [2:0]  s_eng;
+  reg [3:0]  s_eng;
+  // M5 Write Format in progress (s_is_fmt), its address-field words still to
+  // read (s_fmt_left), and whether one of those reads failed (s_fmt_fail).
+  reg        s_is_fmt;
+  reg [15:0] s_fmt_left;
+  reg        s_fmt_fail;
   reg        s_disk_out;      // a backend request was sent and its done has not come yet
   wire       w_disk_out = s_disk_out | disk_req;
   reg [2:0]  s_wait_op;       // the opcode held in E_WAIT_DISK
@@ -614,6 +622,15 @@ module ND_WINCHESTER #(
   wire w_out_of_range = ({5'd0, w_go_cyl}  >= GEO_MAX_CYL) ||
                         ({12'd0, w_go_head} >= GEO_HEADS)  ||
                         ({11'd0, w_go_sec}  >= GEO_SPT);
+
+  // Write Format (M5): the sectors whose address fields this GO reads, two
+  // words each, at most one track's worth (nd100x device_winchester.c,
+  // WD_OP_WRITE_FORMAT: sectors = word count / 2, capped at the sectors per
+  // track; a larger count is not described, BUGS.md W2). w_fmt_words is the
+  // number of words read from memory.
+  wire [15:0] w_fmt_half  = {1'b0, w_go_words[15:1]};
+  wire [15:0] w_fmt_secs  = (w_fmt_half > GEO_SPT) ? GEO_SPT : w_fmt_half;
+  wire [15:0] w_fmt_words = {w_fmt_secs[14:0], 1'b0};
 
   // THE ARM MUST BE ON THE CYLINDER OF THE TRANSFER. Sec 4.4 phase 2: the
   // card reads the address fields under the heads and compares them "bit for
@@ -909,6 +926,9 @@ module ND_WINCHESTER #(
       s_eng          <= E_IDLE;
       s_is_cmp       <= 1'b0;
       s_is_par       <= 1'b0;
+      s_is_fmt       <= 1'b0;
+      s_fmt_left     <= 16'd0;
+      s_fmt_fail     <= 1'b0;
       s_blk_adv      <= 8'd0;
       s_chunk_q      <= 11'd0;
       s_sec_idx      <= 11'd0;
@@ -1067,6 +1087,8 @@ module ND_WINCHESTER #(
               s_rtz_busy <= (iox_wdata[13:11] == OP_RTZ);
               s_blk_adv  <= 8'd0;
               s_is_par   <= 1'b0;
+              s_is_fmt   <= 1'b0;
+              s_fmt_fail <= 1'b0;
               // On cylinder is NOT forced here. A transfer leaves the arm where
               // it is; only M4 and M7 move it (and drop the bit, below), and
               // every completion puts it back.
@@ -1214,15 +1236,55 @@ module ND_WINCHESTER #(
                   end
                 end
 
-                default: begin
-                  // M5 write-format: a documented stub, acknowledged as a
-                  // no-data completion so the guest proceeds. It does not yet
-                  // read its address fields from memory or move the memory
-                  // address (nd100x does both, sec 3.4.6); that is the next
-                  // step of this port. M2 is no longer here: it runs the read
-                  // path above.
+                OP_WR_FORMAT: begin
+                  // M5 Write Format (sec 3.4.6), as nd100x device_winchester.c
+                  // WD_OP_WRITE_FORMAT does it. The block address is checked
+                  // against the drive first, exactly as for a transfer: an
+                  // address outside it is a mismatch that ends through the
+                  // flat delay (wd_end_later), with nothing read and the
+                  // registers left as loaded. (nd100x does not run the
+                  // arm-on-cylinder check for M5: it formats the track under
+                  // the arm.)
                   //
-                  // M3 COMPARE IS NO LONGER ONE OF THEM. It was, and the note
+                  // Otherwise the address fields are DMA-read from memory, two
+                  // words per sector, for word count / 2 sectors, at most one
+                  // track (w_fmt_secs). The memory address moves on and the
+                  // word count goes down by the words read; the block address
+                  // stays. The time is the drive's: a format writes the whole
+                  // track from sector 0 round.
+                  //
+                  // The fields are NOT kept. nd100x stores them in a table in
+                  // memory (BUGS.md W2) so that a later transfer finds a
+                  // non-natural field; this card has no such table, so every
+                  // track keeps its natural fields (Verilog/TODO.md). Nor is a
+                  // write-protected pack refused here: this card has no
+                  // write-protect information about the pack (the backend
+                  // refuses a write, and M5 writes nothing to it).
+                  s_is_fmt <= 1'b1;
+                  if (w_out_of_range) begin
+                    s_addr_mismatch <= 1'b1;
+                    s_fmt_fail  <= 1'b1;   // registers left as loaded
+                    drive_time(T_MIN);
+                    s_delay_cnt <= END_DELAY;
+                    s_eng       <= E_DELAY;
+                  end else begin
+                    drive_time(xfer_ticks(5'd0, GEO_SPT[7:0]));
+                    s_fmt_left <= w_fmt_words;
+                    if (w_fmt_words != 16'd0) begin
+                      s_eng <= E_FMT_RD;
+                    end else begin
+                      s_delay_cnt <= END_DELAY;
+                      s_eng       <= E_DELAY;
+                    end
+                  end
+                end
+
+                default: begin
+                  // No operation code reaches this any more: M0-M3, M4, M5
+                  // and M7 have their own cases above and M6 does not
+                  // activate. Ends after T_MIN, as nd100x's flat delay.
+                  //
+                  // M3 COMPARE WAS ONCE HERE, as a no-data stub, and the note
                   // here claimed that matched both C models - it does not.
                   // nd100x's deviceWinchester.c reads the sector, DMA-reads
                   // the same words back out of ND memory, compares them, and
@@ -1231,18 +1293,13 @@ module ND_WINCHESTER #(
                   // that register holding the address the guest had loaded.
                   //
                   // SINTRAN reads +0 back after every operation, so the stub
-                  // is visible to it. Measured 10-AUG-2026: booting WD0.IMG
+                  // was visible to it. Measured 10-AUG-2026: booting WD0.IMG
                   // with '20500&', the Tang and nd100x request the SAME 124
                   // disc addresses and then split at exactly the group where
                   // SINTRAN reads block 0 twice and compares it. nd100x moves
                   // on; the Tang re-issued block 0 eleven times and gave up
                   // with SINTRAN's own 'TRANSFER ERROR' message.
-                  //
-                  // The time is the drive's even while the address fields are
-                  // a stub: a format writes the whole track from sector 0
-                  // round (nd100x). Any other code here gets T_MIN.
-                  drive_time((iox_wdata[13:11] == OP_WR_FORMAT) ?
-                             xfer_ticks(5'd0, GEO_SPT[7:0]) : T_MIN);
+                  drive_time(T_MIN);
                   s_delay_cnt <= END_DELAY;
                   s_eng       <= E_DELAY;
                 end
@@ -1463,6 +1520,37 @@ module ND_WINCHESTER #(
           end
         end
 
+        // M5: read the address fields from memory, one word per DMA cycle,
+        // and drop them (no address-field table, see OP_WR_FORMAT). The
+        // running memory address and word count step with each word; E_DELAY
+        // writes them back. A failed read ends the format with DMA channel
+        // error b11 and the registers left as loaded, as nd100x does
+        // (dmaChannelError, wd_end_later). nd100x takes its flat end delay
+        // from the GO; here it runs from the failed read, the few clocks of
+        // the reads before it later.
+        E_FMT_RD: begin
+          if (!s_dma_wait && !dma_busy) begin
+            dma_issue(1'b0, s_dma_addr_r, 16'd0);
+          end else if (s_dma_wait && dma_ack) begin
+            s_dma_wait <= 1'b0;
+            if (dma_err) begin
+              s_dma_ch_err <= 1'b1;
+              s_fmt_fail   <= 1'b1;
+              drive_time(T_MIN);
+              s_delay_cnt  <= END_DELAY;
+              s_eng        <= E_DELAY;
+            end else begin
+              s_dma_addr_r <= s_dma_addr_r + 24'd1;
+              s_words_left <= s_words_left - 24'd1;
+              s_fmt_left   <= s_fmt_left - 16'd1;
+              if (s_fmt_left == 16'd1) begin
+                s_delay_cnt <= END_DELAY;
+                s_eng       <= E_DELAY;
+              end
+            end
+          end
+        end
+
         // Completion delay, then FinishOperation.
         // Ends when the flat delay (FAST) and the drive time (FAST = 0) are
         // both over; in each mode the other one is 0.
@@ -1474,9 +1562,15 @@ module ND_WINCHESTER #(
             s_rft    <= 1'b1;
             trace_done <= 1'b1;
             clr_ff;
-            s_mem_addr_lo <= s_dma_addr_r[15:0];
-            s_mem_addr_hi <= s_dma_addr_r[23:16];
-            s_word_cnt    <= 16'd0;
+            // M5 that failed (address outside the drive, or a failed field
+            // read) leaves the memory address and word count as loaded; a
+            // good M5 leaves the word count less the words it read (nd100x
+            // WD_OP_WRITE_FORMAT). Every other operation as before.
+            if (!(s_is_fmt && s_fmt_fail)) begin
+              s_mem_addr_lo <= s_dma_addr_r[15:0];
+              s_mem_addr_hi <= s_dma_addr_r[23:16];
+              s_word_cnt    <= s_is_fmt ? s_words_left[15:0] : 16'd0;
+            end
             s_on_cyl[s_unit] <= 1'b1;
             s_blkaddr     <= blk_advanced(s_blkaddr, s_blk_adv);
             s_eng         <= E_IDLE;

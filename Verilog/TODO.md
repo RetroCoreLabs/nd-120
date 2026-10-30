@@ -477,8 +477,18 @@ marked.
 
 - [ ] A GO while the card is active but not in a return to zero restarts the
   engine. The manual is silent on this case.
-- [ ] M2 and M5 are stubs in the RTL. The oracle's M5 writes memory as if it were
-  M1, which is wrong against the manual (sec 3.4.6).
+- [ ] M2 is a stub in the RTL. M5 now does what nd100x does (`WD_OP_WRITE_FORMAT`):
+  it DMA-reads two words per sector for word count / 2 sectors, at most one track,
+  moves the memory address and word count on by them, and ends with an address
+  mismatch (b8) for a block address outside the drive (bench `test-wd-format`).
+- [ ] Winchester M5 keeps no address-field table; nd100x keeps one in memory,
+  BUGS.md W2; needed only for non-natural formats such as bad-track flags or a
+  deliberate address-mismatch test. The fields are read and dropped, so a later
+  transfer never finds a field different from the natural one.
+- [ ] M5 does not refuse a write-protected drive. nd100x does; the RTL has no
+  write-protect information (no metadata port, as for M1).
+- [ ] An M5 whose field read fails (b11) ends T_MIN after the failed read. nd100x
+  reads all the fields at the GO, so its T_MIN counts from the GO.
 - [ ] The oracle's partial-sector DMA overruns its buffer (oracle bug, not ours).
 - [ ] The oracle's master clear does not return the arm to cylinder 0. The manual
   (3.4.8) and the RTL do.
