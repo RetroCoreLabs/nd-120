@@ -201,9 +201,10 @@ VT100 manual: a real VT100 clears the screen and homes the cursor on `ESC[?3l` (
 **SMD disc controller (1540).** A separate session has taken over the SMD work
 from the old SMD handoff (now the `ND_SMD.v` header), together with the Pi Pico C-code
 side that is running ground-truth tests to confirm the nd100x oracle is 100%
-correct. Off our plate:
+correct. The register semantics of `ND-BUS-DEVICES/SMD/circuit/ND_SMD.v` are NOT
+off our plate any more: they were brought in line with nd100x (`device_smd.c`) here,
+see "Open: SMD points" below for what is left. Still off our plate:
 
-- `ND-BUS-DEVICES/SMD/circuit/ND_SMD.v` - register semantics.
 - `SD-FAT/circuit/nd_storage_disc_adapter.v` position mapping (still
   `blkaddr2*2048 + blkaddr1*64`, not the oracle's cylinder/head/sector -> LBA;
   changing it means changing the adapter, `ND-BUS-DEVICES/SMD/sim/nd_smd_tb.v`
@@ -212,10 +213,11 @@ correct. Off our plate:
 Captured ground truth for the oracle side lives in
 `ND-BUS-DEVICES/SMD/sim/traces/`.
 
-**Open: SMD M5 write format and M8 run ECC are not modelled; M2 does not check CRC.**
-`ND_SMD.v` (default branch) and `nd_smd.c` (default case) complete M5 and M8 without
-doing the operation, and M2 only ends in error on a media fault, not on a bad check word.
-The `21540&` start-up "TRANSFER ERROR" line is gone in `ND_SMD.v`: SINTRAN sends an M3
+**Open: the C twin `nd_smd.c` still completes M5 write format and M8 run ECC without
+doing the operation.** `ND_SMD.v` now does what nd100x does: M5 reads its address fields
+from memory (not kept, see below), M8 ends at once (nd100x does not model it either), and
+M2 sets data error b9 only in long mode, which is not modelled here (see below). The
+`21540&` start-up "TRANSFER ERROR" line is gone in `ND_SMD.v`: SINTRAN sends an M3
 compare (control word 014005) after its first read, and the old stub finished it without
 reading memory or stepping the counters, so the driver saw a failed compare, retried it
 8 times and stored error 97. M3 now reads one memory word per word and sets status b10 on a
@@ -242,11 +244,38 @@ transfer fails part way. Done on nd100x's evidence ONLY (its comments cite DISC-
 message text is not in our manuals; the SMD manual does not state either): status b5 (illegal
 load) is cleared at each GO, and status b14 (on cylinder) is no longer forced to 1 by every
 control word (powered-up drives start on cylinder, errors leave it alone, M6/M7 set it). If a
-real DISC-TEMA run on the SMD disagrees, these two are the ones to revisit. Still different:
-- M6 with no earlier seek completes at once (nd100x times out, b6); M5 does not check its
-  word count (nd100x raises a timeout unless it is a whole number of tracks); a register load
-  while the unit is off cylinder is not an illegal load; write protect and "unit not
-  attached" (units 1-3) are not seen by the RTL.
+real DISC-TEMA run on the SMD disagrees, these two are the ones to revisit.
+
+`ND_SMD.v` was then brought in line with nd100x (`device_smd.c`, BUGS.md S1-S11): drive
+timing (per-unit seeks, rotation, the `CLK_HZ`/`FAST` parameters), the arm position per
+unit, the M6 timeout with no seek given, the M5 word count check, the illegal load off
+cylinder, the end of an address mismatch, and the remaining operations (test mode, M8,
+M9, codes 10-15, a GO on a not-specified unit). Benches `test-smd-timing` and
+`test-smd-ops`. Still different from nd100x, each written in the RTL where it happens:
+- No address-field table (BUGS.md S4). M5 reads the fields from memory but does not keep
+  them, so a later transfer never finds a field different from the natural one and the
+  "field does not match" mismatch never happens. Needed only for non-natural formats
+  (bad-track flags, a deliberate mismatch test).
+- ECC control bit 2 (long mode, the 64 ECC bits read or written with the sector, BUGS.md
+  S2, S3) and bits 3-6 (the format bits) are not modelled, so b9 from a long read never
+  happens.
+- A disk backend fault during a transfer sets b13 (unit not ready) as well as b12. nd100x
+  reads its image file and has no such fault; its nearest case, a media read error, shows
+  b12 only (BUGS.md S11). This card keeps its own choice.
+- A second seek given while a unit's heads are still moving restarts that unit's timer, so
+  only the last arrival is seen. nd100x keeps both queued and the first still raises
+  on-cylinder early.
+- A device clear stops the controller at once. nd100x leaves the queued end event, which
+  later sets ready-for-transfer and can interrupt.
+- M1 that fails part way has already written the earlier chunks to the disc. nd100x reads
+  all of memory first and writes nothing on a failure.
+- The memory address and word count registers are brought up to date at the end of a
+  transfer, not word by word as it runs.
+- Write protect and "unit not attached" (units 1-3) are not seen by the RTL (no metadata
+  port, see the `ND_SMD.v` header).
+- With `FAST = 1` (the default build) an M4 now leaves the unit off cylinder for
+  `DELAY_TICKS` (8 ms, as `ND120_CORE.v` sets it) before it arrives. The whole-machine SINTRAN
+  boot from the SMD was not run against this change.
 
 **Open: SMD units 1-3 are NOT supported.** Only unit 0 has a disc image
 (`ND120_SMD_IMG`). SINTRAN could ask for another unit, and none is served yet:
