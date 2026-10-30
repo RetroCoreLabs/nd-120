@@ -113,6 +113,24 @@ module nd_winchester_wcsweep_tb;
     sys_rst_n = 0; repeat (5) @(negedge sysclk);
     sys_rst_n = 1; repeat (5) @(negedge sysclk);
     $display("== ND_WINCHESTER word-count sweep (backend always completes) ==");
+    // Every transfer below reads block address 000200 = cylinder 4. The arm
+    // must be on that cylinder first (sec 2.2: "The software driver must do a
+    // seek to the correct cylinder prior to a read or write operation"), so
+    // step it out 4 cylinders once; a device clear does not move the arm.
+    begin : seek_to_4
+      reg [15:0] sst; integer sp;
+      iox_write(BASE+7, 16'd4);
+      iox_write(BASE+5, 16'o060004);          // activate, M4, direction out
+      sp = 0; sst = 16'hFFFF;
+      while (sp < 60000 && sst[SB_ACTIVE] !== 1'b0) begin
+        iox_read(BASE+4, sst); sp = sp + 1;
+      end
+      if (dut.s_cyl_pos[0] != 16'd4) begin
+        $display("  FAIL - the seek to cylinder 4 did not get there (arm at %0d)",
+                 dut.s_cyl_pos[0]);
+        errors = errors + 1;
+      end
+    end
     try_wc(16'd512);   try_wc(16'd1023);  try_wc(16'd1024);
     try_wc(16'd1025);  try_wc(16'd1026);  try_wc(16'd2047);
     try_wc(16'd2048);  try_wc(16'd2049);  try_wc(16'd3072);

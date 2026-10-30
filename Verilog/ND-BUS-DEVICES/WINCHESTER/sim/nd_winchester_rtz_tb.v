@@ -9,7 +9,8 @@
 **                                                                          **
 **  WHY THIS BENCH EXISTS - 09-AUG-2026, from silicon.                      **
 **                                                                          **
-**  The nd100x oracle (oracle/fsi-lifi-nd100x.trace) is a capture of the    **
+**  The nd100x oracle (oracle/fsi-lifi-nd100x-old-model.trace, the older    **
+**  nd100x model; see oracle/README.md) is a capture of the                 **
 **  File System Investigator opening the Winchester on a machine where it   **
 **  WORKS. Its opening sequence is:                                         **
 **                                                                          **

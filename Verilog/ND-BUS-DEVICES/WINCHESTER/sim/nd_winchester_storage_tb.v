@@ -533,16 +533,26 @@ module nd_winchester_storage_tb;
     end
 
     // ---- 0. THE DRIVER'S OPENING SEQUENCE, replayed from the C model ----
-    // Captured 08-AUG-2026 by running images/FILSYS-INV-Q04.BPUN (the same
-    // File System Investigator that fails on the Tang) under nd100x with
-    // ND100X_WD_DEBUG=1 against the real 75 MiB WD0.IMG, device name
-    // DISC-74MB-1. In the C model it WORKS - LIST-FILE-NAMES prints the real
-    // SINTRAN directory - so this sequence and its status words are the
+    // images/FILSYS-INV-Q04.BPUN (the same File System Investigator that
+    // fails on the Tang) under nd100x against the real 75 MiB WD0.IMG, device
+    // name DISC-74MB-1. In the C model it WORKS - LIST-FILE-NAMES prints the
+    // real SINTRAN directory - so this sequence and its status words are the
     // specification, exactly as nd_winchester_oracle_tb.v treats the
-    // DISC-TEMA trace.
+    // DISC-TEMA trace. The capture is ../oracle/fsi-lifi-nd100x.trace (how
+    // it was made: ../oracle/README.md).
     //
-    //   IOX READ  504 -> 020000     power-on: not finished, NOT on cylinder
-    //   IOX WRITE 505 =  034005     M7 return-to-zero, activate, int enable
+    // POWER-ON IS ON CYLINDER. The current model reads 060000 first and the
+    // FSI goes straight to its first read; a real 3041 with a Micropolis 1325
+    // read 060011 after its first control word, with no return to zero before
+    // it (DISC-TEMA start-up trace kept in RetroCore's
+    // NDBusDiscControllerWinchester.cs), and master clear puts the heads on
+    // cylinder 0 (ND-11.015.01 sec 3.4.8, 5.5). The older model read 020000,
+    // and the FSI then opened with the M7 below
+    // (../oracle/fsi-lifi-nd100x-old-model.trace); the M7 is kept here because
+    // it still has to end on cylinder, with no error.
+    //
+    //   IOX READ  504 -> 060000     power-on: not finished, on cylinder
+    //   IOX WRITE 505 =  034005     M7 return-to-zero (older capture only)
     //   IOX READ  504 -> 060005     active, on cylinder
     //   IOX READ  504 -> 060011     finished, on cylinder
     //   IOX WRITE 507 =  000000     word count cleared
@@ -559,8 +569,8 @@ module nd_winchester_storage_tb;
     // the bit the failing silicon status (020010 = finished, NOT on cylinder,
     // no error bits) says never got set.
     iox_read(16'o504);
-    if (rdlat !== 16'o020000) begin
-      $display("FAIL: power-on status %06o, oracle says 020000", rdlat);
+    if (rdlat !== 16'o060000) begin
+      $display("FAIL: power-on status %06o, oracle says 060000", rdlat);
       errors = errors + 1;
     end
 

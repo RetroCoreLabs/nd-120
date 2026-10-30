@@ -246,13 +246,24 @@ module nd_winchester_oracle_tb;
     // failing read down the same path. It may not: a single status word that
     // differs earlier sends DISC-TEMA somewhere else. So every read the
     // oracle logged is checked against the oracle's own value.
+    // op3 / op5 / op7 have b14 (on cylinder) SET. The capture above came from
+    // the older nd100x model, which read NOT on cylinder until the M7 at
+    // op12 (020010 / 020010 / 020011). The current model starts on cylinder,
+    // as master clear puts the heads on cylinder 0 (ND-11.015.01 sec 3.4.8,
+    // 5.5), and a real 3041 with a 1325 read 060011 after its first control
+    // word 000011 with no return to zero before it (../oracle/README.md).
+    //
+    // NOT SETTLED: on that real card, control word 100000 then read back
+    // 070010 - bit 12, "not used" in sec 3.5, read 1. What sets it is not
+    // known (nd100x BUGS.md W10, a red check in tests/test_winchester_units.c).
+    // This RTL keeps b12 at 0, so op3 and op5 expect 060010 here.
     ck_rd(BASE + R_READ_MA, 16'o000000, "op1  RD +0");
     iox_write(BASE + R_CONTROL, 16'o100000);
-    ck_rd(BASE + R_STATUS, 16'o020010, "op3  RD +4");
+    ck_rd(BASE + R_STATUS, 16'o060010, "op3  RD +4");
     iox_write(BASE + R_CONTROL, 16'o000000);
-    ck_rd(BASE + R_STATUS, 16'o020010, "op5  RD +4");
+    ck_rd(BASE + R_STATUS, 16'o060010, "op5  RD +4");
     iox_write(BASE + R_CONTROL, 16'o000011);
-    ck_rd(BASE + R_STATUS, 16'o020011, "op7  RD +4");
+    ck_rd(BASE + R_STATUS, 16'o060011, "op7  RD +4");
     iox_write(BASE + R_CONTROL, 16'o000010);
     iox_write(BASE + R_CONTROL, 16'o000020);
     iox_write(BASE + R_LOAD_WC, 16'o000000);
@@ -399,6 +410,64 @@ module nd_winchester_oracle_tb;
       errors = errors + 1;
     end else $display("[ ok ] mid-transfer control word did not fake FINISHED (status %o)", st);
     wait_finish;
+
+    // ---- the block address moves on by the sectors a transfer dealt with --
+    // Inferred from the SINTRAN driver (WINCHESTER:NPL IERR "A-1=:ADMIA"),
+    // nd100x BUGS.md W7 and wd_advance_block_address: the sector field moves
+    // on by the number of sectors the word count touched. 1024 words from
+    // sector 3 = 2 sectors, so the register reads sector 5 afterwards; a
+    // count that ends inside a sector still counts that sector (513 words =
+    // 2 sectors too).
+    iox_write(BASE + R_LOAD_BLOCK, 16'd3);
+    iox_write(BASE + R_LOAD_MA,    MA_HI_IN);
+    iox_write(BASE + R_LOAD_MA,    MA_LO_IN);
+    iox_write(BASE + R_LOAD_WC,    16'd1024);
+    iox_write(BASE + R_CONTROL,    CTRL_GO);
+    wait_finish;
+    iox_read(BASE + 16'd6, st);
+    check_eq(st, 16'd5, "block address after 1024 words from sector 3");
+    iox_write(BASE + R_LOAD_BLOCK, 16'd3);
+    iox_write(BASE + R_LOAD_WC,    16'd513);
+    iox_write(BASE + R_CONTROL,    CTRL_GO);
+    wait_finish;
+    iox_read(BASE + 16'd6, st);
+    check_eq(st, 16'd5, "block address after 513 words from sector 3 (whole sectors)");
+
+    // ---- M2 read parity: no memory cycles, counters run through ---------
+    // Sec 3.4.3 "No data transfer to the computer memory is performed"; the
+    // memory address still ends at start + word count and the word count at 0
+    // (nd100x BUGS.md W8: DISC-TEMA J02 PARITY-CHECK reads the address back
+    // after every M2). 1536 words = 3 sectors in two chunks (1024 + 512), so
+    // the chunk step of the M2 path is covered too.
+    iox_write(BASE + R_LOAD_BLOCK, 16'd0);
+    iox_write(BASE + R_LOAD_MA,    MA_HI_IN);
+    iox_write(BASE + R_LOAD_MA,    MA_LO_IN);
+    iox_write(BASE + R_LOAD_WC,    16'd1536);
+    dma_words = 0;
+    guard = disk_ops;
+    iox_write(BASE + R_CONTROL,    16'o010005);   // M2 (2 << 11), activate, int enable
+    wait_finish;
+    iox_read(BASE + R_STATUS, st);
+    if (st[4]) begin
+      $display("FAIL: M2 reported an error, status %o", st);
+      errors = errors + 1;
+    end
+    if (dma_words !== 0) begin
+      $display("FAIL: M2 made %0d DMA cycles (sec 3.4.3: none)", dma_words);
+      errors = errors + 1;
+    end else $display("[ ok ] M2 made no DMA cycles");
+    if (disk_ops - guard !== 2) begin
+      $display("FAIL: M2 read %0d chunks off the disc, want 2 (1024 + 512 words)",
+               disk_ops - guard);
+      errors = errors + 1;
+    end else $display("[ ok ] M2 read its 2 chunks off the disc");
+    iox_read(BASE + R_READ_MA, ma_lo);
+    iox_read(BASE + R_READ_MA, ma_hi);
+    check_eq(ma_lo, 16'd1536, "M2: memory address low = start + 1536");
+    check_eq(ma_hi, MA_HI_IN, "M2: memory address high unchanged");
+    check_eq(dut.s_word_cnt, 16'd0, "M2: word count 0 at the end");
+    iox_read(BASE + 16'd6, st);
+    check_eq(st, 16'd3, "M2: block address moved on by 3 sectors");
 
     if (errors == 0)
       $display("TB_RESULT: PASS (Winchester MAR writeback matches the oracle)");

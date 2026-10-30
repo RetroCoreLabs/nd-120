@@ -1,0 +1,72 @@
+WD: IOX READ  addr=504 reg=4 -> 20000
+WD: IOX WRITE addr=505 reg=5 value=34005
+WD: IOX READ  addr=504 reg=4 -> 60005
+WD: IO complete drive=0 intEnabled=1
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX WRITE addr=507 reg=7 value=0
+WD: IOX WRITE addr=503 reg=3 value=0
+WD: IOX WRITE addr=501 reg=1 value=0
+WD: IOX WRITE addr=501 reg=1 value=61100
+WD: IOX WRITE addr=507 reg=7 value=2000
+WD: IOX WRITE addr=505 reg=5 value=5
+WD: GO M0-Read unit=0 C/H/S=0/0/0 LBA=0 WC=1024 core=61100
+WD: IOX READ  addr=504 reg=4 -> 60005
+WD: IO complete drive=0 intEnabled=1
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX READ  addr=500 reg=0 -> 63100
+WD: IOX READ  addr=500 reg=0 -> 0
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX WRITE addr=505 reg=5 value=0
+WD: IOX READ  addr=504 reg=4 -> 60010
+WD: IOX WRITE addr=507 reg=7 value=1616
+WD: IOX WRITE addr=505 reg=5 value=60105
+WD: M4-Seek unit=0 dir=out count=910 -> cylinder 910
+WD: IOX READ  addr=504 reg=4 -> 60005
+WD: IO complete drive=0 intEnabled=1
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX WRITE addr=503 reg=3 value=70704
+WD: IOX WRITE addr=501 reg=1 value=0
+WD: IOX WRITE addr=501 reg=1 value=61100
+WD: IOX WRITE addr=507 reg=7 value=2000
+WD: IOX WRITE addr=505 reg=5 value=105
+WD: GO M0-Read unit=0 C/H/S=910/2/4 LBA=65542 WC=1024 core=61100
+WD: IOX READ  addr=504 reg=4 -> 60005
+WD: IO complete drive=0 intEnabled=1
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX READ  addr=500 reg=0 -> 63100
+WD: IOX READ  addr=500 reg=0 -> 0
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX WRITE addr=505 reg=5 value=0
+WD: IOX READ  addr=504 reg=4 -> 60010
+WD: IOX WRITE addr=507 reg=7 value=0
+WD: IOX WRITE addr=503 reg=3 value=70702
+WD: IOX WRITE addr=501 reg=1 value=0
+WD: IOX WRITE addr=501 reg=1 value=63100
+WD: IOX WRITE addr=507 reg=7 value=2000
+WD: IOX WRITE addr=505 reg=5 value=105
+WD: GO M0-Read unit=0 C/H/S=910/2/2 LBA=65540 WC=1024 core=63100
+WD: IOX READ  addr=504 reg=4 -> 60005
+WD: IO complete drive=0 intEnabled=1
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX READ  addr=500 reg=0 -> 65100
+WD: IOX READ  addr=500 reg=0 -> 0
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX WRITE addr=505 reg=5 value=0
+WD: IOX READ  addr=504 reg=4 -> 60010
+WD: IOX WRITE addr=507 reg=7 value=3
+WD: IOX WRITE addr=505 reg=5 value=60105
+WD: M4-Seek unit=0 dir=out count=3 -> cylinder 913
+WD: IOX READ  addr=504 reg=4 -> 60005
+WD: IO complete drive=0 intEnabled=1
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX WRITE addr=503 reg=3 value=71044
+WD: IOX WRITE addr=501 reg=1 value=0
+WD: IOX WRITE addr=501 reg=1 value=65100
+WD: IOX WRITE addr=507 reg=7 value=2000
+WD: IOX WRITE addr=505 reg=5 value=105
+WD: GO M0-Read unit=0 C/H/S=913/2/4 LBA=65758 WC=1024 core=65100
+WD: IOX READ  addr=504 reg=4 -> 60005
+WD: IO complete drive=0 intEnabled=1
+WD: IOX READ  addr=504 reg=4 -> 60011
+WD: IOX READ  addr=500 reg=0 -> 67100
+WD: IOX READ  addr=500 reg=0 -> 0

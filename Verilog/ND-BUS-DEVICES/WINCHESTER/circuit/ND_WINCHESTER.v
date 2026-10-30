@@ -471,6 +471,11 @@ module ND_WINCHESTER #(
   reg [3:0]  s_go_head;       // head latched at activation (b8-5 of the GO word)
   reg        s_rtz_busy;      // the running operation is an M7 return to zero
   reg        s_is_cmp;       // this operation is M3, not M0
+  reg        s_is_par;       // this operation is M2: read the disc, no memory cycles
+  // Sectors the block address moves on when this operation completes (see
+  // the note at blk_advanced). Latched at activation, applied at completion,
+  // so the backend's block address stays put for the whole transfer.
+  reg [7:0]  s_blk_adv;
   reg [10:0] s_chunk_q;
   reg [10:0] s_sec_idx;
   reg [31:0] s_delay_cnt;
@@ -481,31 +486,75 @@ module ND_WINCHESTER #(
 
   assign disk_wordcount = s_chunk_q;
 
-  // CHS -> LBA, the same formula the SMD core and both C models use.
-  function [31:0] chs2lba;
-    input [15:0] cyl;
-    input [15:0] head;
-    input [15:0] sector;
-    begin
-      chs2lba = (({16'd0, cyl} * {16'd0, GEO_HEADS}) + {16'd0, head})
-                * {16'd0, GEO_SPT} + {16'd0, sector};
-    end
-  endfunction
-
   // GO-time address decode (registers are stable outside a control write).
   // The range check of a GO runs on the head OF THAT GO WORD (iox_wdata[8:5]),
   // not on s_head, which only takes the new value at this same clock edge.
-  // A device clear in the same word zeroes the block address, word count and
-  // memory address, so the GO sees cylinder 0 / sector 0 / zero words / address
-  // 0 (the oracle clears first, then runs the GO).
+  // A device clear in the same word zeroes the word count and the memory
+  // address, so the GO sees zero words at address 0 (the oracle clears first,
+  // then runs the GO). The block address is NOT cleared by a device clear (see
+  // the device clear below), so the GO sees the block address as loaded.
   wire        w_go_clr  = iox_wdata[4];
   wire [3:0]  w_go_head = iox_wdata[8:5];
-  wire [10:0] w_go_cyl  = w_go_clr ? 11'd0 : w_cyl;
-  wire [4:0]  w_go_sec  = w_go_clr ? 5'd0  : w_sector;
-  wire [31:0] w_lba     = chs2lba({5'd0, w_go_cyl}, {12'd0, w_go_head}, {11'd0, w_go_sec});
-  wire [31:0] w_max_lba = chs2lba(GEO_MAX_CYL, GEO_HEADS, GEO_SPT);
+  wire        w_go_unit = iox_wdata[9];
+  wire [10:0] w_go_cyl  = w_cyl;
+  wire [4:0]  w_go_sec  = w_sector;
   wire [23:0] w_words   = {8'd0, s_word_cnt};
   wire [23:0] w_go_words = w_go_clr ? 24'd0 : w_words;
+
+  // Each field against the drive, as nd100x checks it: cylinder GEO_MAX_CYL
+  // is already past the end (GEO_MAX_CYL is a count, sec 2.1 "Cylinders
+  // total"). No sector on the pack carries such an address, so the address
+  // compare of sec 4.4 phase 2 finds none: address mismatch (sec 10.3).
+  wire w_out_of_range = ({5'd0, w_go_cyl}  >= GEO_MAX_CYL) ||
+                        ({12'd0, w_go_head} >= GEO_HEADS)  ||
+                        ({11'd0, w_go_sec}  >= GEO_SPT);
+
+  // THE ARM MUST BE ON THE CYLINDER OF THE TRANSFER. Sec 4.4 phase 2: the
+  // card reads the address fields under the heads and compares them "bit for
+  // bit", so a block address on another cylinder finds nothing. Sec 2.2: "The
+  // software driver must do a seek to the correct cylinder prior to a read or
+  // write operation"; sec 5.5: "To read or write on other cylinders, a seek
+  // command must be carried out". Ported from nd100x wd_address_fields_found
+  // (device_winchester.c): the transfer runs sector by sector and, at the end
+  // of a track, on to the next head; it cannot go on to the next cylinder
+  // without a seek, so a transfer that runs off the arm's cylinder ends in
+  // address mismatch after the sectors it did find. Whether the real card
+  // goes on to the next head is not in the manual (nd100x BUGS.md W3).
+  //
+  // w_go_count is the number of sectors the word count touches: a count that
+  // ends inside a sector still reads that sector (whole sectors, nd100x).
+  // The sector is 1024 bytes = 512 words on this card (sec 2.1), hence the
+  // shift by 9.
+  wire [16:0] w_go_wplus  = {1'b0, w_go_words[15:0]} + 17'd511;
+  wire [7:0]  w_go_count  = w_go_wplus[16:9];
+  wire [15:0] w_arm_cyl   = s_cyl_pos[w_go_unit];
+  wire        w_arm_here  = (w_arm_cyl == {5'd0, w_go_cyl});
+  // Sectors left on the arm's cylinder from (head, sector) on. Only used when
+  // the fields are in range, so the subtraction cannot go below zero.
+  wire [31:0] w_cyl_left  = (({16'd0, GEO_HEADS} - {28'd0, w_go_head}) * {16'd0, GEO_SPT})
+                            - {27'd0, w_go_sec};
+  // How many of the transfer's sectors are found before it runs off.
+  wire [31:0] w_found     = !w_arm_here ? 32'd0 :
+                            (({24'd0, w_go_count} > w_cyl_left) ? w_cyl_left : {24'd0, w_go_count});
+  wire        w_runs_off  = (w_go_count != 8'd0) &&
+                            (!w_arm_here || ({24'd0, w_go_count} > w_cyl_left));
+
+  // The block address register after an operation. INFERRED from the SINTRAN
+  // driver, not stated in ND-11.015.01 (nd100x BUGS.md W7, ported from its
+  // wd_advance_block_address): after an address mismatch the driver reads the
+  // register and takes "register - 1" as the failing sector (WINCHESTER:NPL,
+  // IERR: "A-1=:ADMIA % SAVE FAILING BLOCK ADDRESS"); that is only right if
+  // the card has moved the register one sector past each sector it dealt
+  // with, the failing one included. The sector field (bits 4-0) moves on,
+  // modulo 32; the cylinder field is left alone, as the head is in the control
+  // word and the driver never runs a transfer past the end of a track.
+  function [15:0] blk_advanced;
+    input [15:0] blk;
+    input [7:0]  sectors;
+    begin
+      blk_advanced = {blk[15:5], blk[4:0] + sectors[4:0]};
+    end
+  endfunction
 
   task dma_issue(input wr, input [23:0] a, input [15:0] d);
     begin
@@ -542,7 +591,11 @@ module ND_WINCHESTER #(
       s_mem_addr_lo <= s_dma_addr_r[15:0];
       s_mem_addr_hi <= s_dma_addr_r[23:16];
       s_word_cnt    <= 16'd0;
-      s_on_cyl[s_unit] <= 1'b0;
+      // Sec 3.4.5: an operation "is completed when the heads are settled over
+      // the correct tracks", so every completion, the ones that end in error
+      // too, leaves the unit on cylinder (nd100x wd_transfer_end). The arm of
+      // a transfer does not move; it was already on its cylinder.
+      s_on_cyl[s_unit] <= 1'b1;
       s_eng      <= E_IDLE;
       s_dma_wait <= 1'b0;
       if (s_errint_en) s_irq <= 1'b1;
@@ -638,7 +691,9 @@ module ND_WINCHESTER #(
       // M3 takes the READ path off the disc - it has to, it is reading the
       // sector - and then compares in E_MEM_CMP instead of storing in E_MEM_WR.
       s_is_cmp <= (op == OP_COMPARE);
-      if (op == OP_READ || op == OP_COMPARE) begin
+      // M2 reads the sectors too (the CRC is checked as they pass), it just
+      // makes no memory cycles; see E_DISK_RD.
+      if (op == OP_READ || op == OP_COMPARE || op == OP_READ_PAR) begin
         disk_start <= 1'b1;
         disk_req   <= 1'b1;
         disk_wr    <= 1'b0;
@@ -682,7 +737,12 @@ module ND_WINCHESTER #(
       s_head         <= 4'd0;
       s_seek_dir     <= 1'b0;
       s_bad_track    <= 1'b0;
-      s_on_cyl       <= 2'd0;
+      // Master clear returns every drive's heads to cylinder 0: sec 3.4.8,
+      // "Return to zero by pushing the master clear button", and sec 5.5,
+      // "Pushing Master Clear will position the heads to cylinder 0". So both
+      // arms start at 0 and on cylinder; a mass-storage load of block 0 then
+      // finds its sector without a seek (nd100x wd_reset).
+      s_on_cyl       <= 2'b11;
       s_cyl_pos[0]   <= 16'd0;
       s_cyl_pos[1]   <= 16'd0;
       s_int_en       <= 1'b0;
@@ -707,6 +767,8 @@ module ND_WINCHESTER #(
       s_irq          <= 1'b0;
       s_eng          <= E_IDLE;
       s_is_cmp       <= 1'b0;
+      s_is_par       <= 1'b0;
+      s_blk_adv      <= 8'd0;
       s_chunk_q      <= 11'd0;
       s_sec_idx      <= 11'd0;
       s_delay_cnt    <= 32'd0;
@@ -788,7 +850,13 @@ module ND_WINCHESTER #(
               s_mem_addr_lo  <= 16'd0;
               s_mem_addr_hi  <= 8'd0;
               s_word_cnt     <= 16'd0;
-              s_blkaddr      <= 16'd0;
+              // The block address is NOT cleared. The SINTRAN driver's error
+              // routine gives a device clear and then reads the block address
+              // register to find the failing sector (WINCHESTER:NPL, IERR:
+              // "IOXIN LCON % DEVICE CLEAR" ... "IOXIN RDAD % READ LAST DISK
+              // ADDRESS"); a register cleared by the device clear would always
+              // give it sector 0 of cylinder 0. Master clear does clear it.
+              // Same rule as nd100x wd_device_clear.
               s_rtz_viol     <= 1'b0;
               s_time_out     <= 1'b0;
               s_disk_fault   <= 1'b0;
@@ -828,7 +896,11 @@ module ND_WINCHESTER #(
               s_unit   <= iox_wdata[9];
               s_go_head  <= w_go_head;
               s_rtz_busy <= (iox_wdata[13:11] == OP_RTZ);
-              s_on_cyl[iox_wdata[9]] <= 1'b1;
+              s_blk_adv  <= 8'd0;
+              s_is_par   <= 1'b0;
+              // On cylinder is NOT forced here. A transfer leaves the arm where
+              // it is; only M4 and M7 move it (and drop the bit, below), and
+              // every completion puts it back.
 
               s_rtz_viol      <= 1'b0;
               s_time_out      <= 1'b0;
@@ -851,18 +923,26 @@ module ND_WINCHESTER #(
                   // word-count register, direction in b14 where ZERO means
                   // towards cylinder 0. Clamped at both stops - running the
                   // arm past either one is not a status-reported error, the
-                  // drive simply stops.
+                  // drive simply stops. GEO_MAX_CYL is the number of
+                  // cylinders, so the last one is GEO_MAX_CYL - 1 (the arm
+                  // used to be allowed to stop ON GEO_MAX_CYL, a cylinder the
+                  // drive does not have). What a real drive does when stepped
+                  // past either end is not in the manual (nd100x BUGS.md W5).
                   if (!iox_wdata[14]) begin
                     s_cyl_pos[iox_wdata[9]] <=
                         (s_cyl_pos[iox_wdata[9]] > s_word_cnt) ?
                         (s_cyl_pos[iox_wdata[9]] - s_word_cnt) : 16'd0;
                   end else begin
                     s_cyl_pos[iox_wdata[9]] <=
-                        ((s_cyl_pos[iox_wdata[9]] + s_word_cnt) > GEO_MAX_CYL ||
+                        ((s_cyl_pos[iox_wdata[9]] + s_word_cnt) > (GEO_MAX_CYL - 16'd1) ||
                          (s_cyl_pos[iox_wdata[9]] + s_word_cnt) <
                           s_cyl_pos[iox_wdata[9]]) ?
-                        GEO_MAX_CYL : (s_cyl_pos[iox_wdata[9]] + s_word_cnt);
+                        (GEO_MAX_CYL - 16'd1) : (s_cyl_pos[iox_wdata[9]] + s_word_cnt);
                   end
+                  // Status bit 14 "On cylinder" reads 0 while the heads travel
+                  // (sec 3.4.5 "completed when the heads are settled over the
+                  // correct tracks"); the completion in E_DELAY puts it back.
+                  s_on_cyl[iox_wdata[9]] <= 1'b0;
                   // A zero-step seek takes the same delay as any other: the
                   // oracle gives every seek one delay, and the OP_RTZ note below
                   // proves from a silicon trace that a short "nothing to do"
@@ -885,7 +965,7 @@ module ND_WINCHESTER #(
                   // 74646 pin-node correction in BIF_DPATH_9.v.
                   //
                   // The 8-tick path is itself a bug, and the nd100x oracle
-                  // proves it. In oracle/fsi-lifi-nd100x.trace the File System
+                  // proves it. In oracle/fsi-lifi-nd100x-old-model.trace the File System
                   // Investigator writes 034005 and its next status read
                   // returns 060005 - ACTIVE, seek still running. On silicon
                   // the same read returns 060011, already finished, because
@@ -896,45 +976,51 @@ module ND_WINCHESTER #(
                   // divergence and fails on the old 8-tick behaviour.
                   s_cyl_pos[iox_wdata[9]] <= 16'd0;
                   s_rtz_viol  <= 1'b0;
+                  // Not on cylinder while the arm travels home (sec 3.4.8: the
+                  // disc seeks to cylinder 0); the completion puts it back.
+                  s_on_cyl[iox_wdata[9]] <= 1'b0;
                   s_delay_cnt <= DELAY_TICKS;
                   s_eng       <= E_DELAY;
                 end
 
-                OP_READ, OP_WRITE, OP_COMPARE: begin
+                OP_READ, OP_WRITE, OP_COMPARE, OP_READ_PAR: begin
                   // Test mode (control b3) does NOT skip this check. An earlier
                   // version bypassed it and cited sec 3.4, but 3.4 only gives the
                   // test-mode control word (100254: read, head 5, bad-track) and
                   // says nothing about skipping a check; the oracle runs the
                   // check in test mode too. The head tested is the one in THIS
                   // control word (see w_go_head).
-                  if ((w_lba > w_max_lba) ||
-                      ({11'd0, w_go_head} >= GEO_HEADS) ||
-                      ({11'd0, w_go_sec}  >= GEO_SPT)) begin
+                  //
+                  // AN ADDRESS MISMATCH ENDS LATER, NOT INSIDE THIS IOX. The card
+                  // goes active at activation and only finds out about the
+                  // address while it works (the compare of sec 4.4 phase 2 happens
+                  // as the sectors pass under the head). The SINTRAN driver reads
+                  // status straight after activating and takes "not active" as an
+                  // error of its own (WINCHESTER:NPL, WDACT: "IF A NBIT ACTIV GO
+                  // CNACT % ERROR, NOT BUSY", "CONTROLLER NOT ACTIVE AFTER
+                  // ACTIVATE"); ending at once sent SINTRAN to ERRFATAL instead of
+                  // into its retry and recalibrate path. Same rule as nd100x
+                  // wd_end_later. So the mismatch is set here and the operation
+                  // completes through E_DELAY like any other: the flip-flops are
+                  // cleared there, and the memory address stays as loaded, since
+                  // s_dma_addr_r starts at it and nothing moves it.
+                  if (w_out_of_range) begin
+                    // Nothing found, but the sector it failed on counts: + 1.
                     s_addr_mismatch <= 1'b1;
-                    s_active <= 1'b0;
-                    s_rft    <= 1'b1;
-                    trace_done <= 1'b1;
-                    s_on_cyl[iox_wdata[9]] <= 1'b0;
-                    s_eng      <= E_IDLE;
-                    s_dma_wait <= 1'b0;
-                    // EVERY completion is a FinishOperation, and a
-                    // FinishOperation always clears the upper/lower selection
-                    // flip-flops and zeroes the word counter - both C models
-                    // route this path through wd_finish_operation(), which
-                    // calls wd_clear_flipflops() + wd_sync_registers().
-                    // Leaving them alone here is what made a LATER IOX 500
-                    // read return the wrong half: the transfer and the status
-                    // word stay perfectly correct, so the fault surfaces only
-                    // as DISC-TEMA's "Memory address Register not as
-                    // expected" long after the probe that caused it. The
-                    // address registers themselves are NOT advanced - nothing
-                    // was transferred, which is also what wd_sync_registers
-                    // computes here (mem_addr still equals what was loaded).
-                    clr_ff;
-                    s_word_cnt <= 16'd0;
-                    if (iox_wdata[1]) s_irq <= 1'b1;
-                    else              s_irq <= iox_wdata[0];
+                    s_blk_adv   <= 8'd1;
+                    s_delay_cnt <= DELAY_TICKS;
+                    s_eng       <= E_DELAY;
+                  end else if (w_runs_off) begin
+                    // The arm is on another cylinder, or the transfer runs off
+                    // the arm's cylinder: the sectors found, plus the one that
+                    // was not.
+                    s_addr_mismatch <= 1'b1;
+                    s_blk_adv   <= w_found[7:0] + 8'd1;
+                    s_delay_cnt <= DELAY_TICKS;
+                    s_eng       <= E_DELAY;
                   end else if (w_go_words != 24'd0) begin
+                    s_blk_adv <= w_go_count;
+                    s_is_par  <= (iox_wdata[13:11] == OP_READ_PAR);
                     if (w_disk_out) begin
                       // The backend still owes a done from a cut-short
                       // operation: wait for it (E_WAIT_DISK).
@@ -951,8 +1037,12 @@ module ND_WINCHESTER #(
                 end
 
                 default: begin
-                  // M2 read-parity / M5 write-format: documented stubs,
-                  // acknowledged as no-data completions so the guest proceeds.
+                  // M5 write-format: a documented stub, acknowledged as a
+                  // no-data completion so the guest proceeds. It does not yet
+                  // read its address fields from memory or move the memory
+                  // address (nd100x does both, sec 3.4.6); that is the next
+                  // step of this port. M2 is no longer here: it runs the read
+                  // path above.
                   //
                   // M3 COMPARE IS NO LONGER ONE OF THEM. It was, and the note
                   // here claimed that matched both C models - it does not.
@@ -1037,6 +1127,26 @@ module ND_WINCHESTER #(
             if (disk_err_in) begin
               set_backend_fault(disk_err_code);
               err_active;
+            end else if (s_is_par) begin
+              // M2 read parity, sec 3.4.3: "No data transfer to the computer
+              // memory is performed." No memory cycles, but the address and
+              // word counters still run through the chunk as the data passes
+              // the FIFO. Not stated in the manual (nd100x BUGS.md W8);
+              // DISC-TEMA J02 PARITY-CHECK, the card's checkout (sec 5.6),
+              // reads the memory address back after every M2 and reports
+              // "Memory address Register not as expected" when it has not
+              // moved. Same as nd100x (device_winchester.c, WD_OP_READ_PARITY).
+              s_dma_addr_r <= s_dma_addr_r + {13'd0, s_chunk_q};
+              s_words_left <= s_words_left - {13'd0, s_chunk_q};
+              if (s_words_left <= {13'd0, s_chunk_q}) begin
+                s_delay_cnt <= DELAY_TICKS;
+                s_eng       <= E_DELAY;
+              end else begin
+                s_chunk_q <= ((s_words_left - {13'd0, s_chunk_q}) > {13'd0, BUF_WORDS}) ?
+                             BUF_WORDS : (s_words_left[10:0] - s_chunk_q);
+                disk_req  <= 1'b1;
+                disk_wr   <= 1'b0;
+              end
             end else begin
               s_sec_idx <= 11'd0;
               s_eng     <= s_is_cmp ? E_MEM_CMP : E_MEM_WR;
@@ -1096,6 +1206,11 @@ module ND_WINCHESTER #(
               err_active;
             end else if (dma_rdata != s_buf_dout) begin
               s_compare_err <= 1'b1;
+              // nd100x stops comparing at the first difference and still
+              // writes the block address back moved on by the whole transfer
+              // (device_winchester.c, WD_OP_COMPARE, then
+              // wd_advance_block_address(block_counter)).
+              s_blkaddr <= blk_advanced(s_blkaddr, s_blk_adv);
               err_active;
             end else begin
               s_dma_addr_r <= s_dma_addr_r + 24'd1;
@@ -1177,6 +1292,7 @@ module ND_WINCHESTER #(
             s_mem_addr_hi <= s_dma_addr_r[23:16];
             s_word_cnt    <= 16'd0;
             s_on_cyl[s_unit] <= 1'b1;
+            s_blkaddr     <= blk_advanced(s_blkaddr, s_blk_adv);
             s_eng         <= E_IDLE;
             // Sec 4.1 with ready now true: the line follows the enable.
             s_irq         <= s_int_en;

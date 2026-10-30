@@ -429,7 +429,14 @@ module nd_winchester_iox_tb;
     iox_write(BASE + R_LOAD_BLOCK, 16'd20);      // sector 20, drive has 9
     iox_write(BASE + R_LOAD_WC, 16'd512);
     iox_write(BASE + R_CONTROL, CW_ACTIVE);      // M0 read
+    // The mismatch ends LATER, not inside the activating IOX: the SINTRAN
+    // driver reads status straight after the activate and takes "not active"
+    // as an error of its own (WINCHESTER:NPL WDACT, "CONTROLLER NOT ACTIVE
+    // AFTER ACTIVATE"). Same rule as nd100x wd_end_later.
     repeat (20) @(posedge sysclk);
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ACTIVE]   === 1'b1, "address mismatch: still active straight after the activate");
+    repeat (LONG_DELAY + 100) @(posedge sysclk);
     iox_read(BASE + R_STATUS, d);
     check(d[SB_ADDRMISM] === 1'b1, "sector past the end of a track mismatches");
     check(d[SB_INCLOR]   === 1'b1, "address mismatch feeds the inclusive OR");
@@ -447,6 +454,93 @@ module nd_winchester_iox_tb;
     iox_read(BASE + R_STATUS, d);
     check(d[SB_ADDRMISM] === 1'b1,
           "test mode still checks the address bounds");
+
+    // ---- master clear: both arms on cylinder 0 -----------------------
+    // Sec 3.4.8 "Return to zero by pushing the master clear button", sec 5.5
+    // "Pushing Master Clear will position the heads to cylinder 0".
+    master_clear;
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ONCYL] === 1'b1, "master clear: unit 0 on cylinder");
+    iox_write(BASE + R_CONTROL, CW_UNIT);        // select unit 1, no activate
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ONCYL] === 1'b1, "master clear: unit 1 on cylinder");
+
+    // ---- on cylinder drops while M4 moves the arm --------------------
+    // Sec 3.4.5: a seek "is completed when the heads are settled over the
+    // correct tracks".
+    master_clear;
+    iox_write(BASE + R_LOAD_WC, 16'd3);
+    iox_write(BASE + R_CONTROL, CW_ACTIVE | CW_DIR | (16'd4 << 11));
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ACTIVE] === 1'b1 && d[SB_ONCYL] === 1'b0,
+          "M4: active and not on cylinder while the heads travel");
+    repeat (LONG_DELAY + 100) @(posedge sysclk);
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ACTIVE] === 1'b0 && d[SB_ONCYL] === 1'b1,
+          "M4: on cylinder again once it has finished");
+
+    // ---- M7 drops on cylinder too -------------------------------------
+    iox_write(BASE + R_CONTROL, CW_ACTIVE | (16'd7 << 11));
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ONCYL] === 1'b0, "M7: not on cylinder while moving home");
+    repeat (LONG_DELAY + 100) @(posedge sysclk);
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ONCYL] === 1'b1 && dut.s_cyl_pos[0] == 16'd0,
+          "M7: on cylinder 0 once it has finished");
+
+    // ---- M4 out stops on the last cylinder, not past it ----------------
+    // GEO_MAX_CYL (1024) is the number of cylinders, so the last is 1023.
+    iox_write(BASE + R_LOAD_WC, 16'd5000);
+    iox_write(BASE + R_CONTROL, CW_ACTIVE | CW_DIR | (16'd4 << 11));
+    repeat (LONG_DELAY + 100) @(posedge sysclk);
+    check_eq(dut.s_cyl_pos[0], 16'd1023, "M4 out: arm stops on the last cylinder (1023)");
+
+    // ---- a transfer needs the arm on its cylinder ----------------------
+    // Sec 2.2 "The software driver must do a seek to the correct cylinder
+    // prior to a read or write operation"; sec 4.4 phase 2 compares the
+    // address fields under the heads. Arm at 0, block address on cylinder 3,
+    // sector 4: nothing found, mismatch, and the block address moves on by
+    // the one sector it failed on (nd100x BUGS.md W7, the driver's
+    // "A-1=:ADMIA").
+    master_clear;
+    iox_write(BASE + R_LOAD_BLOCK, (16'd3 << 5) | 16'd4);
+    iox_write(BASE + R_LOAD_WC, 16'd512);
+    iox_write(BASE + R_CONTROL, CW_ACTIVE);      // M0 read
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ACTIVE] === 1'b1, "arm off cylinder: still active straight after the activate");
+    repeat (LONG_DELAY + 100) @(posedge sysclk);
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ADDRMISM] === 1'b1 && d[SB_ACTIVE] === 1'b0 && d[SB_FINISHED] === 1'b1,
+          "arm on cylinder 0, block on cylinder 3: address mismatch, finished");
+    iox_read(BASE + R_READ_BLOCK, d);
+    check_eq(d, (16'd3 << 5) | 16'd5,
+             "after the mismatch the block address points one past the failing sector");
+    check(disk_req === 1'b0 && dut.s_disk_out === 1'b0,
+          "no backend request for a sector the card did not find");
+
+    // ---- a transfer that runs off the arm's cylinder ---------------------
+    // Arm at 0, head 7, sector 8 (the last sector of cylinder 0), 2 sectors
+    // (1024 words): the first is found, the second would be on cylinder 1.
+    master_clear;
+    iox_write(BASE + R_LOAD_BLOCK, 16'd8);
+    iox_write(BASE + R_LOAD_WC, 16'd1024);
+    iox_write(BASE + R_CONTROL, CW_ACTIVE | (16'd7 << 5));
+    repeat (LONG_DELAY + 100) @(posedge sysclk);
+    iox_read(BASE + R_STATUS, d);
+    check(d[SB_ADDRMISM] === 1'b1, "a transfer that runs off the arm's cylinder mismatches");
+    iox_read(BASE + R_READ_BLOCK, d);
+    check_eq(d, 16'd10, "run off the cylinder: block address moved on by found (1) + 1");
+
+    // ---- device clear keeps the block address -------------------------
+    // WINCHESTER:NPL IERR gives a device clear and then reads the block
+    // address to find the failing sector; master clear does clear it.
+    iox_write(BASE + R_LOAD_BLOCK, 16'o012345);
+    iox_write(BASE + R_CONTROL, CW_DEVCLR);
+    iox_read(BASE + R_READ_BLOCK, d);
+    check_eq(d, 16'o012345, "device clear keeps the block address");
+    master_clear;
+    iox_read(BASE + R_READ_BLOCK, d);
+    check_eq(d, 16'd0, "master clear clears the block address");
 
     if (errors == 0)
       $display("=== %0d checks passed ===\nTB_RESULT: PASS", checks);
