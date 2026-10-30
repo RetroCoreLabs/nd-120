@@ -61,7 +61,7 @@
 // BOOT_NAME("BOOT.TAP") is not conditional on this define.
 `define TANG_FLOPPY
 
-// TANG_SMD = ADD the ND_SMD disk controller at 1540 (boot '1540&') on top of
+// TANG_SMD = ADD the ND_SMD disk controller at 1540 (boot '21540&' - measured on the board; OPCOM answers '?' to '1540&') on top of
 // the selected base build: ND_SMD + its own ND_DMA_MASTER in the core, and
 // nd_storage_disc_adapter serving SMD0.IMG off the SD card (nd_storage client
 // 3, slot remapped to 1376 blocks -> image limit 2,818,048 bytes). Costs ONE
