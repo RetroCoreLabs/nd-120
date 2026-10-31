@@ -21,7 +21,7 @@
 **      ND-120 mass-storage microcode works here at all.                  **
 **   5. block address split: cylinder b15-5, sector b4-0 (sec 3.3)        **
 **   6. status constants: b15 always 0 (not the 10 Mb controller),        **
-**      b12 always 0, b13 always 1 on the 3041                            **
+**      b13 always 1 on the 3041; b12 is TR00 (sec 7.11), 1 on cyl 0   **
 **   7. the interrupt / IDENT probe of sec 4.1 - the TPE CONFIGURATION    **
 **      sequence. The C port shipped once without it and TPE reported     **
 **      "No identcode found on level 11D, expected identcode : 1B", so    **
@@ -303,7 +303,9 @@ module nd_winchester_iox_tb;
     iox_read(BASE + R_STATUS, d);
     check(d[SB_BIT15] === 1'b0,
           "status b15 always 0 - distinguishes from the 10 Mb controller");
-    check(d[SB_NOTUSED] === 1'b0, "status b12 always 0");
+    // b12 is TR00, the selected drive's Track 000 line (sec 7.9/7.11):
+    // master clear leaves unit 0 selected, out of test mode, on cylinder 0.
+    check(d[SB_NOTUSED] === 1'b1, "status b12 = TR00, 1 on cylinder 0 after master clear");
     check(d[SB_CONTRID] === 1'b1, "3041: status b13 always 1");
     check(d !== 16'd0, "status is readable straight after master clear");
 

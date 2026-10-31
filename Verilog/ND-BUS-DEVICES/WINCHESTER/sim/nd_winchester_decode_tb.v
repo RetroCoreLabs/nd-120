@@ -329,11 +329,12 @@ module nd_winchester_decode_tb;
     //    heads on cylinder 0; a real 3041 with a 1325 read 060011 after its
     //    first control word, with no return to zero before it - see
     //    ../oracle/README.md). So on a 3041 the status bits set are b14, on
-    //    cylinder, and b13, the card identity constant.
+    //    cylinder, b13, the card identity constant, and b12, TR00: unit 0's
+    //    Track 000 line, as its heads are on cylinder 0 (sec 7.9/7.11).
     // ---------------------------------------------------------------
     peek(BASE + R_STATUS);
-    ck("S0_STATUS_AFTER_MASTER_CLEAR", rv, 16'h6000);
-    status_reset = 16'h6000;
+    ck("S0_STATUS_AFTER_MASTER_CLEAR", rv, 16'h7000);
+    status_reset = 16'h7000;
 
     // 3038 strap: b13 is the live read/write gate, which is 0 when idle
     iox_addr = BASE + R_STATUS; iox_rd = 1'b1; #1;

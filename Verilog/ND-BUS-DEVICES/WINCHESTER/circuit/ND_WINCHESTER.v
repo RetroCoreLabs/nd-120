@@ -66,7 +66,8 @@
 **   b5 3041: r/w during RTZ  b6 timeout  b7 disk fault                  **
 **   b8 address mismatch   b9 CRC error   b10 compare error              **
 **   b11 FIFO over/under-run or DMA channel error                        **
-**   b12 always 0          b13 3041: always 1 / 3038: r/w gate active    **
+**   b12 3041: drive Track 000 (TR00, sec 7.11) / 3038: 0 (not traced)  **
+**                         b13 3041: always 1 / 3038: r/w gate active    **
 **   b14 on cylinder       b15 always 0 - distinguishes this card from   **
 **                             the 10 Mb controller                      **
 **                                                                       **
@@ -488,11 +489,27 @@ module ND_WINCHESTER #(
   // the 3038 from the 3041"), the 3038 reports its live read/write gate.
   wire s_contr_id = IS_3038 ? s_rw_gate : 1'b1;
 
+  // Bit 12. Sec 3.5 calls it "0 (Not used)", but on the 3041 the logic
+  // diagram (sec 7.11) feeds it from TR00, the selected drive's Track 000
+  // line (sec 7.9, cable pin Ra5), through the status driver 11F. The drive
+  // only answers when selected, and the select lines are
+  // US0 = NOT CR9 AND TEST, US1 = CR9 AND TEST (sec 7.9), so test mode
+  // (control b3) selects no drive and the bit reads 0. A real 3041 trace
+  // (nd100x tests/test_winchester_units.c) reads 060011 after control 000011
+  // and 070010 after 100000 and 000000 at power-on, which this gives.
+  // The heads reach cylinder 0 only when a seek towards it ends, and
+  // s_cyl_pos holds the target from the start, so the arrival is taken as
+  // on-cylinder coming back. Like b14, this core cannot tell an attached
+  // unit from an empty one (see the header). On the 3038 (sec 7.4) the bit
+  // comes from an SB12 latch whose source has NOT been traced: 0 there.
+  wire s_track0 = !IS_3038 && !s_test_mode &&
+                  (s_cyl_pos[s_sel_unit] == 16'd0) && s_on_cyl[s_sel_unit];
+
   wire [15:0] s_status =
       { 1'b0,             // b15 always 0 - not the 10 Mb controller
         s_on_cyl[s_sel_unit], // b14 on cylinder
         s_contr_id,       // b13 card identity
-        1'b0,             // b12 always 0
+        s_track0,         // b12 3041: selected drive's Track 000 (TR00)
         s_dma_ch_err,     // b11 FIFO over/under-run or DMA channel error
         s_compare_err,    // b10 compare error
         s_crc_err,        // b9  CRC error

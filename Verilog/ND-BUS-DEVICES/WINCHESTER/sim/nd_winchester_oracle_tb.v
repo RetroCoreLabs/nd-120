@@ -253,15 +253,17 @@ module nd_winchester_oracle_tb;
     // 5.5), and a real 3041 with a 1325 read 060011 after its first control
     // word 000011 with no return to zero before it (../oracle/README.md).
     //
-    // NOT SETTLED: on that real card, control word 100000 then read back
-    // 070010 - bit 12, "not used" in sec 3.5, read 1. What sets it is not
-    // known (nd100x BUGS.md W10, a red check in tests/test_winchester_units.c).
-    // This RTL keeps b12 at 0, so op3 and op5 expect 060010 here.
+    // On that real card control word 100000 then read back 070010: bit 12,
+    // "not used" in sec 3.5, is TR00, the selected drive's Track 000 line
+    // (sec 7.9/7.11). It reads 1 whenever unit 0 is on cylinder 0 outside test
+    // mode (control b3), so 070010 below, and 060011 only after 000011, which
+    // sets test mode and selects no drive. The older nd100x captures this
+    // bench was first built from read 0 in b12 because nd100x tied it to 0.
     ck_rd(BASE + R_READ_MA, 16'o000000, "op1  RD +0");
     iox_write(BASE + R_CONTROL, 16'o100000);
-    ck_rd(BASE + R_STATUS, 16'o060010, "op3  RD +4");
+    ck_rd(BASE + R_STATUS, 16'o070010, "op3  RD +4");
     iox_write(BASE + R_CONTROL, 16'o000000);
-    ck_rd(BASE + R_STATUS, 16'o060010, "op5  RD +4");
+    ck_rd(BASE + R_STATUS, 16'o070010, "op5  RD +4");
     iox_write(BASE + R_CONTROL, 16'o000011);
     ck_rd(BASE + R_STATUS, 16'o060011, "op7  RD +4");
     iox_write(BASE + R_CONTROL, 16'o000010);
@@ -269,13 +271,13 @@ module nd_winchester_oracle_tb;
     iox_write(BASE + R_LOAD_WC, 16'o000000);
     iox_write(BASE + R_CONTROL, 16'o034005);       // GO
     wait_finish;
-    ck_rd(BASE + R_STATUS, 16'o060011, "op13 RD +4");
+    ck_rd(BASE + R_STATUS, 16'o070011, "op13 RD +4");
     iox_write(BASE + R_CONTROL, 16'o000000);
-    ck_rd(BASE + R_STATUS, 16'o060010, "op15 RD +4");
-    ck_rd(BASE + R_STATUS, 16'o060010, "op16 RD +4");
+    ck_rd(BASE + R_STATUS, 16'o070010, "op15 RD +4");
+    ck_rd(BASE + R_STATUS, 16'o070010, "op16 RD +4");
     iox_write(BASE + R_CONTROL, 16'o000020);
     iox_write(BASE + R_CONTROL, 16'o000020);
-    ck_rd(BASE + R_STATUS, 16'o060010, "op19 RD +4");
+    ck_rd(BASE + R_STATUS, 16'o070010, "op19 RD +4");
     iox_write(BASE + R_CONTROL, 16'o000020);
     iox_write(BASE + R_CONTROL, 16'o000020);
     iox_write(BASE + R_LOAD_WC, 16'o000000);

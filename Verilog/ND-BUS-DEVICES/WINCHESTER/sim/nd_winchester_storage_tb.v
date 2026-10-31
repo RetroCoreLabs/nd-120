@@ -551,7 +551,8 @@ module nd_winchester_storage_tb;
     // (../oracle/fsi-lifi-nd100x-old-model.trace); the M7 is kept here because
     // it still has to end on cylinder, with no error.
     //
-    //   IOX READ  504 -> 060000     power-on: not finished, on cylinder
+    //   IOX READ  504 -> 070000     power-on: not finished, on cylinder,
+    //                               b12 TR00: unit 0 on cylinder 0 (sec 7.11)
     //   IOX WRITE 505 =  034005     M7 return-to-zero (older capture only)
     //   IOX READ  504 -> 060005     active, on cylinder
     //   IOX READ  504 -> 060011     finished, on cylinder
@@ -569,8 +570,8 @@ module nd_winchester_storage_tb;
     // the bit the failing silicon status (020010 = finished, NOT on cylinder,
     // no error bits) says never got set.
     iox_read(16'o504);
-    if (rdlat !== 16'o060000) begin
-      $display("FAIL: power-on status %06o, oracle says 060000", rdlat);
+    if (rdlat !== 16'o070000) begin
+      $display("FAIL: power-on status %06o, expected 070000", rdlat);
       errors = errors + 1;
     end
 
