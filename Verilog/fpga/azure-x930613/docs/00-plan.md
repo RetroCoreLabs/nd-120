@@ -1,5 +1,8 @@
 # Azure FPGA (X930613-001) - plan
 
+**Next:** step V1 of "Verilog plan" below - the PCIe console register
+block and its iverilog test. None of the V steps need the card or Quartus.
+
 **Status: not started.** No Quartus project, no PCIe endpoint Verilog, no
 console driver exist yet anywhere in this repo. Everything below the
 "Open questions" section is a **design intent**, written from facts
@@ -82,6 +85,38 @@ verified against multiple independent sources (see
   itself under that preload. Source + working C code:
   <https://github.com/ruurdk/sv_second_pcie_hip> (Linux) /
   `sv_second_pcie_hip_windows` (Windows variant, not yet checked).
+- **THE BITSTREAM NEEDS A PAID LICENCE - no free route was found.**
+  Quartus works in two stages: (1) synthesis, fitting and timing, which
+  show whether the design fits and is fast enough; (2) the Assembler,
+  which writes the *programming files* - the `.sof` the Programmer loads
+  over JTAG, and `.pof`/`.jic` for flash. Without stage 2 there is nothing
+  to load into the card. What a web search found:
+  - Altera's own download page: Quartus Prime Standard "requires a paid
+    license" and is the edition that lists Stratix V. Lite (free) stops at
+    Cyclone V / MAX 10 / Cyclone 10; Pro's free mode covers Cyclone 10 GX
+    only.
+  - Price: about USD 2,995 node-locked ("fixed"), 3,995 floating - from a
+    third-party listing (manuals.plus), NOT Altera's store; check before
+    relying on it.
+  - The software itself is a free download (Standard 25.1, Windows and
+    Linux, with Stratix V device support). Only the licence costs money.
+  - The 30-day evaluation does stage 1 but not stage 2 (see below).
+  - None of the hobbyist write-ups for this card (devops.lol, j-marjanovic,
+    `ruurdk/storey-peak`) say which licence they used. devops.lol only says
+    "installed Quartus Prime Standard edition, as Lite and Pro don't
+    support this Stratix V part".
+  - No free hobbyist licence for Standard was found, and no way to make a
+    `.sof` without one. Not checked: Altera's academic programme (needs a
+    university).
+  - A Docker container does not change any of this; the licence rules are
+    the same inside it.
+
+  **Consequence for this board:** for a hobbyist without a licence, the
+  card can be SIMULATED and its design checked for fit and timing (the
+  evaluation), but a bitstream cannot be produced. Every other board in
+  this repo builds with free tools; this one does not. Getting a
+  bitstream needs either a bought Standard seat or someone who already
+  holds a licence running the final step.
 - **Licensing (re-checked directly with an Altera source):**
   intel.com and altera.com themselves blocked every direct fetch attempt
   (bot protection, both curl and the fetch tool - the archived copy
@@ -175,7 +210,43 @@ has to ride PCIe instead:
   this exact card) already has a working PCIe driver stack for Storey
   Peak-class cards worth reading before writing one from scratch.
 
-## Next step
+## Verilog plan (testable before the card is in a PC)
+
+Decisions taken (Ronny):
+
+- **Console over PCIe.** The PC reads and writes a small register block
+  behind a PCIe BAR; a small PC program turns it into a telnet port
+  RetroTerm can open. No serial wire through the QSFP cage.
+- **Main memory in on-chip block RAM first.** DDR3 comes later, behind the
+  same cache wrapper the Nexys uses for DDR2 (`MEM_RAM_49_DDR2`). The block
+  RAM size of this custom part is NOT verified - the 2 MB ND memory target
+  must be checked against the Quartus fit report before it is relied on.
+  Memory must not alias above 0o200000 (the MiSTer lesson).
+- **Disks planned now, served by the PC.** Same split as the MiSTer: the
+  MiSTer's `nd_storage_hps.v` / `nd_storage_mister_devices.v` answer the ND
+  floppy, Winchester and tape controllers unchanged; on the MiSTer the ARM
+  serves the image files through `hps_io`'s block interface, here the PC
+  serves them through a new PCIe block that presents the same interface.
+
+Every vendor block (PLL, PCIe hard IP, later DDR3) sits behind a thin
+wrapper module with a plain simulation model, so everything below runs in
+iverilog/Verilator without Quartus.
+
+| Step | File(s) under `rtl/` | What | Test |
+|---|---|---|---|
+| V1 | `nd_pcie_console.v` | Console register block: send queue (ND -> PC), receive queue (PC -> ND), status word. CPU side is the same byte interface the other boards' console UART uses. Register layout written down in this file before coding. | iverilog tb in `sim/`, PC side simulated as BAR reads/writes; registered in `Verilog/tests/run_all_tests.sh` |
+| V2 | `nd_pcie_storage.v` | PC-served disk block: a mailbox the PC polls (which slot wants which block, read or write), a 2048-byte data window, and mount records (size, read-only). Drives the `sd_*`/`img_*` side of `nd_storage_hps.v` exactly as `hps_io` does (rules in that file's header). | iverilog tb with a simulated PC serving a small image; read, write, unmounted slot, read-only, out of range |
+| V3 | `pcie_bar_bus.v` + `pcie_hip_wrap.v` | One BAR split between V1 and V2. The wrapper hides the Stratix V PCIe hard IP; its sim model is a plain read/write bus. | covered by V4 |
+| V4 | `nd120_azure_top.v` | Board top: shared CPU/board tree unchanged, block RAM main memory, V1-V3, storage devices from `../mister/rtl/`. | Verilator: boots to OPCOM through the simulated PCIe console, then a floppy/disk read through V2 |
+| V5 | `build.tcl` or `.qsf` + file list | Quartus project for `5SGSMD5K1F40C1` (stand-in for the custom part, see Build). Gives `Verilog/tests/gen_hierarchy.py` a `quartus` entry, so the board appears in `Verilog/HIERARCHY.md`. | hierarchy generator runs clean |
+| V6 | PC program (new folder, language not chosen) | Maps the BAR; console -> telnet port; serves image files to V2. | needs the card |
+
+Reuse questions to settle while doing V2: whether `nd_storage_hps.v`'s
+two-clock design is needed here (PCIe user clock vs CPU clock - yes, two
+domains) and whether its MiSTer-specific timing assumptions (PC polling
+rate) hold for a PC on the other end of PCIe.
+
+## Next step (hardware)
 
 Answer open questions 1-5 above - starting with #1 (bifurcation support
 on Ronny's actual motherboard), since if that's a dead end the rest of

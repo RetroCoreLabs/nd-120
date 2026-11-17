@@ -51,6 +51,14 @@ repo: a non-catalog FPGA part, Quartus Prime Standard (not Lite/Pro), a
 motherboard BIOS bifurcation requirement, no confirmed GPIO, and a
 JTAG/UART bridge over a repurposed FTDI chip instead of a normal header.
 
+> **Hobbyist warning: no free way to build the bitstream was found.**
+> The Stratix V needs Quartus Prime Standard, whose licence is paid
+> (about USD 3,000 per seat, third-party price). Without it the design can
+> be simulated, and the 30-day evaluation can check fit and timing, but
+> the file that is loaded into the card (`.sof`) cannot be made. Every
+> other board in this repo builds with free tools. Details and sources:
+> [`docs/00-plan.md`](docs/00-plan.md), "Build".
+
 ## Why this board is a different shape from every other target
 
 Every other board in `Verilog/fpga/` is a hobbyist devboard: it has a
@@ -128,4 +136,11 @@ list and the planned (not yet built) build/flash/console workflow.
 | <https://github.com/ruurdk/jtag-quartus-ft232h> | Working driver + exact recipe for using the onboard FT232H as a Quartus JTAG interface on Linux (OpenOCD init, `libjtag_hw_otma.so`, udev rule) - confirms JTAG IDCODE `0x029070dd` matches this Stratix V part |
 | <https://github.com/ruurdk/sv_second_pcie_hip> | Working `LD_PRELOAD` shim to unlock the second PCIe hard IP block, which Quartus's stock device database disables for this part by default - required for the full bifurcated x8+x8, not just one x8 link |
 | <https://hub.docker.com/r/alterafpga/quartus-std> | Official Altera Quartus Prime Standard 25.1 Docker image - tested, the `-all` tag does NOT include Stratix V device files (only Cyclone V + MAX 10), ruling out this specific container as a build environment |
+| <https://www.intel.com/content/www/us/en/software/programmable/quartus-prime/download.html> | Altera's Quartus download page - says Standard "requires a paid license" and lists Stratix V under it; Lite is free but stops at Cyclone V / MAX 10 / Cyclone 10 |
+| <https://www.altera.com/downloads/fpga-development-tools/quartus-prime-standard-edition-design-software-version-25-1-windows> | Quartus Prime Standard 25.1 for Windows - free download with Stratix V device support; the licence is separate and paid |
+| <https://www.intel.com/content/www/us/en/docs/programmable/683472/25-1/types-of-fpga-software-licenses.html> | Altera licence types (fixed / floating); Pro and Standard need a paid licence key |
+| <https://www.altera.com/support/support-resources/licensing/q-and-a> | Altera Licensing Help Guide - fixed vs floating is chosen at purchase |
+| <https://manuals.plus/intel/quartus-prime-design-software-manual> | Third-party listing giving Standard at USD 2,995 fixed / 3,995 floating - NOT Altera's store, check before relying on it |
+| <https://j-marjanovic.io/stratix-v-accelerator-card-from-ebay-part-3.html> | j-marjanovic blog, part 3: FT232H JTAG library used with Quartus Programmer on this card family; does not say which Quartus licence was used |
+| <https://en.wikipedia.org/wiki/Quartus_Prime> | Overview of the Quartus editions; mentions free Pro licences for some device families, none found for Standard |
 | <https://www.macnica.co.jp/en/business/semiconductor/support/faqs/intel/128229/> | Official Altera-distributor FAQ confirming Quartus Prime Standard's 30-day unlicensed evaluation terms (full features, no programming-file output, one-time per machine) - used because intel.com/altera.com themselves blocked direct fetches |
