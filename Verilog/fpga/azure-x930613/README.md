@@ -1,6 +1,7 @@
 # ND-120 on the Microsoft Azure FPGA card (X930613-001)
 
-**Status: PAPER PLAN.** No build files exist yet. This folder
+**Status: PLAN + FIRST BLOCKS.** No build files exist yet; the PCIe console
+and disk blocks exist in `rtl/` with tests in `sim/`. This folder
 only records the card's specs and the open questions that have to be
 answered before any Verilog gets written.
 
@@ -53,7 +54,7 @@ JTAG/UART bridge over a repurposed FTDI chip instead of a normal header.
 
 > **Hobbyist warning: no free way to build the bitstream was found.**
 > The Stratix V needs Quartus Prime Standard, whose licence is paid
-> (about USD 3,000 per seat, third-party price). Without it the design can
+> (SW-ONE-QUARTUS, about USD 3,645). Without it the design can
 > be simulated, and the 30-day evaluation can check fit and timing, but
 > the file that is loaded into the card (`.sof`) cannot be made. Every
 > other board in this repo builds with free tools. Details and sources:
@@ -119,6 +120,9 @@ list and the planned (not yet built) build/flash/console workflow.
 |---|---|
 | [`docs/00-plan.md`](docs/00-plan.md) | Open questions, and the planned build/flash/PCIe-console workflow (design intent only - nothing built yet) |
 | `Makefile` | Standard board API placeholder - no build yet |
+| `rtl/nd_pcie_console.v` | The console as PCIe registers (two byte queues); layout in the file header |
+| `rtl/nd_pcie_storage.v` | Disk images served by the PC; drives the MiSTer `nd_storage_hps` block interface; layout in the file header |
+| `sim/` | iverilog tests: `make all` (`test-console`, `test-storage`), both in the global suite |
 
 ## Links
 
@@ -140,7 +144,40 @@ list and the planned (not yet built) build/flash/console workflow.
 | <https://www.altera.com/downloads/fpga-development-tools/quartus-prime-standard-edition-design-software-version-25-1-windows> | Quartus Prime Standard 25.1 for Windows - free download with Stratix V device support; the licence is separate and paid |
 | <https://www.intel.com/content/www/us/en/docs/programmable/683472/25-1/types-of-fpga-software-licenses.html> | Altera licence types (fixed / floating); Pro and Standard need a paid licence key |
 | <https://www.altera.com/support/support-resources/licensing/q-and-a> | Altera Licensing Help Guide - fixed vs floating is chosen at purchase |
-| <https://manuals.plus/intel/quartus-prime-design-software-manual> | Third-party listing giving Standard at USD 2,995 fixed / 3,995 floating - NOT Altera's store, check before relying on it |
+| <https://manuals.plus/intel/quartus-prime-design-software-manual> | Third-party listing giving Standard at USD 2,995 fixed / 3,995 floating - an OUT-OF-DATE price, see the PCN below |
+| <https://cdrdv2-public.intel.com/808179/PCN118401-00.pdf> | Intel product change notice: the Standard licence part was replaced by SW-ONE-QUARTUS (Standard + Pro + Questa), USD 3,645 "subject to change" |
+| <https://community.altera.com/discussions/quartus-prime/swr-quartus-se-fix-renewal-license/308507/replies/308508> | Intel staff: the Standard renewal licence was dropped for the same bundle |
+| <https://community.altera.com/discussions/quartus-prime/can-someone-please-explain-the-new-one-part-number-quartus-licensing/253346> | SW-ONE-QUARTUS: fixed or floating is chosen after buying |
+| <https://www.digikey.fi/en/products/detail/altera/SW-ONE-QUARTUS/15668225> | Digi-Key Finland listing, USD 3,645.02 without VAT (seen in a search snapshot, page not opened) |
+| <https://www.digikey.ie/en/products/detail/altera/SW-ONE-QUARTUS/15668225> | Digi-Key Ireland listing, EUR 3,121.23 without VAT (search snapshot) |
+| <https://www.mouser.dk/c/embedded-solutions/engineering-tools/development-software/?m=Altera> | Mouser Denmark, DKK 23,384.86 (search snapshot) |
+| <https://community.altera.com/discussions/quartus-prime/quartus-prime-standard-purchase-eligiability/305181> | Forum question whether a private person may buy Standard - unanswered |
+| <https://www.intel.com/content/www/us/en/developer/topic-technology/fpga-academic/membership.html> | Altera/Intel FPGA Academic Program membership: faculty and staff of universities, colleges and non-profit research institutes, academic e-mail required |
+| <https://www.intel.com/content/www/us/en/docs/programmable/683472/22-3/university-program-software-licenses.html> | University Program software licences: licensed Standard and Pro for university labs |
+| <https://community.altera.com/discussions/quartus-prime/quartus-academic-licence/306584> | Forum: students cannot be members; professors request the licences |
+| <https://community.intel.com/t5/Intel-FPGA-University-Program/Temporary-licenses-for-students/m-p/1219069/highlight/true> | Forum: no temporary student licences |
+| <https://community.intel.com/t5/Intel-FPGA-Software-Installation/Quartus-licence-for-educational-purposes/m-p/1577438> | Forum: the academic licence is for non-commercial use only |
+| <https://community.intel.com/t5/Programmable-Devices/Need-help-identifying-an-FPGA-board/td-p/270803> | Forum: academics can ask Microsoft's academic programme for Catapult boards |
+| <https://www.altera.com/products/devkit/po-3024/stratix-v-gs-dsp-development-kit> | Stratix V GS DSP dev kit, said to ship with a one-year Quartus licence (page refused direct fetches) |
+| <https://www.macnica.co.jp/en/business/semiconductor/articles/intel/2063/> | Distributor (Macnica): one-year "Development Kit Edition" licence with the kits |
+| <https://www.macnica.co.jp/en/business/semiconductor/articles/intel/2068/> | Macnica: Stratix V kits came with a one-year licence |
+| <https://community.intel.com/t5/Intel-Quartus-Prime-Software/Can-t-generate-license-for-my-Altera-Stratix-V-Dev-board-valid/td-p/258760> | Second-hand Stratix V kit buyers: the licence form rejects the serial number |
+| <https://community.intel.com/t5/Intel-Quartus-Prime-Software/Subscription-Expiration-date/m-p/1560044/highlight/true> | Intel: dev-kit licences do not last forever |
+| <https://community.intel.com/t5/Programmable-Devices/One-year-time-limited-lincese/m-p/10308> | Forum: conflicting reports on what happens when the one-year kit licence ends |
+| <https://community.altera.com/discussions/boards-and-dev-kits/quartus-development-kit-bundled-license/74195> | Forum thread on whether a kit licence works for other boards (page refused direct fetches; not answered here) |
+| <https://microsites.altera.com/microsites/psg_microsites_migration/quartushelp/18.1/msgs/msgs/ecpt_license_outdated.htm> | Quartus help: a licence covers versions released before its maintenance end date |
+| <https://community.altera.com/discussions/quartus-prime/subscription-expiration-date/318780> | Intel staff: a licence file with an expiry date stops on that date |
+| <https://community.altera.com/discussions/quartus-prime/quartus-ii-no-sof-or-output-file-generated/303986> | Forum: the evaluation-mode refusal "Can't generate programming files ..." |
+| <https://community.altera.com/discussions/fpga-device/-sof-not-generated/232957> | Forum: the same on a Stratix V board with the 30-day evaluation |
+| <https://community.intel.com/t5/Intel-Quartus-Prime-Software/Quartus-Prime-Lite-with-NIOS2-Generates-Time-Limited-SOF-File/m-p/1301583> | `_time_limited.sof` is OpenCore Plus (IP-core trial), not a device-licence escape |
+| <https://www.intel.com/content/www/us/en/support/programmable/articles/000089475.html> | Intel article on OpenCore Plus time-limited files |
+| <https://community.altera.com/kb/knowledge-base/can-i-create-programming-files-for-production-stratix-v-series-devices-using-the/339214> | Stratix V production programming files need Quartus II 12.0 or later |
+| <https://community.altera.com/discussions/fpga-device/quartus-ii-web-edition-for-stratix/285228> | Forum: the free Web Edition never supported the Stratix series |
+| <https://community.altera.com/discussions/quartus-prime/which-stratix-devices-are-supported-by-quartus-ii-v14-web-edition/292899> | Forum: 14.0 Web Edition page listed Stratix V but the device files did not include it (unanswered; page refused direct fetches) |
+| <https://www.intel.com/content/dam/www/central-libraries/us/en/documents/ss-quartussevswe-guide.pdf> | Intel Subscription vs Web Edition comparison guide |
+| <https://community.intel.com/t5/Intel-Quartus-Prime-Software/Adding-Support-for-DE5-Net/m-p/1197444> | Forum: Quartus Standard 20.1 said to be the last with Stratix V |
+| <https://www.intel.com/content/www/us/en/docs/programmable/683665/current/design-security.html> | Intel handbook: the Stratix V configuration format is proprietary |
+| <https://github.com/wirebond/catapult_v2_pikes_peak> | Pikes Peak works with bitstreams built for 5SGSMD5H* / 5SGSMD5K*; Quartus 18.0 has no entry for the real part; licence not stated |
 | <https://j-marjanovic.io/stratix-v-accelerator-card-from-ebay-part-3.html> | j-marjanovic blog, part 3: FT232H JTAG library used with Quartus Programmer on this card family; does not say which Quartus licence was used |
 | <https://en.wikipedia.org/wiki/Quartus_Prime> | Overview of the Quartus editions; mentions free Pro licences for some device families, none found for Standard |
 | <https://www.macnica.co.jp/en/business/semiconductor/support/faqs/intel/128229/> | Official Altera-distributor FAQ confirming Quartus Prime Standard's 30-day unlicensed evaluation terms (full features, no programming-file output, one-time per machine) - used because intel.com/altera.com themselves blocked direct fetches |

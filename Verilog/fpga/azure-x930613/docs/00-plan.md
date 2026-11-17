@@ -1,7 +1,8 @@
 # Azure FPGA (X930613-001) - plan
 
-**Next:** step V1 of "Verilog plan" below - the PCIe console register
-block and its iverilog test. None of the V steps need the card or Quartus.
+**Next:** step V3 of "Verilog plan" below - the BAR split and the PCIe
+wrapper with its simulation model. None of the V steps need the card or
+Quartus.
 
 **Status: not started.** No Quartus project, no PCIe endpoint Verilog, no
 console driver exist yet anywhere in this repo. Everything below the
@@ -95,9 +96,14 @@ verified against multiple independent sources (see
     license" and is the edition that lists Stratix V. Lite (free) stops at
     Cyclone V / MAX 10 / Cyclone 10; Pro's free mode covers Cyclone 10 GX
     only.
-  - Price: about USD 2,995 node-locked ("fixed"), 3,995 floating - from a
-    third-party listing (manuals.plus), NOT Altera's store; check before
-    relying on it.
+  - Price: the Standard-only licence (`SW-QUARTUS-SE-FIX`, the old
+    "USD 2,995" figure) was replaced by one bundled part, **SW-ONE-QUARTUS**
+    (Standard + Pro + the Questa simulator), USD 3,645 "subject to change",
+    per Intel's product change notice PCN118401. Distributor prices seen in
+    search snapshots only (pages not opened): Digi-Key Finland USD 3,645.02,
+    Digi-Key Ireland EUR 3,121.23 (both without VAT). Fixed (one machine)
+    or floating is chosen after buying. No rule was found that stops a
+    private person from buying it.
   - The software itself is a free download (Standard 25.1, Windows and
     Linux, with Stratix V device support). Only the licence costs money.
   - The 30-day evaluation does stage 1 but not stage 2 (see below).
@@ -106,8 +112,38 @@ verified against multiple independent sources (see
     "installed Quartus Prime Standard edition, as Lite and Pro don't
     support this Stratix V part".
   - No free hobbyist licence for Standard was found, and no way to make a
-    `.sof` without one. Not checked: Altera's academic programme (needs a
-    university).
+    `.sof` without one.
+  - Evaluation mode refuses with "Can't generate programming files because
+    you are currently using the Quartus II software in Evaluation Mode"
+    (warning 292011, forum quote). The `_time_limited.sof` files some
+    people get are OpenCore Plus - a trial of an IP core inside an
+    otherwise licensed design - and do not help with an unlicensed device.
+  - **Academic programme:** only faculty and staff of a university,
+    college or non-profit research institute can join, with an academic
+    e-mail address; students cannot be members, and the licence is for
+    non-commercial use. No route for alumni, self-learners or hobbyists
+    was found. Whether it covers Stratix V programming files was not
+    confirmed. (An Intel forum post says academics can also ask
+    Microsoft's academic programme for the Catapult boards themselves.)
+  - **Dev-kit licences:** Stratix V kits shipped with a one-year
+    "Development Kit Edition" licence. Buyers of second-hand kits report
+    that the licence form rejects their kit's serial number. Whether such
+    a licence works for another board than the kit's own was not found.
+  - **Old licences:** a bought licence keeps working for every Quartus
+    released before its maintenance end date (Intel staff); one with an
+    expiry date in the file stops on that date. It is tied to the buyer's
+    account; no official second-hand transfer was found.
+  - **Old free Web Edition:** forum answers say it never supported any
+    Stratix part. The last Quartus with Stratix V is said to be
+    Standard 20.1 (forum post) - not checked against the 25.1 download,
+    which lists Stratix V.
+  - **Open source:** no Stratix V bitstream documentation project (like
+    Mistral for Cyclone V) was found; Intel calls the format proprietary.
+  - **Not found at all:** cloud machines with Quartus already licensed,
+    a build-for-hire service, a monthly or short-term licence, a startup
+    or hobbyist price after the Altera spin-off.
+  - Reddit, EEVblog, Hacker News and X returned no matching threads, but
+    those sites were not searched directly - absence there is not proof.
   - A Docker container does not change any of this; the licence rules are
     the same inside it.
 
@@ -115,8 +151,10 @@ verified against multiple independent sources (see
   card can be SIMULATED and its design checked for fit and timing (the
   evaluation), but a bitstream cannot be produced. Every other board in
   this repo builds with free tools; this one does not. Getting a
-  bitstream needs either a bought Standard seat or someone who already
-  holds a licence running the final step.
+  bitstream needs a bought licence (SW-ONE-QUARTUS, about USD 3,645),
+  an academic licence held by a university staff member, or someone who
+  already holds a licence running the final step. The sources for every
+  point above are in the Links table of [`../README.md`](../README.md).
 - **Licensing (re-checked directly with an Altera source):**
   intel.com and altera.com themselves blocked every direct fetch attempt
   (bot protection, both curl and the fetch tool - the archived copy
@@ -234,17 +272,22 @@ iverilog/Verilator without Quartus.
 
 | Step | File(s) under `rtl/` | What | Test |
 |---|---|---|---|
-| V1 | `nd_pcie_console.v` | Console register block: send queue (ND -> PC), receive queue (PC -> ND), status word. CPU side is the same byte interface the other boards' console UART uses. Register layout written down in this file before coding. | iverilog tb in `sim/`, PC side simulated as BAR reads/writes; registered in `Verilog/tests/run_all_tests.sh` |
-| V2 | `nd_pcie_storage.v` | PC-served disk block: a mailbox the PC polls (which slot wants which block, read or write), a 2048-byte data window, and mount records (size, read-only). Drives the `sd_*`/`img_*` side of `nd_storage_hps.v` exactly as `hps_io` does (rules in that file's header). | iverilog tb with a simulated PC serving a small image; read, write, unmounted slot, read-only, out of range |
 | V3 | `pcie_bar_bus.v` + `pcie_hip_wrap.v` | One BAR split between V1 and V2. The wrapper hides the Stratix V PCIe hard IP; its sim model is a plain read/write bus. | covered by V4 |
 | V4 | `nd120_azure_top.v` | Board top: shared CPU/board tree unchanged, block RAM main memory, V1-V3, storage devices from `../mister/rtl/`. | Verilator: boots to OPCOM through the simulated PCIe console, then a floppy/disk read through V2 |
 | V5 | `build.tcl` or `.qsf` + file list | Quartus project for `5SGSMD5K1F40C1` (stand-in for the custom part, see Build). Gives `Verilog/tests/gen_hierarchy.py` a `quartus` entry, so the board appears in `Verilog/HIERARCHY.md`. | hierarchy generator runs clean |
 | V6 | PC program (new folder, language not chosen) | Maps the BAR; console -> telnet port; serves image files to V2. | needs the card |
 
-Reuse questions to settle while doing V2: whether `nd_storage_hps.v`'s
-two-clock design is needed here (PCIe user clock vs CPU clock - yes, two
-domains) and whether its MiSTer-specific timing assumptions (PC polling
-rate) hold for a PC on the other end of PCIe.
+The console block (`rtl/nd_pcie_console.v`) and the disk block
+(`rtl/nd_pcie_storage.v`) exist, with their register layouts in the file
+headers; their tests are `make -C sim all` (`test-console`,
+`test-storage`) and are in the global suite. Still open from them:
+
+- The disk test proves the block against a simulated PC that follows the
+  register recipe. Whether the real PC program (V6) can poll fast enough is
+  not measured; nd_storage_hps has no timeout, so a slow PC only makes the
+  disks slow.
+- The console queue's 512 bytes are a choice, not a measurement. If the PC
+  falls behind, ERRS[0] says bytes were lost.
 
 ## Next step (hardware)
 

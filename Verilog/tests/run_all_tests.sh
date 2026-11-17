@@ -162,6 +162,11 @@ REGISTRY=(
   # no reset ordering of nd_storage_hps's two clock domains hangs a read
   # (the automount stuck-R root-cause: the reset CDC is exonerated)
   "fpga/mister/sim :: test-storage-reset :: TB_RESULT: PASS"
+  # Azure card (X930613-001): the console as PCIe registers, run through the
+  # board's real serial pair in a loop; and the PC-served disk block in front
+  # of the unchanged MiSTer storage backend, held to the MiSTer test's checks.
+  "fpga/azure-x930613/sim :: test-console :: TB_RESULT: PASS"
+  "fpga/azure-x930613/sim :: test-storage :: TB_RESULT: PASS"
   # the console keyboard path end to end (the board-wiring seam the per-module
   # tests miss): key expander -> serializer, and a full PS/2 scancode -> byte
   "fpga/mister/sim :: test-kbd-uart :: TB_RESULT: PASS"
