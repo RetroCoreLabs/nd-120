@@ -1,7 +1,7 @@
 # Azure FPGA (X930613-001) - plan
 
-**Next:** step V3 of "Verilog plan" below - the BAR split and the PCIe
-wrapper with its simulation model. None of the V steps need the card or
+**Next:** step V4 of "Verilog plan" below - the board top, booting to
+OPCOM in Verilator through the simulated PCIe console. None of the V steps need the card or
 Quartus.
 
 **Status: not started.** No Quartus project, no PCIe endpoint Verilog, no
@@ -144,6 +144,32 @@ verified against multiple independent sources (see
     or hobbyist price after the Altera spin-off.
   - Reddit, EEVblog, Hacker News and X returned no matching threads, but
     those sites were not searched directly - absence there is not proof.
+  - **Second, deeper search** (most pages could only be seen as search
+    summaries - several Intel and Altera pages refused direct fetches):
+    - Intel DevCloud (remote machines with licensed tools) was shut down
+      on 31-OCT-2024, and had Arria 10 / Stratix 10 only, no Stratix V.
+    - An Azure Marketplace image with Quartus **Pro** existed (bring your
+      own licence, or pay as you go); nothing shows it ever covered
+      Standard or Stratix V, or that it still exists. Nothing found for
+      AWS, Nimbix or Plunify.
+    - Altera's free licences today: Lite, Pro for Cyclone 10 GX, Agilex 5
+      E-Series and Agilex 3, the Questa Starter simulator. No Stratix V,
+      no hobbyist or open-source programme.
+    - Evaluation extensions: Altera staff say it "cannot be extended". A
+      forum mention of a "90-Day Evaluation License" was not confirmed,
+      and nothing says it can write programming files.
+    - Kit licences are "valid only for one year"; kits sold today (e.g.
+      Arria 10 SoC) carry Pro licences, which cannot target Stratix V.
+    - Microsoft's Catapult academic programme (around 2015) gave
+      researchers free time on Stratix V Catapult machines at TACC (UT
+      Austin), "plus a development kit and tools", by a one-page proposal
+      to catapult@microsoft.com. Not found: whether it still runs, takes
+      people outside a university, or lets a `.sof` be taken away.
+    - Not tried: asking a distributor (Arrow, Macnica) for a quote or a
+      shorter licence. That is the one route left to check.
+  - What the people who programmed these cards did, in detail (devices
+    chosen, tools, pin and clock facts, problems): `01-prior-work.md`. None
+    of them says which licence they used.
   - A Docker container does not change any of this; the licence rules are
     the same inside it.
 
@@ -272,15 +298,23 @@ iverilog/Verilator without Quartus.
 
 | Step | File(s) under `rtl/` | What | Test |
 |---|---|---|---|
-| V3 | `pcie_bar_bus.v` + `pcie_hip_wrap.v` | One BAR split between V1 and V2. The wrapper hides the Stratix V PCIe hard IP; its sim model is a plain read/write bus. | covered by V4 |
 | V4 | `nd120_azure_top.v` | Board top: shared CPU/board tree unchanged, block RAM main memory, V1-V3, storage devices from `../mister/rtl/`. | Verilator: boots to OPCOM through the simulated PCIe console, then a floppy/disk read through V2 |
 | V5 | `build.tcl` or `.qsf` + file list | Quartus project for `5SGSMD5K1F40C1` (stand-in for the custom part, see Build). Gives `Verilog/tests/gen_hierarchy.py` a `quartus` entry, so the board appears in `Verilog/HIERARCHY.md`. | hierarchy generator runs clean |
 | V6 | PC program (new folder, language not chosen) | Maps the BAR; console -> telnet port; serves image files to V2. | needs the card |
 
-The console block (`rtl/nd_pcie_console.v`) and the disk block
-(`rtl/nd_pcie_storage.v`) exist, with their register layouts in the file
+The console block (`rtl/nd_pcie_console.v`), the disk block
+(`rtl/nd_pcie_storage.v`), the 4 KB window split (`rtl/pcie_bar_bus.v`:
+console at 0o0000, disks at 0o1000) and the PCIe wrapper
+(`rtl/pcie_hip_wrap.v`) exist, with their register layouts in the file
 headers; their tests are `make -C sim all` (`test-console`,
-`test-storage`) and are in the global suite. Still open from them:
+`test-storage`, `test-bar`) and are in the global suite. Still open from
+them:
+
+- `pcie_hip_wrap.v` has only its simulation version working
+  (`ND120_AZURE_SIM_PCIE`). The real-card version names
+  `nd120_azure_pcie_ip`, the Quartus-generated PCIe block made in V5; until
+  then a real-card build stops with "module not found". Its port names are
+  a plan and must be checked against the generated module.
 
 - The disk test proves the block against a simulated PC that follows the
   register recipe. Whether the real PC program (V6) can poll fast enough is

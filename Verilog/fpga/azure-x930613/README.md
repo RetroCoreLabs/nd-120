@@ -118,11 +118,15 @@ list and the planned (not yet built) build/flash/console workflow.
 
 | File | Purpose |
 |---|---|
-| [`docs/00-plan.md`](docs/00-plan.md) | Open questions, and the planned build/flash/PCIe-console workflow (design intent only - nothing built yet) |
+| [`docs/00-plan.md`](docs/00-plan.md) | Open questions, the licence findings, and the Verilog plan (what is still to build) |
+| [`docs/01-prior-work.md`](docs/01-prior-work.md) | What other people did with these cards: devices chosen, tools, pin and clock facts, problems - none says which licence they used |
+| [`docs/01-prior-work.md`](docs/01-prior-work.md) | What other people did with these cards: devices chosen, tools, pin and clock facts, problems - none says which licence they used |
 | `Makefile` | Standard board API placeholder - no build yet |
 | `rtl/nd_pcie_console.v` | The console as PCIe registers (two byte queues); layout in the file header |
 | `rtl/nd_pcie_storage.v` | Disk images served by the PC; drives the MiSTer `nd_storage_hps` block interface; layout in the file header |
-| `sim/` | iverilog tests: `make all` (`test-console`, `test-storage`), both in the global suite |
+| `rtl/pcie_bar_bus.v` | Splits the 4 KB PCIe register window: console at 0o0000, disks at 0o1000 |
+| `rtl/pcie_hip_wrap.v` | The PCIe hard block behind a plain bus; simulation version only, the real-card version waits for V5 |
+| `sim/` | iverilog tests: `make all` (`test-console`, `test-storage`, `test-bar`), all in the global suite |
 
 ## Links
 
@@ -178,6 +182,23 @@ list and the planned (not yet built) build/flash/console workflow.
 | <https://community.intel.com/t5/Intel-Quartus-Prime-Software/Adding-Support-for-DE5-Net/m-p/1197444> | Forum: Quartus Standard 20.1 said to be the last with Stratix V |
 | <https://www.intel.com/content/www/us/en/docs/programmable/683665/current/design-security.html> | Intel handbook: the Stratix V configuration format is proprietary |
 | <https://github.com/wirebond/catapult_v2_pikes_peak> | Pikes Peak works with bitstreams built for 5SGSMD5H* / 5SGSMD5K*; Quartus 18.0 has no entry for the real part; licence not stated |
+| <https://intel.com/content/www/us/en/developer/articles/news/devcloud-oneapi-eol-information.html> | Intel DevCloud end of life: discontinued 31-OCT-2024 |
+| <https://community.altera.com/discussions/acceleration/is-intel-stratix-fpga-available-in-intel-devcloud/301698> | DevCloud FPGA nodes were Arria 10 and Stratix 10 |
+| <https://www.intel.com/content/www/us/en/docs/programmable/683498/17-1/hosting-a-license-server-in-the-cloud.html> | Quartus Pro on Azure, bring your own licence (17.1 guide) |
+| <https://community.intel.com/t5/Intel-FPGA-Software-Installation/What-are-the-advantages-of-purchasing-a-license-for-Quartus/td-p/1207530> | Forum: pay-as-you-go licensing in the Azure cloud |
+| <https://www.intel.com/content/www/us/en/docs/programmable/683472/25-3/acquiring-free-no-cost-licenses.html> | Altera's free licences: Lite, Pro for Cyclone 10 GX / Agilex 5 E / Agilex 3, Questa Starter - no Stratix V |
+| <https://community.altera.com/discussions/quartus-prime/quartus-prime-standard-19-1-evaluation-license-extension/242403> | Altera staff: the Standard 19.1 evaluation cannot be extended; go to a distributor |
+| <https://community.intel.com/t5/Intel-Quartus-Prime-Software/How-can-I-request-an-extension-to-Quartus-Prime-Pro18-1-eval/td-p/221873> | Same for the Pro 18.1 evaluation |
+| <https://intel.com/content/www/us/en/docs/programmable/683553/current/activating-your-software-license.html> | Kit licences are "valid only for one year" |
+| <https://community.altera.com/discussions/quartus-prime/does-arria-10-soc-development-come-with-a-license-for-quartus-standard-edition-i/292206/replies/292208> | The Arria 10 SoC kit licence is for Pro |
+| <https://www.microsoft.com/en-us/research/academic-program/project-catapult-academic-program/> | Microsoft Project Catapult academic programme: researchers, Stratix V machines at TACC, proposal to catapult@microsoft.com |
+| <https://campustechnology.com/articles/2015/11/16/tacc-makes-microsoft-project-catapult-servers-available-to-academic-researchers.aspx> | 2015 report: free access if the code is shared |
+| <https://j-marjanovic.io/stratix-v-accelerator-card-from-ebay.html> | j-marjanovic part 1 (Pikes Peak power-up) - all four parts analysed in `docs/01-prior-work.md` |
+| <https://j-marjanovic.io/stratix-v-accelerator-card-from-ebay-part-2.html> | j-marjanovic part 2 (tray adapter, PCIe enumeration) |
+| <https://j-marjanovic.io/stratix-v-accelerator-card-from-ebay-part-4.html> | j-marjanovic part 4 (40G Ethernet) |
+| <https://raw.githubusercontent.com/ruurdk/pp-sp-reference-design/master/project/otma_bringup.qsf> | Reference design Quartus settings: device, Quartus 19.1.0 Standard, clock/LED/DDR3/I2C pins |
+| <https://github.com/j-marjanovic/jtag-quartus-ft232h> | Original FT232H Quartus JTAG library (Linux) |
+| <https://github.com/ruurdk/sv_second_pcie_hip_windows> | Windows replacement `ddb_dev.dll` for the second PCIe hard IP |
 | <https://j-marjanovic.io/stratix-v-accelerator-card-from-ebay-part-3.html> | j-marjanovic blog, part 3: FT232H JTAG library used with Quartus Programmer on this card family; does not say which Quartus licence was used |
 | <https://en.wikipedia.org/wiki/Quartus_Prime> | Overview of the Quartus editions; mentions free Pro licences for some device families, none found for Standard |
 | <https://www.macnica.co.jp/en/business/semiconductor/support/faqs/intel/128229/> | Official Altera-distributor FAQ confirming Quartus Prime Standard's 30-day unlicensed evaluation terms (full features, no programming-file output, one-time per machine) - used because intel.com/altera.com themselves blocked direct fetches |

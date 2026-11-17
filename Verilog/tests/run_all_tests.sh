@@ -167,6 +167,9 @@ REGISTRY=(
   # of the unchanged MiSTer storage backend, held to the MiSTer test's checks.
   "fpga/azure-x930613/sim :: test-console :: TB_RESULT: PASS"
   "fpga/azure-x930613/sim :: test-storage :: TB_RESULT: PASS"
+  # ...and the PC's way in: PCIe wrapper (simulation version) -> the 4 KB
+  # window split -> both blocks, incl. holding an access while a read is open
+  "fpga/azure-x930613/sim :: test-bar :: TB_RESULT: PASS"
   # the console keyboard path end to end (the board-wiring seam the per-module
   # tests miss): key expander -> serializer, and a full PS/2 scancode -> byte
   "fpga/mister/sim :: test-kbd-uart :: TB_RESULT: PASS"
