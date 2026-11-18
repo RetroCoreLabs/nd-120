@@ -379,11 +379,14 @@ iverilog/Verilator without Quartus.
 MOPC's `#` arrives through the PCIe console, and a RETURN typed through
 it gets a new `#`. Still open from V4:
 
-- No disk is read in that test. The disk block is proven against the
-  MiSTer storage backend (`test-storage`), but not yet with the CPU's own
-  floppy/Winchester controllers driving it on this top. That needs a boot
-  from an image (e.g. OPCOM's boot command) and a simulated PC serving the
-  file - the next test to write.
+- **A floppy boot through the PC works** (`make -C sim vtest-disk`, also in
+  `make test-full`): the bench serves the runSim floppy gate's image on
+  slot 0, types `1560&` through the PCIe console, and the CPU's floppy
+  controller reads block 0 from the PC; the boot program lands at 0o2000
+  and runs (0o77 stored at 0o2012). Serving zeros instead makes it fail.
+  Not yet tested on this top: the Winchester, the tape, any WRITE to an
+  image, and a SINTRAN boot (needs a full SINTRAN image served by the PC,
+  minutes of simulated time).
 - The 2 MB limit is checked in the PAL tests, not by the machine test:
   MOPC does not touch memory above 2 MB.
 

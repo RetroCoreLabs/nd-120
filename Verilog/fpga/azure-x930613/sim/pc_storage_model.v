@@ -24,6 +24,12 @@
 ** The bus is used by ONE process only (the poll loop). Mount requests     **
 ** from the testbench are queued and carried out by that loop between      **
 ** polls, so two processes never drive the bus in the same cycle.          **
+**                                                                         **
+** SHARING THE BUS: a bench that also talks to other registers on the same **
+** PCIe window (the machine test's console loop) raises 'hold'. The loop   **
+** finishes the transfer it is in, stops between polls and raises 'idle';  **
+** the bus is the bench's until it drops 'hold'. Left unconnected, 'hold'  **
+** is never 1 and the model runs as before.                                **
 *****************************************************************************/
 `timescale 1ns / 1ps
 module pc_storage_model #(
@@ -38,6 +44,8 @@ module pc_storage_model #(
     output reg         rd,
     input  wire [31:0] rdata,
     input  wire        rvalid,
+    input  wire        hold,      //! another master wants the bus (see header)
+    output reg         idle,      //! the loop is parked; the bus is free
     output integer     n_reads,
     output integer     n_writes,
     output integer     violations
@@ -49,7 +57,7 @@ module pc_storage_model #(
   reg [7:0] img[0:VDNUM*IMG_BYTES-1];
 
   initial begin
-    addr = 0; wr = 0; wdata = 0; rd = 0;
+    addr = 0; wr = 0; wdata = 0; rd = 0; idle = 0;
     n_reads = 0; n_writes = 0; violations = 0;
   end
 
@@ -107,6 +115,13 @@ module pc_storage_model #(
 
   always begin
     repeat (POLL_CYCLES) @(posedge clk);
+
+    if (hold === 1'b1) begin
+      idle = 1'b1;
+      wait (hold !== 1'b1);
+      @(posedge clk);
+      idle = 1'b0;
+    end
 
     if (m_req && !m_done) begin
       bus_write(SIZE_LO, m_size);

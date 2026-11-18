@@ -5,7 +5,8 @@
 #   make test-storage     the PC-served disk block (nd_pcie_storage) in front
 #                         of the MiSTer storage backend (nd_storage_hps)
 #   make test-bar         the PC path: PCIe wrapper -> window split -> blocks
-#   make vtest            the whole machine booted in Verilator (several minutes)
+#   make vtest            the whole machine booted in Verilator (about 2 minutes)
+#   make vtest-disk       the whole machine boots a floppy image served by the PC
 #   make clean
 #
 # Run from WSL/Linux with iverilog on PATH. No Quartus needed.
@@ -22,7 +23,7 @@ SDFAT     = ../../../SD-FAT/circuit
 
 IVFLAGS = -g2012 -Wall
 
-.PHONY: all test-console test-storage test-bar vtest clean
+.PHONY: all test-console test-storage test-bar vtest vtest-disk clean
 
 all: test-console test-storage test-bar
 	@echo "Azure card: all testbenches passed"
@@ -56,6 +57,9 @@ pcie_bar_bus_tb.vvp: pcie_bar_bus_tb.v $(RTL)/pcie_hip_wrap.v $(RTL)/pcie_bar_bu
 # test-full, like the Tang and MEGA65 vtests.
 vtest:
 	bash vtest.sh vtest
+
+vtest-disk:
+	bash vtest.sh disk
 
 clean:
 	rm -f *.vvp *.log *.vcd

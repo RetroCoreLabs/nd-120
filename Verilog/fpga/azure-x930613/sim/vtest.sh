@@ -5,6 +5,7 @@
 # '#'. (docs/00-plan.md, step V4.)
 #
 #   ./vtest.sh          build and run (several minutes)
+#   ./vtest.sh disk     floppy boot from a PC-served image (nd120_azure_disk_tb.v)
 #   ./vtest.sh lint     Verilator lint of the top only
 #
 # The CPU source list is the MiSTer core's files.qip (the same shared tree
@@ -48,19 +49,29 @@ case "$mode" in
       | grep -E "%Error|azure|nd_pcie|pcie_" | head -30
     echo "lint done"
     ;;
-  vtest)
-    run=$here/vtest-run
+  vtest|disk)
+    if [ "$mode" = disk ]; then
+      tb=nd120_azure_disk_tb; extra=("$here/pc_storage_model.v")
+    else
+      tb=nd120_azure_top_tb; extra=()
+    fi
+    run=$here/vtest-run/$mode
     mkdir -p "$run"
     cp "$vroot"/Shared/support/wcs_*.hex "$run"/
     cp "$vroot"/../Code/Microcode/AM27256_45132L.hex "$vroot"/../Code/Microcode/AM27256_45133L.hex "$run"/
     cd "$run"
-    verilator --binary --timing -j 4 "${flags[@]}" --top-module nd120_azure_top_tb \
+    if [ "$mode" = disk ]; then
+      # the runSim floppy gate's image; its first 64 KB, one hex byte per line
+      python3 "$vroot/tests/gen_fboot_img.py" fboot.img fboot_exp.txt
+      python3 -c 'd=open("fboot.img","rb").read(65536); open("fboot.hex","w").write("".join("%02x\n" % b for b in d))'
+    fi
+    verilator --binary --timing -j 4 "${flags[@]}" --top-module $tb \
       -CFLAGS "-std=gnu++20 -fcoroutines" \
-      "$here/nd120_azure_top_tb.v" "${top_srcs[@]}" 2>&1 \
+      "$here/$tb.v" "${extra[@]}" "${top_srcs[@]}" 2>&1 \
       | grep -E "%Error|%Warning" | grep -vE "WIDTH|UNUSED" | head -40 || true
-    [ -x obj_dir/Vnd120_azure_top_tb ] || { echo "vtest: build failed"; exit 1; }
-    ./obj_dir/Vnd120_azure_top_tb 2>&1 | tee "$here/nd120_azure_top_tb.log"
-    grep -q "TB_RESULT: PASS" "$here/nd120_azure_top_tb.log"
+    [ -x obj_dir/V$tb ] || { echo "vtest: build failed"; exit 1; }
+    ./obj_dir/V$tb 2>&1 | tee "$here/$tb.log"
+    grep -q "TB_RESULT: PASS" "$here/$tb.log"
     ;;
-  *) echo "usage: $0 [vtest|lint]"; exit 2;;
+  *) echo "usage: $0 [vtest|disk|lint]"; exit 2;;
 esac
