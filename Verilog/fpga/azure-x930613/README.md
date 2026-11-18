@@ -126,7 +126,8 @@ list and the planned (not yet built) build/flash/console workflow.
 | `rtl/nd_pcie_storage.v` | Disk images served by the PC; drives the MiSTer `nd_storage_hps` block interface; layout in the file header |
 | `rtl/pcie_bar_bus.v` | Splits the 4 KB PCIe register window: console at 0o0000, disks at 0o1000 |
 | `rtl/pcie_hip_wrap.v` | The PCIe hard block behind a plain bus; simulation version only, the real-card version waits for V5 |
-| `sim/` | iverilog tests: `make all` (`test-console`, `test-storage`, `test-bar`), all in the global suite |
+| `rtl/nd120_azure_top.v` | The board top: CPU + 2 MB block-RAM board, console and disks over PCIe |
+| `sim/` | iverilog tests: `make all` (`test-console`, `test-storage`, `test-bar`), all in the global suite; `make vtest` boots the whole machine in Verilator (in `make test-full`) |
 
 ## Links
 

@@ -1,8 +1,8 @@
 # Azure FPGA (X930613-001) - plan
 
-**Next:** step V4 of "Verilog plan" below - the board top, booting to
-OPCOM in Verilator through the simulated PCIe console. None of the V steps need the card or
-Quartus.
+**Next:** step V5 of "Verilog plan" below - the Quartus project and file
+list (needs the stand-in part settled, see Build), then the real PCIe block
+behind `pcie_hip_wrap.v`. V1-V4 run without the card or Quartus.
 
 **Status: not started.** No Quartus project, no PCIe endpoint Verilog, no
 console driver exist yet anywhere in this repo. Everything below the
@@ -173,6 +173,35 @@ verified against multiple independent sources (see
     - Not tried: asking a distributor (Arrow, Macnica) for a quote or a
       shorter licence. That is the one route left to check. Draft below.
 
+  - **Reverse engineering / open-source tools: nothing for Stratix V.**
+    - No project documents the bitstream of Stratix V, Stratix IV, Arria V
+      or Arria 10. Mistral ([github.com/Ravenslofty/mistral](https://github.com/Ravenslofty/mistral),
+      [docs](https://prjmistral.readthedocs.io/en/latest/cyclonev_fpga.html))
+      covers Cyclone V only and says nothing about other families. Whether
+      Arria V or Stratix V share Cyclone V's layout is not known either way.
+    - The nearest academic work is a 2013 paper that recovered the Stratix
+      II bitstream ENCRYPTION key ([doi 10.1145/2435264.2435282](https://unpaywall.org/10.1145%2F2435264.2435282)),
+      not the fabric layout. A Cyclone IV project credits Mistral's method
+      ([Cyclone_CRAM_Mapper](https://github.com/14sea/Cyclone_CRAM_Mapper)).
+    - nextpnr lists no Stratix or Arria ([README](https://foss-fpga-tools.googlesource.com/third_party/nextpnr/+show/HEAD/README.md)).
+    - Hybrid flow (yosys synthesis, Quartus place-and-route) does not
+      help: an Intel article (search snippet only - the page now
+      redirects to a 404) says every Quartus process checks the licence,
+      naming Analysis & Synthesis, the Assembler and the timing analyser
+      ([000083874](https://www.intel.com/content/www/us/en/support/programmable/articles/000083874.html)).
+    - Changing RAM contents without recompiling (`quartus_cdb
+      --update_mif`) ends with the Assembler writing the `.sof` again
+      ([Intel doc](https://intel.com/content/www/us/en/docs/programmable/683325/18-1/update-memory-contents-without-recompiling.html)),
+      so it needs the licence too (expected, not stated by a source).
+    - What IS free: the stand-alone Programmer, incl. "Convert Programming
+      Files" (`quartus_cpf`, `.sof` -> `.rbf`/`.jic`)
+      ([stand-alone Programmer](https://www.intel.com/content/www/us/en/docs/programmable/683528/18-1/stand-alone-programmer.html),
+      [quartus_cpf](https://www.intel.com/content/www/us/en/docs/programmable/683039/25-1/quartus-cpf-command-line-tool.html),
+      [Macnica FAQ](https://www.macnica.co.jp/en/business/semiconductor/support/faqs/intel/91873/)).
+      So once ONE licensed build exists, loading it and converting it for
+      flash needs no licence. Not checked: that the stand-alone
+      Programmer handles Stratix V.
+
   **Draft enquiry to a distributor** (not sent; to be sent by Ronny from
   his own address to an Altera distributor, e.g. Arrow or Macnica - fill in
   the name and country):
@@ -313,11 +342,23 @@ Decisions taken (Ronny):
 - **Console over PCIe.** The PC reads and writes a small register block
   behind a PCIe BAR; a small PC program turns it into a telnet port
   RetroTerm can open. No serial wire through the QSFP cage.
-- **Main memory in on-chip block RAM first.** DDR3 comes later, behind the
-  same cache wrapper the Nexys uses for DDR2 (`MEM_RAM_49_DDR2`). The block
-  RAM size of this custom part is NOT verified - the 2 MB ND memory target
-  must be checked against the Quartus fit report before it is relied on.
-  Memory must not alias above 0o200000 (the MiSTer lesson).
+- **Main memory: 2 MB in block RAM - the board is built as the 2 MB
+  variant of the 3202D.** Real boards came with 2, 4 or 6 MB (the size
+  display described in `CPU-BOARD-3202/circuit/MEM_ADEC_45.v`); the repo's
+  address-decode PALs are the 4 MB programming. Block RAM cannot hold 4 MB
+  safely (about 1,920 of the stand-in part's 2,014 RAM blocks, a claimed
+  figure), and a memory smaller than what the board answers for wraps high
+  addresses onto low memory - which forbids SINTRAN (the Nexys and MiSTer
+  lesson). So the decode answers for 2 MB only (`ND120_ONBOARD_2MB` in
+  `PAL/PAL_44445B.v`, `PAL/PAL_44446B.v` and their `_D` copies) and the
+  block RAM holds all of it: one bank of 1M words
+  (`ND120_BLOCKRAM_ADDR_BITS=20`, `ND120_BLOCKRAM_BANK_SLOTS=1`), about
+  1,024 RAM blocks. **The 2 MB equations are DERIVED, not from a PAL dump**:
+  each address term of the decode covers one 2 MB block (the original
+  listing's own chopped comments say so), and the 2 MB form keeps the
+  first. Checked by `PAL/sim test-44445b-d-2mb` / `test-44446b-d-2mb`
+  against an independent golden model. Whether the custom part has the
+  stand-in's RAM is not checked. DDR3 (4 MB) can come later.
 - **Disks planned now, served by the PC.** Same split as the MiSTer: the
   MiSTer's `nd_storage_hps.v` / `nd_storage_mister_devices.v` answer the ND
   floppy, Winchester and tape controllers unchanged; on the MiSTer the ARM
@@ -330,9 +371,21 @@ iverilog/Verilator without Quartus.
 
 | Step | File(s) under `rtl/` | What | Test |
 |---|---|---|---|
-| V4 | `nd120_azure_top.v` | Board top: shared CPU/board tree unchanged, block RAM main memory, V1-V3, storage devices from `../mister/rtl/`. | Verilator: boots to OPCOM through the simulated PCIe console, then a floppy/disk read through V2 |
 | V5 | `build.tcl` or `.qsf` + file list | Quartus project for the stand-in part (which one is open, see Build). Gives `Verilog/tests/gen_hierarchy.py` a `quartus` entry, so the board appears in `Verilog/HIERARCHY.md`. | hierarchy generator runs clean |
 | V6 | PC program (new folder, language not chosen) | Maps the BAR; console -> telnet port; serves image files to V2. | needs the card |
+
+**The whole machine boots in Verilator** (`rtl/nd120_azure_top.v`,
+`make -C sim vtest`, about 2 minutes, a system gate in `make test-full`):
+MOPC's `#` arrives through the PCIe console, and a RETURN typed through
+it gets a new `#`. Still open from V4:
+
+- No disk is read in that test. The disk block is proven against the
+  MiSTer storage backend (`test-storage`), but not yet with the CPU's own
+  floppy/Winchester controllers driving it on this top. That needs a boot
+  from an image (e.g. OPCOM's boot command) and a simulated PC serving the
+  file - the next test to write.
+- The 2 MB limit is checked in the PAL tests, not by the machine test:
+  MOPC does not touch memory above 2 MB.
 
 The console block (`rtl/nd_pcie_console.v`), the disk block
 (`rtl/nd_pcie_storage.v`), the 4 KB window split (`rtl/pcie_bar_bus.v`:

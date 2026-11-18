@@ -74,6 +74,20 @@ test-44445b-d: PAL_44445B_D_tb
 test-44446b-d: PAL_44446B_D_tb
 	./PAL_44446B_D_tb
 
+# The same two benches with the derived 2 MB board decode (ND120_ONBOARD_2MB,
+# only the Azure build defines it): the upper 2 MB must not be local.
+test-44445b-d-2mb: PAL_44445B_D_2MB_tb
+	./PAL_44445B_D_2MB_tb
+
+test-44446b-d-2mb: PAL_44446B_D_2MB_tb
+	./PAL_44446B_D_2MB_tb
+
+PAL_44445B_D_2MB_tb: PAL_44445B_D_tb.v $(VERILOG_ROOT)/PAL/PAL_44445B.v $(VERILOG_ROOT)/CPU-BOARD-3202/circuit/PAL_44445B_D.v
+	$(IVERILOG) -g2012 -DND120_ONBOARD_2MB -o $@ $^
+
+PAL_44446B_D_2MB_tb: PAL_44446B_D_tb.v $(VERILOG_ROOT)/PAL/PAL_44446B.v $(VERILOG_ROOT)/CPU-BOARD-3202/circuit/PAL_44446B_D.v
+	$(IVERILOG) -g2012 -DND120_ONBOARD_2MB -o $@ $^
+
 test-pal44304e: PAL_44304E_tb
 	./PAL_44304E_tb
 

@@ -155,7 +155,13 @@ module PAL_44446B_D_tb;
   task check_all;
     reg exp_aok;
     begin
+`ifdef ND120_ONBOARD_2MB
+      // 2 MB board (derived equations, see PAL_44446B.v): BD20 joins the
+      // limit, so the upper 2 MB is not answered
+      exp_aok = ~(BMEM_n | ~BD23_n | ~BD22_n | ~BD21_n | ~BD20_n | ~MOFF_n);
+`else
       exp_aok = ~(BMEM_n | ~BD23_n | ~BD22_n | ~BD21_n | ~MOFF_n);
+`endif
 
       cmp(b_AOK, exp_aok, "b.AOK");
       cmp(b_DDBAPR, CKE, "b.DDBAPR");

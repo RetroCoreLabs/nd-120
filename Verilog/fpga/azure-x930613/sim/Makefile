@@ -5,6 +5,7 @@
 #   make test-storage     the PC-served disk block (nd_pcie_storage) in front
 #                         of the MiSTer storage backend (nd_storage_hps)
 #   make test-bar         the PC path: PCIe wrapper -> window split -> blocks
+#   make vtest            the whole machine booted in Verilator (several minutes)
 #   make clean
 #
 # Run from WSL/Linux with iverilog on PATH. No Quartus needed.
@@ -21,7 +22,7 @@ SDFAT     = ../../../SD-FAT/circuit
 
 IVFLAGS = -g2012 -Wall
 
-.PHONY: all test-console test-storage test-bar clean
+.PHONY: all test-console test-storage test-bar vtest clean
 
 all: test-console test-storage test-bar
 	@echo "Azure card: all testbenches passed"
@@ -48,6 +49,13 @@ test-bar: pcie_bar_bus_tb.vvp
 
 pcie_bar_bus_tb.vvp: pcie_bar_bus_tb.v $(RTL)/pcie_hip_wrap.v $(RTL)/pcie_bar_bus.v $(RTL)/nd_pcie_console.v $(RTL)/nd_pcie_storage.v
 	$(IVERILOG) $(IVFLAGS) -DND120_AZURE_SIM_PCIE -o $@ $^
+
+# The whole machine booted in Verilator --timing (several minutes): MOPC's '#'
+# and its answer to RETURN, both through the PCIe console. Not part of 'all'
+# (too slow for the unit suite); it is a system gate in Verilog/Makefile
+# test-full, like the Tang and MEGA65 vtests.
+vtest:
+	bash vtest.sh vtest
 
 clean:
 	rm -f *.vvp *.log *.vcd

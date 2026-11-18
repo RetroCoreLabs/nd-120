@@ -65,6 +65,7 @@ Verilog/fpga/**/*.jou
 # MEGA65 full-machine Verilator boot test: copies of the WCS/PROM images +
 # obj_dir, made by fpga/mega65/sim/lint_machine.sh vtest
 Verilog/fpga/mega65/sim/vtest-run/
+Verilog/fpga/azure-x930613/sim/vtest-run/
 Verilog/*.log
 Verilog/*.jou
 Verilog/dfx_runtime.txt

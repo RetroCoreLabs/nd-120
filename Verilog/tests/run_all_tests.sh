@@ -323,6 +323,10 @@ REGISTRY=(
   # --- sheet-45 address-decode PALs (base + _D mirror vs PALASM golden) ----
   "PAL/sim :: test-44445b-d :: TB_RESULT: PASS"
   "PAL/sim :: test-44446b-d :: TB_RESULT: PASS"
+  # the same two with the derived 2 MB board decode (ND120_ONBOARD_2MB, the
+  # Azure card's build): the upper 2 MB must be neither local nor answered
+  "PAL/sim :: test-44445b-d-2mb :: TB_RESULT: PASS"
+  "PAL/sim :: test-44446b-d-2mb :: TB_RESULT: PASS"
   # --- CPU board sheets -------------------------------------------------
   "CPU-BOARD-3202/sim         :: test-reqgnt   :: TB_RESULT: PASS"
   # --- backlog burn-down: previously orphaned tbs, verified passing, registered 27-AUG-2026 ---

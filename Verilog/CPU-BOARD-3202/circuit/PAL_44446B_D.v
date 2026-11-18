@@ -58,7 +58,21 @@ module PAL_44446B_D (
   assign BANK0 = OE_n ? 1'b0 : ~BANK0_n_reg;
   assign MWRITE_n = OE_n ? 1'b0 : ~MWRITE_reg;
 
+  // ND120_ONBOARD_2MB: the 2 MB variant of this board. DERIVED, NOT FROM A PAL
+  // DUMP. Real 3202D boards were fitted with 2, 4 or 6 MB (the size display
+  // described in MEM_ADEC_45.v: 100 = 2 MB, 200 = 4 MB, 300 = 6 MB); the
+  // equations in this file are the 4 MB programming. The 2 MB form here keeps
+  // only the first 2 MB block (address bit 20 = 0, BANK0), following the
+  // original listing's own note that each address line in the decode covers
+  // one block ("EACH LINE R...", "THE 4MB (2M..." in PAL_44445B). Above 2 MB
+  // the board then does not answer and the CPU raises memory out of range, as
+  // a 2 MB board would. Only the Azure build defines it
+  // (Verilog/fpga/azure-x930613/docs/00-plan.md).
+`ifdef ND120_ONBOARD_2MB
+  assign AOK = ~(BMEM_n | BD23 | BD22 | BD21 | BD20 | MOFF);  // 2 MB (derived)
+`else
   assign AOK = ~(BMEM_n | BD23 | BD22 | BD21 | MOFF);
+`endif
   assign DDBAPR = DBAPR;
   assign MSIZE1_n = 1;
 endmodule

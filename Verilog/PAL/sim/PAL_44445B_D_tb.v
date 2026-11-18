@@ -152,8 +152,15 @@ module PAL_44445B_D_tb;
     reg exp_clrq_n;
     reg exp_crq_n;
     begin
+`ifdef ND120_ONBOARD_2MB
+      // 2 MB board (derived equations, see PAL_44445B.v): only the lower
+      // 2 MB (PPN20 = 0) is local; the upper 2 MB goes to the bus
+      exp_clrq_n = ~(CKE & IORQ_n & ~PPN23 & ~PPN22 & ~PPN21 & ~PPN20 & MOFF_n);
+      exp_crq_n  = ~(CKE & (~IORQ_n | ~MOFF_n | PPN23 | PPN22 | PPN21 | PPN20));
+`else
       exp_clrq_n = ~(CKE & IORQ_n & ~PPN23 & ~PPN22 & ~PPN21 & MOFF_n);
       exp_crq_n  = ~(CKE & (~IORQ_n | ~MOFF_n | PPN23 | PPN22 | PPN21));
+`endif
 
       cmp(b_MSIZE0_n, 1'b0, "b.MSIZE0_n");
       cmp(b_CLRQ_n, exp_clrq_n, "b.CLRQ_n");

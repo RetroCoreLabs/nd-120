@@ -57,11 +57,29 @@ module PAL_44445B_D (
   assign MWRITE_n = OE_n ? 1'b1 : ~MWRITE_reg;
 
   // Combinational equations copied VERBATIM from PAL_44445B.v
+  // ND120_ONBOARD_2MB: the 2 MB variant of this board. DERIVED, NOT FROM A PAL
+  // DUMP. Real 3202D boards were fitted with 2, 4 or 6 MB (the size display
+  // described in MEM_ADEC_45.v: 100 = 2 MB, 200 = 4 MB, 300 = 6 MB); the
+  // equations in this file are the 4 MB programming. The 2 MB form here keeps
+  // only the first 2 MB block (address bit 20 = 0, BANK0), following the
+  // original listing's own note that each address line in the decode covers
+  // one block ("EACH LINE R...", "THE 4MB (2M..." in PAL_44445B). Above 2 MB
+  // the board then does not answer and the CPU raises memory out of range, as
+  // a 2 MB board would. Only the Azure build defines it
+  // (Verilog/fpga/azure-x930613/docs/00-plan.md).
+`ifdef ND120_ONBOARD_2MB
+  // 2 MB (derived): the second line (PPN20 = 1, the upper 2 MB) is gone, so
+  // those addresses are not local and go to the bus (CRQ) instead
+  assign CLRQ_n = ~(ECREQ & IORQ_n & PPN23_n & PPN22_n & PPN21_n & PPN20_n & MOFF_n);
+  assign CRQ_n = ~((ECREQ & IORQ) |
+      (ECREQ & MOFF) | (ECREQ & PPN23) | (ECREQ & PPN22) | (ECREQ & PPN21) | (ECREQ & PPN20));
+`else
   assign CLRQ_n = ~(
       (ECREQ & IORQ_n & PPN23_n & PPN22_n & PPN21_n & PPN20_n & MOFF_n) |
       (ECREQ & IORQ_n & PPN23_n & PPN22_n & PPN21_n & PPN20 & MOFF_n)
       );
   assign CRQ_n = ~((ECREQ & IORQ) |
       (ECREQ & MOFF) | (ECREQ & PPN23) | (ECREQ & PPN22) | (ECREQ & PPN21));
+`endif
   assign MSIZE0_n = 0;
 endmodule

@@ -12,6 +12,9 @@
 #                      - fpga/mega65 vtest (full R6 machine boot on a 16-bit
 #                        SDRAM model, RETURN through the framework's key scan
 #                        answered by MOPC, ~3 min)
+#                      - fpga/azure-x930613 vtest (full Azure-card machine,
+#                        2 MB block-RAM board, MOPC's prompt and its answer
+#                        to RETURN through the simulated PCIe console, ~2 min)
 #                      - sim test-bmcl (bus master clear reaches the I/O
 #                        cards at power-up and on the operator MACL command)
 #
@@ -112,6 +115,8 @@ test-full: test
 	$(MAKE) -C fpga/tang-nano-20k/sim vtest
 	@echo "==== system gate: MEGA65 vtest (boot + keyboard path to MOPC) ===="
 	$(MAKE) -C fpga/mega65/sim vtest
+	@echo "==== system gate: Azure vtest (boot + console both ways over the simulated PCIe window) ===="
+	$(MAKE) -C fpga/azure-x930613/sim vtest
 	$(MAKE) test-floppy-stdin
 	$(MAKE) test-smd-boot
 	$(MAKE) test-democore
