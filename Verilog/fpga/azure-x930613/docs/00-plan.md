@@ -73,10 +73,15 @@ verified against multiple independent sources (see
 
 ### Build
 
-- New Quartus Prime Standard project in this folder, targeting the
-  standard-catalog equivalent part `5SGSMD5K1F40C1` in place of the real
-  custom marking `5SGSKF40I3LNAC` - now confirmed by two independent
-  sources (devops.lol and `ruurdk/sv_second_pcie_hip`'s own README title).
+- New Quartus Prime Standard project in this folder, targeting a
+  standard-catalog stand-in for the real custom marking `5SGSKF40I3LNAC`.
+  **Which stand-in is NOT settled:** the reference design's `.qsf` uses
+  `5SGSMD5K1F40C1` (speed grade 1, commercial), devops.lol chose
+  `5SGSMD5K2F40I3L` (speed grade 3, industrial - the same `I3L` ending as
+  the real marking). An earlier version of this line said devops.lol
+  confirmed `5SGSMD5K1F40C1`; reading the whole post showed otherwise.
+  Comparison and why speed grade 3 is the safer timing choice:
+  [`01-prior-work.md`](01-prior-work.md), "The two stand-in parts compared".
 - **Second PCIe hard IP is deliberately disabled by Quartus's stock
   device database for this part** (confirmed, `ruurdk/sv_second_pcie_hip`
   README) - Microsoft had it fused/flagged off. Getting the full
@@ -166,7 +171,34 @@ verified against multiple independent sources (see
       to catapult@microsoft.com. Not found: whether it still runs, takes
       people outside a university, or lets a `.sof` be taken away.
     - Not tried: asking a distributor (Arrow, Macnica) for a quote or a
-      shorter licence. That is the one route left to check.
+      shorter licence. That is the one route left to check. Draft below.
+
+  **Draft enquiry to a distributor** (not sent; to be sent by Ronny from
+  his own address to an Altera distributor, e.g. Arrow or Macnica - fill in
+  the name and country):
+
+  > Subject: Quartus Prime Standard licence for a private hobbyist - Stratix V
+  >
+  > Hello,
+  >
+  > I am a private person (not a company) working on a non-commercial hobby
+  > project with a second-hand board that carries an Altera Stratix V GS
+  > FPGA. To load my own designs I need Quartus Prime Standard Edition to
+  > produce programming files (.sof) for Stratix V.
+  >
+  > Could you tell me:
+  >
+  > 1. Can a private individual buy a Quartus licence from you (for example
+  >    SW-ONE-QUARTUS), and what is the price in [country / currency]?
+  > 2. Is there a shorter or cheaper licence that covers Stratix V - for
+  >    example a one-year or time-limited fixed licence?
+  > 3. Is there any evaluation or other licence that allows programming
+  >    files to be generated for Stratix V for non-commercial use?
+  > 4. Is the licence tied to one PC, and can it be moved to a new PC
+  >    later?
+  >
+  > Thank you,
+  > [name]
   - What the people who programmed these cards did, in detail (devices
     chosen, tools, pin and clock facts, problems): `01-prior-work.md`. None
     of them says which licence they used.
@@ -299,7 +331,7 @@ iverilog/Verilator without Quartus.
 | Step | File(s) under `rtl/` | What | Test |
 |---|---|---|---|
 | V4 | `nd120_azure_top.v` | Board top: shared CPU/board tree unchanged, block RAM main memory, V1-V3, storage devices from `../mister/rtl/`. | Verilator: boots to OPCOM through the simulated PCIe console, then a floppy/disk read through V2 |
-| V5 | `build.tcl` or `.qsf` + file list | Quartus project for `5SGSMD5K1F40C1` (stand-in for the custom part, see Build). Gives `Verilog/tests/gen_hierarchy.py` a `quartus` entry, so the board appears in `Verilog/HIERARCHY.md`. | hierarchy generator runs clean |
+| V5 | `build.tcl` or `.qsf` + file list | Quartus project for the stand-in part (which one is open, see Build). Gives `Verilog/tests/gen_hierarchy.py` a `quartus` entry, so the board appears in `Verilog/HIERARCHY.md`. | hierarchy generator runs clean |
 | V6 | PC program (new folder, language not chosen) | Maps the BAR; console -> telnet port; serves image files to V2. | needs the card |
 
 The console block (`rtl/nd_pcie_console.v`), the disk block

@@ -56,6 +56,44 @@ found no further write-ups.
   console instead.)
 - **Unsolved: the DDR3 controller hung the LiteX CPU** once on its bus.
 
+## The two stand-in parts compared
+
+Source: an answer from ChatGPT that Ronny passed on. **Not checked
+against an Altera datasheet** - treat every number as a claim until it is.
+Its prices come from FPGAKey's single-piece catalogue; no in-stock price
+was found at Mouser or Digi-Key for either part (Digi-Key lists the
+replacement 5SGSMD5K2F40I3LG at USD 18,222, zero stock).
+
+| | `5SGSMD5K2F40I3L` (devops.lol) | `5SGSMD5K1F40C1` (reference `.qsf`) |
+|---|---|---|
+| Catalogue price, one bare chip | USD 8,109-9,010 | USD 11,057-12,286 |
+| Core speed grade | 3 | 1 (faster) |
+| Serial transceivers | 36 x 12.5 Gb/s max | 36 x 14.1 Gb/s max |
+| Core voltage | 0.85 V | 0.90 V |
+| Temperature grade | industrial | commercial |
+| Lifecycle | obsolete | obsolete |
+
+Same for both (same claim): 457,000 logic elements, 172,600 ALMs, about
+690,000 registers, **2,014 M20K block RAMs**, 3,180 18x18 multipliers
+(1,590 at 27x27), **one PCIe hard IP block**, 696 user I/Os, 1,517-ball
+40 x 40 mm BGA.
+
+What follows from it for this board (my reading, not measured):
+
+- **Speed grade.** The real chip's marking `5SGSKF40I3LNAC` ends in `I3L`,
+  like `5SGSMD5K2F40I3L` - industrial, speed grade 3, 0.85 V. Building for
+  `5SGSMD5K1F40C1` (speed grade 1) would let Quartus time the design
+  against a FASTER chip than the one on the card, so its timing report
+  would be too optimistic. Unless the card is shown to be speed grade 1,
+  `5SGSMD5K2F40I3L` is the safer choice for V5. Not decided.
+- **Block RAM.** 2,014 x 20 Kbit is about 40 Mbit, about 5 MB - enough for
+  the plan's 2 MB of ND memory in block RAM, if the custom part has the
+  same RAM as the stand-in (not checked).
+- **"One PCIe hard IP block"** matches the stock Quartus device database
+  (the second one is the block the `ddb_dev` / LD_PRELOAD shim unlocks).
+  Whether the silicon has two is what that shim relies on; the card's x8+x8
+  wiring says it does.
+
 ## j-marjanovic.io (Jan Marjanovic) - Pikes Peak, four parts
 
 - Part 1: FPGA markings removed; the FPGA configures itself from flash in
