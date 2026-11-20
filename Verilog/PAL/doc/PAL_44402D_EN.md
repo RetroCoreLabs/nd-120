@@ -9,7 +9,7 @@ Source: `Verilog/PAL/PAL_44402D_EN.v`
 **Where it sits** (Simulation): [ND120_TOP](../../doc/ND120_TOP.md) > [ND120_CORE](../../doc/ND120_CORE.md) > [ND3202D](../../CPU-BOARD-3202/circuit/doc/ND3202D.md) > [CPU_15](../../CPU-BOARD-3202/circuit/doc/CPU_15.md) > [CPU_MMU_24](../../CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md) > [CPU_MMU_CACHE_25](../../CPU-BOARD-3202/circuit/doc/CPU_MMU_CACHE_25.md) > **PAL_44402D_EN**
 - instance path: `CORE.CPU_BOARD.CPU.MMU.CACHE.PAL_44402_UBITS`
 
-**Used in:** [CPU_MMU_CACHE_25](../../CPU-BOARD-3202/circuit/doc/CPU_MMU_CACHE_25.md) (Simulation, Nexys, MEGA65 R6, MEGA65 R3, QMTECH, Basys3, Cmod)
+**Used in:** [CPU_MMU_CACHE_25](../../CPU-BOARD-3202/circuit/doc/CPU_MMU_CACHE_25.md) (Simulation, Nexys, MEGA65 R6, MEGA65 R3, Azure, QMTECH, Basys3, Cmod)
 
 **Contains:** no other modules.
 

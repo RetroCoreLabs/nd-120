@@ -11,7 +11,7 @@ Source: `Verilog/CPU-BOARD-3202/circuit/CPU_MMU_CACHE_25.v`
 
 **Used in:** [CPU_MMU_24](CPU_MMU_24.md) (all tops)
 
-**Contains:** [Am9150](../../../Shared/support/doc/Am9150.md) (only on Simulation, Nexys, MEGA65 R6, MEGA65 R3, QMTECH, Basys3, Cmod), [PAL_44402D_EN](../../../PAL/doc/PAL_44402D_EN.md) (only on Simulation, Nexys, MEGA65 R6, MEGA65 R3, QMTECH, Basys3, Cmod), [TMM2018D_25](../../../Shared/support/doc/TMM2018D_25.md) x4 (only on Simulation, Nexys, MEGA65 R6, MEGA65 R3, QMTECH, Basys3, Cmod)
+**Contains:** [Am9150](../../../Shared/support/doc/Am9150.md) (only on Simulation, Nexys, MEGA65 R6, MEGA65 R3, Azure, QMTECH, Basys3, Cmod), [PAL_44402D_EN](../../../PAL/doc/PAL_44402D_EN.md) (only on Simulation, Nexys, MEGA65 R6, MEGA65 R3, Azure, QMTECH, Basys3, Cmod), [TMM2018D_25](../../../Shared/support/doc/TMM2018D_25.md) x4 (only on Simulation, Nexys, MEGA65 R6, MEGA65 R3, Azure, QMTECH, Basys3, Cmod)
 
 [Module hierarchy](../../../HIERARCHY.md) - [All modules](../../../MODULES.md)
 

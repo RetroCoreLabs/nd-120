@@ -1,0 +1,59 @@
+# Quartus settings for the ND-120 on the Microsoft Azure FPGA card
+# (X930613-001, "Storey Peak"). Plan: docs/00-plan.md, step V5.
+#
+# STATE: this project does NOT build yet, on purpose.
+#   - The PCIe hard block (module nd120_azure_pcie_ip, instantiated by
+#     rtl/pcie_hip_wrap.v) has not been generated. Quartus stops with
+#     "module not found" until it is - a build that silently left PCIe out
+#     would be a card nobody can talk to.
+#   - No pin is assigned. The pins known from other people's work
+#     (docs/01-prior-work.md) are listed below, COMMENTED OUT: they come from
+#     a Pikes Peak project and are not checked against this card.
+#   - clk_cpu is a top-level port until the PLL is written.
+#   - Never built: Quartus Prime Standard needs a paid licence to make a
+#     bitstream (docs/00-plan.md, "Building the bitstream").
+#
+# DEVICE: the card's chip is a custom Microsoft part Quartus does not list.
+# 5SGSMD5K2F40I3L is the stand-in: same family, logic and block RAM (claimed,
+# docs/01-prior-work.md), and speed grade 3 - the slower grade, so timing
+# that passes here has margin on the real chip. Not checked against the card.
+
+set_global_assignment -name FAMILY "Stratix V"
+set_global_assignment -name DEVICE 5SGSMD5K2F40I3L
+set_global_assignment -name TOP_LEVEL_ENTITY nd120_azure_top
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+
+# ---- sources -----------------------------------------------------------------
+# $readmemh finds the WCS images and microcode PROMs through these paths,
+# exactly as on the MiSTer.
+set_global_assignment -name SEARCH_PATH "../../CPU-BOARD-3202/circuit"
+set_global_assignment -name SEARCH_PATH ../../Shared/support
+set_global_assignment -name SEARCH_PATH ../../SD-FAT/circuit
+source files.qip
+set_global_assignment -name SDC_FILE nd120_azure.sdc
+
+# ---- build options (Verilog/docs/build-defines.md) ---------------------------
+# The same set sim/vtest.sh boots in Verilator, apart from the simulation-only
+# ND120_AZURE_SIM_PCIE.
+set_global_assignment -name VERILOG_MACRO "FPGA_FF_MODE=1"
+set_global_assignment -name VERILOG_MACRO "BOARD_CLK_FREQ=20000000"
+set_global_assignment -name VERILOG_MACRO "UART_BAUD_RATE=115200"
+set_global_assignment -name VERILOG_MACRO "SKIP_WCS_LOAD=1"
+set_global_assignment -name VERILOG_MACRO "ND120_PANEL_CLOCK=1"
+set_global_assignment -name VERILOG_MACRO "ND120_MIPS_TAP=1"
+set_global_assignment -name VERILOG_MACRO "QUARTUS_RAM_INFER=1"
+set_global_assignment -name VERILOG_MACRO "QUARTUS_LATCH_RENAME=1"
+# 2 MB board, all of it in block RAM: one bank of 1M words (about 1,024 of
+# the stand-in's RAM blocks - a claimed figure, to be checked in the fit
+# report). The top refuses to build without these.
+set_global_assignment -name VERILOG_MACRO "MAIN_RAM_BLOCKRAM=1"
+set_global_assignment -name VERILOG_MACRO "ND120_BLOCKRAM_ADDR_BITS=20"
+set_global_assignment -name VERILOG_MACRO "ND120_BLOCKRAM_BANK_SLOTS=1"
+set_global_assignment -name VERILOG_MACRO "ND120_ONBOARD_2MB=1"
+
+# ---- pins: NOT CHECKED, left commented out -----------------------------------
+# From ruurdk/pp-sp-reference-design project/otma_bringup.qsf (a Pikes Peak
+# design). Check each against the Storey Peak card before enabling.
+#set_location_assignment PIN_M23 -to CLK_125M          ;# SSTL-135, 125 MHz oscillator
+#set_location_assignment PIN_AF6 -to pcie_refclk       ;# HCSL (AF6/AF5)
+#set_location_assignment PIN_A11 -to LED[0]            ;# 2.5 V; LEDs on A11 A10 B10 C10 C9 C8 B8 A8

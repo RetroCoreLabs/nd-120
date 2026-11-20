@@ -159,6 +159,12 @@ TOPS = [
          build="`Verilog/fpga/mega65/build.tcl board=r3` (HyperRAM instead of "
                "SDRAM). The tree starts at `nd120_mega65_machine`, below the "
                "VHDL framework"),
+    dict(key="azure", title="Azure card X930613", short="Azure",
+         kind="quartus", script="fpga/azure-x930613/nd120_azure.qsf",
+         top="nd120_azure_top",
+         build="`Verilog/fpga/azure-x930613/nd120_azure.qsf` (which sources "
+               "`files.qip`, the list the Verilator boot test also reads). "
+               "Never built: the PCIe hard block is not generated yet"),
     dict(key="qmtech", title="QMTECH XC7A35T", short="QMTECH",
          kind="vivado", script="fpga/qmtech-a35t/build.tcl", args=[],
          build="`Verilog/fpga/qmtech-a35t/build.tcl`, default arguments"),

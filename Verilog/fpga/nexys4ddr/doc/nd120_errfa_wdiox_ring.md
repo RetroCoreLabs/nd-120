@@ -6,7 +6,7 @@ Source: `Verilog/fpga/nexys4ddr/nd120_errfa_wdiox_ring.v`
 
 <!-- HIERARCHY-NAV:BEGIN - written by Verilog/tests/gen_hierarchy.py, do not edit -->
 
-**Hierarchy:** not instantiated by any of the 9 build tops (elaborated by yosys).
+**Hierarchy:** not instantiated by any of the 10 build tops (elaborated by yosys).
 
 [Module hierarchy](../../../HIERARCHY.md) - [All modules](../../../MODULES.md)
 

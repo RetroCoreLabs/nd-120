@@ -9,7 +9,7 @@ Source: `Verilog/Terminals/rtl/console_uart_rx.v`
 **Where it sits** (Nexys): [nd120_nexys4ddr_top](../../../fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md) > **console_uart_rx**
 - instance path: `CONSOLE_RX`
 
-**Used in:** [emu](../../../fpga/mister/doc/emu.md) (MiSTer), [nd120_mega65_machine](../../../fpga/mega65/rtl/doc/nd120_mega65_machine.md) (MEGA65 R6, MEGA65 R3), [nd120_nexys4ddr_top](../../../fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md) (Nexys)
+**Used in:** [emu](../../../fpga/mister/doc/emu.md) (MiSTer), [nd120_azure_top](../../../fpga/azure-x930613/rtl/doc/nd120_azure_top.md) (Azure), [nd120_mega65_machine](../../../fpga/mega65/rtl/doc/nd120_mega65_machine.md) (MEGA65 R6, MEGA65 R3), [nd120_nexys4ddr_top](../../../fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md) (Nexys)
 
 **Contains:** no other modules.
 
@@ -54,7 +54,7 @@ Drawn from the Verilog: the yosys netlist of the Nexys 4 DDR build, instance `CO
 [`Verilog/Terminals/rtl/console_uart_rx.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/Terminals/rtl/console_uart_rx.v) on GitHub.
 
 <details markdown="1">
-<summary>Show the Verilog of console_uart_rx (168 lines)</summary>
+<summary>Show the Verilog of console_uart_rx (173 lines)</summary>
 
 ```verilog
 //============================================================================
@@ -70,14 +70,19 @@ Drawn from the Verilog: the yosys netlist of the Nexys 4 DDR build, instance `CO
 //! unit suite. Deserializing the line costs one small module, touches no
 //! shared code, and has the side benefit of exercising the REAL framing.
 //!
-//! FRAMING IS NOT A CONSTANT. The SC2661 is software programmable - baud and
-//! framing are set at run time by the machine, not fixed in RTL. This repo's
-//! own console.ps1:17 says the OPCOM console is "7E1 in some configurations;
-//! the board check is plain 8N1", and the deployed fast builds run 115200.
-//! So the parameters below MUST be set to match whatever the machine is
-//! actually programmed to, and getting them wrong shows up immediately as
-//! garbage on screen. (The MEGA65 plan's claim of "7E2" is not confirmed
-//! anywhere - do not copy that number without checking.)
+//! FRAMING. The SC2661 MODEL in this repo (Shared/support/SC2661_UART.v) is
+//! fixed at 8 data bits, no parity, 1 stop bit; only the baud rate varies.
+//! The real chip is programmable, but this model does not implement the mode
+//! registers. On the wire every frame is therefore 8 bits long. SINTRAN puts
+//! SOFTWARE parity in bit 7 of some of its output (measured on the MiSTer: the
+//! boot text carries even parity in bit 7, later output is plain 7-bit).
+//! This receiver reads 7 data bits + 1 parity bit, which is the same 8-bit
+//! frame, so it consumes bit 7 instead of showing it as a character bit -
+//! with 8N1 it would see bytes >= 0x7F and the terminal would drop them.
+//! The parameters below must match that frame length and the baud rate, and
+//! getting them wrong shows up immediately as garbage on screen. (The MEGA65
+//! plan's claim of "7E2" is not confirmed anywhere - do not copy that number
+//! without checking.)
 //!
 //! Parity is RECEIVED BUT NOT CHECKED: the bit is consumed so the framing
 //! stays aligned, and that is all. A parity error on a console line means one

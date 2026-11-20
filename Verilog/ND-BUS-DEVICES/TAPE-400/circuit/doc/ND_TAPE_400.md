@@ -9,7 +9,7 @@ Source: `Verilog/ND-BUS-DEVICES/TAPE-400/circuit/ND_TAPE_400.v`
 **Where it sits** (Simulation): [ND120_TOP](../../../../doc/ND120_TOP.md) > [ND120_CORE](../../../../doc/ND120_CORE.md) > **ND_TAPE_400**
 - instance path: `CORE.gen_tape.TAPE_400`
 
-**Used in:** [ND120_CORE](../../../../doc/ND120_CORE.md) (Simulation, Tang, Nexys, MiSTer, MEGA65 R6, MEGA65 R3, QMTECH)
+**Used in:** [ND120_CORE](../../../../doc/ND120_CORE.md) (Simulation, Tang, Nexys, MiSTer, MEGA65 R6, MEGA65 R3, Azure, QMTECH)
 
 **Contains:** no other modules.
 

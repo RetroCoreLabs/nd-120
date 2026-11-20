@@ -9,7 +9,7 @@ Source: `Verilog/fpga/mister/rtl/nd_storage_hps.v`
 **Where it sits** (MiSTer): [emu](../../doc/emu.md) > [nd_storage_mister_devices](nd_storage_mister_devices.md) > **nd_storage_hps**
 - instance path: `STORAGE.u_hps`
 
-**Used in:** [nd_storage_mister_devices](nd_storage_mister_devices.md) (MiSTer)
+**Used in:** [nd_storage_mister_devices](nd_storage_mister_devices.md) (MiSTer, Azure)
 
 **Contains:** no other modules.
 

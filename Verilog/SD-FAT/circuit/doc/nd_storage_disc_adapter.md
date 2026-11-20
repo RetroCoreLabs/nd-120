@@ -9,7 +9,7 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_disc_adapter.v`
 **Where it sits** (Tang): [ND120_TANG20K_TOP](../../../fpga/tang-nano-20k/src/doc/ND120_TANG20K_TOP.md) > [nd_storage_devices](nd_storage_devices.md) > **nd_storage_disc_adapter**
 - instance path: `TAPE_SDFAT_SOURCE.gen_wd.u_wd_adapter`
 
-**Used in:** [nd_storage_devices](nd_storage_devices.md) (Tang, Nexys, QMTECH), [nd_storage_mega65_devices](../../../fpga/mega65/rtl/doc/nd_storage_mega65_devices.md) (MEGA65 R6, MEGA65 R3), [nd_storage_mister_devices](../../../fpga/mister/rtl/doc/nd_storage_mister_devices.md) (MiSTer)
+**Used in:** [nd_storage_devices](nd_storage_devices.md) (Tang, Nexys, QMTECH), [nd_storage_mega65_devices](../../../fpga/mega65/rtl/doc/nd_storage_mega65_devices.md) (MEGA65 R6, MEGA65 R3), [nd_storage_mister_devices](../../../fpga/mister/rtl/doc/nd_storage_mister_devices.md) (MiSTer, Azure)
 
 **Contains:** no other modules.
 

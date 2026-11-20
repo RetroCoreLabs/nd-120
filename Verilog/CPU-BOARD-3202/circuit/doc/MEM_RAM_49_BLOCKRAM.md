@@ -6,10 +6,10 @@ Source: `Verilog/CPU-BOARD-3202/circuit/MEM_RAM_49_BLOCKRAM.v`
 
 <!-- HIERARCHY-NAV:BEGIN - written by Verilog/tests/gen_hierarchy.py, do not edit -->
 
-**Where it sits** (Basys3): [ND120_TOP](../../../doc/ND120_TOP.md) > [ND120_CORE](../../../doc/ND120_CORE.md) > [ND3202D](ND3202D.md) > [MEM_43](MEM_43.md) > **MEM_RAM_49_BLOCKRAM**
+**Where it sits** (Azure): [nd120_azure_top](../../../fpga/azure-x930613/rtl/doc/nd120_azure_top.md) > [ND120_CORE](../../../doc/ND120_CORE.md) > [ND3202D](ND3202D.md) > [MEM_43](MEM_43.md) > **MEM_RAM_49_BLOCKRAM**
 - instance path: `CORE.CPU_BOARD.MEM.RAM`
 
-**Used in:** [MEM_43](MEM_43.md) (Basys3, Cmod)
+**Used in:** [MEM_43](MEM_43.md) (Azure, Basys3, Cmod)
 
 **Contains:** no other modules.
 
@@ -23,7 +23,7 @@ Source: `Verilog/CPU-BOARD-3202/circuit/MEM_RAM_49_BLOCKRAM.v`
 
 ## Schematic
 
-Drawn from the Verilog: the yosys netlist of the Basys3 build, instance `CORE.CPU_BOARD.MEM.RAM`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
+Drawn from the Verilog: the yosys netlist of the Azure card X930613 build, instance `CORE.CPU_BOARD.MEM.RAM`. Sub-modules are boxes (click the picture to open it full size; there every sub-module box links to its page, and every wire shows its Verilog name).
 
 [![MEM_RAM_49_BLOCKRAM schematic](MEM_RAM_49_BLOCKRAM.svg)](MEM_RAM_49_BLOCKRAM.svg)
 

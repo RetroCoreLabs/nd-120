@@ -9,7 +9,7 @@ Source: `Verilog/ND-BUS-DEVICES/DMA/circuit/ND_DMA_MASTER.v`
 **Where it sits** (Simulation): [ND120_TOP](../../../../doc/ND120_TOP.md) > [ND120_CORE](../../../../doc/ND120_CORE.md) > **ND_DMA_MASTER**
 - instance path: `CORE.gen_floppy.FLOPPY_DMA_MASTER`
 
-**Used in:** [ND120_CORE](../../../../doc/ND120_CORE.md) (Simulation, Tang, Nexys, MiSTer, MEGA65 R6, MEGA65 R3, QMTECH)
+**Used in:** [ND120_CORE](../../../../doc/ND120_CORE.md) (Simulation, Tang, Nexys, MiSTer, MEGA65 R6, MEGA65 R3, Azure, QMTECH)
 
 **Contains:** no other modules.
 

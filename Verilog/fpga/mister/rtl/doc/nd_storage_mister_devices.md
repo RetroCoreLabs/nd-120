@@ -9,7 +9,7 @@ Source: `Verilog/fpga/mister/rtl/nd_storage_mister_devices.v`
 **Where it sits** (MiSTer): [emu](../../doc/emu.md) > **nd_storage_mister_devices**
 - instance path: `STORAGE`
 
-**Used in:** [emu](../../doc/emu.md) (MiSTer)
+**Used in:** [emu](../../doc/emu.md) (MiSTer), [nd120_azure_top](../../../azure-x930613/rtl/doc/nd120_azure_top.md) (Azure)
 
 **Contains:** [nd_storage_disc_adapter](../../../../SD-FAT/circuit/doc/nd_storage_disc_adapter.md) x2, [nd_storage_floppy_adapter](../../../../SD-FAT/circuit/doc/nd_storage_floppy_adapter.md) x2, [nd_storage_hps](nd_storage_hps.md), [nd_storage_tape_adapter](../../../../SD-FAT/circuit/doc/nd_storage_tape_adapter.md)
 

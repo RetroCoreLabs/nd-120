@@ -11,7 +11,7 @@ Source: `Verilog/DELILAH-CPU/CGA_MIC/circuit/CGA_MIC_CSEL.v`
 
 **Used in:** [CGA_MIC](CGA_MIC.md) (all tops)
 
-**Contains:** [LATCH](../../../../Shared/ndlib/doc/LATCH.md) (only on Simulation, Tang, Nexys, MEGA65 R6, MEGA65 R3, QMTECH, Basys3, Cmod), [Multiplexer_2](../../../../Shared/logisim/doc/Multiplexer_2.md), [Multiplexer_8](../../../../Shared/logisim/doc/Multiplexer_8.md) x2, [ND120_LATCH](../../../../Shared/ndlib/doc/ND120_LATCH.md) (only on MiSTer)
+**Contains:** [LATCH](../../../../Shared/ndlib/doc/LATCH.md) (only on Simulation, Tang, Nexys, MEGA65 R6, MEGA65 R3, QMTECH, Basys3, Cmod), [Multiplexer_2](../../../../Shared/logisim/doc/Multiplexer_2.md), [Multiplexer_8](../../../../Shared/logisim/doc/Multiplexer_8.md) x2, [ND120_LATCH](../../../../Shared/ndlib/doc/ND120_LATCH.md) (only on MiSTer, Azure)
 
 [Module hierarchy](../../../../HIERARCHY.md) - [All modules](../../../../MODULES.md)
 

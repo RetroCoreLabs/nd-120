@@ -9,7 +9,7 @@ Source: `Verilog/Terminals/rtl/console_uart_tx.v`
 **Where it sits** (Nexys): [nd120_nexys4ddr_top](../../../fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md) > **console_uart_tx**
 - instance path: `CONSOLE_TX`
 
-**Used in:** [emu](../../../fpga/mister/doc/emu.md) (MiSTer), [nd120_mega65_machine](../../../fpga/mega65/rtl/doc/nd120_mega65_machine.md) (MEGA65 R6, MEGA65 R3), [nd120_nexys4ddr_top](../../../fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md) (Nexys)
+**Used in:** [emu](../../../fpga/mister/doc/emu.md) (MiSTer), [nd120_azure_top](../../../fpga/azure-x930613/rtl/doc/nd120_azure_top.md) (Azure), [nd120_mega65_machine](../../../fpga/mega65/rtl/doc/nd120_mega65_machine.md) (MEGA65 R6, MEGA65 R3), [nd120_nexys4ddr_top](../../../fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md) (Nexys)
 
 **Contains:** no other modules.
 
@@ -76,8 +76,8 @@ Drawn from the Verilog: the yosys netlist of the Nexys 4 DDR build, instance `CO
 //! keyboard at the same moment the PC sends one, which is a person's problem,
 //! not a design flaw.
 //!
-//! Framing must match console_uart_rx and the machine - see the long note in
-//! that file about the SC2661 being software programmable.
+//! Framing must match console_uart_rx and the machine - see the note in that
+//! file: the SC2661 model is a fixed 8-bit frame with no hardware parity.
 //!
 //! Written 27-AUG-2026.
 //============================================================================

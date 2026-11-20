@@ -17,10 +17,11 @@ How to read the trees:
 |---|---|---|---|---|---|
 | [Simulation (Verilator)](#simulation-verilator) | `ND120_TOP` | yes | 261 | 2906 | 13 |
 | [Tang Nano 20K](#tang-nano-20k) | `ND120_TANG20K_TOP` | yes | 262 | 2904 | 13 |
-| [Nexys 4 DDR](#nexys-4-ddr) | `nd120_nexys4ddr_top` | yes | 287 | 2943 | 13 |
+| [Nexys 4 DDR](#nexys-4-ddr) | `nd120_nexys4ddr_top` | yes | 288 | 2946 | 13 |
 | [MiSTer](#mister) | `emu` | yes | 277 | 2877 | 13 |
 | [MEGA65 R4 R5 R6](#mega65-r4-r5-r6) | `nd120_mega65_machine` | yes | 277 | 2880 | 13 |
 | [MEGA65 R3](#mega65-r3) | `nd120_mega65_machine` | yes | 277 | 2880 | 13 |
+| [Azure card X930613](#azure-card-x930613) | `nd120_azure_top` | yes | 260 | 2862 | 13 |
 | [QMTECH XC7A35T](#qmtech-xc7a35t) | `nd120_qmtech_top` | yes | 263 | 2914 | 13 |
 | [Basys3](#basys3) | `ND120_TOP` | yes | 244 | 2844 | 13 |
 | [Cmod A7-35T](#cmod-a7-35t) | `nd120_cmod_top` | yes | 245 | 2845 | 14 |
@@ -783,7 +784,7 @@ The simulation models in `SD-FAT/sim/` are behavioural test models yosys cannot 
           <li><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_ACAL_17.md">CPU_CS_ACAL_17</a> <code>ACAL</code></li>
         </ul>
         </details></li>
-        <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md">CPU_MMU_24</a> <code>MMU</code></summary>
+        <li><details><summary><a name="h109"></a><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md">CPU_MMU_24</a> <code>MMU</code></summary>
         <ul>
           <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_HIT_27.md">CPU_MMU_HIT_27</a> <code>MMU_HIT</code></li>
           <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_PPNX_28.md">CPU_MMU_PPNX_28</a> <code>PPNX</code></li>
@@ -1003,7 +1004,7 @@ Build: `Verilog/fpga/tang-nano-20k/Makefile` (the OSS yosys flow, default VARIAN
   </ul>
   </details></li>
   <li><a href="fpga/tang-nano-20k/sdram-test/src/doc/uart_tx.md">uart_tx</a> <code>u_dbg_tx</code></li>
-  <li><details open><summary><a name="h141"></a><a href="SD-FAT/circuit/doc/nd_storage_devices.md">nd_storage_devices</a> <code>TAPE_SDFAT_SOURCE</code></summary>
+  <li><details open><summary><a href="SD-FAT/circuit/doc/nd_storage_devices.md">nd_storage_devices</a> <code>TAPE_SDFAT_SOURCE</code></summary>
   <ul>
     <li><a href="SD-FAT/circuit/doc/nd_storage.md">nd_storage</a> <code>u_nd_storage</code> - same as <a href="#h3">above</a></li>
     <li><a href="SD-FAT/circuit/doc/nd_storage_tape_adapter.md">nd_storage_tape_adapter</a> <code>gen_tape.u_tape_adapter</code></li>
@@ -1070,7 +1071,7 @@ Build: `Verilog/fpga/nexys4ddr/build.tcl`, default arguments.
 
 Defines: `TARGET_NEXYS4DDR`, `FPGA_FF_MODE`, `MAIN_RAM_DDR2`, `ND120_N4DDR_MMCM_DIV=60.0`, `BOARD_CLK_FREQ=16666667`, `UART_BAUD_RATE=115200`, `SKIP_WCS_LOAD`, `ND120_PANEL_CLOCK`, `ND120_CONSOLE_VGA`, `ND120_CONSOLE_BAUD=115200`, `ND120_MIPS_TAP`.
 
-287 of our modules, 2943 module instances, 13 levels deep. Vendor parts: `BUFG`, `BUFGMUX_CTRL`, `MMCME2_BASE`, `ddr`.
+288 of our modules, 2946 module instances, 13 levels deep. Vendor parts: `BUFG`, `BUFGMUX_CTRL`, `MMCME2_BASE`, `ddr`.
 
 <ul class="hier">
 <li><details open><summary><a href="fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md">nd120_nexys4ddr_top</a></summary>
@@ -1120,10 +1121,10 @@ Defines: `TARGET_NEXYS4DDR`, `FPGA_FF_MODE`, `MAIN_RAM_DDR2`, `ND120_N4DDR_MMCM_
   </details></li>
   <li><a href="Terminals/rtl/doc/key_tdv2200.md">key_tdv2200</a> <code>KEYEXP</code></li>
   <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_TX</code></li>
-  <li><details open><summary><a name="h156"></a><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <li><details open><summary><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
   <ul>
     <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
-    <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
+    <li><details><summary><a name="h157"></a><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
     <ul>
       <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
       <li><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code> - same as <a href="#h9">above</a></li>
@@ -1158,12 +1159,20 @@ Defines: `TARGET_NEXYS4DDR`, `FPGA_FF_MODE`, `MAIN_RAM_DDR2`, `ND120_N4DDR_MMCM_
     <li><a href="ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md">ND_BUS_SLAVE</a> <code>gen_bus_slave.BUS_SLAVE</code></li>
     <li><a href="ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md">ND_TAPE_400</a> <code>gen_tape.TAPE_400</code></li>
     <li><a href="ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md">ND_FLOPPY_DMA</a> <code>gen_floppy.FLOPPY_1560</code></li>
-    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x3: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_wd.WD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x4: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_smd.SMD_DMA_MASTER</code>, <code>gen_wd.WD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/SMD/circuit/doc/ND_SMD.md">ND_SMD</a> <code>gen_smd.SMD_1540</code></li>
     <li><a href="ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md">ND_WINCHESTER</a> <code>gen_wd.WD_500</code></li>
   </ul>
   </details></li>
   <li><a href="Terminals/rtl/doc/mips_counter.md">mips_counter</a> <code>MIPS</code></li>
-  <li><a href="SD-FAT/circuit/doc/nd_storage_devices.md">nd_storage_devices</a> <code>STORAGE</code> - same as <a href="#h141">above</a></li>
+  <li><details open><summary><a href="SD-FAT/circuit/doc/nd_storage_devices.md">nd_storage_devices</a> <code>STORAGE</code></summary>
+  <ul>
+    <li><a href="SD-FAT/circuit/doc/nd_storage.md">nd_storage</a> <code>u_nd_storage</code> - same as <a href="#h3">above</a></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_tape_adapter.md">nd_storage_tape_adapter</a> <code>gen_tape.u_tape_adapter</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_floppy_adapter.md">nd_storage_floppy_adapter</a> <code>gen_floppy.u_floppy_adapter</code></li>
+    <li><a href="SD-FAT/circuit/doc/nd_storage_disc_adapter.md">nd_storage_disc_adapter</a> x2: <code>gen_smd.u_smd_adapter</code>, <code>gen_wd.u_wd_adapter</code></li>
+  </ul>
+  </details></li>
   <li><a href="fpga/nexys4ddr/ddr2/doc/nd_ddr2_storage.md">nd_ddr2_storage</a> <code>u_region</code></li>
   <li><a href="fpga/nexys4ddr/ddr2/doc/nd_ddr2_arb.md">nd_ddr2_arb</a> <code>u_arb</code></li>
   <li><details open><summary><a href="fpga/nexys4ddr/ddr2/doc/nd_ddr2_port.md">nd_ddr2_port</a> <code>u_ddr2</code></summary>
@@ -1219,7 +1228,7 @@ Not followed (framework): 3 file(s).
   </details></li>
   <li><a href="Terminals/rtl/doc/console_uart_rx.md">console_uart_rx</a> <code>CONSOLE_UART_RX</code></li>
   <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_UART_TX</code></li>
-  <li><details open><summary><a href="fpga/mister/rtl/doc/nd_storage_mister_devices.md">nd_storage_mister_devices</a> <code>STORAGE</code></summary>
+  <li><details open><summary><a name="h168"></a><a href="fpga/mister/rtl/doc/nd_storage_mister_devices.md">nd_storage_mister_devices</a> <code>STORAGE</code></summary>
   <ul>
     <li><a href="SD-FAT/circuit/doc/nd_storage_floppy_adapter.md">nd_storage_floppy_adapter</a> x2: <code>u_fd0</code>, <code>u_fd1</code></li>
     <li><a href="SD-FAT/circuit/doc/nd_storage_disc_adapter.md">nd_storage_disc_adapter</a> x2: <code>u_wd0</code>, <code>u_wd1</code></li>
@@ -1235,7 +1244,7 @@ Not followed (framework): 3 file(s).
       <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
       <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code></summary>
       <ul>
-        <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md">CPU_PROC_32</a> <code>PROC</code></summary>
+        <li><details><summary><a name="h172"></a><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md">CPU_PROC_32</a> <code>PROC</code></summary>
         <ul>
           <li><a href="Shared/support/doc/AM29841.md">AM29841</a> <code>CHIP_25F</code></li>
           <li><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_CMDDEC_34.md">CPU_PROC_CMDDEC_34</a> <code>CMDDEC</code> - same as <a href="#h11">above</a></li>
@@ -1327,7 +1336,7 @@ Not followed (framework): 7 file(s).
 <ul class="hier">
 <li><details open><summary><a href="fpga/mega65/rtl/doc/nd120_mega65_machine.md">nd120_mega65_machine</a></summary>
 <ul>
-  <li><details open><summary><a name="h177"></a><a href="fpga/mega65/rtl/doc/nd120_console_mega65.md">nd120_console_mega65</a> <code>CONSOLE</code></summary>
+  <li><details open><summary><a name="h178"></a><a href="fpga/mega65/rtl/doc/nd120_console_mega65.md">nd120_console_mega65</a> <code>CONSOLE</code></summary>
   <ul>
     <li><a href="fpga/mega65/rtl/doc/m65_keys_to_ps2.md">m65_keys_to_ps2</a> <code>KEYS</code></li>
     <li><a href="Terminals/rtl/doc/ps2_decoder_tdv.md">ps2_decoder_tdv</a> <code>DECODER</code> - same as <a href="#h155">above</a></li>
@@ -1339,7 +1348,7 @@ Not followed (framework): 7 file(s).
   <li><a href="Terminals/rtl/doc/console_uart_rx.md">console_uart_rx</a> <code>CONSOLE_UART_RX</code></li>
   <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_UART_TX</code></li>
   <li><a href="Terminals/rtl/doc/mips_counter.md">mips_counter</a> <code>MIPS</code></li>
-  <li><details open><summary><a name="h178"></a><a href="fpga/mega65/rtl/doc/nd_storage_mega65_devices.md">nd_storage_mega65_devices</a> <code>STORAGE</code></summary>
+  <li><details open><summary><a name="h179"></a><a href="fpga/mega65/rtl/doc/nd_storage_mega65_devices.md">nd_storage_mega65_devices</a> <code>STORAGE</code></summary>
   <ul>
     <li><a href="SD-FAT/circuit/doc/nd_storage_floppy_adapter.md">nd_storage_floppy_adapter</a> x2: <code>u_fd0</code>, <code>u_fd1</code></li>
     <li><a href="SD-FAT/circuit/doc/nd_storage_disc_adapter.md">nd_storage_disc_adapter</a> x2: <code>u_wd0</code>, <code>u_wd1</code></li>
@@ -1347,7 +1356,7 @@ Not followed (framework): 7 file(s).
     <li><a href="fpga/mega65/rtl/doc/nd_storage_vdrives.md">nd_storage_vdrives</a> <code>u_vd</code></li>
   </ul>
   </details></li>
-  <li><details open><summary><a name="h179"></a><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <li><details open><summary><a name="h180"></a><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
   <ul>
     <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
     <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
@@ -1383,13 +1392,84 @@ Not followed (framework): 7 file(s).
 <ul class="hier">
 <li><details open><summary><a href="fpga/mega65/rtl/doc/nd120_mega65_machine.md">nd120_mega65_machine</a></summary>
 <ul>
-  <li><a href="fpga/mega65/rtl/doc/nd120_console_mega65.md">nd120_console_mega65</a> <code>CONSOLE</code> - same as <a href="#h177">above</a></li>
+  <li><a href="fpga/mega65/rtl/doc/nd120_console_mega65.md">nd120_console_mega65</a> <code>CONSOLE</code> - same as <a href="#h178">above</a></li>
   <li><a href="Terminals/rtl/doc/console_uart_rx.md">console_uart_rx</a> <code>CONSOLE_UART_RX</code></li>
   <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_UART_TX</code></li>
   <li><a href="Terminals/rtl/doc/mips_counter.md">mips_counter</a> <code>MIPS</code></li>
-  <li><a href="fpga/mega65/rtl/doc/nd_storage_mega65_devices.md">nd_storage_mega65_devices</a> <code>STORAGE</code> - same as <a href="#h178">above</a></li>
+  <li><a href="fpga/mega65/rtl/doc/nd_storage_mega65_devices.md">nd_storage_mega65_devices</a> <code>STORAGE</code> - same as <a href="#h179">above</a></li>
   <li><a href="fpga/mega65/rtl/doc/nd_avalon_port.md">nd_avalon_port</a> <code>MEMPORT</code></li>
-  <li><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code> - same as <a href="#h156">above</a></li>
+  <li><details open><summary><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <ul>
+    <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
+    <li><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code> - same as <a href="#h157">above</a></li>
+    <li><a href="ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md">ND_BUS_SLAVE</a> <code>gen_bus_slave.BUS_SLAVE</code></li>
+    <li><a href="ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md">ND_TAPE_400</a> <code>gen_tape.TAPE_400</code></li>
+    <li><a href="ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md">ND_FLOPPY_DMA</a> <code>gen_floppy.FLOPPY_1560</code></li>
+    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x3: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_wd.WD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md">ND_WINCHESTER</a> <code>gen_wd.WD_500</code></li>
+  </ul>
+  </details></li>
+</ul>
+</details></li>
+</ul>
+
+## Azure card X930613
+
+Build: `Verilog/fpga/azure-x930613/nd120_azure.qsf` (which sources `files.qip`, the list the Verilator boot test also reads). Never built: the PCIe hard block is not generated yet.
+
+Defines: `FPGA_FF_MODE=1`, `BOARD_CLK_FREQ=20000000`, `UART_BAUD_RATE=115200`, `SKIP_WCS_LOAD=1`, `ND120_PANEL_CLOCK=1`, `ND120_MIPS_TAP=1`, `QUARTUS_RAM_INFER=1`, `QUARTUS_LATCH_RENAME=1`, `MAIN_RAM_BLOCKRAM=1`, `ND120_BLOCKRAM_ADDR_BITS=20`, `ND120_BLOCKRAM_BANK_SLOTS=1`, `ND120_ONBOARD_2MB=1`.
+
+260 of our modules, 2862 module instances, 13 levels deep. Vendor parts: `nd120_azure_pcie_ip`.
+
+<ul class="hier">
+<li><details open><summary><a href="fpga/azure-x930613/rtl/doc/nd120_azure_top.md">nd120_azure_top</a></summary>
+<ul>
+  <li><details open><summary><a href="fpga/azure-x930613/rtl/doc/pcie_hip_wrap.md">pcie_hip_wrap</a> <code>HIP</code></summary>
+  <ul>
+    <li>nd120_azure_pcie_ip (vendor) <code>PCIE</code></li>
+  </ul>
+  </details></li>
+  <li><a href="fpga/azure-x930613/rtl/doc/pcie_bar_bus.md">pcie_bar_bus</a> <code>BAR</code></li>
+  <li><a href="Terminals/rtl/doc/console_uart_rx.md">console_uart_rx</a> <code>CONSOLE_UART_RX</code></li>
+  <li><a href="Terminals/rtl/doc/console_uart_tx.md">console_uart_tx</a> <code>CONSOLE_UART_TX</code></li>
+  <li><a href="fpga/azure-x930613/rtl/doc/nd_pcie_console.md">nd_pcie_console</a> <code>CONSOLE</code></li>
+  <li><a href="fpga/mister/rtl/doc/nd_storage_mister_devices.md">nd_storage_mister_devices</a> <code>STORAGE</code> - same as <a href="#h168">above</a></li>
+  <li><a href="fpga/azure-x930613/rtl/doc/nd_pcie_storage.md">nd_pcie_storage</a> <code>DISKS</code></li>
+  <li><details open><summary><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code></summary>
+  <ul>
+    <li><a href="Shared/support/doc/BACKWIRING_PROM.md">BACKWIRING_PROM</a> <code>BACKPLANE_INR_PROM</code></li>
+    <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/ND3202D.md">ND3202D</a> <code>CPU_BOARD</code></summary>
+    <ul>
+      <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
+      <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code></summary>
+      <ul>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md">CPU_PROC_32</a> <code>PROC</code> - same as <a href="#h172">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CPU_CS_16.md">CPU_CS_16</a> <code>CS</code> - same as <a href="#h106">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/CPU_MMU_24.md">CPU_MMU_24</a> <code>MMU</code> - same as <a href="#h109">above</a></li>
+      </ul>
+      </details></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/IO_37.md">IO_37</a> <code>IO</code> - same as <a href="#h158">above</a></li>
+      <li><details><summary><a name="h189"></a><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code></summary>
+      <ul>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md">MEM_ADEC_45</a> <code>ADEC</code> - same as <a href="#h124">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md">MEM_LBDIF_48</a> <code>LBDIF</code> - same as <a href="#h125">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md">MEM_DATA_46</a> <code>DATA</code> - same as <a href="#h126">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md">MEM_ERROR_47</a> <code>ERROR</code> - same as <a href="#h127">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md">MEM_RAMC_50</a> <code>RAMC</code> - same as <a href="#h128">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md">MEM_ADDR_44</a> <code>ADDR</code> - same as <a href="#h129">above</a></li>
+        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAM_49_BLOCKRAM.md">MEM_RAM_49_BLOCKRAM</a> <code>RAM</code></li>
+      </ul>
+      </details></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/BIF_5.md">BIF_5</a> <code>BIF</code> - same as <a href="#h130">above</a></li>
+    </ul>
+    </details></li>
+    <li><a href="ND-BUS-DEVICES/BUS-IF/circuit/doc/ND_BUS_SLAVE.md">ND_BUS_SLAVE</a> <code>gen_bus_slave.BUS_SLAVE</code></li>
+    <li><a href="ND-BUS-DEVICES/TAPE-400/circuit/doc/ND_TAPE_400.md">ND_TAPE_400</a> <code>gen_tape.TAPE_400</code></li>
+    <li><a href="ND-BUS-DEVICES/FLOPPY-DMA/circuit/doc/ND_FLOPPY_DMA.md">ND_FLOPPY_DMA</a> <code>gen_floppy.FLOPPY_1560</code></li>
+    <li><a href="ND-BUS-DEVICES/DMA/circuit/doc/ND_DMA_MASTER.md">ND_DMA_MASTER</a> x3: <code>gen_floppy.FLOPPY_DMA_MASTER</code>, <code>gen_wd.WD_DMA_MASTER</code>, <code>gen_dma_master.DMA_MASTER</code></li>
+    <li><a href="ND-BUS-DEVICES/WINCHESTER/circuit/doc/ND_WINCHESTER.md">ND_WINCHESTER</a> <code>gen_wd.WD_500</code></li>
+  </ul>
+  </details></li>
 </ul>
 </details></li>
 </ul>
@@ -1423,7 +1503,7 @@ Defines: `FPGA_FF_MODE`, `MAIN_RAM_SDRAM`, `ND_SDRAM_PACK16`, `ND_SDRAM_DQ16`, `
   </ul>
   </details></li>
   <li><a href="fpga/qmtech-a35t/rtl/doc/nd_storage_bram.md">nd_storage_bram</a> <code>STORAGE_REGION</code></li>
-  <li><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code> - same as <a href="#h179">above</a></li>
+  <li><a href="doc/ND120_CORE.md">ND120_CORE</a> <code>CORE</code> - same as <a href="#h180">above</a></li>
 </ul>
 </details></li>
 </ul>
@@ -1437,7 +1517,7 @@ Defines: `FPGA_FF_MODE`, `SKIP_WCS_LOAD`, `MAIN_RAM_BLOCKRAM`, `BOARD_CLK_FREQ=1
 244 of our modules, 2844 module instances, 13 levels deep. Vendor parts: `BUFG`, `MMCME2_BASE`.
 
 <ul class="hier">
-<li><details open><summary><a name="h185"></a><a href="doc/ND120_TOP.md">ND120_TOP</a></summary>
+<li><details open><summary><a name="h193"></a><a href="doc/ND120_TOP.md">ND120_TOP</a></summary>
 <ul>
   <li>MMCME2_BASE (vendor) <code>mmcm_cpu_clk</code></li>
   <li>BUFG (vendor) x2: <code>bufg_fb</code>, <code>bufg_cpu</code></li>
@@ -1450,17 +1530,7 @@ Defines: `FPGA_FF_MODE`, `SKIP_WCS_LOAD`, `MAIN_RAM_BLOCKRAM`, `BOARD_CLK_FREQ=1
       <li><a href="CPU-BOARD-3202/circuit/doc/CYC_36.md">CYC_36</a> <code>CYC</code> - same as <a href="#h8">above</a></li>
       <li><a href="CPU-BOARD-3202/circuit/doc/CPU_15.md">CPU_15</a> <code>CPU</code> - same as <a href="#h9">above</a></li>
       <li><a href="CPU-BOARD-3202/circuit/doc/IO_37.md">IO_37</a> <code>IO</code> - same as <a href="#h112">above</a></li>
-      <li><details><summary><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code></summary>
-      <ul>
-        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADEC_45.md">MEM_ADEC_45</a> <code>ADEC</code> - same as <a href="#h124">above</a></li>
-        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_LBDIF_48.md">MEM_LBDIF_48</a> <code>LBDIF</code> - same as <a href="#h125">above</a></li>
-        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_DATA_46.md">MEM_DATA_46</a> <code>DATA</code> - same as <a href="#h126">above</a></li>
-        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ERROR_47.md">MEM_ERROR_47</a> <code>ERROR</code> - same as <a href="#h127">above</a></li>
-        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAMC_50.md">MEM_RAMC_50</a> <code>RAMC</code> - same as <a href="#h128">above</a></li>
-        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_ADDR_44.md">MEM_ADDR_44</a> <code>ADDR</code> - same as <a href="#h129">above</a></li>
-        <li><a href="CPU-BOARD-3202/circuit/doc/MEM_RAM_49_BLOCKRAM.md">MEM_RAM_49_BLOCKRAM</a> <code>RAM</code></li>
-      </ul>
-      </details></li>
+      <li><a href="CPU-BOARD-3202/circuit/doc/MEM_43.md">MEM_43</a> <code>MEM</code> - same as <a href="#h189">above</a></li>
       <li><a href="CPU-BOARD-3202/circuit/doc/BIF_5.md">BIF_5</a> <code>BIF</code> - same as <a href="#h130">above</a></li>
     </ul>
     </details></li>
@@ -1481,7 +1551,7 @@ Defines: `TARGET_CMOD_A7`, `FPGA_FF_MODE`, `MAIN_RAM_BLOCKRAM`, `BOARD_CLK_FREQ=
 <ul class="hier">
 <li><details open><summary><a href="fpga/cmod-a7-35t/doc/nd120_cmod_top.md">nd120_cmod_top</a></summary>
 <ul>
-  <li><a href="doc/ND120_TOP.md">ND120_TOP</a> <code>nd120</code> - same as <a href="#h185">above</a></li>
+  <li><a href="doc/ND120_TOP.md">ND120_TOP</a> <code>nd120</code> - same as <a href="#h193">above</a></li>
 </ul>
 </details></li>
 </ul>

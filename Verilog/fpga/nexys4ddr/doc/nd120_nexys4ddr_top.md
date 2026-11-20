@@ -41,10 +41,10 @@ DEVICES INCLUDED
 TAPE-400   papertape at 400   - BOOT.TAP
 FLOPPY     DMA floppy at 1560 - FLOPPY1.IMG / FLOPPY2.IMG
 WINCHESTER ST506 disc at 500  - WD0.IMG / WD1.IMG
-(SMD at 1540 is left out - Ronny asked for these three. On the Tang
-SMD and Winchester are mutually exclusive for want of one BSRAM
-block; this part has 135 tiles against the Tang's 46, so that
-constraint does not apply here and SMD could be added later.)
+SMD        disc at 1540       - SMD0.IMG (storage client 3)
+(On the Tang SMD and Winchester are mutually exclusive for want of one
+BSRAM block; this part has 135 tiles against the Tang's 46, so both
+are built in here.)
 STORAGE REGION - CACHED READS, WRITE THROUGH
 nd_storage's Phase-4 tag directory (SD-FAT/circuit/nd_storage_cache.v)
 uses a 4 MB region as a CACHE of arbitrarily large images: the disc
@@ -121,7 +121,7 @@ Ronny Hansen
 [`Verilog/fpga/nexys4ddr/nd120_nexys4ddr_top.v`](https://github.com/RetroCoreLabs/nd-120/blob/main/Verilog/fpga/nexys4ddr/nd120_nexys4ddr_top.v) on GitHub.
 
 <details markdown="1">
-<summary>Show the Verilog of nd120_nexys4ddr_top (1595 lines)</summary>
+<summary>Show the Verilog of nd120_nexys4ddr_top (1596 lines)</summary>
 
 ```verilog
 /****************************************************************************
@@ -138,10 +138,10 @@ Ronny Hansen
 **   TAPE-400   papertape at 400   - BOOT.TAP                              **
 **   FLOPPY     DMA floppy at 1560 - FLOPPY1.IMG / FLOPPY2.IMG             **
 **   WINCHESTER ST506 disc at 500  - WD0.IMG / WD1.IMG                     **
-**   (SMD at 1540 is left out - Ronny asked for these three. On the Tang    **
-**    SMD and Winchester are mutually exclusive for want of one BSRAM       **
-**    block; this part has 135 tiles against the Tang's 46, so that         **
-**    constraint does not apply here and SMD could be added later.)         **
+**   SMD        disc at 1540       - SMD0.IMG (storage client 3)           **
+**   (On the Tang SMD and Winchester are mutually exclusive for want of one **
+**    BSRAM block; this part has 135 tiles against the Tang's 46, so both   **
+**    are built in here.)                                                   **
 **                                                                         **
 ** STORAGE REGION - CACHED READS, WRITE THROUGH                             **
 **   nd_storage's Phase-4 tag directory (SD-FAT/circuit/nd_storage_cache.v) **
@@ -524,11 +524,13 @@ module nd120_nexys4ddr_top (
   wire [ 3:0] WDISK_ERR_CODE;
   wire [ 9:0] WDBUF_ADDR;
 
-  // SMD is not built into this bitstream; its seam is tied inactive
-  wire        SDISK_START, SDISK_REQ, SDISK_WR;
-  wire [15:0] SDISK_BLKADDR1, SDISK_BLKADDR2, SDBUF_RDATA;
+  // SMD disc seam (core <-> storage), same shape as the Winchester's
+  wire        SDISK_START, SDISK_REQ, SDISK_WR, SDISK_DONE, SDISK_ERR, SDBUF_WE;
+  wire [15:0] SDISK_BLKADDR1, SDISK_BLKADDR2, SDBUF_WDATA, SDBUF_RDATA;
   wire [ 2:0] SDISK_UNIT;
   wire [10:0] SDISK_WORDCOUNT;
+  wire [ 3:0] SDISK_ERR_CODE;
+  wire [ 9:0] SDBUF_ADDR;
 
   /**********************************************
   *  Status / debug                             *
@@ -1033,7 +1035,7 @@ module nd120_nexys4ddr_top (
   ND120_CORE #(
       .INCLUDE_TAPE  (1),
       .INCLUDE_FLOPPY(1),
-      .INCLUDE_SMD   (0),
+      .INCLUDE_SMD   (1),
       .INCLUDE_WD    (1)
   ) CORE (
       .BAUD_9600(s_baud9600_cpu),   // sw[7]: console 9600 (else 115200)
@@ -1112,7 +1114,6 @@ module nd120_nexys4ddr_top (
       .FDBUF_WE       (FDBUF_WE),
       .FDBUF_RDATA    (FDBUF_RDATA),
 
-      // SMD absent from this build: outputs left open, inputs inactive
       .SDISK_START    (SDISK_START),
       .SDISK_REQ      (SDISK_REQ),
       .SDISK_WR       (SDISK_WR),
@@ -1120,12 +1121,12 @@ module nd120_nexys4ddr_top (
       .SDISK_BLKADDR2 (SDISK_BLKADDR2),
       .SDISK_UNIT     (SDISK_UNIT),
       .SDISK_WORDCOUNT(SDISK_WORDCOUNT),
-      .SDISK_DONE     (1'b0),
-      .SDISK_ERR      (1'b0),
-      .SDISK_ERR_CODE (4'd0),
-      .SDBUF_ADDR     (10'd0),
-      .SDBUF_WDATA    (16'd0),
-      .SDBUF_WE       (1'b0),
+      .SDISK_DONE     (SDISK_DONE),
+      .SDISK_ERR      (SDISK_ERR),
+      .SDISK_ERR_CODE (SDISK_ERR_CODE),
+      .SDBUF_ADDR     (SDBUF_ADDR),
+      .SDBUF_WDATA    (SDBUF_WDATA),
+      .SDBUF_WE       (SDBUF_WE),
       .SDBUF_RDATA    (SDBUF_RDATA),
 
       .WDISK_START    (WDISK_START),
@@ -1257,7 +1258,7 @@ module nd120_nexys4ddr_top (
       .SIMULATE      (0),
       .INCLUDE_TAPE  (1),
       .INCLUDE_FLOPPY(1),
-      .INCLUDE_SMD   (0),
+      .INCLUDE_SMD   (1),
       .INCLUDE_WD    (1),
       // 8.3 name: ".BPUN" is a 4-character extension that FAT can only hold
       // through a VFAT long-name entry, and the floppy/WD builds strip long-
@@ -1299,12 +1300,12 @@ module nd120_nexys4ddr_top (
       .SDISK_BLKADDR2 (SDISK_BLKADDR2),
       .SDISK_UNIT     (SDISK_UNIT),
       .SDISK_WORDCOUNT(SDISK_WORDCOUNT),
-      .SDISK_DONE     (),
-      .SDISK_ERR      (),
-      .SDISK_ERR_CODE (),
-      .SDBUF_ADDR     (),
-      .SDBUF_WDATA    (),
-      .SDBUF_WE       (),
+      .SDISK_DONE     (SDISK_DONE),
+      .SDISK_ERR      (SDISK_ERR),
+      .SDISK_ERR_CODE (SDISK_ERR_CODE),
+      .SDBUF_ADDR     (SDBUF_ADDR),
+      .SDBUF_WDATA    (SDBUF_WDATA),
+      .SDBUF_WE       (SDBUF_WE),
       .SDBUF_RDATA    (SDBUF_RDATA),
 
       .WDISK_START    (WDISK_START),

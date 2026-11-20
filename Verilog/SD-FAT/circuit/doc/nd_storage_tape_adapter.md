@@ -9,7 +9,7 @@ Source: `Verilog/SD-FAT/circuit/nd_storage_tape_adapter.v`
 **Where it sits** (Simulation): [ND120_TOP](../../../doc/ND120_TOP.md) > [nd_storage_devices](nd_storage_devices.md) > **nd_storage_tape_adapter**
 - instance path: `TAPE_SDFAT_SOURCE.gen_tape.u_tape_adapter`
 
-**Used in:** [nd_storage_devices](nd_storage_devices.md) (Simulation, Tang, Nexys, QMTECH), [nd_storage_mega65_devices](../../../fpga/mega65/rtl/doc/nd_storage_mega65_devices.md) (MEGA65 R6, MEGA65 R3), [nd_storage_mister_devices](../../../fpga/mister/rtl/doc/nd_storage_mister_devices.md) (MiSTer)
+**Used in:** [nd_storage_devices](nd_storage_devices.md) (Simulation, Tang, Nexys, QMTECH), [nd_storage_mega65_devices](../../../fpga/mega65/rtl/doc/nd_storage_mega65_devices.md) (MEGA65 R6, MEGA65 R3), [nd_storage_mister_devices](../../../fpga/mister/rtl/doc/nd_storage_mister_devices.md) (MiSTer, Azure)
 
 **Contains:** no other modules.
 

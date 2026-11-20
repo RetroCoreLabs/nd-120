@@ -396,6 +396,12 @@ nav:
           - "terminal_top": "Verilog/Terminals/rtl/doc/terminal_top.md"
           - "text_screen": "Verilog/Terminals/rtl/doc/text_screen.md"
           - "vga_timing": "Verilog/Terminals/rtl/doc/vga_timing.md"
+      - "FPGA board: azure-x930613 (5)":
+          - "nd120_azure_top": "Verilog/fpga/azure-x930613/rtl/doc/nd120_azure_top.md"
+          - "nd_pcie_console": "Verilog/fpga/azure-x930613/rtl/doc/nd_pcie_console.md"
+          - "nd_pcie_storage": "Verilog/fpga/azure-x930613/rtl/doc/nd_pcie_storage.md"
+          - "pcie_bar_bus": "Verilog/fpga/azure-x930613/rtl/doc/pcie_bar_bus.md"
+          - "pcie_hip_wrap": "Verilog/fpga/azure-x930613/rtl/doc/pcie_hip_wrap.md"
       - "FPGA board: basys3 (4)":
           - "basys3_mem_test_top": "Verilog/fpga/basys3/mem-test/doc/basys3_mem_test_top.md"
           - "basys3_sd_fat_top": "Verilog/fpga/basys3/sd-fat-test/doc/basys3_sd_fat_top.md"
@@ -508,6 +514,7 @@ nav:
       - "The Back-Wiring PROM (installation number) \u2014 mechanism, and how to bake it into a bitstream": "Verilog/docs/backwiring-prom-installation-number.md"
       - "The ND-120 cache: status, root causes and how to test it": "Verilog/docs/CACHE-STATUS.md"
       - "USB flash-drive storage for the ND-120 boards: feasibility, options, effort": "Verilog/docs/usb-storage-options.md"
+      - "Worklog 2026-08-31 - VT100 terminal, keyboard, and the SC2661 overrun bug": "Verilog/docs/worklog-2026-08-31-vt100-terminal-uart-overrun.md"
       - "Older notes in Verilog/":
           - "ND-120 microword field layout and CPU signal names": "Verilog/nd120-plan.md"
           - "ND-120 FPGA Boot Sequence": "Verilog/boot-sequence.md"

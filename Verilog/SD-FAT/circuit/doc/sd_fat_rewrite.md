@@ -6,7 +6,7 @@ Source: `Verilog/SD-FAT/circuit/sd_fat_rewrite.v`
 
 <!-- HIERARCHY-NAV:BEGIN - written by Verilog/tests/gen_hierarchy.py, do not edit -->
 
-**Hierarchy:** not instantiated by any of the 9 build tops (elaborated by yosys).
+**Hierarchy:** not instantiated by any of the 10 build tops (elaborated by yosys).
 
 [Module hierarchy](../../../HIERARCHY.md) - [All modules](../../../MODULES.md)
 

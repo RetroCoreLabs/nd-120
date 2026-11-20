@@ -1,9 +1,11 @@
 # ND-120 on the Microsoft Azure FPGA card (X930613-001)
 
-**Status: PLAN + FIRST BLOCKS.** No build files exist yet; the PCIe console
-and disk blocks exist in `rtl/` with tests in `sim/`. This folder
-only records the card's specs and the open questions that have to be
-answered before any Verilog gets written.
+**Status: RUNS IN SIMULATION, NOT BUILT.** The whole machine (2 MB board,
+console and disks over PCIe) boots in Verilator and boots a floppy image
+served by the simulated PC (`make -C sim vtest`, `vtest-disk`). A Quartus
+project exists (`nd120_azure.qsf`, stand-in part `5SGSMD5K2F40I3L`) but
+does not build yet: the PCIe hard block, the clock PLL and checked pins
+are missing, and a bitstream needs a paid Quartus licence.
 
 Card facts, as given by Ronny - **not yet independently
 verified against a datasheet or the physical card**:
@@ -126,6 +128,7 @@ list and the planned (not yet built) build/flash/console workflow.
 | `rtl/nd_pcie_storage.v` | Disk images served by the PC; drives the MiSTer `nd_storage_hps` block interface; layout in the file header |
 | `rtl/pcie_bar_bus.v` | Splits the 4 KB PCIe register window: console at 0o0000, disks at 0o1000 |
 | `rtl/pcie_hip_wrap.v` | The PCIe hard block behind a plain bus; simulation version only, the real-card version waits for V5 |
+| `nd120_azure.qpf`, `.qsf`, `.sdc`, `files.qip` | The Quartus project; `files.qip` is also the Verilator test's file list |
 | `rtl/nd120_azure_top.v` | The board top: CPU + 2 MB block-RAM board, console and disks over PCIe |
 | `sim/` | iverilog tests: `make all` (`test-console`, `test-storage`, `test-bar`), all in the global suite; `make vtest` boots the whole machine in Verilator (in `make test-full`) |
 

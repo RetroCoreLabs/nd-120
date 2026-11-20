@@ -7,7 +7,7 @@ Source: `Verilog/SD-FAT/circuit/nds_sync.v`
 <!-- HIERARCHY-NAV:BEGIN - written by Verilog/tests/gen_hierarchy.py, do not edit -->
 
 **Where it sits** (Simulation): [ND120_TOP](../../../doc/ND120_TOP.md) > [nd_storage_devices](nd_storage_devices.md) > [nd_storage](nd_storage.md) > [nd_storage_engine](nd_storage_engine.md) > **nds_sync_level**
-- instance path: `TAPE_SDFAT_SOURCE.u_nd_storage.u_engine.u_sync_err`
+- instance path: `TAPE_SDFAT_SOURCE.u_nd_storage.u_engine.u_sync_grant`
 
 **Used in:** [nd_storage_engine](nd_storage_engine.md) (Simulation, Tang, Nexys, QMTECH)
 

@@ -9,7 +9,7 @@ Source: `Verilog/Shared/ndlib/LATCH.v`
 **Where it sits** (MiSTer): [emu](../../../fpga/mister/doc/emu.md) > [ND120_CORE](../../../doc/ND120_CORE.md) > [ND3202D](../../../CPU-BOARD-3202/circuit/doc/ND3202D.md) > [CPU_15](../../../CPU-BOARD-3202/circuit/doc/CPU_15.md) > [CPU_PROC_32](../../../CPU-BOARD-3202/circuit/doc/CPU_PROC_32.md) > [CPU_PROC_CGA_33](../../../CPU-BOARD-3202/circuit/doc/CPU_PROC_CGA_33.md) > [CGA](../../../DELILAH-CPU/CGA/circuit/doc/CGA.md) > [CGA_MIC](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC.md) > [CGA_MIC_CSEL](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CSEL.md) > **ND120_LATCH**
 - instance path: `CORE.CPU_BOARD.CPU.PROC.CGA.DELILAH.MIC.CSEL.CSEL_LATCH`
 
-**Used in:** [CGA_MIC_CSEL](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CSEL.md) (MiSTer)
+**Used in:** [CGA_MIC_CSEL](../../../DELILAH-CPU/CGA_MIC/circuit/doc/CGA_MIC_CSEL.md) (MiSTer, Azure)
 
 **Contains:** no other modules.
 

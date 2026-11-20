@@ -4,7 +4,7 @@
 
 Every module of the design has its own page: what it is, a table of
 its ports, and a picture of its symbol. Each page is made from the
-`//!` comments in the module's source. 393 modules in 16 areas.
+`//!` comments in the module's source. 398 modules in 17 areas.
 
 What sits inside what, for the simulation and for every FPGA board,
 is on [HIERARCHY.md](HIERARCHY.md) (made from a yosys elaboration).
@@ -18,6 +18,7 @@ is on [HIERARCHY.md](HIERARCHY.md) (made from a yosys elaboration).
 - [ND-bus devices (floppy, Winchester, tape)](#nd-bus-devices-floppy-winchester-tape) (7)
 - [SD card and FAT file system](#sd-card-and-fat-file-system) (17)
 - [Terminals (TDV2200 screen and keyboard)](#terminals-tdv2200-screen-and-keyboard) (27)
+- [FPGA board: azure-x930613](#fpga-board-azure-x930613) (5)
 - [FPGA board: basys3](#fpga-board-basys3) (4)
 - [FPGA board: cmod-a7-35t](#fpga-board-cmod-a7-35t) (1)
 - [FPGA board: mega65](#fpga-board-mega65) (6)
@@ -408,6 +409,16 @@ is on [HIERARCHY.md](HIERARCHY.md) (made from a yosys elaboration).
 | [terminal_top](Terminals/rtl/doc/terminal_top.md) | - | `Terminals/rtl/terminal_top.v` |
 | [text_screen](Terminals/rtl/doc/text_screen.md) | - | `Terminals/rtl/text_screen.v` |
 | [vga_timing](Terminals/rtl/doc/vga_timing.md) | - | `Terminals/rtl/vga_timing.v` |
+
+## FPGA board: azure-x930613
+
+| Module | What it is | Source |
+|---|---|---|
+| [nd120_azure_top](fpga/azure-x930613/rtl/doc/nd120_azure_top.md) | - | `fpga/azure-x930613/rtl/nd120_azure_top.v` |
+| [nd_pcie_console](fpga/azure-x930613/rtl/doc/nd_pcie_console.md) | - | `fpga/azure-x930613/rtl/nd_pcie_console.v` |
+| [nd_pcie_storage](fpga/azure-x930613/rtl/doc/nd_pcie_storage.md) | - | `fpga/azure-x930613/rtl/nd_pcie_storage.v` |
+| [pcie_bar_bus](fpga/azure-x930613/rtl/doc/pcie_bar_bus.md) | - | `fpga/azure-x930613/rtl/pcie_bar_bus.v` |
+| [pcie_hip_wrap](fpga/azure-x930613/rtl/doc/pcie_hip_wrap.md) | - | `fpga/azure-x930613/rtl/pcie_hip_wrap.v` |
 
 ## FPGA board: basys3
 

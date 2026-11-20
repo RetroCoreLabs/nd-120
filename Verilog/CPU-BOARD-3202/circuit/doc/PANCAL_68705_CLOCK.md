@@ -9,7 +9,7 @@ Source: `Verilog/CPU-BOARD-3202/circuit/PANCAL_68705_CLOCK.v`
 **Where it sits** (Nexys): [nd120_nexys4ddr_top](../../../fpga/nexys4ddr/doc/nd120_nexys4ddr_top.md) > [ND120_CORE](../../../doc/ND120_CORE.md) > [ND3202D](ND3202D.md) > [IO_37](IO_37.md) > [IO_PANCAL_40](IO_PANCAL_40.md) > **PANCAL_68705_CLOCK**
 - instance path: `CORE.CPU_BOARD.IO.PANCAL.CHIP_35C`
 
-**Used in:** [IO_PANCAL_40](IO_PANCAL_40.md) (Nexys, MiSTer, MEGA65 R6, MEGA65 R3, QMTECH)
+**Used in:** [IO_PANCAL_40](IO_PANCAL_40.md) (Nexys, MiSTer, MEGA65 R6, MEGA65 R3, Azure, QMTECH)
 
 **Contains:** no other modules.
 

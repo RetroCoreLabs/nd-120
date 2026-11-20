@@ -11,7 +11,7 @@ Source: `Verilog/CPU-BOARD-3202/circuit/IO_PANCAL_40.v`
 
 **Used in:** [IO_37](IO_37.md) (all tops)
 
-**Contains:** [PANCAL_68705_CLOCK](PANCAL_68705_CLOCK.md) (only on Nexys, MiSTer, MEGA65 R6, MEGA65 R3, QMTECH), [TTL_74244](../../../Shared/support/doc/TTL_74244.md), [TTL_74374](../../../Shared/support/doc/TTL_74374.md)
+**Contains:** [PANCAL_68705_CLOCK](PANCAL_68705_CLOCK.md) (only on Nexys, MiSTer, MEGA65 R6, MEGA65 R3, Azure, QMTECH), [TTL_74244](../../../Shared/support/doc/TTL_74244.md), [TTL_74374](../../../Shared/support/doc/TTL_74374.md)
 
 [Module hierarchy](../../../HIERARCHY.md) - [All modules](../../../MODULES.md)
 

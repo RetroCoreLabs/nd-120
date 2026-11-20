@@ -1,8 +1,8 @@
 # Azure FPGA (X930613-001) - plan
 
-**Next:** step V5 of "Verilog plan" below - the Quartus project and file
-list (needs the stand-in part settled, see Build), then the real PCIe block
-behind `pcie_hip_wrap.v`. V1-V4 run without the card or Quartus.
+**Next:** finish V5 - the real PCIe block behind `pcie_hip_wrap.v`, the
+CPU clock PLL and checked pins - which needs a licensed Quartus Prime
+Standard. V1-V4 and the project files run without the card or Quartus.
 
 **Status: not started.** No Quartus project, no PCIe endpoint Verilog, no
 console driver exist yet anywhere in this repo. Everything below the
@@ -75,7 +75,9 @@ verified against multiple independent sources (see
 
 - New Quartus Prime Standard project in this folder, targeting a
   standard-catalog stand-in for the real custom marking `5SGSKF40I3LNAC`.
-  **Which stand-in is NOT settled:** the reference design's `.qsf` uses
+  **Stand-in chosen: `5SGSMD5K2F40I3L`** (in `nd120_azure.qsf`) - the
+  slower speed grade, so timing that passes has margin on the real chip.
+  Not checked against the card. The background: the reference design's `.qsf` uses
   `5SGSMD5K1F40C1` (speed grade 1, commercial), devops.lol chose
   `5SGSMD5K2F40I3L` (speed grade 3, industrial - the same `I3L` ending as
   the real marking). An earlier version of this line said devops.lol
@@ -371,7 +373,7 @@ iverilog/Verilator without Quartus.
 
 | Step | File(s) under `rtl/` | What | Test |
 |---|---|---|---|
-| V5 | `build.tcl` or `.qsf` + file list | Quartus project for the stand-in part (which one is open, see Build). Gives `Verilog/tests/gen_hierarchy.py` a `quartus` entry, so the board appears in `Verilog/HIERARCHY.md`. | hierarchy generator runs clean |
+| V5 (rest) | `nd120_azure.qsf` | The project exists (`nd120_azure.qpf`/`.qsf`/`.sdc`, file list `files.qip` shared with the Verilator test; the board is in `Verilog/HIERARCHY.md`). Left: generate the PCIe hard block as `nd120_azure_pcie_ip` (the project stops on its absence, on purpose), a PLL from the 125 MHz oscillator for clk_cpu, and pins checked against the card (the known ones are in the `.qsf`, commented out). | a Quartus compile and fit report - needs the paid licence |
 | V6 | PC program (new folder, language not chosen) | Maps the BAR; console -> telnet port; serves image files to V2. | needs the card |
 
 **The whole machine boots in Verilator** (`rtl/nd120_azure_top.v`,
