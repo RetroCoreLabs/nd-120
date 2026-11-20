@@ -282,18 +282,26 @@ module ND_WINCHESTER #(
 
   // Cycles from now until `sec` is under the head, then `n` sector times:
   // nd100x wd_transfer_ticks, floored at T_MIN. Three small functions, so
-  // none needs a temporary.
+  // none needs a temporary. The disc position comes in as an argument
+  // (`rot`, always r_rot at the call) rather than being read inside the
+  // function: one caller passes only constants, and yosys then evaluates
+  // the whole call as a constant function, which may not read a register
+  // ("Non-constant expression in constant function"). The disc position comes in as an argument
+  // (`rot`, always r_rot at the call) rather than being read inside the
+  // function: one caller passes only constants, and yosys then evaluates
+  // the whole call as a constant function, which may not read a register
+  // ("Non-constant expression in constant function").
   function [31:0] sec_start(input [4:0] sec);   // where sector `sec` begins
     sec_start = ({27'd0, sec} % SPT32) * T_SECTOR;
   endfunction
-  function [31:0] rot_wait(input [31:0] start); // until the disc is at `start`
-    rot_wait = (start >= r_rot) ? (start - r_rot) : (start + T_REV - r_rot);
+  function [31:0] rot_wait(input [31:0] start, input [31:0] rot); // until the disc is at `start`
+    rot_wait = (start >= rot) ? (start - rot) : (start + T_REV - rot);
   endfunction
   function [31:0] at_least_min(input [31:0] t);
     at_least_min = (t < T_MIN) ? T_MIN : t;
   endfunction
-  function [31:0] xfer_ticks(input [4:0] sec, input [7:0] n);
-    xfer_ticks = at_least_min(rot_wait(sec_start(sec)) + {24'd0, n} * T_SECTOR);
+  function [31:0] xfer_ticks(input [4:0] sec, input [7:0] n, input [31:0] rot);
+    xfer_ticks = at_least_min(rot_wait(sec_start(sec), rot) + {24'd0, n} * T_SECTOR);
   endfunction
 
   reg [31:0] s_drv_left;   // drive time still to run for this operation
@@ -1226,7 +1234,7 @@ module ND_WINCHESTER #(
                     s_addr_mismatch <= 1'b1;
                     s_blk_adv   <= w_found[7:0] + 8'd1;
                     // The sectors found pass the head, then the one that is not.
-                    drive_time(xfer_ticks(w_go_sec, w_found[7:0] + 8'd1));
+                    drive_time(xfer_ticks(w_go_sec, w_found[7:0] + 8'd1, r_rot));
                     s_delay_cnt <= END_DELAY;
                     s_eng       <= E_DELAY;
                   end else if (w_go_words != 24'd0) begin
@@ -1235,7 +1243,7 @@ module ND_WINCHESTER #(
                     // The wait for the first sector, then one sector time
                     // each. The data moves meanwhile; E_DELAY ends the
                     // operation when both are done.
-                    drive_time(xfer_ticks(w_go_sec, w_go_count));
+                    drive_time(xfer_ticks(w_go_sec, w_go_count, r_rot));
                     if (w_disk_out) begin
                       // The backend still owes a done from a cut-short
                       // operation: wait for it (E_WAIT_DISK).
@@ -1285,7 +1293,7 @@ module ND_WINCHESTER #(
                     s_delay_cnt <= END_DELAY;
                     s_eng       <= E_DELAY;
                   end else begin
-                    drive_time(xfer_ticks(5'd0, GEO_SPT[7:0]));
+                    drive_time(xfer_ticks(5'd0, GEO_SPT[7:0], r_rot));
                     s_fmt_left <= w_fmt_words;
                     if (w_fmt_words != 16'd0) begin
                       s_eng <= E_FMT_RD;
