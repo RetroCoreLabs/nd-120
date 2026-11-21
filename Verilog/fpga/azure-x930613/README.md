@@ -184,7 +184,7 @@ list and the planned (not yet built) build/flash/console workflow.
 |---|---|
 | [`docs/00-plan.md`](docs/00-plan.md) | Open questions, the licence findings, and the Verilog plan (what is still to build) |
 | [`docs/01-prior-work.md`](docs/01-prior-work.md) | What other people did with these cards: devices chosen, tools, pin and clock facts, problems - none says which licence they used |
-| [`docs/01-prior-work.md`](docs/01-prior-work.md) | What other people did with these cards: devices chosen, tools, pin and clock facts, problems - none says which licence they used |
+| [`docs/02-ddr3.md`](docs/02-ddr3.md) | The card's 4 GB DDR3: chips, speed, how a controller + cache would drive it, what code exists to reuse |
 | `Makefile` | Standard board API placeholder - no build yet |
 | `rtl/nd_pcie_console.v` | The console as PCIe registers (two byte queues); layout in the file header |
 | `rtl/nd_pcie_storage.v` | Disk images served by the PC; drives the MiSTer `nd_storage_hps` block interface; layout in the file header |
