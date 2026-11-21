@@ -7,47 +7,109 @@ project exists (`nd120_azure.qsf`, stand-in part `5SGSMD5K2F40I3L`) but
 does not build yet: the PCIe hard block, the clock PLL and checked pins
 are missing, and a bitstream needs a paid Quartus licence.
 
-Card facts, as given by Ronny - **not yet independently
-verified against a datasheet or the physical card**:
+## The card: what is known, and where it comes from
 
-| Item | Value |
-|---|---|
-| Product name | Microsoft Azure FPGA 40GbE QSFP+ PCIe |
-| Part number | X930613-001 |
-| PCB part number | DAT6MTHUEB0 |
-| FPGA | Altera (Intel) **Stratix V GS** |
-| Main memory | 4 GB DDR3, ECC |
-| Network | 2x QSFP+ / 40GbE |
-| Host interface | PCIe Gen3 x16 |
+Every line below names its source. Three kinds of statement are kept
+apart: **official** (an Intel/Altera document), **community** (people who
+took the card apart - nearly all of it from one person, Ruurd Keizer, who
+writes devops.lol and keeps `ruurdk/storey-peak`, plus j-marjanovic's pin
+file), and **NOT FOUND**. No Microsoft schematic or datasheet for the card
+has been found, so nothing here is checked against one, and nothing is
+checked against our own card yet.
 
-The exact Stratix V GS variant, the board's clocking and its debug access
-have not been checked against a datasheet or the physical card - the table
-above is Ronny's own numbers.
+Sources: **[BOM]** <https://github.com/ruurdk/storey-peak/blob/main/BOM.md>
+(part list read from chip markings) - **[SP]**
+<https://github.com/ruurdk/storey-peak> - **[QSF]**
+<https://github.com/j-marjanovic/pp-sp-reference-design/blob/master/project/otma_bringup.qsf>
+and **[SDC]** `.../constraints/timing.sdc` in the same repo (a test design
+shared by Pikes Peak and Storey Peak) - **[DL]**
+<https://devops.lol/azure-fpga/> - **[FW]**
+<https://github.com/ruurdk/storey-peak/blob/main/firmware/README.md>
+(flash read-out) - **[C213]** <https://github.com/corundum/corundum/issues/213> -
+**[PP]** <https://github.com/wirebond/catapult_v2_pikes_peak> (the sister
+card) - **[DO]** Altera *Stratix V Device Overview*, SV51001, 2015.10.01
+(Intel's copy: <https://www.intel.com/content/www/us/en/docs/programmable/683258/current/stratix-v-family-plan.html>;
+read from a mirror because intel.com returned 404).
 
-A third-party blog, [devops.lol](https://www.devops.lol/) (see Links,
-below), identifies this same part number (X930613-001) as the **Microsoft
-"Storey Peak" board (Catapult v2)** and gives more specific numbers. A
-second, unsourced report added more detail; every checkable
-claim in it was run against independent sources: a GitHub issue on the
-`corundum` project (corundum/corundum#213), the community
-reverse-engineering repo [`ruurdk/storey-peak`](https://github.com/ruurdk/storey-peak),
-and [theretroweb.com](https://theretroweb.com/expansioncards/s/microsoft-azure-x930613-001-fpga-card).
-Results below - **confirmed** means at least two independent sources
-agree; **unverified** means only the unsourced report claims it and no
-other source was found:
+### Identity
 
-| Item | Value | Status |
+| Item | Value | Source |
 |---|---|---|
-| Codename | "Storey Peak" (Microsoft Catapult v2) | confirmed (devops.lol, corundum#213, theretroweb) |
-| FPGA part | custom **5SGSKF40I3LNAC**, Stratix V GS, DSP-optimized, dual PCIe hard IP | confirmed (devops.lol, ruurdk/storey-peak) |
-| PCIe | **physical x16 edge connector, but wired as two bifurcated Gen3 x8 links** - the host motherboard's BIOS **must support PCIe bifurcation** on that slot or only one x8 link (or none) will come up | confirmed (corundum#213, ruurdk/storey-peak) - resolves the x16-vs-dual-x8 mismatch between Ronny's numbers and devops.lol above: it's genuinely both, and bifurcation support is a new hard requirement not in either original report |
-| Memory | **4 GB usable ECC** (4.5 GB raw before ECC), DDR3L, 72-bit bus (64 data + 8 ECC), 9x SK Hynix `H5TC4G83BFR` chips | confirmed (corundum#213, ruurdk/storey-peak) |
-| Debug access | on-board **FTDI FT232H**, USB-to-JTAG, **no PCB modification or external programmer needed** - Quartus/OpenOCD can use it via community driver/library work | confirmed (devops.lol, corundum#213, ruurdk/storey-peak) |
-| Toolchain | **Quartus Prime Standard required** - Quartus Lite's free tier stops at Cyclone V/MAX 10 (which is why the `mister/` DE10-Nano board in this repo gets free tooling and this one doesn't) | confirmed - Stratix V is absent from every Lite device list checked, and Quartus's own Docker image tagged `-all` was pulled and queried directly: it ships only Cyclone V + MAX 10 device files, zero Stratix V |
-| GPIO | **none** on the standard interfaces - devops.lol's author rewired a UART through the QSFP+ module's I2C pins to get any general-purpose signal off the board | devops.lol only, unverified elsewhere |
-| Onboard flash size | the unsourced report claimed "~256 Mbit (32 MB) NOR flash" for persistent config | **unverified - no source found for this number**, treat as a guess until checked against the board itself or a schematic |
-| Logic capacity (~457K LE / ~172K ALM / ~40 Mbit BRAM) | the unsourced report gave these as "approximate capacity" | **unverified** - 457K LE appears in devops.lol too, but the ALM and BRAM numbers have no independent source |
-| Known issues (devops.lol author's) | dual-PCIe-IP selection needed DLL shimming on Windows; Nios II/Eclipse toolchain flaky; DDR3 bus deadlocks were hit building a LiteX-based SoC | devops.lol only, unverified elsewhere |
+| Product | Microsoft Azure FPGA card, part X930613-001, PCB DAT6MTHUEB0 | label on Ronny's card |
+| Codename | "Storey Peak", Microsoft Catapult v2 | community: [DL], [SP], [C213] |
+| Sister card | "Pikes Peak" - its PCB, heatsink and mezzanine PCIe do NOT apply to this card | community: [PP] |
+
+### The FPGA
+
+| Item | Value | Source |
+|---|---|---|
+| Marking on the chip | `5SGSKF40I3LNAC` - a custom Microsoft marking, not in Intel's catalogue | community, as text: [SP], [DL], [PP]. No source describes a photo of the chip top that we have looked at |
+| What the marking decodes to | `5SGS` Stratix V GS, `K` 36 transceivers, `F40` 1517-ball FineLine BGA, `I` industrial (-40 to 100 °C), `L` low power, `N` lead-free | official code scheme: [DO] Figure 2 p.20 |
+| What it does NOT say | the variant letter (M/E), the family member (D5), the transceiver speed digit; `3` is probably the core speed grade by position (a guess); `AC` is not in Altera's scheme | [DO] Figure 2 |
+| JTAG ID | `0x029070dd`, IR length 10; Quartus lists it as `5SGSMD5H(1|2|3)` / `5SGSMD5K1` | community: [DL], [PP]. Intel's ID table could not be read (404), so NOT checked officially |
+| Two PCIe hard blocks | yes, two x8 links (PCIE1, PCIE2, each its own reset pin) - a catalogue D5 "M" part has ONE; Quartus's device data disables the second, needs a patch (docs/00-plan.md) | community: [DL], [QSF]; one per "M" part: [DO] |
+
+**Catalogue Stratix V GS D5 figures** - official, from [DO] Table 4 pp.7-8.
+They are the figures for the stand-in part. **That the custom chip has the
+same numbers is NOT confirmed** (only the JTAG ID points to D5).
+
+| Item | D5 |
+|---|---|
+| Logic | 457K logic elements, 172,600 ALMs, 690K registers |
+| Block RAM (M20K) | **2,014 blocks, 39 Mbit** |
+| Small RAM (MLAB) | 640 bits each ([DO] Table 1); total for D5 NOT FOUND |
+| Multipliers | 3,180 of 18x18, or 1,590 of 27x27 (DSP block count NOT FOUND) |
+| Transceivers | 36 in the F40 package, up to 14.1 Gbit/s ([DO] Table 7: 12.5 for backplane) |
+| PCIe hard IP | 1 per "M" part, Gen1/2/3, up to x8 |
+| User I/O, F40 | 696 (174 LVDS pairs); 24 fractional PLLs |
+| Core voltage | 0.85 V or 0.9 V ([DO] Table 1). Which grade uses which: from datasheet mirrors only, NOT checked officially |
+
+What this means for the ND-120 build: the 2 MB main memory is 1M words
+x 16 bits = 16 Mbit, about 1,024 M20K blocks (planned, not yet measured
+in a fit report) - half of the catalogue part's 2,014.
+
+### Memory and flash on the card
+
+| Item | Value | Source |
+|---|---|---|
+| DDR3 chips | 9 x SK Hynix H5TC4G83BFR, 4 Gbit each, DDR3L 1.35 V, at U46/48/50/52/54/56/58/60/64 | community: [BOM] (written "HSTC4G83BFR", a typo) |
+| DDR3 bus | 72 bits = 64 data + 8 ECC, pins SSTL-135 (1.35 V), 9 strobe pairs | community: [SP], [PP], [QSF] |
+| DDR3 size | 9 x 4 Gbit = 4.5 GB raw, 4 GB usable with ECC | arithmetic; also [C213] |
+| DDR3 speed | NOT FOUND for this card (the speed letters after "BFR" were not read). A distributor lists the part as 1866 MT/s, x8 width from the name - not checked in Hynix's datasheet | - |
+| Used by the ND-120? | **No.** This build keeps main memory in block RAM; DDR3 is a later option | this repo |
+| Config flash | Micron N25Q256A (256 Mbit = 32 MB serial NOR), SOIC-16, at U2; the FPGA loads from it at power-up | community: [BOM], [FW] (flashrom read-out), [DL] |
+| Flash mode (x1 or x4) | NOT FOUND | - |
+| Other memory | ST 128-kbit I2C EEPROM at U16 (address 0x51) | community: [BOM] |
+
+### Clocks
+
+| Item | Value | Source |
+|---|---|---|
+| Main oscillator | 125 MHz (TXC, OSC2), pin M23 | community: [BOM], [QSF] |
+| QSFP clock | IDT8N4Q001 programmable, 644.53125 MHz at power-up, pins T7/T6, I2C 0x6E | community: [BOM], [QSF], [SDC] |
+| PCIe reference | 2 x 100 MHz, pins AF6/AF5 and AF34/AF35, through a Pericom PI6CEQ200 (U9) | community: [QSF], [SDC], [BOM] |
+| 12 MHz crystal Y1 | probably the FT232H's - a guess | [BOM] says "12 MHz?" |
+
+### Connections
+
+| Item | Value | Source |
+|---|---|---|
+| PCIe | x16 edge connector, wired as two Gen3 x8 links; the PC's slot must support splitting (bifurcation) | community: [SP], [BOM], [C213] |
+| Network | 2 x QSFP+ 40G cages, straight to FPGA transceivers, 4 lanes each | community: [BOM], [SP], [QSF]. [C213] says "SFP+", which the others contradict |
+| USB / JTAG | FTDI FT232H (U3); OpenOCD drives it as a JTAG cable; a TI TS3USB221 switch (U75) picks between internal USB J3 and external CN1; JTAG header J5 | community: [BOM], [DL], [C213] |
+| Console / GPIO | none - devops.lol ran a UART over a QSFP cage's I2C pins | community: [DL] |
+| LEDs | 8 on A8 B8 C8 C9 C10 B10 A10 A11 (2.5 V) in the shared pin file - **not confirmed on Storey Peak** | community: [QSF] |
+| Buttons | NOT FOUND | - |
+
+### Power and other chips
+
+| Item | Value | Source |
+|---|---|---|
+| Regulators | EC7100VQI (core), ER2120QI x3, ER2105DI, EN2342QI x2, EY1602 | community: [BOM] |
+| Input | ES1010SI 12 V hot-swap controller - 12 V input implied, connector NOT FOUND | community: [BOM] |
+| Power draw | NOT FOUND | - |
+| Monitors | TI INA219 current monitor (I2C 0x41), temperature sensor "T411" (U5, 0x4C; TMP411 is a guess from the marking) | community: [BOM] |
+| Other | NXP I2C repeater (U74); unidentified markings "AUPK U610", "F DG06A", "MX 6", "70H"; no CPLD or microcontroller found | community: [BOM] |
 
 This is a much harder bring-up target than any board currently in this
 repo: a non-catalog FPGA part, Quartus Prime Standard (not Lite/Pro), a
