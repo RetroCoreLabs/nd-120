@@ -1,5 +1,7 @@
 # Azure FPGA (X930613-001) - plan
 
+**Handoff:** [`HANDOFF.md`](HANDOFF.md) - stopped for lack of a Quartus licence and an installed card.
+
 **Next:** finish V5 - the real PCIe block behind `pcie_hip_wrap.v`, the
 CPU clock PLL and checked pins - which needs a licensed Quartus Prime
 Standard. V1-V4 and the project files run without the card or Quartus.
